@@ -141,14 +141,19 @@ class Properties extends BaseController
         $property = $this->propertyModel->find($id);
         
         if (!$property) {
-            return redirect()->to('/admin/properties')->with('error', 'Propriété non trouvée');
+            return redirect()->to('/admin/properties')->with('error', 'Bien non trouvé');
         }
 
+        $userModel = model('UserModel');
+        $propertyMediaModel = model('PropertyMediaModel');
+
         $data = [
-            'title' => 'Modifier Propriété',
+            'title' => 'Modifier le Bien',
             'property' => $property,
-            'zones' => $this->zoneModel->getGovernorates(),
-            'agencies' => $this->agencyModel->where('status', 'active')->findAll()
+            'zones' => $this->zoneModel->findAll(),
+            'agencies' => $this->agencyModel->where('status', 'active')->findAll(),
+            'agents' => $userModel->where('role_id >=', 6)->findAll(),
+            'property_images' => $propertyMediaModel->getPropertyImages($id)
         ];
 
         return view('admin/properties/edit', $data);
@@ -159,7 +164,23 @@ class Properties extends BaseController
         $property = $this->propertyModel->find($id);
         
         if (!$property) {
-            return redirect()->to('/admin/properties')->with('error', 'Propriété non trouvée');
+            return redirect()->to('/admin/properties')->with('error', 'Bien non trouvé');
+        }
+
+        $validation = \Config\Services::validation();
+        
+        $rules = [
+            'title' => 'required|min_length[3]|max_length[255]',
+            'description' => 'required|min_length[10]',
+            'type' => 'required|in_list[apartment,villa,house,land,commercial,office]',
+            'transaction_type' => 'required|in_list[sale,rent,both]',
+            'area' => 'required|decimal',
+            'zone_id' => 'required|is_natural_no_zero',
+            'address' => 'required|min_length[5]',
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
 
         $data = [
@@ -167,28 +188,71 @@ class Properties extends BaseController
             'description' => $this->request->getPost('description'),
             'type' => $this->request->getPost('type'),
             'transaction_type' => $this->request->getPost('transaction_type'),
-            'price' => $this->request->getPost('price'),
-            'rental_price' => $this->request->getPost('rental_price'),
-            'area_total' => $this->request->getPost('area_total'),
-            'rooms' => $this->request->getPost('rooms'),
-            'bedrooms' => $this->request->getPost('bedrooms'),
+            'price' => $this->request->getPost('price') ?: null,
+            'rent_price' => $this->request->getPost('rent_price') ?: null,
+            'area' => $this->request->getPost('area'),
+            'bedrooms' => $this->request->getPost('bedrooms') ?: 0,
+            'bathrooms' => $this->request->getPost('bathrooms') ?: 0,
+            'floor' => $this->request->getPost('floor'),
+            'year_built' => $this->request->getPost('year_built'),
+            'parking' => $this->request->getPost('parking') ?: 0,
+            'furnished' => $this->request->getPost('furnished') ?: 0,
+            'zone_id' => $this->request->getPost('zone_id'),
+            'address' => $this->request->getPost('address'),
+            'latitude' => $this->request->getPost('latitude'),
+            'longitude' => $this->request->getPost('longitude'),
+            'agency_id' => $this->request->getPost('agency_id') ?: null,
+            'agent_id' => $this->request->getPost('agent_id') ?: session()->get('user_id'),
+            'is_featured' => $this->request->getPost('is_featured') ? 1 : 0,
+            'is_published' => $this->request->getPost('is_published') ? 1 : 0,
             'status' => $this->request->getPost('status')
         ];
 
         if ($this->propertyModel->update($id, $data)) {
-            return redirect()->to('/admin/properties')->with('success', 'Propriété mise à jour');
+            // Upload des nouvelles images
+            $newImages = $this->request->getFiles();
+            if (!empty($newImages['new_images'])) {
+                $this->handleImageUpload($id, $newImages['new_images']);
+            }
+            
+            return redirect()->to('/admin/properties')->with('success', 'Bien modifié avec succès');
         }
 
-        return redirect()->back()->withInput()->with('error', 'Erreur lors de la mise à jour');
+        return redirect()->back()->withInput()->with('error', 'Erreur lors de la modification');
     }
 
     public function delete($id)
     {
+        $property = $this->propertyModel->find($id);
+        
+        if (!$property) {
+            return redirect()->to('/admin/properties')->with('error', 'Bien non trouvé');
+        }
+
+        // Supprimer les images associées
+        $propertyMediaModel = model('PropertyMediaModel');
+        $propertyMediaModel->deletePropertyMedia($id);
+
         if ($this->propertyModel->delete($id)) {
-            return redirect()->to('/admin/properties')->with('success', 'Propriété supprimée');
+            return redirect()->to('/admin/properties')->with('success', 'Bien supprimé avec succès');
         }
 
         return redirect()->to('/admin/properties')->with('error', 'Erreur lors de la suppression');
+    }
+
+    public function deleteImage($imageId)
+    {
+        if (!$this->request->isAJAX()) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Requête invalide']);
+        }
+
+        $propertyMediaModel = model('PropertyMediaModel');
+        
+        if ($propertyMediaModel->deleteMediaFile($imageId)) {
+            return $this->response->setJSON(['success' => true]);
+        }
+
+        return $this->response->setJSON(['success' => false, 'message' => 'Erreur lors de la suppression']);
     }
 
     public function view($id)

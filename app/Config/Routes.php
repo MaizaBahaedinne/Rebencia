@@ -14,7 +14,8 @@ $routes->get('/', 'Home::index');
 // ==========================================
 $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($routes) {
     
-    // Dashboard
+    // Dashboard (route principale admin)
+    $routes->get('/', 'Dashboard::index');
     $routes->get('dashboard', 'Dashboard::index');
     
     // Authentication
@@ -61,6 +62,7 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->post('update/(:num)', 'Properties::update/$1');
         $routes->delete('delete/(:num)', 'Properties::delete/$1');
         $routes->get('view/(:num)', 'Properties::view/$1');
+        $routes->post('deleteImage/(:num)', 'Properties::deleteImage/$1');
     });
     
     // Clients & CRM

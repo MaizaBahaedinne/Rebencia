@@ -81,14 +81,14 @@ defined('EXIT__AUTO_MAX')      || define('EXIT__AUTO_MAX', 125);    // highest a
 /**
  * @deprecated Use \CodeIgniter\Events\Events::PRIORITY_LOW instead.
  */
-define('EVENT_PRIORITY_LOW', 200);
+defined('EVENT_PRIORITY_LOW') || define('EVENT_PRIORITY_LOW', 200);
 
 /**
  * @deprecated Use \CodeIgniter\Events\Events::PRIORITY_NORMAL instead.
  */
-define('EVENT_PRIORITY_NORMAL', 100);
+defined('EVENT_PRIORITY_NORMAL') || define('EVENT_PRIORITY_NORMAL', 100);
 
 /**
  * @deprecated Use \CodeIgniter\Events\Events::PRIORITY_HIGH instead.
  */
-define('EVENT_PRIORITY_HIGH', 10);
+defined('EVENT_PRIORITY_HIGH') || define('EVENT_PRIORITY_HIGH', 10);

@@ -25,7 +25,7 @@ class Database extends Config
         'DSN'          => '',
         'hostname'     => 'localhost',
         'username'     => 'root',
-        'password'     => '',
+        'password'     => 'RebenciaDB2026!!',
         'database'     => 'rebe_RebenciaDB',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',

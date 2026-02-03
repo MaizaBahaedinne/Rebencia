@@ -51,7 +51,10 @@ class Users extends BaseController
             'username' => 'required|min_length[3]|is_unique[users.username]',
             'email' => 'required|valid_email|is_unique[users.email]',
             'password' => 'required|min_length[8]',
-            'role_id' => 'required|integer',
+            'password_confirm' => 'required|matches[password]',
+            'first_name' => 'required|min_length[2]',
+            'last_name' => 'required|min_length[2]',
+            'role_id' => 'required|is_natural_no_zero',
         ];
 
         if (!$this->validate($rules)) {
@@ -61,14 +64,15 @@ class Users extends BaseController
         $data = [
             'username' => $this->request->getPost('username'),
             'email' => $this->request->getPost('email'),
-            'password_hash' => $this->request->getPost('password'),
+            'password_hash' => password_hash($this->request->getPost('password'), PASSWORD_BCRYPT),
             'first_name' => $this->request->getPost('first_name'),
             'last_name' => $this->request->getPost('last_name'),
             'phone' => $this->request->getPost('phone'),
+            'cin' => $this->request->getPost('cin'),
             'role_id' => $this->request->getPost('role_id'),
             'agency_id' => $this->request->getPost('agency_id'),
-            'manager_id' => $this->request->getPost('manager_id'),
-            'status' => 'active',
+            'hire_date' => $this->request->getPost('hire_date'),
+            'status' => $this->request->getPost('status') ?? 'active',
             'email_verified' => true
         ];
 
@@ -106,26 +110,50 @@ class Users extends BaseController
             return redirect()->to('/admin/users')->with('error', 'Utilisateur non trouvé');
         }
 
+        $validation = \Config\Services::validation();
+        
+        $rules = [
+            'username' => "required|min_length[3]|is_unique[users.username,id,{$id}]",
+            'email' => "required|valid_email|is_unique[users.email,id,{$id}]",
+            'first_name' => 'required|min_length[2]',
+            'last_name' => 'required|min_length[2]',
+            'role_id' => 'required|is_natural_no_zero',
+        ];
+
+        // Ajouter validation mot de passe si fourni
+        $newPassword = $this->request->getPost('password');
+        if (!empty($newPassword)) {
+            $rules['password'] = 'required|min_length[8]';
+            $rules['password_confirm'] = 'required|matches[password]';
+        }
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $validation->getErrors());
+        }
+
         $data = [
+            'username' => $this->request->getPost('username'),
+            'email' => $this->request->getPost('email'),
             'first_name' => $this->request->getPost('first_name'),
             'last_name' => $this->request->getPost('last_name'),
             'phone' => $this->request->getPost('phone'),
+            'cin' => $this->request->getPost('cin'),
             'role_id' => $this->request->getPost('role_id'),
             'agency_id' => $this->request->getPost('agency_id'),
+            'hire_date' => $this->request->getPost('hire_date'),
             'status' => $this->request->getPost('status')
         ];
 
         // Update password only if provided
-        $newPassword = $this->request->getPost('password');
         if (!empty($newPassword)) {
-            $data['password_hash'] = $newPassword;
+            $data['password_hash'] = password_hash($newPassword, PASSWORD_BCRYPT);
         }
 
         if ($this->userModel->update($id, $data)) {
-            return redirect()->to('/admin/users')->with('success', 'Utilisateur mis à jour');
+            return redirect()->to('/admin/users')->with('success', 'Utilisateur modifié avec succès');
         }
 
-        return redirect()->back()->withInput()->with('error', 'Erreur lors de la mise à jour');
+        return redirect()->back()->withInput()->with('error', 'Erreur lors de la modification');
     }
 
     public function delete($id)

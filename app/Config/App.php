@@ -12,7 +12,7 @@ class App extends BaseConfig
     public string $defaultLocale = 'fr';
     public bool $negotiateLocale = true;
     public array $supportedLocales = ['fr', 'ar', 'en'];
-    public int $appTimezone = 'Africa/Tunis';
+    public string $appTimezone = 'Africa/Tunis';
     public string $charset = 'UTF-8';
     public bool $forceGlobalSecureRequests = false;
     public int $sessionExpiration = 7200;

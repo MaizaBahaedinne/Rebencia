@@ -25,6 +25,14 @@ if (!function_exists('get_template_styles')) {
             'sidebar_bg' => $settingModel->get('sidebar_bg', '#1e293b'),
             'card_shadow' => $settingModel->get('card_shadow', '0 2px 8px rgba(0,0,0,0.08)'),
             'border_radius' => $settingModel->get('border_radius', '10'),
+            'btn_font_size' => $settingModel->get('btn_font_size', '13'),
+            'btn_font_size_sm' => $settingModel->get('btn_font_size_sm', '12'),
+            'btn_font_size_lg' => $settingModel->get('btn_font_size_lg', '15'),
+            'btn_padding_y' => $settingModel->get('btn_padding_y', '8'),
+            'btn_padding_x' => $settingModel->get('btn_padding_x', '16'),
+            'input_font_size' => $settingModel->get('input_font_size', '13'),
+            'label_font_size' => $settingModel->get('label_font_size', '13'),
+            'table_font_size' => $settingModel->get('table_font_size', '13'),
         ];
         
         // Generate CSS variables
@@ -48,6 +56,11 @@ if (!function_exists('get_template_styles')) {
         $css .= 'h3, .h3 { font-size: ' . $settings['font_size_h3'] . 'px !important; }';
         $css .= 'h4, .h4 { font-size: ' . $settings['font_size_h4'] . 'px !important; }';
         
+        // Apply button styles
+        $css .= '.btn { font-size: ' . $settings['btn_font_size'] . 'px !important; padding: ' . $settings['btn_padding_y'] . 'px ' . $settings['btn_padding_x'] . 'px !important; border-radius: ' . $settings['border_radius'] . 'px; }';
+        $css .= '.btn-sm { font-size: ' . $settings['btn_font_size_sm'] . 'px !important; }';
+        $css .= '.btn-lg { font-size: ' . $settings['btn_font_size_lg'] . 'px !important; }';
+        
         // Apply colors to Bootstrap classes
         $css .= '.btn-primary { background-color: ' . $settings['primary_color'] . '; border-color: ' . $settings['primary_color'] . '; }';
         $css .= '.btn-success { background-color: ' . $settings['success_color'] . '; border-color: ' . $settings['success_color'] . '; }';
@@ -61,8 +74,14 @@ if (!function_exists('get_template_styles')) {
         $css .= '.badge.bg-warning { background-color: ' . $settings['warning_color'] . ' !important; }';
         $css .= '.badge.bg-info { background-color: ' . $settings['info_color'] . ' !important; }';
         
+        // Apply form styles
+        $css .= '.form-control, .form-select { font-size: ' . $settings['input_font_size'] . 'px !important; }';
+        $css .= '.form-label, label { font-size: ' . $settings['label_font_size'] . 'px !important; }';
+        
+        // Apply table styles
+        $css .= '.table { font-size: ' . $settings['table_font_size'] . 'px !important; }';
+        
         $css .= '.card { box-shadow: ' . $settings['card_shadow'] . '; border-radius: ' . $settings['border_radius'] . 'px; }';
-        $css .= '.btn { border-radius: ' . $settings['border_radius'] . 'px; }';
         
         $css .= '</style>';
         

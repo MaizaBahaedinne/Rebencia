@@ -49,7 +49,7 @@ class Reports extends BaseController
 
         $db = \Config\Database::connect();
         $builder = $db->table('properties p');
-        $builder->select('p.*, z.name as zone_name, u.full_name as agent_name, a.name as agency_name');
+        $builder->select('p.*, z.name as zone_name, CONCAT(u.first_name, " ", u.last_name) as agent_name, a.name as agency_name');
         $builder->join('zones z', 'z.id = p.zone_id', 'left');
         $builder->join('users u', 'u.id = p.agent_id', 'left');
         $builder->join('agencies a', 'a.id = p.agency_id', 'left');
@@ -84,7 +84,7 @@ class Reports extends BaseController
 
         $db = \Config\Database::connect();
         $builder = $db->table('clients c');
-        $builder->select('c.*, u.full_name as agent_name');
+        $builder->select('c.*, CONCAT(u.first_name, " ", u.last_name) as agent_name');
         $builder->join('users u', 'u.id = c.agent_id', 'left');
 
         if ($type) {
@@ -118,7 +118,7 @@ class Reports extends BaseController
         $db = \Config\Database::connect();
         $builder = $db->table('transactions t');
         $builder->select('t.*, p.title as property_title, p.reference as property_ref, 
-                         c.full_name as client_name, u.full_name as agent_name');
+                         c.full_name as client_name, CONCAT(u.first_name, " ", u.last_name) as agent_name');
         $builder->join('properties p', 'p.id = t.property_id', 'left');
         $builder->join('clients c', 'c.id = t.client_id', 'left');
         $builder->join('users u', 'u.id = t.agent_id', 'left');
@@ -151,7 +151,7 @@ class Reports extends BaseController
 
         $db = \Config\Database::connect();
         $builder = $db->table('commissions c');
-        $builder->select('c.*, t.reference as transaction_ref, u.full_name as agent_name, 
+        $builder->select('c.*, t.reference as transaction_ref, CONCAT(u.first_name, " ", u.last_name) as agent_name, 
                          p.title as property_title');
         $builder->join('transactions t', 't.id = c.transaction_id', 'left');
         $builder->join('users u', 'u.id = c.user_id', 'left');

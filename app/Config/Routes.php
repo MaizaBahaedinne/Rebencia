@@ -89,9 +89,11 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
     // Commissions
     $routes->group('commissions', function($routes) {
         $routes->get('/', 'Commissions::index');
-        $routes->post('calculate', 'Commissions::calculate');
-        $routes->post('approve/(:num)', 'Commissions::approve/$1');
-        $routes->post('pay/(:num)', 'Commissions::markAsPaid/$1');
+        $routes->get('approve/(:num)', 'Commissions::approve/$1');
+        $routes->get('mark-as-paid/(:num)', 'Commissions::markAsPaid/$1');
+        $routes->post('bulk-approve', 'Commissions::bulkApprove');
+        $routes->post('bulk-pay', 'Commissions::bulkPay');
+        $routes->get('agent-report/(:num)', 'Commissions::agentReport/$1');
     });
     
     // Notifications
@@ -121,6 +123,15 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->delete('delete/(:num)', 'Workflows::delete/$1');
         $routes->get('pipeline/(:alpha)', 'Workflows::pipeline/$1');
         $routes->post('move-stage', 'Workflows::moveStage');
+    });
+    
+    // Documents
+    $routes->group('documents', function($routes) {
+        $routes->get('(:num)', 'Documents::index/$1');
+        $routes->post('upload/(:num)', 'Documents::upload/$1');
+        $routes->get('download/(:num)', 'Documents::download/$1');
+        $routes->post('delete/(:num)', 'Documents::delete/$1');
+        $routes->get('generate-contract/(:num)', 'Documents::generateContract/$1');
     });
     
     // Settings

@@ -207,7 +207,7 @@
                                 $agents = $userModel->where('status', 'active')->findAll();
                                 foreach($agents as $agent): 
                                 ?>
-                                    <option value="<?= $agent['id'] ?>"><?= esc($agent['full_name']) ?></option>
+                                    <option value="<?= $agent['id'] ?>"><?= esc(($agent['first_name'] ?? '') . ' ' . ($agent['last_name'] ?? '')) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>

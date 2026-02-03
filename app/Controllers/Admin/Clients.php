@@ -86,7 +86,11 @@ class Clients extends BaseController
             'notes' => $this->request->getPost('notes')
         ];
 
-        if ($this->clientModel->insert($data)) {
+        if ($clientId = $this->clientModel->insert($data)) {
+            // Trigger notification
+            $notificationHelper = new \App\Libraries\NotificationHelper();
+            $notificationHelper->notifyClientCreated($clientId, $data, session()->get('user_id'));
+            
             return redirect()->to('/admin/clients')->with('success', 'Client créé avec succès');
         }
 

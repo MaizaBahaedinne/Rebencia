@@ -103,6 +103,11 @@ class Properties extends BaseController
                 $this->handleImageUpload($propertyId, $images['images']);
             }
             
+            // Trigger notifications
+            $notificationHelper = new \App\Libraries\NotificationHelper();
+            $notificationHelper->notifyPropertyCreated($propertyId, $data, session()->get('user_id'));
+            $notificationHelper->checkPropertyClientMatches($propertyId, $data);
+            
             return redirect()->to('/admin/properties')->with('success', 'Bien immobilier créé avec succès');
         }
 

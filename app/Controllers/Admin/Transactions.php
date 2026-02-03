@@ -94,6 +94,10 @@ class Transactions extends BaseController
             // Créer l'entrée de commission
             $this->createCommissionEntry($transactionId, $data['agent_id'], $commissionAmount);
             
+            // Trigger notification
+            $notificationHelper = new \App\Libraries\NotificationHelper();
+            $notificationHelper->notifyTransactionCreated($transactionId, $data, session()->get('user_id'));
+            
             return redirect()->to('/admin/transactions')->with('success', 'Transaction créée avec succès');
         }
 

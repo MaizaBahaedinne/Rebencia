@@ -635,7 +635,11 @@
             <a href="<?= base_url('admin/transactions') ?>" class="menu-item <?= url_is('admin/transactions*') ? 'active' : '' ?>">
                 <i class="fas fa-file-invoice-dollar"></i>
                 <span>Transactions</span>
-                <span class="menu-badge">3</span>
+            </a>
+            
+            <a href="<?= base_url('admin/commissions') ?>" class="menu-item <?= url_is('admin/commissions*') ? 'active' : '' ?>">
+                <i class="fas fa-dollar-sign"></i>
+                <span>Commissions</span>
             </a>
 
             <div class="menu-section-title">ORGANISATION</div>

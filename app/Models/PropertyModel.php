@@ -1,0 +1,101 @@
+<?php
+
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class PropertyModel extends Model
+{
+    protected $table = 'properties';
+    protected $primaryKey = 'id';
+    protected $useAutoIncrement = true;
+    protected $returnType = 'array';
+    protected $useSoftDeletes = false;
+    protected $protectFields = true;
+    protected $allowedFields = [
+        'reference', 'title', 'title_ar', 'title_en',
+        'description', 'description_ar', 'description_en',
+        'type', 'transaction_type', 'price', 'rental_price',
+        'internal_estimation', 'area_total', 'area_living', 'area_land',
+        'rooms', 'bedrooms', 'bathrooms', 'floor', 'total_floors',
+        'has_elevator', 'has_parking', 'parking_spaces', 'has_garden', 'has_pool',
+        'construction_year', 'standing', 'condition_state', 'legal_status',
+        'zone_id', 'address', 'city', 'governorate', 'postal_code',
+        'latitude', 'longitude', 'agency_id', 'agent_id',
+        'owner_name', 'owner_phone', 'owner_email',
+        'status', 'featured', 'views_count', 'published_at'
+    ];
+
+    protected bool $allowEmptyInserts = false;
+    protected bool $updateOnlyChanged = true;
+
+    protected array $casts = [
+        'has_elevator' => 'boolean',
+        'has_parking' => 'boolean',
+        'has_garden' => 'boolean',
+        'has_pool' => 'boolean',
+        'featured' => 'boolean',
+    ];
+
+    // Dates
+    protected $useTimestamps = true;
+    protected $dateFormat = 'datetime';
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
+
+    // Validation
+    protected $validationRules = [
+        'reference' => 'required|is_unique[properties.reference,id,{id}]',
+        'title' => 'required|min_length[3]|max_length[255]',
+        'type' => 'required',
+        'transaction_type' => 'required',
+        'price' => 'required|decimal',
+    ];
+
+    public function getPropertyWithDetails($id)
+    {
+        return $this->select('properties.*, zones.name as zone_name, agencies.name as agency_name, users.first_name as agent_first_name, users.last_name as agent_last_name')
+            ->join('zones', 'zones.id = properties.zone_id', 'left')
+            ->join('agencies', 'agencies.id = properties.agency_id', 'left')
+            ->join('users', 'users.id = properties.agent_id', 'left')
+            ->where('properties.id', $id)
+            ->first();
+    }
+
+    public function searchProperties($filters = [])
+    {
+        $builder = $this->builder();
+        
+        if (!empty($filters['type'])) {
+            $builder->where('type', $filters['type']);
+        }
+        
+        if (!empty($filters['transaction_type'])) {
+            $builder->where('transaction_type', $filters['transaction_type']);
+        }
+        
+        if (isset($filters['price_min'])) {
+            $builder->where('price >=', $filters['price_min']);
+        }
+        
+        if (isset($filters['price_max'])) {
+            $builder->where('price <=', $filters['price_max']);
+        }
+        
+        if (!empty($filters['zone_id'])) {
+            $builder->where('zone_id', $filters['zone_id']);
+        }
+        
+        if (isset($filters['rooms_min'])) {
+            $builder->where('rooms >=', $filters['rooms_min']);
+        }
+        
+        if (isset($filters['area_min'])) {
+            $builder->where('area_total >=', $filters['area_min']);
+        }
+        
+        $builder->where('status', 'published');
+        
+        return $builder->get()->getResultArray();
+    }
+}

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REBENCIA REAL ESTATE - Accueil</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 900px;
+            animation: fadeIn 1s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .logo {
+            font-size: 5rem;
+            margin-bottom: 2rem;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 15px rgba(0,0,0,0.3);
+            font-weight: bold;
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 3rem;
+            opacity: 0.95;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+        }
+        
+        .btn {
+            padding: 1.2rem 2.5rem;
+            font-size: 1.2rem;
+            border: 2px solid white;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+        
+        .status-card {
+            margin-top: 3rem;
+            padding: 2.5rem;
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .status-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .status-item {
+            padding: 1rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .status-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.05);
+        }
+        
+        .status-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+        
+        .status-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
+        }
+        
+        .badge-success {
+            background: #10b981;
+        }
+        
+        .badge-info {
+            background: #3b82f6;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .feature-box {
+            padding: 1.5rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            transition: all 0.3s;
+        }
+        
+        .feature-box:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            font-size: 0.95rem;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🏢</div>
+        <h1>REBENCIA REAL ESTATE</h1>
+        <p class="subtitle">Plateforme Immobilière Professionnelle Multi-Agences - Tunisie 🇹🇳</p>
+        
+        <div class="btn-group">
+            <a href="#" class="btn" onclick="alert('Module en développement')">
+                👨‍💼 Espace Professionnel
+            </a>
+            <a href="#" class="btn" onclick="alert('Module en développement')">
+                🏠 Voir les Propriétés
+            </a>
+            <a href="#" class="btn" onclick="alert('Module en développement')">
+                🔍 Recherche Avancée
+            </a>
+        </div>
+        
+        <div class="status-card">
+            <h3>📊 Progression du Projet</h3>
+            
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="status-label">Base de données</div>
+                    <div class="status-value">✅ 29</div>
+                    <div class="badge badge-success">Tables créées</div>
+                </div>
+                
+                <div class="status-item">
+                    <div class="status-label">Structure CI4</div>
+                    <div class="status-value">✅ 100%</div>
+                    <div class="badge badge-success">Installée</div>
+                </div>
+                
+                <div class="status-item">
+                    <div class="status-label">Models</div>
+                    <div class="status-value">✅ 2+</div>
+                    <div class="badge badge-success">Créés</div>
+                </div>
+                
+                <div class="status-item">
+                    <div class="status-label">Controllers</div>
+                    <div class="status-value">⚙️ En cours</div>
+                    <div class="badge badge-info">Développement</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="status-card">
+            <h3>🎯 Fonctionnalités Principales</h3>
+            
+            <div class="features">
+                <div class="feature-box">
+                    <div class="feature-icon">🏛️</div>
+                    <h4>Multi-Agences</h4>
+                    <p>Gestion hiérarchique Siège → Agences</p>
+                </div>
+                
+                <div class="feature-box">
+                    <div class="feature-icon">👥</div>
+                    <h4>CRM Intégré</h4>
+                    <p>Clients, leads & interactions</p>
+                </div>
+                
+                <div class="feature-box">
+                    <div class="feature-icon">🤖</div>
+                    <h4>IA Estimation</h4>
+                    <p>Évaluation intelligente des biens</p>
+                </div>
+                
+                <div class="feature-box">
+                    <div class="feature-icon">⚡</div>
+                    <h4>Workflows</h4>
+                    <p>Automatisation des processus</p>
+                </div>
+                
+                <div class="feature-box">
+                    <div class="feature-icon">💰</div>
+                    <h4>Commissions</h4>
+                    <p>Calcul automatique multi-niveaux</p>
+                </div>
+                
+                <div class="feature-box">
+                    <div class="feature-icon">🗺️</div>
+                    <h4>Half Map</h4>
+                    <p>Recherche avec carte interactive</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Développé avec ❤️ pour REBENCIA REAL ESTATE</p>
+            <p style="margin-top: 0.5rem;">CodeIgniter 4 • MySQL • Bootstrap 5 • OpenStreetMap</p>
+            <p style="margin-top: 0.5rem;">© <?= date('Y') ?> REBENCIA - Tous droits réservés</p>
+        </div>
+    </div>
+</body>
+</html>

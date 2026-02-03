@@ -687,8 +687,28 @@
                 <i class="fas fa-calendar-alt"></i>
                 <span>Agenda</span>
             </a>
+            
+            <a href="<?= base_url('admin/tasks') ?>" class="menu-item <?= url_is('admin/tasks*') ? 'active' : '' ?>">
+                <i class="fas fa-tasks"></i>
+                <span>Tâches</span>
+            </a>
+            
+            <a href="<?= base_url('admin/chat') ?>" class="menu-item <?= url_is('admin/chat*') ? 'active' : '' ?>">
+                <i class="fas fa-comments"></i>
+                <span>Chat</span>
+            </a>
+            
+            <a href="<?= base_url('admin/objectives') ?>" class="menu-item <?= url_is('admin/objectives*') ? 'active' : '' ?>">
+                <i class="fas fa-bullseye"></i>
+                <span>Objectifs</span>
+            </a>
 
             <div class="menu-section-title">SYSTÈME</div>
+            
+            <a href="<?= base_url('admin/system') ?>" class="menu-item <?= url_is('admin/system*') ? 'active' : '' ?>">
+                <i class="fas fa-server"></i>
+                <span>Système & Backup</span>
+            </a>
             
             <a href="<?= base_url('admin/settings') ?>" class="menu-item <?= url_is('admin/settings*') ? 'active' : '' ?>">
                 <i class="fas fa-cog"></i>

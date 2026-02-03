@@ -161,6 +161,50 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->get('sendReminders', 'Appointments::sendReminders');
     });
     
+    // Tasks
+    $routes->group('tasks', function($routes) {
+        $routes->get('/', 'Tasks::index');
+        $routes->get('create', 'Tasks::create');
+        $routes->post('store', 'Tasks::store');
+        $routes->post('updateStatus', 'Tasks::updateStatus');
+        $routes->delete('delete/(:num)', 'Tasks::delete/$1');
+        $routes->get('my-tasks', 'Tasks::myTasks');
+    });
+    
+    // System & Backup
+    $routes->group('system', function($routes) {
+        $routes->get('/', 'System::index');
+        $routes->get('createBackup', 'System::createBackup');
+        $routes->get('downloadBackup/(:segment)', 'System::downloadBackup/$1');
+        $routes->delete('deleteBackup/(:segment)', 'System::deleteBackup/$1');
+        $routes->get('audit-logs', 'System::auditLogs');
+        $routes->get('info', 'System::info');
+    });
+    
+    // Signatures
+    $routes->group('signatures', function($routes) {
+        $routes->get('sign/(:num)', 'Signatures::sign/$1');
+        $routes->post('saveSignature', 'Signatures::saveSignature');
+        $routes->get('view/(:num)', 'Signatures::view/$1');
+        $routes->get('getSignatures/(:num)', 'Signatures::getSignatures/$1');
+        $routes->post('requestSignature', 'Signatures::requestSignature');
+    });
+    
+    // Chat
+    $routes->group('chat', function($routes) {
+        $routes->get('/', 'Chat::index');
+        $routes->get('getMessages', 'Chat::getMessages');
+        $routes->post('sendMessage', 'Chat::sendMessage');
+        $routes->get('getUnreadCount', 'Chat::getUnreadCount');
+    });
+    
+    // Objectives
+    $routes->group('objectives', function($routes) {
+        $routes->get('/', 'Objectives::index');
+        $routes->get('set', 'Objectives::setObjectives');
+        $routes->post('save', 'Objectives::save');
+    });
+    
     // CMS
     $routes->group('pages', function($routes) {
         $routes->get('/', 'Pages::index');

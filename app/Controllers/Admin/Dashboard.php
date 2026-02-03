@@ -91,7 +91,7 @@ class Dashboard extends BaseController
                       c.first_name as buyer_name, c.last_name as buyer_lastname,
                       u.first_name as agent_name, u.last_name as agent_lastname')
             ->join('properties p', 'p.id = t.property_id', 'left')
-            ->join('clients c', 'c.id = t.buyer_id', 'left')
+            ->join('clients c', 'c.id = t.client_id', 'left')
             ->join('users u', 'u.id = t.agent_id', 'left')
             ->orderBy('t.created_at', 'DESC')
             ->limit(5)

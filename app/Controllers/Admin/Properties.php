@@ -90,9 +90,8 @@ class Properties extends BaseController
             'longitude' => $this->request->getPost('longitude'),
             'agency_id' => $this->request->getPost('agency_id') ?: null,
             'agent_id' => $this->request->getPost('agent_id') ?: session()->get('user_id'),
-            'is_featured' => $this->request->getPost('is_featured') ? 1 : 0,
-            'is_published' => $this->request->getPost('is_published') ? 1 : 0,
-            'status' => $this->request->getPost('status') ?: 'available'
+            'featured' => $this->request->getPost('is_featured') ? 1 : 0,
+            'status' => $this->request->getPost('is_published') ? 'published' : 'draft'
         ];
 
         // Gestion des images (à implémenter)
@@ -203,9 +202,8 @@ class Properties extends BaseController
             'longitude' => $this->request->getPost('longitude'),
             'agency_id' => $this->request->getPost('agency_id') ?: null,
             'agent_id' => $this->request->getPost('agent_id') ?: session()->get('user_id'),
-            'is_featured' => $this->request->getPost('is_featured') ? 1 : 0,
-            'is_published' => $this->request->getPost('is_published') ? 1 : 0,
-            'status' => $this->request->getPost('status')
+            'featured' => $this->request->getPost('is_featured') ? 1 : 0,
+            'status' => $this->request->getPost('is_published') ? 'published' : 'draft'
         ];
 
         if ($this->propertyModel->update($id, $data)) {

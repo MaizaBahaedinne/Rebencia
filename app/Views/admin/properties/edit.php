@@ -245,7 +245,7 @@
                     </div>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="is_published" name="is_published" value="1" 
-                               <?= $property['is_published'] ? 'checked' : '' ?>>
+                               <?= $property['status'] == 'published' ? 'checked' : '' ?>>
                         <label class="form-check-label" for="is_published">
                             <i class="fas fa-globe text-success"></i> Publier sur le site
                         </label>

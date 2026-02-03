@@ -42,7 +42,7 @@ class Dashboard extends BaseController
             'total_clients' => $db->table('clients')->countAllResults(),
             'total_transactions' => $db->table('transactions')->countAllResults(),
             'total_users' => $db->table('users')->where('status', 'active')->countAllResults(),
-            'properties_published' => $db->table('properties')->where('is_published', 1)->countAllResults(),
+            'properties_published' => $db->table('properties')->where('status', 'published')->countAllResults(),
             'transactions_pending' => $db->table('transactions')->where('status', 'pending')->countAllResults(),
             'leads_count' => $db->table('clients')->where('status', 'lead')->countAllResults(),
         ];
@@ -120,7 +120,7 @@ class Dashboard extends BaseController
             ->select('p.*, z.city, z.governorate, COUNT(t.id) as transaction_count')
             ->join('zones z', 'z.id = p.zone_id', 'left')
             ->join('transactions t', 't.property_id = p.id', 'left')
-            ->where('p.is_published', 1)
+            ->where('p.status', 'published')
             ->groupBy('p.id')
             ->orderBy('transaction_count', 'DESC')
             ->limit(5)

@@ -1,11 +1,13 @@
-<?= $this->extend('layouts/admin') ?>
+<?= $this->extend('layouts/admin_modern') ?>
 
 <?= $this->section('content') ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+    </h1>
     <div class="text-muted">
-        <i class="fas fa-calendar"></i> <?= date('d/m/Y') ?>
+        <i class="fas fa-calendar"></i> <?= date('d/m/Y H:i') ?>
     </div>
 </div>
 

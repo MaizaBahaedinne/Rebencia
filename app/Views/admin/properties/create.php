@@ -1,26 +1,8 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Créer un Bien - REBENCIA Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-    <div class="d-flex">
-        <!-- Sidebar (même que index.php) -->
-        <?= view('admin/partials/sidebar') ?>
+<?= $this->extend('layouts/admin_modern') ?>
 
-        <!-- Main Content -->
-        <div class="flex-grow-1" style="margin-left: 250px;">
-            <!-- Navbar -->
-            <?= view('admin/partials/navbar') ?>
-
-            <!-- Page Content -->
-            <div class="container-fluid p-4">
+<?= $this->section('content') ?>
                 <!-- Breadcrumb -->
-                <nav aria-label="breadcrumb">
+                <nav class="page-breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="<?= base_url('admin') ?>">Dashboard</a></li>
                         <li class="breadcrumb-item"><a href="<?= base_url('admin/properties') ?>">Biens</a></li>
@@ -29,8 +11,10 @@
                 </nav>
 
                 <!-- Page Title -->
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2><i class="fas fa-plus-circle text-primary"></i> Créer un Nouveau Bien</h2>
+                <div class="page-header">
+                    <h1 class="page-title">
+                        <i class="fas fa-plus-circle"></i> Créer un Nouveau Bien
+                    </h1>
                     <a href="<?= base_url('admin/properties') ?>" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Retour à la liste
                     </a>
@@ -319,12 +303,11 @@
                         </div>
                     </div>
                 </form>
-            </div>
-        </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+<script>
         // Preview des images sélectionnées
         document.getElementById('images').addEventListener('change', function(e) {
             const preview = document.getElementById('image-preview');
@@ -350,4 +333,4 @@
         });
     </script>
 </body>
-</html>
+<?= $this->endSection() ?

@@ -69,8 +69,8 @@ class Dashboard extends BaseController
         $monthlyRevenue = $db->table('transactions')
             ->selectSum('amount')
             ->where('status', 'completed')
-            ->where('MONTH(transaction_date)', date('m'))
-            ->where('YEAR(transaction_date)', date('Y'))
+            ->where('MONTH(completion_date)', date('m'))
+            ->where('YEAR(completion_date)', date('Y'))
             ->get()
             ->getRow()
             ->amount ?? 0;
@@ -143,7 +143,7 @@ class Dashboard extends BaseController
             $revenue = $db->table('transactions')
                 ->selectSum('amount')
                 ->where('status', 'completed')
-                ->where('DATE_FORMAT(transaction_date, "%Y-%m")', $date)
+                ->where('DATE_FORMAT(completion_date, "%Y-%m")', $date)
                 ->get()
                 ->getRow()
                 ->amount ?? 0;

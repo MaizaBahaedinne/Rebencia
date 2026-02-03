@@ -1,0 +1,15 @@
+# Disable directory browsing
+Options -Indexes
+
+# Redirect all requests to public folder
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# If mod_rewrite is not available
+<IfModule !mod_rewrite.c>
+    ErrorDocument 404 public/index.php
+</IfModule>

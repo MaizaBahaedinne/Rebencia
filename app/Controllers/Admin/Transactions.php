@@ -176,10 +176,6 @@ class Transactions extends BaseController
 
         return redirect()->back()->withInput()->with('error', 'Erreur lors de la modification');
     }
-        }
-
-        return redirect()->back()->withInput()->with('error', 'Erreur lors de la mise à jour');
-    }
 
     public function delete($id)
     {

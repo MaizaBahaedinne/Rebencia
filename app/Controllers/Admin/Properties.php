@@ -33,10 +33,13 @@ class Properties extends BaseController
 
     public function create()
     {
+        $userModel = model('UserModel');
+        
         $data = [
             'title' => 'Nouvelle Propriété',
-            'zones' => $this->zoneModel->getGovernorates(),
-            'agencies' => $this->agencyModel->where('status', 'active')->findAll()
+            'zones' => $this->zoneModel->findAll(),
+            'agencies' => $this->agencyModel->where('status', 'active')->findAll(),
+            'agents' => $userModel->where('role_id >=', 6)->findAll() // Agents immobiliers
         ];
 
         return view('admin/properties/create', $data);
@@ -47,51 +50,90 @@ class Properties extends BaseController
         $validation = \Config\Services::validation();
         
         $rules = [
-            'title' => 'required|min_length[3]',
-            'type' => 'required',
-            'transaction_type' => 'required',
-            'price' => 'required|decimal',
-            'area_total' => 'permit_empty|decimal',
+            'title' => 'required|min_length[3]|max_length[255]',
+            'description' => 'required|min_length[10]',
+            'type' => 'required|in_list[apartment,villa,house,land,commercial,office]',
+            'transaction_type' => 'required|in_list[sale,rent,both]',
+            'area' => 'required|decimal',
+            'zone_id' => 'required|is_natural_no_zero',
+            'address' => 'required|min_length[5]',
         ];
 
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
 
+        // Génération de la référence unique
+        $reference = $this->request->getPost('reference');
+        if (empty($reference)) {
+            $reference = 'PROP-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -6));
+        }
+
         $data = [
-            'reference' => 'PROP-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -6)),
+            'reference' => $reference,
             'title' => $this->request->getPost('title'),
             'description' => $this->request->getPost('description'),
             'type' => $this->request->getPost('type'),
             'transaction_type' => $this->request->getPost('transaction_type'),
-            'price' => $this->request->getPost('price'),
-            'rental_price' => $this->request->getPost('rental_price'),
-            'area_total' => $this->request->getPost('area_total'),
-            'area_living' => $this->request->getPost('area_living'),
-            'rooms' => $this->request->getPost('rooms'),
-            'bedrooms' => $this->request->getPost('bedrooms'),
-            'bathrooms' => $this->request->getPost('bathrooms'),
+            'price' => $this->request->getPost('price') ?: null,
+            'rent_price' => $this->request->getPost('rent_price') ?: null,
+            'area' => $this->request->getPost('area'),
+            'bedrooms' => $this->request->getPost('bedrooms') ?: 0,
+            'bathrooms' => $this->request->getPost('bathrooms') ?: 0,
             'floor' => $this->request->getPost('floor'),
-            'has_elevator' => $this->request->getPost('has_elevator') ? 1 : 0,
-            'has_parking' => $this->request->getPost('has_parking') ? 1 : 0,
-            'has_garden' => $this->request->getPost('has_garden') ? 1 : 0,
-            'has_pool' => $this->request->getPost('has_pool') ? 1 : 0,
+            'year_built' => $this->request->getPost('year_built'),
+            'parking' => $this->request->getPost('parking') ?: 0,
+            'furnished' => $this->request->getPost('furnished') ?: 0,
             'zone_id' => $this->request->getPost('zone_id'),
             'address' => $this->request->getPost('address'),
-            'city' => $this->request->getPost('city'),
-            'governorate' => $this->request->getPost('governorate'),
             'latitude' => $this->request->getPost('latitude'),
             'longitude' => $this->request->getPost('longitude'),
-            'agency_id' => session()->get('agency_id'),
-            'agent_id' => session()->get('user_id'),
-            'status' => 'draft'
+            'agency_id' => $this->request->getPost('agency_id') ?: null,
+            'agent_id' => $this->request->getPost('agent_id') ?: session()->get('user_id'),
+            'is_featured' => $this->request->getPost('is_featured') ? 1 : 0,
+            'is_published' => $this->request->getPost('is_published') ? 1 : 0,
+            'status' => $this->request->getPost('status') ?: 'available'
         ];
 
-        if ($this->propertyModel->insert($data)) {
-            return redirect()->to('/admin/properties')->with('success', 'Propriété créée avec succès');
+        // Gestion des images (à implémenter)
+        $images = $this->request->getFiles();
+        
+        if ($propertyId = $this->propertyModel->insert($data)) {
+            // Upload des images
+            if (!empty($images['images'])) {
+                $this->handleImageUpload($propertyId, $images['images']);
+            }
+            
+            return redirect()->to('/admin/properties')->with('success', 'Bien immobilier créé avec succès');
         }
 
-        return redirect()->back()->withInput()->with('error', 'Erreur lors de la création');
+        return redirect()->back()->withInput()->with('error', 'Erreur lors de la création du bien');
+    }
+    
+    private function handleImageUpload($propertyId, $files)
+    {
+        $propertyMediaModel = model('PropertyMediaModel');
+        $uploadPath = WRITEPATH . 'uploads/properties/' . $propertyId;
+        
+        if (!is_dir($uploadPath)) {
+            mkdir($uploadPath, 0755, true);
+        }
+        
+        $order = 1;
+        foreach ($files as $file) {
+            if ($file->isValid() && !$file->hasMoved()) {
+                $newName = $file->getRandomName();
+                $file->move($uploadPath, $newName);
+                
+                $propertyMediaModel->insert([
+                    'property_id' => $propertyId,
+                    'type' => 'image',
+                    'file_path' => 'uploads/properties/' . $propertyId . '/' . $newName,
+                    'display_order' => $order++,
+                    'is_primary' => ($order == 2) ? 1 : 0 // Premier fichier = image principale
+                ]);
+            }
+        }
     }
 
     public function edit($id)

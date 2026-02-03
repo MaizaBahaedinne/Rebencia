@@ -1,9 +1,11 @@
-<?= $this->extend('layouts/admin') ?>
+<?= $this->extend('layouts/admin_modern') ?>
 
 <?= $this->section('content') ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="fas fa-exchange-alt"></i> Transactions</h2>
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fas fa-file-invoice-dollar"></i> Gestion des Transactions
+    </h1>
     <a href="<?= base_url('admin/transactions/create') ?>" class="btn btn-primary">
         <i class="fas fa-plus"></i> Nouvelle Transaction
     </a>

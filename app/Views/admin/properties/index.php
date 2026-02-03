@@ -1,11 +1,13 @@
-<?= $this->extend('layouts/admin') ?>
+<?= $this->extend('layouts/admin_modern') ?>
 
 <?= $this->section('content') ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="fas fa-home"></i> Propriétés</h2>
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fas fa-building"></i> Gestion des Biens Immobiliers
+    </h1>
     <a href="<?= base_url('admin/properties/create') ?>" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Nouvelle Propriété
+        <i class="fas fa-plus"></i> Nouveau Bien
     </a>
 </div>
 

@@ -35,10 +35,16 @@ class Transactions extends BaseController
 
     public function create()
     {
+        $userModel = model('UserModel');
+        $agencyModel = model('AgencyModel');
+        
         $data = [
             'title' => 'Nouvelle Transaction',
-            'properties' => $this->propertyModel->where('status', 'published')->findAll(),
-            'clients' => $this->clientModel->where('status !=', 'archived')->findAll()
+            'properties' => $this->propertyModel->where('is_published', 1)->findAll(),
+            'buyers' => $this->clientModel->whereIn('type', ['buyer', 'tenant'])->findAll(),
+            'sellers' => $this->clientModel->whereIn('type', ['seller', 'landlord'])->findAll(),
+            'agents' => $userModel->where('role_id >=', 6)->findAll(),
+            'agencies' => $agencyModel->where('status', 'active')->findAll()
         ];
 
         return view('admin/transactions/create', $data);
@@ -49,35 +55,44 @@ class Transactions extends BaseController
         $validation = \Config\Services::validation();
         
         $rules = [
-            'property_id' => 'required|integer',
-            'client_id' => 'required|integer',
+            'property_id' => 'required|is_natural_no_zero',
+            'buyer_id' => 'required|is_natural_no_zero',
             'type' => 'required|in_list[sale,rent]',
+            'transaction_date' => 'required|valid_date',
             'amount' => 'required|decimal',
+            'agent_id' => 'required|is_natural_no_zero',
         ];
 
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
 
+        // Calcul de la commission
+        $amount = $this->request->getPost('amount');
+        $commissionPercentage = $this->request->getPost('commission_percentage') ?? 3;
+        $commissionAmount = ($amount * $commissionPercentage) / 100;
+
         $data = [
             'property_id' => $this->request->getPost('property_id'),
-            'client_id' => $this->request->getPost('client_id'),
-            'agent_id' => session()->get('user_id'),
-            'agency_id' => session()->get('agency_id'),
+            'buyer_id' => $this->request->getPost('buyer_id'),
+            'seller_id' => $this->request->getPost('seller_id'),
+            'agent_id' => $this->request->getPost('agent_id'),
+            'agency_id' => $this->request->getPost('agency_id') ?? session()->get('agency_id'),
             'type' => $this->request->getPost('type'),
-            'amount' => $this->request->getPost('amount'),
-            'commission_percentage' => $this->request->getPost('commission_percentage') ?? 3,
-            'status' => 'draft',
+            'transaction_date' => $this->request->getPost('transaction_date'),
+            'amount' => $amount,
+            'commission_percentage' => $commissionPercentage,
+            'commission_amount' => $commissionAmount,
+            'commission_paid' => $this->request->getPost('commission_paid') ?? 0,
+            'contract_number' => $this->request->getPost('contract_number'),
+            'notary' => $this->request->getPost('notary'),
+            'status' => $this->request->getPost('status') ?? 'pending',
             'notes' => $this->request->getPost('notes')
         ];
 
-        // Calculate commission
-        $commissionPercentage = $data['commission_percentage'];
-        $data['commission_amount'] = ($data['amount'] * $commissionPercentage) / 100;
-
         if ($transactionId = $this->transactionModel->insert($data)) {
-            // Create commission entry
-            $this->commissionModel->calculateCommission($transactionId, $data['agent_id'], $commissionPercentage);
+            // Créer l'entrée de commission
+            $this->createCommissionEntry($transactionId, $data['agent_id'], $commissionAmount);
             
             return redirect()->to('/admin/transactions')->with('success', 'Transaction créée avec succès');
         }
@@ -138,5 +153,22 @@ class Transactions extends BaseController
         }
 
         return redirect()->to('/admin/transactions')->with('error', 'Erreur lors de la suppression');
+    }
+
+    /**
+     * Créer une entrée de commission pour la transaction
+     */
+    private function createCommissionEntry($transactionId, $agentId, $commissionAmount)
+    {
+        $commissionData = [
+            'transaction_id' => $transactionId,
+            'user_id' => $agentId,
+            'amount' => $commissionAmount,
+            'percentage' => $this->request->getPost('commission_percentage') ?? 3,
+            'status' => 'pending',
+            'type' => 'agent_commission'
+        ];
+
+        return $this->commissionModel->insert($commissionData);
     }
 }

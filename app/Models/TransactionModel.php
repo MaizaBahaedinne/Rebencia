@@ -13,9 +13,10 @@ class TransactionModel extends Model
     protected $useSoftDeletes = false;
     protected $protectFields = true;
     protected $allowedFields = [
-        'reference', 'property_id', 'client_id', 'agent_id', 'agency_id',
-        'type', 'amount', 'commission_percentage', 'commission_amount',
-        'status', 'signature_date', 'completion_date', 'start_date', 'end_date',
+        'reference', 'property_id', 'buyer_id', 'seller_id', 'agent_id', 'agency_id',
+        'type', 'transaction_date', 'amount', 'commission_percentage', 'commission_amount',
+        'commission_paid', 'contract_number', 'notary', 'status', 
+        'signature_date', 'completion_date', 'start_date', 'end_date',
         'contract_file', 'notes'
     ];
 
@@ -28,12 +29,13 @@ class TransactionModel extends Model
     protected $updatedField = 'updated_at';
 
     protected $validationRules = [
-        'reference' => 'required|is_unique[transactions.reference,id,{id}]',
-        'property_id' => 'required|integer',
-        'client_id' => 'required|integer',
-        'agent_id' => 'required|integer',
+        'reference' => 'permit_empty|is_unique[transactions.reference,id,{id}]',
+        'property_id' => 'required|is_natural_no_zero',
+        'buyer_id' => 'required|is_natural_no_zero',
+        'agent_id' => 'required|is_natural_no_zero',
         'type' => 'required|in_list[sale,rent]',
         'amount' => 'required|decimal',
+        'transaction_date' => 'required|valid_date',
     ];
 
     protected $beforeInsert = ['generateReference'];

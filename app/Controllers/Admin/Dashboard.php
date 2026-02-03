@@ -117,7 +117,7 @@ class Dashboard extends BaseController
         $db = \Config\Database::connect();
         
         return $db->table('properties p')
-            ->select('p.*, z.city, z.governorate, COUNT(t.id) as transaction_count')
+            ->select('p.*, z.name as zone_name, COUNT(t.id) as transaction_count')
             ->join('zones z', 'z.id = p.zone_id', 'left')
             ->join('transactions t', 't.property_id = p.id', 'left')
             ->where('p.status', 'published')

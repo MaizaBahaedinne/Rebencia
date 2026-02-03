@@ -12,6 +12,8 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <?= get_template_styles() ?>
+    
     <style>
         :root {
             --sidebar-width: 280px;
@@ -674,6 +676,16 @@
             <a href="<?= base_url('admin/reports') ?>" class="menu-item <?= url_is('admin/reports*') ? 'active' : '' ?>">
                 <i class="fas fa-chart-bar"></i>
                 <span>Rapports & Export</span>
+            </a>
+            
+            <a href="<?= base_url('admin/analytics') ?>" class="menu-item <?= url_is('admin/analytics*') ? 'active' : '' ?>">
+                <i class="fas fa-chart-line"></i>
+                <span>Analytics</span>
+            </a>
+            
+            <a href="<?= base_url('admin/appointments') ?>" class="menu-item <?= url_is('admin/appointments*') ? 'active' : '' ?>">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Agenda</span>
             </a>
 
             <div class="menu-section-title">SYSTÈME</div>

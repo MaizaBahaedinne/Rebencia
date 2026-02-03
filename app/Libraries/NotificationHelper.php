@@ -5,17 +5,12 @@ namespace App\Libraries;
 class NotificationHelper
 {
     protected $notificationModel;
-    
+    protected $emailService;
+
     public function __construct()
     {
         $this->notificationModel = model('NotificationModel');
-    }
-
-    /**
-     * Send notification when property is created
-     */
-    public function notifyPropertyCreated($propertyId, $propertyData, $creatorId)
-    {
+        $this->emailService = new \App\Libraries\EmailService();
         // Notify all active agents in the same agency
         $userModel = model('UserModel');
         $creator = $userModel->find($creatorId);

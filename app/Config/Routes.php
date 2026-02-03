@@ -140,6 +140,27 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->post('update', 'Settings::update');
     });
     
+    // Analytics
+    $routes->group('analytics', function($routes) {
+        $routes->get('/', 'Analytics::index');
+        $routes->get('agent/(:num)', 'Analytics::agentReport/$1');
+        $routes->get('commission-evolution', 'Analytics::getCommissionEvolution');
+    });
+    
+    // Appointments
+    $routes->group('appointments', function($routes) {
+        $routes->get('/', 'Appointments::index');
+        $routes->get('list', 'Appointments::list');
+        $routes->get('create', 'Appointments::create');
+        $routes->post('store', 'Appointments::store');
+        $routes->get('edit/(:num)', 'Appointments::edit/$1');
+        $routes->post('update/(:num)', 'Appointments::update/$1');
+        $routes->delete('delete/(:num)', 'Appointments::delete/$1');
+        $routes->get('getEvents', 'Appointments::getEvents');
+        $routes->post('updateStatus', 'Appointments::updateStatus');
+        $routes->get('sendReminders', 'Appointments::sendReminders');
+    });
+    
     // CMS
     $routes->group('pages', function($routes) {
         $routes->get('/', 'Pages::index');
@@ -167,8 +188,13 @@ $routes->get('page/(:segment)', 'Pages::view/$1');
 
 // API Routes (REST)
 $routes->group('api', ['namespace' => 'App\Controllers\Api'], function($routes) {
-    $routes->resource('properties');
-    $routes->resource('clients');
-    $routes->resource('transactions');
-    $routes->post('estimation/calculate', 'Estimation::calculate');
+    // Auth
+    $routes->post('auth/login', 'Auth::login');
+    $routes->post('auth/me', 'Auth::me');
+    $routes->post('auth/refresh', 'Auth::refresh');
+    
+    // Resources
+    $routes->resource('properties', ['controller' => 'Properties']);
+    $routes->resource('clients', ['controller' => 'Clients']);
+    $routes->resource('transactions', ['controller' => 'Transactions']);
 });

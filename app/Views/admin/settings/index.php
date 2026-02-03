@@ -25,7 +25,8 @@
         'commissions' => ['label' => 'Commissions', 'icon' => 'fa-dollar-sign', 'color' => 'success'],
         'email' => ['label' => 'Configuration Email', 'icon' => 'fa-envelope', 'color' => 'info'],
         'notifications' => ['label' => 'Notifications', 'icon' => 'fa-bell', 'color' => 'warning'],
-        'integrations' => ['label' => 'Intégrations', 'icon' => 'fa-plug', 'color' => 'danger']
+        'integrations' => ['label' => 'Intégrations', 'icon' => 'fa-plug', 'color' => 'danger'],
+        'template' => ['label' => 'Apparence & Template', 'icon' => 'fa-palette', 'color' => 'purple']
     ];
     
     foreach ($settings as $category => $categorySettings): 
@@ -67,6 +68,20 @@
                                        name="<?= esc($setting['key_name']) ?>" 
                                        value="<?= esc($setting['value']) ?>"
                                        step="0.01">
+                            
+                            <?php elseif (strpos($setting['key_name'], 'color') !== false): ?>
+                                <div class="input-group">
+                                    <input type="color" 
+                                           class="form-control form-control-color" 
+                                           name="<?= esc($setting['key_name']) ?>" 
+                                           value="<?= esc($setting['value']) ?>"
+                                           style="max-width: 80px;">
+                                    <input type="text" 
+                                           class="form-control" 
+                                           value="<?= esc($setting['value']) ?>"
+                                           readonly
+                                           style="max-width: 120px;">
+                                </div>
                             
                             <?php else: ?>
                                 <input type="<?= strpos($setting['key_name'], 'password') !== false ? 'password' : 'text' ?>" 

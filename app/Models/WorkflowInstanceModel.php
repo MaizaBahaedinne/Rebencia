@@ -29,7 +29,7 @@ class WorkflowInstanceModel extends Model
     {
         return $this->where('entity_type', $entityType)
             ->where('entity_id', $entityId)
-            ->whereNull('completed_at')
+            ->where('completed_at', null)
             ->first();
     }
 
@@ -66,7 +66,7 @@ class WorkflowInstanceModel extends Model
     {
         return $this->where('workflow_id', $workflowId)
             ->where('current_stage', $stage)
-            ->whereNull('completed_at')
+            ->where('completed_at', null)
             ->findAll();
     }
 

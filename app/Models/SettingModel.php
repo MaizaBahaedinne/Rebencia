@@ -41,7 +41,7 @@ class SettingModel extends Model
     /**
      * Set setting value
      */
-    public function set($key, $value)
+    public function setSetting($key, $value)
     {
         $setting = $this->where('key_name', $key)->first();
         

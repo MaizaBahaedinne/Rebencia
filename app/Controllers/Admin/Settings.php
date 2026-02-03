@@ -44,7 +44,7 @@ class Settings extends BaseController
         
         foreach ($postData as $key => $value) {
             if ($key !== 'csrf_test_name') { // Skip CSRF token
-                $this->settingModel->set($key, $value);
+                $this->settingModel->setSetting($key, $value);
             }
         }
 

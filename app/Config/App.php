@@ -7,6 +7,7 @@ use CodeIgniter\Config\BaseConfig;
 class App extends BaseConfig
 {
     public string $baseURL = 'http://localhost:8080/';
+    public array $allowedHostnames = [];
     public string $indexPage = '';
     public string $uriProtocol = 'REQUEST_URI';
     public string $defaultLocale = 'fr';

@@ -27,38 +27,69 @@
   - Hashage sécurisé passwords
   - Attribution agences
 
-## 🚀 Phase 3 - Dashboard & Statistiques (EN COURS)
-### 3.1 Dashboard Avancé
-- [ ] Statistiques en temps réel
-  - KPI: Total biens, clients, transactions
-  - Graphiques revenus mensuels
-  - Commissions par agent
-  - Taux de conversion
-- [ ] Widgets interactifs
-  - Dernières transactions
-  - Clients récents
-  - Biens populaires
-  - Notifications système
-- [ ] Filtres par date/agence/agent
+## 🚀 Phase 3 - Modules Avancés (✅ TERMINÉE)
 
-### 3.2 Rapports & Export
-- [ ] Rapport mensuel transactions
-- [ ] Rapport commissions par agent
-- [ ] Export Excel/PDF
-- [ ] Graphiques Chart.js
+### 3.1 Données de Test
+- [x] 10 propriétés test insérées
+- [x] 10 clients test insérés
+- [x] 5 transactions test insérées
+- [x] 10 notifications test insérées
 
-## 📋 Phase 4 - Workflows & Automatisation
-### 4.1 Système de Notifications
-- [ ] Notifications en temps réel
-- [ ] Emails automatiques
-- [ ] Rappels de suivi client
-- [ ] Alertes nouveaux biens
+### 3.2 Système de Notifications
+- [x] Table `notifications` créée
+- [x] NotificationModel avec méthodes CRUD
+- [x] Controller Notifications (AJAX)
+- [x] Widget notification dans header
+- [x] Badge compteur temps réel
+- [x] Dropdown avec liste notifications
+- [x] Marquer comme lu (simple/tout)
+- [x] Auto-refresh toutes les 30s
+- [x] Types: info, success, warning, danger
 
-### 4.2 Workflows Métier
-- [ ] Pipeline de vente
-- [ ] Suivi étapes transaction
-- [ ] Assignation automatique leads
-- [ ] Rappels tâches
+### 3.3 Rapports & Export
+- [x] Controller Reports créé
+- [x] PhpSpreadsheet intégré
+- [x] Export Propriétés (Excel)
+  - Filtres: statut, type, dates
+  - Colonnes: ID, Référence, Titre, Type, Prix, Zone, Agent
+- [x] Export Clients (Excel)
+  - Filtres: type, statut, dates
+  - Colonnes: ID, Nom, Type, Email, Téléphone, Agent
+- [x] Export Transactions (Excel)
+  - Filtres: type, statut, dates
+  - Colonnes: Référence, Propriété, Client, Montant, Commission, Date
+- [x] Export Commissions (Excel)
+  - Filtre: mois, agent
+  - Colonnes: Transaction, Propriété, Agent, Montant, Pourcentage
+- [x] Interface utilisateur moderne avec cartes
+- [x] Route `/admin/reports`
+
+### 3.4 Workflows & Pipeline
+- [x] Tables `workflows`, `workflow_instances`, `workflow_history` créées
+- [x] WorkflowModel, WorkflowInstanceModel, WorkflowHistoryModel
+- [x] Controller Workflows avec méthodes CRUD
+- [x] Pipeline Kanban avec drag & drop
+- [x] 3 workflows par défaut:
+  - Pipeline Vente: Lead → Contact → Visite → Offre → Négociation → Signature → Complété
+  - Pipeline Client: Lead → Contact Initial → Qualification → Actif → Transaction → Fidélisé
+  - Processus Transaction: Brouillon → En cours → Documents → Validation → Signature → Complété
+- [x] Interface Kanban responsive
+- [x] Déplacement cartes entre colonnes
+- [x] Historique changements d'étape
+- [x] Assignation utilisateurs
+- [x] 8 instances workflow test créées
+- [x] Routes `/admin/workflows/pipeline/{type}`
+
+### 3.5 Dashboard avec Statistiques Réelles
+- [x] Statistiques temps réel depuis DB
+- [x] Chart.js intégration
+- [x] Graphique revenus mensuels
+- [x] Top 5 propriétés populaires
+- [x] Dernières transactions
+- [x] Clients récents
+- [x] KPI cards (Total propriétés, clients, transactions, revenus)
+
+## 📋 Phase 4 - Optimisations & IA (PROCHAINE)
 
 ## 🤖 Phase 5 - IA & Estimation
 - [ ] Estimation automatique prix biens

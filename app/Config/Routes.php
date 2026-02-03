@@ -94,6 +94,23 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->post('pay/(:num)', 'Commissions::markAsPaid/$1');
     });
     
+    // Notifications
+    $routes->group('notifications', function($routes) {
+        $routes->get('/', 'Notifications::index');
+        $routes->post('mark-as-read/(:num)', 'Notifications::markAsRead/$1');
+        $routes->post('mark-all-as-read', 'Notifications::markAllAsRead');
+        $routes->get('unread-count', 'Notifications::getUnreadCount');
+    });
+    
+    // Reports & Export
+    $routes->group('reports', function($routes) {
+        $routes->get('/', 'Reports::index');
+        $routes->get('export-properties', 'Reports::exportProperties');
+        $routes->get('export-clients', 'Reports::exportClients');
+        $routes->get('export-transactions', 'Reports::exportTransactions');
+        $routes->get('export-commissions', 'Reports::exportCommissions');
+    });
+    
     // Workflows
     $routes->group('workflows', function($routes) {
         $routes->get('/', 'Workflows::index');
@@ -102,6 +119,8 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->get('edit/(:num)', 'Workflows::edit/$1');
         $routes->post('update/(:num)', 'Workflows::update/$1');
         $routes->delete('delete/(:num)', 'Workflows::delete/$1');
+        $routes->get('pipeline/(:alpha)', 'Workflows::pipeline/$1');
+        $routes->post('move-stage', 'Workflows::moveStage');
     });
     
     // Settings

@@ -267,4 +267,79 @@ class Properties extends BaseController
 
         return view('admin/properties/view', $data);
     }
+
+    /**
+     * Page de gestion des affectations
+     */
+    public function assignments()
+    {
+        $userModel = model('UserModel');
+        
+        // Filtres
+        $currentAgency = $this->request->getGet('agency_id');
+        $currentAgent = $this->request->getGet('agent_id');
+        $status = $this->request->getGet('status');
+
+        $builder = $this->propertyModel
+            ->select('properties.*, zones.name as zone_name, 
+                     agencies.name as agency_name, 
+                     CONCAT(users.first_name, " ", users.last_name) as agent_name')
+            ->join('zones', 'zones.id = properties.zone_id', 'left')
+            ->join('agencies', 'agencies.id = properties.agency_id', 'left')
+            ->join('users', 'users.id = properties.agent_id', 'left');
+
+        if ($currentAgency) {
+            $builder->where('properties.agency_id', $currentAgency);
+        }
+        if ($currentAgent) {
+            $builder->where('properties.agent_id', $currentAgent);
+        }
+        if ($status) {
+            $builder->where('properties.status', $status);
+        }
+
+        $data = [
+            'title' => 'Gestion des Affectations',
+            'properties' => $builder->orderBy('properties.created_at', 'DESC')->findAll(),
+            'agencies' => $this->agencyModel->where('status', 'active')->findAll(),
+            'agents' => $userModel->where('role_id >=', 6)->where('status', 'active')->findAll(),
+            'currentAgency' => $currentAgency,
+            'currentAgent' => $currentAgent,
+            'currentStatus' => $status
+        ];
+
+        return view('admin/properties/assignments', $data);
+    }
+
+    /**
+     * Réassigner des biens en masse
+     */
+    public function reassign()
+    {
+        $propertyIds = $this->request->getPost('property_ids');
+        $newAgencyId = $this->request->getPost('new_agency_id');
+        $newAgentId = $this->request->getPost('new_agent_id');
+
+        if (!$propertyIds || (!$newAgencyId && !$newAgentId)) {
+            return redirect()->back()->with('error', 'Veuillez sélectionner des biens et au moins une nouvelle affectation');
+        }
+
+        $updated = 0;
+        foreach ($propertyIds as $propertyId) {
+            $data = [];
+            if ($newAgencyId) {
+                $data['agency_id'] = $newAgencyId;
+            }
+            if ($newAgentId) {
+                $data['agent_id'] = $newAgentId;
+            }
+            
+            if ($this->propertyModel->update($propertyId, $data)) {
+                $updated++;
+            }
+        }
+
+        return redirect()->to(base_url('admin/properties/assignments'))
+            ->with('success', "$updated bien(s) réaffecté(s) avec succès");
+    }
 }

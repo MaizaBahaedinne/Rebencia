@@ -6,9 +6,11 @@
     <h1 class="page-title">
         <i class="fas fa-building"></i> Gestion des Biens Immobiliers
     </h1>
+    <?php if (canCreate('properties')): ?>
     <a href="<?= base_url('admin/properties/create') ?>" class="btn btn-primary">
         <i class="fas fa-plus"></i> Nouveau Bien
     </a>
+    <?php endif; ?>
 </div>
 
 <?php if (session()->getFlashdata('success')): ?>

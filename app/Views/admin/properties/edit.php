@@ -119,7 +119,7 @@
                         <div class="col-md-6 mb-3">
                             <label for="rent_price" class="form-label">Prix de Location (TND/mois)</label>
                             <input type="number" class="form-control" id="rent_price" name="rent_price" 
-                                   value="<?= $property['rent_price'] ?>" min="0" step="0.01">
+                                   value="<?= $property['rental_price'] ?? '' ?>" min="0" step="0.01">
                         </div>
                     </div>
                 </div>

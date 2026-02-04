@@ -237,7 +237,8 @@ class Roles extends BaseController
         foreach ($modules as $moduleName => $actions) {
             foreach ($actions as $action) {
                 $permissionName = strtolower($moduleName) . '_' . $action;
-                $description = ucfirst($action) . ' ' . ucfirst($moduleName);
+                $displayName = ucfirst($action) . ' ' . ucfirst($moduleName);
+                $description = ucfirst($action) . ' les ' . strtolower($moduleName);
 
                 // Vérifier si la permission existe déjà
                 $existing = $this->permissionModel->where('name', $permissionName)->first();
@@ -245,6 +246,7 @@ class Roles extends BaseController
                 if (!$existing) {
                     $this->permissionModel->insert([
                         'name' => $permissionName,
+                        'display_name' => $displayName,
                         'description' => $description,
                         'module' => strtolower($moduleName)
                     ]);

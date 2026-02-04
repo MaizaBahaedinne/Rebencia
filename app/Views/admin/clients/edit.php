@@ -94,41 +94,41 @@
                                 <label for="property_type_preference" class="form-label">Type de Bien Souhaité</label>
                                 <select class="form-select" id="property_type_preference" name="property_type_preference">
                                     <option value="">-- Sélectionner --</option>
-                                    <option value="apartment" <?= old('property_type_preference', $client['property_type_preference']) == 'apartment' ? 'selected' : '' ?>>Appartement</option>
-                                    <option value="villa" <?= old('property_type_preference', $client['property_type_preference']) == 'villa' ? 'selected' : '' ?>>Villa</option>
-                                    <option value="house" <?= old('property_type_preference', $client['property_type_preference']) == 'house' ? 'selected' : '' ?>>Maison</option>
-                                    <option value="land" <?= old('property_type_preference', $client['property_type_preference']) == 'land' ? 'selected' : '' ?>>Terrain</option>
-                                    <option value="commercial" <?= old('property_type_preference', $client['property_type_preference']) == 'commercial' ? 'selected' : '' ?>>Commercial</option>
-                                    <option value="office" <?= old('property_type_preference', $client['property_type_preference']) == 'office' ? 'selected' : '' ?>>Bureau</option>
+                                    <option value="apartment" <?= old('property_type_preference', $client['property_type_preference'] ?? '') == 'apartment' ? 'selected' : '' ?>>Appartement</option>
+                                    <option value="villa" <?= old('property_type_preference', $client['property_type_preference'] ?? '') == 'villa' ? 'selected' : '' ?>>Villa</option>
+                                    <option value="house" <?= old('property_type_preference', $client['property_type_preference'] ?? '') == 'house' ? 'selected' : '' ?>>Maison</option>
+                                    <option value="land" <?= old('property_type_preference', $client['property_type_preference'] ?? '') == 'land' ? 'selected' : '' ?>>Terrain</option>
+                                    <option value="commercial" <?= old('property_type_preference', $client['property_type_preference'] ?? '') == 'commercial' ? 'selected' : '' ?>>Commercial</option>
+                                    <option value="office" <?= old('property_type_preference', $client['property_type_preference'] ?? '') == 'office' ? 'selected' : '' ?>>Bureau</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
                                 <label for="transaction_type_preference" class="form-label">Type de Transaction</label>
                                 <select class="form-select" id="transaction_type_preference" name="transaction_type_preference">
                                     <option value="">-- Sélectionner --</option>
-                                    <option value="sale" <?= old('transaction_type_preference', $client['transaction_type_preference']) == 'sale' ? 'selected' : '' ?>>Achat</option>
-                                    <option value="rent" <?= old('transaction_type_preference', $client['transaction_type_preference']) == 'rent' ? 'selected' : '' ?>>Location</option>
+                                    <option value="sale" <?= old('transaction_type_preference', $client['transaction_type_preference'] ?? '') == 'sale' ? 'selected' : '' ?>>Achat</option>
+                                    <option value="rent" <?= old('transaction_type_preference', $client['transaction_type_preference'] ?? '') == 'rent' ? 'selected' : '' ?>>Location</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
                                 <label for="budget_min" class="form-label">Budget Minimum (TND)</label>
                                 <input type="number" class="form-control" id="budget_min" name="budget_min" 
-                                       value="<?= old('budget_min', $client['budget_min']) ?>" step="1000">
+                                       value="<?= old('budget_min', $client['budget_min'] ?? '') ?>" step="1000">
                             </div>
                             <div class="col-md-6">
                                 <label for="budget_max" class="form-label">Budget Maximum (TND)</label>
                                 <input type="number" class="form-control" id="budget_max" name="budget_max" 
-                                       value="<?= old('budget_max', $client['budget_max']) ?>" step="1000">
+                                       value="<?= old('budget_max', $client['budget_max'] ?? '') ?>" step="1000">
                             </div>
                             <div class="col-md-6">
                                 <label for="preferred_zones" class="form-label">Zones Préférées</label>
                                 <?php 
-                                $selectedZones = $client['preferred_zones'] ? json_decode($client['preferred_zones'], true) : [];
+                                $selectedZones = !empty($client['preferred_zones']) ? json_decode($client['preferred_zones'], true) : [];
                                 ?>
                                 <select class="form-select" id="preferred_zones" name="preferred_zones[]" multiple size="5">
                                     <?php foreach ($zones as $zone): ?>
-                                        <option value="<?= $zone['id'] ?>" <?= in_array($zone['id'], $selectedZones) ? 'selected' : '' ?>>
-                                            <?= esc($zone['governorate']) ?> - <?= esc($zone['city']) ?>
+                                        <option value="<?= $zone['id'] ?>" <?= in_array($zone['id'], $selectedZones ?? []) ? 'selected' : '' ?>>
+                                            <?= esc($zone['name']) ?>
                                         </option>
                                     <?php endforeach ?>
                                 </select>
@@ -137,7 +137,7 @@
                             <div class="col-md-6">
                                 <label for="area_preference" class="form-label">Surface Souhaitée (m²)</label>
                                 <input type="number" class="form-control" id="area_preference" name="area_preference" 
-                                       value="<?= old('area_preference', $client['area_preference']) ?>" step="10">
+                                       value="<?= old('area_preference', $client['area_preference'] ?? '') ?>" step="10">
                             </div>
                             <div class="col-12">
                                 <label for="notes" class="form-label">Notes & Commentaires</label>

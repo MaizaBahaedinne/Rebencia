@@ -36,7 +36,7 @@ class ClientModel extends Model
 
     public function getClientWithAgent($id)
     {
-        return $this->select('clients.*, users.first_name as agent_first_name, users.last_name as agent_last_name, agencies.name as agency_name')
+        return $this->select('clients.*, CONCAT(users.first_name, " ", users.last_name) as agent_name, agencies.name as agency_name')
             ->join('users', 'users.id = clients.assigned_to', 'left')
             ->join('agencies', 'agencies.id = clients.agency_id', 'left')
             ->where('clients.id', $id)

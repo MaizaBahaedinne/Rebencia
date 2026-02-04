@@ -89,12 +89,12 @@
                             <div class="col-md-6">
                                 <label for="transaction_date" class="form-label">Date de Transaction <span class="text-danger">*</span></label>
                                 <input type="date" class="form-control" id="transaction_date" name="transaction_date" 
-                                       value="<?= old('transaction_date', $transaction['transaction_date']) ?>" required>
+                                       value="<?= old('transaction_date', date('Y-m-d', strtotime($transaction['transaction_date'] ?? 'now'))) ?>" required>
                             </div>
                             <div class="col-md-6">
                                 <label for="amount" class="form-label">Montant (TND) <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control" id="amount" name="amount" 
-                                       value="<?= old('amount', $transaction['amount']) ?>" step="0.01" required onchange="calculateCommission()">
+                                       value="<?= old('amount', $transaction['amount'] ?? '') ?>" step="0.01" required onchange="calculateCommission()">
                             </div>
                         </div>
                     </div>

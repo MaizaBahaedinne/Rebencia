@@ -52,7 +52,7 @@
                                     <?php foreach ($properties as $property): ?>
                                         <option value="<?= $property['id'] ?>" 
                                                 data-price="<?= $property['price'] ?>"
-                                                data-rent="<?= $property['rent_price'] ?>"
+                                                data-rent="<?= $property['rental_price'] ?? 0 ?>"
                                                 data-type="<?= $property['transaction_type'] ?>"
                                                 <?= old('property_id') == $property['id'] ? 'selected' : '' ?>>
                                             <?= esc($property['reference']) ?> - <?= esc($property['title']) ?>

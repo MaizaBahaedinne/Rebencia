@@ -54,12 +54,20 @@ class PropertyModel extends Model
 
     public function getPropertyWithDetails($id)
     {
-        return $this->select('properties.*, zones.name as zone_name, agencies.name as agency_name, users.first_name as agent_first_name, users.last_name as agent_last_name')
+        $property = $this->select('properties.*, zones.name as zone_name, agencies.name as agency_name, CONCAT(users.first_name, " ", users.last_name) as agent_name')
             ->join('zones', 'zones.id = properties.zone_id', 'left')
             ->join('agencies', 'agencies.id = properties.agency_id', 'left')
             ->join('users', 'users.id = properties.agent_id', 'left')
             ->where('properties.id', $id)
             ->first();
+
+        if ($property) {
+            // Récupérer les images
+            $propertyMediaModel = model('PropertyMediaModel');
+            $property['images'] = $propertyMediaModel->where('property_id', $id)->where('media_type', 'image')->findAll();
+        }
+
+        return $property;
     }
 
     public function searchProperties($filters = [])

@@ -10,6 +10,13 @@ class AuthFilter implements FilterInterface
 {
     public function before(RequestInterface $request, $arguments = null)
     {
+        $uri = $request->uri->getPath();
+        
+        // Ne pas rediriger si on est déjà sur la page de login
+        if (strpos($uri, 'admin/login') !== false) {
+            return;
+        }
+        
         // Check if user is logged in
         if (!session()->get('user_id')) {
             return redirect()->to(base_url('admin/login'))

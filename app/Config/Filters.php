@@ -75,6 +75,7 @@ class Filters extends BaseConfig
             'except' => [
                 'admin/login',
                 'admin/login/*',
+                'admin/logout',
             ],
         ],
         'permission' => [

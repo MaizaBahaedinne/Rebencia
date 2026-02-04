@@ -179,7 +179,13 @@
             </div>
 
             <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check">
+                <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                <label class="form-check-label" for="remember">
+                    Se souvenir de moi
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-2">
                 <i class="fas fa-sign-in-alt me-2"></i> Se connecter
             </button>
 

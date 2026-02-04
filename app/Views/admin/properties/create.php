@@ -332,5 +332,4 @@
             });
         });
     </script>
-</body>
-<?= $this->endSection() ?
+<?= $this->endSection() ?>

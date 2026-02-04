@@ -124,7 +124,7 @@
                                 <label for="preferred_zones" class="form-label">Zones Préférées</label>
                                 <select class="form-select" id="preferred_zones" name="preferred_zones[]" multiple size="5">
                                     <?php foreach ($zones as $zone): ?>
-                                        <option value="<?= $zone['id'] ?>"><?= esc($zone['governorate']) ?> - <?= esc($zone['city']) ?></option>
+                                        <option value="<?= $zone['id'] ?>"><?= esc($zone['name']) ?></option>
                                     <?php endforeach ?>
                                 </select>
                                 <small class="text-muted">Maintenez Ctrl/Cmd pour sélectionner plusieurs zones</small>

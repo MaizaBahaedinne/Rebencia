@@ -656,6 +656,18 @@
                 <span>Utilisateurs</span>
             </a>
 
+            <div class="menu-section-title">SÉCURITÉ</div>
+            
+            <a href="<?= base_url('admin/roles') ?>" class="menu-item <?= url_is('admin/roles') ? 'active' : '' ?>">
+                <i class="fas fa-user-shield"></i>
+                <span>Rôles</span>
+            </a>
+            
+            <a href="<?= base_url('admin/roles/matrix') ?>" class="menu-item <?= url_is('admin/roles/matrix') ? 'active' : '' ?>">
+                <i class="fas fa-table"></i>
+                <span>Matrice Permissions</span>
+            </a>
+
             <div class="menu-section-title">OUTILS</div>
             
             <a href="<?= base_url('admin/workflows/pipeline/property') ?>" class="menu-item <?= url_is('admin/workflows*') ? 'active' : '' ?>">
@@ -710,9 +722,29 @@
                 <span>Système & Backup</span>
             </a>
             
-            <a href="<?= base_url('admin/settings') ?>" class="menu-item <?= url_is('admin/settings*') ? 'active' : '' ?>">
-                <i class="fas fa-cog"></i>
-                <span>Paramètres</span>
+            <a href="<?= base_url('admin/settings/general') ?>" class="menu-item <?= url_is('admin/settings/general') ? 'active' : '' ?>">
+                <i class="fas fa-sliders-h"></i>
+                <span>Paramètres Généraux</span>
+            </a>
+            
+            <a href="<?= base_url('admin/settings/email') ?>" class="menu-item <?= url_is('admin/settings/email') ? 'active' : '' ?>">
+                <i class="fas fa-envelope"></i>
+                <span>Configuration Email</span>
+            </a>
+            
+            <a href="<?= base_url('admin/settings/sms') ?>" class="menu-item <?= url_is('admin/settings/sms') ? 'active' : '' ?>">
+                <i class="fas fa-sms"></i>
+                <span>Configuration SMS</span>
+            </a>
+            
+            <a href="<?= base_url('admin/settings/payment') ?>" class="menu-item <?= url_is('admin/settings/payment') ? 'active' : '' ?>">
+                <i class="fas fa-credit-card"></i>
+                <span>Moyens de Paiement</span>
+            </a>
+            
+            <a href="<?= base_url('admin/settings/notifications') ?>" class="menu-item <?= url_is('admin/settings/notifications') ? 'active' : '' ?>">
+                <i class="fas fa-bell"></i>
+                <span>Notifications</span>
             </a>
             
             <a href="<?= base_url('admin/logout') ?>" class="menu-item" style="margin-top: 2rem; color: #ef4444;">

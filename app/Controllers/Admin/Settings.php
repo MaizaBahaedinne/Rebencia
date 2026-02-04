@@ -14,25 +14,91 @@ class Settings extends BaseController
     }
 
     /**
-     * Settings page
+     * Settings page (redirect to general)
      */
     public function index()
     {
-        $settings = $this->settingModel->findAll();
-        
-        // Group settings by category
-        $groupedSettings = [];
-        foreach ($settings as $setting) {
-            $groupedSettings[$setting['category']][] = $setting;
-        }
+        return redirect()->to(base_url('admin/settings/general'));
+    }
 
+    /**
+     * General settings
+     */
+    public function general()
+    {
+        $settings = $this->settingModel->where('category', 'general')->findAll();
+        
         $data = [
-            'title' => 'Paramètres Système',
-            'page_title' => 'Paramètres',
-            'settings' => $groupedSettings
+            'title' => 'Paramètres Généraux',
+            'page_title' => 'Paramètres Généraux',
+            'settings' => $this->formatSettings($settings)
         ];
 
-        return view('admin/settings/index', $data);
+        return view('admin/settings/general', $data);
+    }
+
+    /**
+     * Email configuration
+     */
+    public function email()
+    {
+        $settings = $this->settingModel->where('category', 'email')->findAll();
+        
+        $data = [
+            'title' => 'Configuration Email',
+            'page_title' => 'Configuration Email',
+            'settings' => $this->formatSettings($settings)
+        ];
+
+        return view('admin/settings/email', $data);
+    }
+
+    /**
+     * SMS configuration
+     */
+    public function sms()
+    {
+        $settings = $this->settingModel->where('category', 'sms')->findAll();
+        
+        $data = [
+            'title' => 'Configuration SMS',
+            'page_title' => 'Configuration SMS',
+            'settings' => $this->formatSettings($settings)
+        ];
+
+        return view('admin/settings/sms', $data);
+    }
+
+    /**
+     * Payment methods
+     */
+    public function payment()
+    {
+        $settings = $this->settingModel->where('category', 'payment')->findAll();
+        
+        $data = [
+            'title' => 'Moyens de Paiement',
+            'page_title' => 'Moyens de Paiement',
+            'settings' => $this->formatSettings($settings)
+        ];
+
+        return view('admin/settings/payment', $data);
+    }
+
+    /**
+     * Notification settings
+     */
+    public function notifications()
+    {
+        $settings = $this->settingModel->where('category', 'notifications')->findAll();
+        
+        $data = [
+            'title' => 'Paramètres des Notifications',
+            'page_title' => 'Notifications',
+            'settings' => $this->formatSettings($settings)
+        ];
+
+        return view('admin/settings/notifications', $data);
     }
 
     /**
@@ -41,13 +107,36 @@ class Settings extends BaseController
     public function update()
     {
         $postData = $this->request->getPost();
+        $category = $this->request->getPost('_category');
         
         foreach ($postData as $key => $value) {
-            if ($key !== 'csrf_test_name') { // Skip CSRF token
+            if ($key !== 'csrf_test_name' && $key !== '_category') {
                 $this->settingModel->setSetting($key, $value);
             }
         }
 
-        return redirect()->back()->with('success', 'Paramètres mis à jour avec succès');
+        $redirectMap = [
+            'general' => 'admin/settings/general',
+            'email' => 'admin/settings/email',
+            'sms' => 'admin/settings/sms',
+            'payment' => 'admin/settings/payment',
+            'notifications' => 'admin/settings/notifications',
+        ];
+
+        $redirectUrl = $redirectMap[$category] ?? 'admin/settings/general';
+
+        return redirect()->to(base_url($redirectUrl))->with('success', 'Paramètres mis à jour avec succès');
+    }
+
+    /**
+     * Format settings array
+     */
+    private function formatSettings($settings)
+    {
+        $formatted = [];
+        foreach ($settings as $setting) {
+            $formatted[$setting['key']] = $setting['value'];
+        }
+        return $formatted;
     }
 }

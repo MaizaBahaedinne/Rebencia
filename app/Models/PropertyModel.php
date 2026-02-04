@@ -54,12 +54,16 @@ class PropertyModel extends Model
 
     public function getPropertyWithDetails($id)
     {
-        $property = $this->select('properties.*, zones.name as zone_name, agencies.name as agency_name, CONCAT(users.first_name, " ", users.last_name) as agent_name')
+        $builder = $this->select('properties.*, zones.name as zone_name, agencies.name as agency_name, CONCAT(users.first_name, " ", users.last_name) as agent_name')
             ->join('zones', 'zones.id = properties.zone_id', 'left')
             ->join('agencies', 'agencies.id = properties.agency_id', 'left')
             ->join('users', 'users.id = properties.agent_id', 'left')
-            ->where('properties.id', $id)
-            ->first();
+            ->where('properties.id', $id);
+        
+        // Appliquer le filtre d'agence
+        applyAgencyFilter($builder, 'properties.agency_id');
+        
+        $property = $builder->first();
 
         if ($property) {
             // Récupérer les images
@@ -73,6 +77,9 @@ class PropertyModel extends Model
     public function searchProperties($filters = [])
     {
         $builder = $this->builder();
+        
+        // Appliquer le filtre d'agence automatiquement
+        applyAgencyFilter($builder, 'agency_id');
         
         if (!empty($filters['type'])) {
             $builder->where('type', $filters['type']);

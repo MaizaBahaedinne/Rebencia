@@ -36,23 +36,32 @@ class ClientModel extends Model
 
     public function getClientWithAgent($id)
     {
-        return $this->select('clients.*, CONCAT(users.first_name, " ", users.last_name) as agent_name, agencies.name as agency_name')
+        $builder = $this->select('clients.*, CONCAT(users.first_name, " ", users.last_name) as agent_name, agencies.name as agency_name')
             ->join('users', 'users.id = clients.assigned_to', 'left')
             ->join('agencies', 'agencies.id = clients.agency_id', 'left')
-            ->where('clients.id', $id)
-            ->first();
+            ->where('clients.id', $id);
+        
+        applyAgencyFilter($builder, 'clients.agency_id');
+        
+        return $builder->first();
     }
 
     public function getClientsByStatus($status = 'lead')
     {
-        return $this->where('status', $status)
+        $builder = $this->builder();
+        applyAgencyFilter($builder, 'agency_id');
+        
+        return $builder->where('status', $status)
             ->orderBy('created_at', 'DESC')
-            ->findAll();
+            ->get()->getResultArray();
     }
 
     public function searchClients($filters = [])
     {
         $builder = $this->builder();
+        
+        // Appliquer le filtre d'agence automatiquement
+        applyAgencyFilter($builder, 'agency_id');
         
         if (!empty($filters['status'])) {
             $builder->where('status', $filters['status']);
@@ -62,9 +71,10 @@ class ClientModel extends Model
             $builder->where('assigned_to', $filters['assigned_to']);
         }
         
-        if (!empty($filters['agency_id'])) {
-            $builder->where('agency_id', $filters['agency_id']);
-        }
+        // Ne pas écraser le filtre d'agence si déjà appliqué
+        // if (!empty($filters['agency_id'])) {
+        //     $builder->where('agency_id', $filters['agency_id']);
+        // }
         
         if (!empty($filters['search'])) {
             $builder->groupStart()

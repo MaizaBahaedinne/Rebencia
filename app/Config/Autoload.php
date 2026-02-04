@@ -95,5 +95,5 @@ class Autoload extends AutoloadConfig
      *
      * @var list<string>
      */
-    public $helpers = ['template', 'permission'];
+    public $helpers = ['template', 'permission', 'agency'];
 }

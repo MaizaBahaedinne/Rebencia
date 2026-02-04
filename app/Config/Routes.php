@@ -50,7 +50,8 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->post('store', 'Agencies::store');
         $routes->get('edit/(:num)', 'Agencies::edit/$1');
         $routes->post('update/(:num)', 'Agencies::update/$1');
-        $routes->delete('delete/(:num)', 'Agencies::delete/$1');
+        $routes->get('delete/(:num)', 'Agencies::delete/$1');
+        $routes->get('view/(:num)', 'Agencies::view/$1');
     });
     
     // Properties

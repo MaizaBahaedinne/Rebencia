@@ -64,7 +64,7 @@ class PropertyModel extends Model
         if ($property) {
             // Récupérer les images
             $propertyMediaModel = model('PropertyMediaModel');
-            $property['images'] = $propertyMediaModel->where('property_id', $id)->where('media_type', 'image')->findAll();
+            $property['images'] = $propertyMediaModel->where('property_id', $id)->where('type', 'image')->findAll();
         }
 
         return $property;

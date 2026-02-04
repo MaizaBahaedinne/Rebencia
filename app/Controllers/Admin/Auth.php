@@ -64,6 +64,14 @@ class Auth extends BaseController
             $fullName = $user['username'] ?? $user['email'];
         }
 
+        // Récupérer le nom de l'agence
+        $agencyName = null;
+        if ($user['agency_id']) {
+            $agencyModel = model('AgencyModel');
+            $agency = $agencyModel->find($user['agency_id']);
+            $agencyName = $agency['name'] ?? null;
+        }
+
         // Set session
         session()->set([
             'user_id' => $user['id'],
@@ -75,6 +83,7 @@ class Auth extends BaseController
             'role_display_name' => $defaultRole['display_name'] ?? 'Utilisateur',
             'role_level' => $defaultRole['level'] ?? 0,
             'agency_id' => $user['agency_id'],
+            'agency_name' => $agencyName,
             'is_logged_in' => true
         ]);
 

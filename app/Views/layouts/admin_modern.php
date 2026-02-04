@@ -831,7 +831,12 @@
                          alt="Avatar" class="user-avatar">
                     <div class="user-info d-none d-md-block">
                         <div class="user-name"><?= esc(session()->get('user_name') ?? 'Admin') ?></div>
-                        <div class="user-role"><?= esc(session()->get('role_display_name') ?? 'Administrateur') ?></div>
+                        <div class="user-role">
+                            <?= esc(session()->get('role_display_name') ?? 'Administrateur') ?>
+                            <?php if (session()->get('agency_name')): ?>
+                                <span class="text-muted" style="font-size: 0.75rem;"> • <?= esc(session()->get('agency_name')) ?></span>
+                            <?php endif; ?>
+                        </div>
                     </div>
                     <i class="fas fa-chevron-down" style="color: #9ca3af; font-size: 0.8rem;"></i>
                 </div>

@@ -113,4 +113,26 @@ class PropertyModel extends Model
         
         return $builder->get()->getResultArray();
     }
+
+    /**
+     * Récupérer toutes les propriétés accessibles avec filtrage automatique par agence
+     */
+    public function getAllWithAgencyFilter($joins = true)
+    {
+        $builder = $this->builder();
+        
+        // Appliquer le filtre d'agence
+        applyAgencyFilter($builder, 'properties.agency_id');
+        
+        if ($joins) {
+            $builder->select('properties.*, zones.name as zone_name, users.first_name as agent_name, agencies.name as agency_name')
+                ->join('zones', 'zones.id = properties.zone_id', 'left')
+                ->join('users', 'users.id = properties.agent_id', 'left')
+                ->join('agencies', 'agencies.id = properties.agency_id', 'left');
+        }
+        
+        $builder->orderBy('properties.created_at', 'DESC');
+        
+        return $builder;
+    }
 }

@@ -40,6 +40,15 @@ if (!function_exists('getAccessibleAgencies')) {
         $agencyId = $user['agency_id'];
         $db = \Config\Database::connect();
         
+        // Vérifier si les colonnes parent_agency_id et is_headquarters existent
+        $fieldsQuery = $db->query("SHOW COLUMNS FROM agencies LIKE 'parent_agency_id'");
+        $hasHierarchy = $fieldsQuery->getNumRows() > 0;
+        
+        if (!$hasHierarchy) {
+            // Pas de hiérarchie = uniquement son agence
+            return [$agencyId];
+        }
+        
         // Vérifier si l'utilisateur est dans un siège
         $agency = $db->table('agencies')->where('id', $agencyId)->get()->getRowArray();
         
@@ -48,7 +57,7 @@ if (!function_exists('getAccessibleAgencies')) {
         }
 
         // Si c'est un siège (is_headquarters = 1), accès à toutes les sous-agences
-        if ($agency['is_headquarters'] == 1) {
+        if (isset($agency['is_headquarters']) && $agency['is_headquarters'] == 1) {
             return getAllSubAgencies($agencyId, true);
         }
 

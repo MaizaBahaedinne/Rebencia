@@ -21,10 +21,7 @@ class Clients extends BaseController
     {
         $data = [
             'title' => 'Gestion des Clients',
-            'clients' => $this->clientModel->select('clients.*, users.first_name as agent_name, users.last_name as agent_lastname')
-                ->join('users', 'users.id = clients.assigned_to', 'left')
-                ->orderBy('clients.created_at', 'DESC')
-                ->paginate(20)
+            'clients' => $this->clientModel->getAllWithAgencyFilter(true)->paginate(20)
         ];
 
         return view('admin/clients/index', $data);

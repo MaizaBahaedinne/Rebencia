@@ -21,11 +21,7 @@ class Properties extends BaseController
     {
         $data = [
             'title' => 'Gestion des Propriétés',
-            'properties' => $this->propertyModel->select('properties.*, zones.name as zone_name, users.first_name as agent_name')
-                ->join('zones', 'zones.id = properties.zone_id', 'left')
-                ->join('users', 'users.id = properties.agent_id', 'left')
-                ->orderBy('properties.created_at', 'DESC')
-                ->paginate(20)
+            'properties' => $this->propertyModel->getAllWithAgencyFilter(true)->paginate(20)
         ];
 
         return view('admin/properties/index', $data);

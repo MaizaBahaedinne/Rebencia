@@ -238,7 +238,7 @@
                 <div class="card-body">
                     <div class="form-check mb-2">
                         <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1" 
-                               <?= $property['is_featured'] ? 'checked' : '' ?>>
+                               <?= $property['featured'] ? 'checked' : '' ?>>
                         <label class="form-check-label" for="is_featured">
                             <i class="fas fa-star text-warning"></i> Mettre en avant
                         </label>

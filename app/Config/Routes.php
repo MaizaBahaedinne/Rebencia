@@ -45,7 +45,9 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->post('store', 'Roles::store');
         $routes->get('edit/(:num)', 'Roles::edit/$1');
         $routes->post('update/(:num)', 'Roles::update/$1');
-        $routes->delete('delete/(:num)', 'Roles::delete/$1');
+        $routes->get('delete/(:num)', 'Roles::delete/$1');
+        $routes->get('matrix', 'Roles::matrix');
+        $routes->post('sync-permissions', 'Roles::syncPermissions');
     });
     
     // Agencies

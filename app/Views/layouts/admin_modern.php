@@ -872,7 +872,7 @@
                                                     <?= esc($role['display_name']) ?>
                                                 </div>
                                                 <small class="<?= $role['is_active'] == 1 ? 'text-white-50' : 'text-muted' ?>" style="font-size: 0.75rem;">
-                                                    Niveau <?= $role['level'] ?>
+                                                    <?= esc($role['name']) ?>
                                                 </small>
                                             </div>
                                         </div>

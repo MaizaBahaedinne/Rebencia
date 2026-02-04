@@ -74,9 +74,9 @@ class Analytics extends BaseController
     private function getAverageSaleTime()
     {
         $result = $this->db->query(
-            "SELECT AVG(DATEDIFF(t.transaction_date, c.created_at)) as avg_days
+            "SELECT AVG(DATEDIFF(t.created_at, c.created_at)) as avg_days
              FROM transactions t
-             JOIN clients c ON t.client_id = c.id
+             JOIN clients c ON t.buyer_id = c.id
              WHERE t.status IN ('signed', 'completed')
              AND t.created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)"
         )->getRow();
@@ -110,13 +110,13 @@ class Analytics extends BaseController
     {
         $results = $this->db->query(
             "SELECT 
-                DATE_FORMAT(transaction_date, '%Y-%m') as month,
+                DATE_FORMAT(created_at, '%Y-%m') as month,
                 SUM(amount) as revenue,
                 COUNT(*) as deals
              FROM transactions
              WHERE status IN ('signed', 'completed')
-             AND transaction_date >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
-             GROUP BY DATE_FORMAT(transaction_date, '%Y-%m')
+             AND created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+             GROUP BY DATE_FORMAT(created_at, '%Y-%m')
              ORDER BY month ASC"
         )->getResultArray();
 
@@ -149,7 +149,7 @@ class Analytics extends BaseController
                 COUNT(DISTINCT t.id) as total_deals,
                 SUM(t.amount) as total_revenue,
                 SUM(c.amount) as total_commission,
-                AVG(DATEDIFF(t.transaction_date, t.created_at)) as avg_deal_time
+                AVG(DATEDIFF(t.completion_date, t.created_at)) as avg_deal_time
              FROM users u
              LEFT JOIN transactions t ON u.id = t.user_id AND t.status IN ('signed', 'completed')
              LEFT JOIN commissions c ON c.transaction_id = t.id AND c.user_id = u.id
@@ -172,7 +172,7 @@ class Analytics extends BaseController
                 p.type,
                 COUNT(p.id) as total_properties,
                 COUNT(t.id) as sold_count,
-                AVG(DATEDIFF(t.transaction_date, p.created_at)) as avg_days_to_sell,
+                AVG(DATEDIFF(t.completion_date, p.created_at)) as avg_days_to_sell,
                 AVG(t.amount) as avg_sale_price
              FROM properties p
              LEFT JOIN transactions t ON p.id = t.property_id AND t.status IN ('signed', 'completed')
@@ -291,7 +291,7 @@ class Analytics extends BaseController
     {
         return $this->db->query(
             "SELECT 
-                DATE_FORMAT(t.transaction_date, '%Y-%m') as month,
+                DATE_FORMAT(t.created_at, '%Y-%m') as month,
                 COUNT(*) as deals,
                 SUM(t.amount) as revenue,
                 SUM(c.amount) as commission
@@ -299,7 +299,7 @@ class Analytics extends BaseController
              LEFT JOIN commissions c ON t.id = c.transaction_id AND c.user_id = ?
              WHERE t.user_id = ?
              AND t.status IN ('signed', 'completed')
-             AND t.transaction_date >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+             AND t.created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
              GROUP BY month
              ORDER BY month DESC
              LIMIT 12",
@@ -338,12 +338,12 @@ class Analytics extends BaseController
         $agentId = $this->request->getGet('agent_id');
         
         $query = "SELECT 
-                    DATE_FORMAT(t.transaction_date, '%Y-%m') as month,
+                    DATE_FORMAT(t.created_at, '%Y-%m') as month,
                     SUM(c.amount) as commission
                   FROM commissions c
                   JOIN transactions t ON c.transaction_id = t.id
                   WHERE t.status IN ('signed', 'completed')
-                  AND t.transaction_date >= DATE_SUB(NOW(), INTERVAL 12 MONTH)";
+                  AND t.created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)";
         
         if ($agentId) {
             $query .= " AND c.user_id = " . (int)$agentId;

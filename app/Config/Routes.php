@@ -157,6 +157,11 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
     // Settings
     $routes->group('settings', function($routes) {
         $routes->get('/', 'Settings::index');
+        $routes->get('general', 'Settings::general');
+        $routes->get('email', 'Settings::email');
+        $routes->get('sms', 'Settings::sms');
+        $routes->get('payment', 'Settings::payment');
+        $routes->get('notifications', 'Settings::notifications');
         $routes->post('update', 'Settings::update');
     });
     

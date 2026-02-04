@@ -22,9 +22,24 @@ class Roles extends BaseController
      */
     public function index()
     {
+        // Get all roles with user counts and permission counts
+        $roles = $this->db->query("
+            SELECT r.*, 
+                   COUNT(DISTINCT u.id) as user_count,
+                   COUNT(DISTINCT rp.permission_id) as permission_count
+            FROM roles r
+            LEFT JOIN users u ON u.role_id = r.id
+            LEFT JOIN role_permissions rp ON rp.role_id = r.id
+            GROUP BY r.id
+            ORDER BY r.level DESC
+        ")->getResultArray();
+
         $data = [
             'title' => 'Gestion des Rôles',
-            'roles' => $this->roleModel->orderBy('level', 'ASC')->findAll()
+            'page_title' => 'Gestion des Rôles',
+            'roles' => $roles,
+            'totalPermissions' => $this->permissionModel->countAllResults(),
+            'totalUsers' => $this->db->table('users')->countAllResults()
         ];
 
         return view('admin/roles/index', $data);

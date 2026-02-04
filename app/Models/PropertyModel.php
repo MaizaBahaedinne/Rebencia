@@ -117,22 +117,17 @@ class PropertyModel extends Model
     /**
      * Récupérer toutes les propriétés accessibles avec filtrage automatique par agence
      */
-    public function getAllWithAgencyFilter($joins = true)
+    public function getAllWithAgencyFilter($page = 20)
     {
-        $builder = $this->builder();
-        
         // Appliquer le filtre d'agence
-        applyAgencyFilter($builder, 'properties.agency_id');
+        applyAgencyFilter($this, 'properties.agency_id');
         
-        if ($joins) {
-            $builder->select('properties.*, zones.name as zone_name, users.first_name as agent_name, agencies.name as agency_name')
-                ->join('zones', 'zones.id = properties.zone_id', 'left')
-                ->join('users', 'users.id = properties.agent_id', 'left')
-                ->join('agencies', 'agencies.id = properties.agency_id', 'left');
-        }
+        $this->select('properties.*, zones.name as zone_name, users.first_name as agent_name, agencies.name as agency_name')
+            ->join('zones', 'zones.id = properties.zone_id', 'left')
+            ->join('users', 'users.id = properties.agent_id', 'left')
+            ->join('agencies', 'agencies.id = properties.agency_id', 'left')
+            ->orderBy('properties.created_at', 'DESC');
         
-        $builder->orderBy('properties.created_at', 'DESC');
-        
-        return $builder;
+        return $this->paginate($page);
     }
 }

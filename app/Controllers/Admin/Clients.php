@@ -21,7 +21,8 @@ class Clients extends BaseController
     {
         $data = [
             'title' => 'Gestion des Clients',
-            'clients' => $this->clientModel->getAllWithAgencyFilter(true)->paginate(20)
+            'clients' => $this->clientModel->getAllWithAgencyFilter(20),
+            'pager' => $this->clientModel->pager
         ];
 
         return view('admin/clients/index', $data);

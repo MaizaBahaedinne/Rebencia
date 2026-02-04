@@ -91,21 +91,16 @@ class ClientModel extends Model
     /**
      * Récupérer tous les clients accessibles avec filtrage automatique par agence
      */
-    public function getAllWithAgencyFilter($joins = true)
+    public function getAllWithAgencyFilter($page = 20)
     {
-        $builder = $this->builder();
-        
         // Appliquer le filtre d'agence
-        applyAgencyFilter($builder, 'clients.agency_id');
+        applyAgencyFilter($this, 'clients.agency_id');
         
-        if ($joins) {
-            $builder->select('clients.*, users.first_name as agent_name, users.last_name as agent_lastname, agencies.name as agency_name')
-                ->join('users', 'users.id = clients.assigned_to', 'left')
-                ->join('agencies', 'agencies.id = clients.agency_id', 'left');
-        }
+        $this->select('clients.*, users.first_name as agent_name, users.last_name as agent_lastname, agencies.name as agency_name')
+            ->join('users', 'users.id = clients.assigned_to', 'left')
+            ->join('agencies', 'agencies.id = clients.agency_id', 'left')
+            ->orderBy('clients.created_at', 'DESC');
         
-        $builder->orderBy('clients.created_at', 'DESC');
-        
-        return $builder;
+        return $this->paginate($page);
     }
 }

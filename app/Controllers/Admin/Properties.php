@@ -21,7 +21,8 @@ class Properties extends BaseController
     {
         $data = [
             'title' => 'Gestion des Propriétés',
-            'properties' => $this->propertyModel->getAllWithAgencyFilter(true)->paginate(20)
+            'properties' => $this->propertyModel->getAllWithAgencyFilter(20),
+            'pager' => $this->propertyModel->pager
         ];
 
         return view('admin/properties/index', $data);

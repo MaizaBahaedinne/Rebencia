@@ -71,6 +71,131 @@ class UserModel extends Model
             ->first();
     }
 
+    /**
+     * Get user with all their roles
+     */
+    public function getUserWithRoles($userId)
+    {
+        $db = \Config\Database::connect();
+        
+        $user = $this->find($userId);
+        if (!$user) {
+            return null;
+        }
+
+        // Get all roles for this user
+        $userRoles = $db->table('user_roles')
+            ->select('user_roles.*, roles.name, roles.display_name, roles.level')
+            ->join('roles', 'roles.id = user_roles.role_id')
+            ->where('user_roles.user_id', $userId)
+            ->get()
+            ->getResultArray();
+
+        $user['roles'] = $userRoles;
+        
+        // Get active role
+        $activeRole = null;
+        foreach ($userRoles as $role) {
+            if ($role['is_active'] == 1) {
+                $activeRole = $role;
+                break;
+            }
+        }
+        
+        $user['active_role'] = $activeRole;
+        
+        return $user;
+    }
+
+    /**
+     * Get active role for user
+     */
+    public function getActiveRole($userId)
+    {
+        $db = \Config\Database::connect();
+        
+        return $db->table('user_roles')
+            ->select('user_roles.*, roles.name, roles.display_name, roles.level')
+            ->join('roles', 'roles.id = user_roles.role_id')
+            ->where('user_roles.user_id', $userId)
+            ->where('user_roles.is_active', 1)
+            ->get()
+            ->getRowArray();
+    }
+
+    /**
+     * Switch active role for user
+     */
+    public function switchRole($userId, $roleId)
+    {
+        $db = \Config\Database::connect();
+        
+        // Deactivate all roles
+        $db->table('user_roles')
+            ->where('user_id', $userId)
+            ->update(['is_active' => 0]);
+        
+        // Activate selected role
+        $db->table('user_roles')
+            ->where('user_id', $userId)
+            ->where('role_id', $roleId)
+            ->update(['is_active' => 1]);
+        
+        return true;
+    }
+
+    /**
+     * Assign role to user
+     */
+    public function assignRole($userId, $roleId, $setActive = false)
+    {
+        $db = \Config\Database::connect();
+        
+        // Check if role already assigned
+        $existing = $db->table('user_roles')
+            ->where('user_id', $userId)
+            ->where('role_id', $roleId)
+            ->get()
+            ->getRowArray();
+        
+        if ($existing) {
+            return false; // Already assigned
+        }
+        
+        // If this is the first role or setActive is true, deactivate others
+        if ($setActive) {
+            $db->table('user_roles')
+                ->where('user_id', $userId)
+                ->update(['is_active' => 0]);
+        }
+        
+        // Insert new role
+        $db->table('user_roles')->insert([
+            'user_id' => $userId,
+            'role_id' => $roleId,
+            'is_active' => $setActive ? 1 : 0,
+            'assigned_at' => date('Y-m-d H:i:s'),
+            'assigned_by' => session()->get('user_id'),
+        ]);
+        
+        return true;
+    }
+
+    /**
+     * Remove role from user
+     */
+    public function removeRole($userId, $roleId)
+    {
+        $db = \Config\Database::connect();
+        
+        $db->table('user_roles')
+            ->where('user_id', $userId)
+            ->where('role_id', $roleId)
+            ->delete();
+        
+        return true;
+    }
+
     public function getUsersByAgency($agencyId)
     {
         return $this->where('agency_id', $agencyId)

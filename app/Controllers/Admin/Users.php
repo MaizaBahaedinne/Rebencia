@@ -291,4 +291,103 @@ class Users extends BaseController
 
         return redirect()->back()->with('password_error', 'Erreur lors du changement de mot de passe');
     }
+
+    /**
+     * Switch user role
+     */
+    public function switchRole()
+    {
+        $userId = session()->get('user_id');
+        $roleId = $this->request->getPost('role_id');
+
+        if (!$userId || !$roleId) {
+            return redirect()->back()->with('error', 'Paramètres manquants');
+        }
+
+        // Verify user has this role
+        $db = \Config\Database::connect();
+        $userRole = $db->table('user_roles')
+            ->where('user_id', $userId)
+            ->where('role_id', $roleId)
+            ->get()
+            ->getRowArray();
+
+        if (!$userRole) {
+            return redirect()->back()->with('error', 'Vous n\'avez pas accès à ce rôle');
+        }
+
+        // Switch role
+        if ($this->userModel->switchRole($userId, $roleId)) {
+            // Update session with new role
+            $activeRole = $this->userModel->getActiveRole($userId);
+            session()->set([
+                'role_id' => $activeRole['role_id'],
+                'role_name' => $activeRole['name'],
+                'role_display_name' => $activeRole['display_name'],
+                'role_level' => $activeRole['level']
+            ]);
+
+            return redirect()->back()->with('success', 'Rôle changé vers: ' . $activeRole['display_name']);
+        }
+
+        return redirect()->back()->with('error', 'Erreur lors du changement de rôle');
+    }
+
+    /**
+     * Manage user roles (assign/remove multiple roles)
+     */
+    public function manageRoles($userId)
+    {
+        $user = $this->userModel->getUserWithRoles($userId);
+        
+        if (!$user) {
+            return redirect()->to('/admin/users')->with('error', 'Utilisateur introuvable');
+        }
+
+        $data = [
+            'title' => 'Gestion des Rôles - ' . $user['first_name'] . ' ' . $user['last_name'],
+            'page_title' => 'Gestion des Rôles',
+            'user' => $user,
+            'allRoles' => $this->roleModel->orderBy('level', 'DESC')->findAll()
+        ];
+
+        return view('admin/users/manage_roles', $data);
+    }
+
+    /**
+     * Assign role to user
+     */
+    public function assignRole($userId)
+    {
+        $roleId = $this->request->getPost('role_id');
+        $setActive = $this->request->getPost('set_active') == '1';
+
+        if ($this->userModel->assignRole($userId, $roleId, $setActive)) {
+            return redirect()->back()->with('success', 'Rôle assigné avec succès');
+        }
+
+        return redirect()->back()->with('error', 'Ce rôle est déjà assigné à cet utilisateur');
+    }
+
+    /**
+     * Remove role from user
+     */
+    public function removeRole($userId, $roleId)
+    {
+        // Check if user has more than one role
+        $db = \Config\Database::connect();
+        $roleCount = $db->table('user_roles')
+            ->where('user_id', $userId)
+            ->countAllResults();
+
+        if ($roleCount <= 1) {
+            return redirect()->back()->with('error', 'L\'utilisateur doit avoir au moins un rôle');
+        }
+
+        if ($this->userModel->removeRole($userId, $roleId)) {
+            return redirect()->back()->with('success', 'Rôle retiré avec succès');
+        }
+
+        return redirect()->back()->with('error', 'Erreur lors du retrait du rôle');
+    }
 }

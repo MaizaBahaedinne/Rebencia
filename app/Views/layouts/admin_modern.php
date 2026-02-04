@@ -796,7 +796,7 @@
                          alt="Avatar" class="user-avatar">
                     <div class="user-info d-none d-md-block">
                         <div class="user-name"><?= esc(session()->get('user_name') ?? 'Admin') ?></div>
-                        <div class="user-role"><?= esc(session()->get('role_name') ?? 'Administrateur') ?></div>
+                        <div class="user-role"><?= esc(session()->get('role_display_name') ?? 'Administrateur') ?></div>
                     </div>
                     <i class="fas fa-chevron-down" style="color: #9ca3af; font-size: 0.8rem;"></i>
                 </div>
@@ -804,7 +804,44 @@
                     <li><a class="dropdown-item" href="<?= base_url('admin/profile') ?>">
                         <i class="fas fa-user me-2"></i> Mon Profil
                     </a></li>
-                    <li><a class="dropdown-item" href="<?= base_url('admin/settings') ?>">
+                    
+                    <?php 
+                    // Get user roles if multiple
+                    $userId = session()->get('user_id');
+                    if ($userId) {
+                        $userModel = model('UserModel');
+                        $userWithRoles = $userModel->getUserWithRoles($userId);
+                        if (!empty($userWithRoles['roles']) && count($userWithRoles['roles']) > 1):
+                    ?>
+                    <li><hr class="dropdown-divider"></li>
+                    <li class="px-3 py-1">
+                        <small class="text-muted text-uppercase" style="font-size: 0.7rem; font-weight: 600;">
+                            <i class="fas fa-user-shield"></i> Changer de Rôle
+                        </small>
+                    </li>
+                    <?php foreach ($userWithRoles['roles'] as $role): ?>
+                    <li>
+                        <form action="<?= base_url('admin/switch-role') ?>" method="post" class="m-0">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="role_id" value="<?= $role['role_id'] ?>">
+                            <button type="submit" class="dropdown-item <?= $role['is_active'] == 1 ? 'active' : '' ?>" 
+                                    <?= $role['is_active'] == 1 ? 'disabled' : '' ?>>
+                                <i class="fas fa-<?= $role['is_active'] == 1 ? 'check-circle' : 'circle' ?> me-2"></i>
+                                <?= esc($role['display_name']) ?>
+                                <?php if ($role['is_active'] == 1): ?>
+                                    <span class="badge bg-success ms-2" style="font-size: 0.65rem;">Actif</span>
+                                <?php endif; ?>
+                            </button>
+                        </form>
+                    </li>
+                    <?php endforeach; ?>
+                    <?php 
+                        endif;
+                    }
+                    ?>
+                    
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="<?= base_url('admin/settings/general') ?>">
                         <i class="fas fa-cog me-2"></i> Paramètres
                     </a></li>
                     <li><hr class="dropdown-divider"></li>

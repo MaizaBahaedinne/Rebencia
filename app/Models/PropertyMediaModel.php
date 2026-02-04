@@ -21,8 +21,7 @@ class PropertyMediaModel extends Model
         'mime_type',
         'title',
         'description',
-        'display_order',
-        'is_primary'
+        'display_order'
     ];
 
     // Dates
@@ -48,8 +47,8 @@ class PropertyMediaModel extends Model
     {
         return $this->where('property_id', $propertyId)
                     ->where('type', 'image')
-                    ->orderBy('is_primary', 'DESC')
                     ->orderBy('display_order', 'ASC')
+                    ->orderBy('created_at', 'ASC')
                     ->findAll();
     }
 
@@ -60,7 +59,7 @@ class PropertyMediaModel extends Model
     {
         return $this->where('property_id', $propertyId)
                     ->where('type', 'image')
-                    ->where('is_primary', 1)
+                    ->orderBy('display_order', 'ASC')
                     ->first();
     }
 
@@ -69,13 +68,8 @@ class PropertyMediaModel extends Model
      */
     public function setPrimaryImage($propertyId, $mediaId)
     {
-        // Retirer le statut primary de toutes les images
-        $this->where('property_id', $propertyId)
-             ->set(['is_primary' => 0])
-             ->update();
-
-        // Définir la nouvelle image principale
-        return $this->update($mediaId, ['is_primary' => 1]);
+        // Définir display_order = 0 pour cette image (sera affichée en premier)
+        return $this->update($mediaId, ['display_order' => 0]);
     }
 
     /**

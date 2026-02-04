@@ -62,7 +62,14 @@ INSERT INTO `permissions` (`name`, `display_name`, `description`, `module`, `cre
 ('reports_create', 'Créer Rapports', 'Créer des rapports', 'reports', NOW()),
 ('reports_update', 'Modifier Rapports', 'Modifier des rapports', 'reports', NOW()),
 ('reports_delete', 'Supprimer Rapports', 'Supprimer des rapports', 'reports', NOW()),
-('reports_export', 'Exporter Rapports', 'Exporter des rapports', 'reports', NOW());
+('reports_export', 'Exporter Rapports', 'Exporter des rapports', 'reports', NOW()),
+
+-- SÉCURITÉ (uniquement pour super admin niveau 100)
+('roles_view', 'Voir Rôles', 'Voir les rôles et permissions', 'roles', NOW()),
+('roles_create', 'Créer Rôles', 'Créer des rôles', 'roles', NOW()),
+('roles_update', 'Modifier Rôles', 'Modifier des rôles', 'roles', NOW()),
+('roles_delete', 'Supprimer Rôles', 'Supprimer des rôles', 'roles', NOW()),
+('roles_matrix', 'Matrice Permissions', 'Gérer la matrice des permissions', 'roles', NOW());
 
 -- =============================================
 -- 2. ASSIGNER LES PERMISSIONS AUX RÔLES

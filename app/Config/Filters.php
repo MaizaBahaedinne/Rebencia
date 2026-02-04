@@ -86,6 +86,7 @@ class Filters extends BaseConfig
                 'admin/agencies/*',
                 'admin/zones/*',
                 'admin/commissions/*',
+                'admin/roles/*',
             ],
             'except' => [
                 'admin/profile',

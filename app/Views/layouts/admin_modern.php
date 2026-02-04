@@ -677,7 +677,7 @@
             </a>
             <?php endif; ?>
 
-            <?php if (isAdmin()): ?>
+            <?php if (canRead('roles') || isSuperAdmin()): ?>
             <div class="menu-section-title">SÉCURITÉ</div>
             
             <a href="<?= base_url('admin/roles') ?>" class="menu-item <?= url_is('admin/roles') ? 'active' : '' ?>">

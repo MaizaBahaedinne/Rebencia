@@ -63,6 +63,8 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->delete('delete/(:num)', 'Properties::delete/$1');
         $routes->get('view/(:num)', 'Properties::view/$1');
         $routes->post('deleteImage/(:num)', 'Properties::deleteImage/$1');
+        $routes->get('assignments', 'Properties::assignments');
+        $routes->post('reassign', 'Properties::reassign');
     });
     
     // Clients & CRM

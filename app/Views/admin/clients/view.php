@@ -96,26 +96,26 @@
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
-                        <?php if ($client['property_type_preference']): ?>
+                        <?php if (!empty($client['property_type_preference'])): ?>
                             <div class="col-md-6">
                                 <small class="text-muted">Type de Bien</small>
                                 <div><strong><?= ucfirst($client['property_type_preference']) ?></strong></div>
                             </div>
                         <?php endif ?>
-                        <?php if ($client['transaction_type_preference']): ?>
+                        <?php if (!empty($client['transaction_type_preference'])): ?>
                             <div class="col-md-6">
                                 <small class="text-muted">Type de Transaction</small>
                                 <div><strong><?= ucfirst($client['transaction_type_preference']) ?></strong></div>
                             </div>
                         <?php endif ?>
-                        <?php if ($client['budget_min'] || $client['budget_max']): ?>
+                        <?php if (($client['budget_min'] ?? 0) || ($client['budget_max'] ?? 0)): ?>
                             <div class="col-md-6">
                                 <small class="text-muted">Budget</small>
                                 <div>
                                     <strong>
-                                        <?php if ($client['budget_min'] && $client['budget_max']): ?>
+                                        <?php if (($client['budget_min'] ?? 0) && ($client['budget_max'] ?? 0)): ?>
                                             <?= number_format($client['budget_min']) ?> - <?= number_format($client['budget_max']) ?> TND
-                                        <?php elseif ($client['budget_min']): ?>
+                                        <?php elseif ($client['budget_min'] ?? 0): ?>
                                             À partir de <?= number_format($client['budget_min']) ?> TND
                                         <?php else: ?>
                                             Jusqu'à <?= number_format($client['budget_max']) ?> TND
@@ -124,13 +124,13 @@
                                 </div>
                             </div>
                         <?php endif ?>
-                        <?php if ($client['area_preference']): ?>
+                        <?php if (!empty($client['area_preference'])): ?>
                             <div class="col-md-6">
                                 <small class="text-muted">Surface Souhaitée</small>
                                 <div><strong><?= number_format($client['area_preference']) ?> m²</strong></div>
                             </div>
                         <?php endif ?>
-                        <?php if ($client['preferred_zones']): ?>
+                        <?php if (!empty($client['preferred_zones'])): ?>
                             <div class="col-12">
                                 <small class="text-muted">Zones Préférées</small>
                                 <div class="mt-2">
@@ -149,7 +149,7 @@
                         <?php endif ?>
                     </div>
                     
-                    <?php if ($client['notes']): ?>
+                    <?php if (!empty($client['notes'])): ?>
                         <hr class="my-3">
                         <div>
                             <small class="text-muted">Notes</small>

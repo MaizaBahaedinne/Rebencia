@@ -150,7 +150,7 @@
                         <div class="mb-3">
                             <label for="hire_date" class="form-label">Date d'Embauche</label>
                             <input type="date" class="form-control" id="hire_date" name="hire_date" 
-                                   value="<?= old('hire_date', $user['hire_date']) ?>">
+                                   value="<?= old('hire_date', $user['hire_date'] ?? '') ?>">
                         </div>
 
                         <hr>

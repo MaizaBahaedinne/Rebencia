@@ -169,4 +169,126 @@ class Users extends BaseController
 
         return redirect()->to('/admin/users')->with('error', 'Erreur lors de la suppression');
     }
+
+    /**
+     * User profile page
+     */
+    public function profile()
+    {
+        $userId = session()->get('user_id');
+        $user = $this->userModel->find($userId);
+
+        if (!$user) {
+            return redirect()->to('/admin/login')->with('error', 'Session expirée');
+        }
+
+        // Get user with relationships
+        $user = $this->userModel->select('users.*, roles.display_name as role_name, agencies.name as agency_name')
+            ->join('roles', 'roles.id = users.role_id')
+            ->join('agencies', 'agencies.id = users.agency_id', 'left')
+            ->where('users.id', $userId)
+            ->first();
+
+        $data = [
+            'title' => 'Mon Profil',
+            'user' => $user,
+            'agencies' => $this->agencyModel->where('status', 'active')->findAll()
+        ];
+
+        return view('admin/users/profile', $data);
+    }
+
+    /**
+     * Update profile
+     */
+    public function updateProfile()
+    {
+        $userId = session()->get('user_id');
+        $user = $this->userModel->find($userId);
+
+        if (!$user) {
+            return redirect()->to('/admin/login')->with('error', 'Session expirée');
+        }
+
+        $validation = \Config\Services::validation();
+        
+        $rules = [
+            'first_name' => 'required|min_length[2]',
+            'last_name' => 'required|min_length[2]',
+            'email' => 'required|valid_email|is_unique[users.email,id,' . $userId . ']',
+            'phone' => 'permit_empty|min_length[8]',
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $validation->getErrors());
+        }
+
+        $data = [
+            'first_name' => $this->request->getPost('first_name'),
+            'last_name' => $this->request->getPost('last_name'),
+            'email' => $this->request->getPost('email'),
+            'phone' => $this->request->getPost('phone'),
+            'cin' => $this->request->getPost('cin'),
+            'agency_id' => $this->request->getPost('agency_id'),
+        ];
+
+        // Handle avatar upload
+        $avatar = $this->request->getFile('avatar');
+        if ($avatar && $avatar->isValid() && !$avatar->hasMoved()) {
+            // Delete old avatar if exists
+            if ($user['avatar'] && file_exists(ROOTPATH . 'public/uploads/avatars/' . $user['avatar'])) {
+                unlink(ROOTPATH . 'public/uploads/avatars/' . $user['avatar']);
+            }
+            
+            $newName = $avatar->getRandomName();
+            $avatar->move(ROOTPATH . 'public/uploads/avatars', $newName);
+            $data['avatar'] = $newName;
+        }
+
+        if ($this->userModel->update($userId, $data)) {
+            return redirect()->to('/admin/profile')->with('success', 'Profil mis à jour avec succès');
+        }
+
+        return redirect()->back()->withInput()->with('error', 'Erreur lors de la mise à jour');
+    }
+
+    /**
+     * Change password
+     */
+    public function changePassword()
+    {
+        $userId = session()->get('user_id');
+        $user = $this->userModel->find($userId);
+
+        if (!$user) {
+            return redirect()->to('/admin/login')->with('error', 'Session expirée');
+        }
+
+        $validation = \Config\Services::validation();
+        
+        $rules = [
+            'current_password' => 'required',
+            'new_password' => 'required|min_length[8]',
+            'confirm_password' => 'required|matches[new_password]',
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->with('password_errors', $validation->getErrors());
+        }
+
+        // Verify current password
+        if (!password_verify($this->request->getPost('current_password'), $user['password_hash'])) {
+            return redirect()->back()->with('password_error', 'Mot de passe actuel incorrect');
+        }
+
+        $data = [
+            'password_hash' => password_hash($this->request->getPost('new_password'), PASSWORD_BCRYPT)
+        ];
+
+        if ($this->userModel->update($userId, $data)) {
+            return redirect()->to('/admin/profile')->with('success', 'Mot de passe modifié avec succès');
+        }
+
+        return redirect()->back()->with('password_error', 'Erreur lors du changement de mot de passe');
+    }
 }

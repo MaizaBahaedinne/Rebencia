@@ -23,6 +23,11 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
     $routes->post('login', 'Auth::attemptLogin');
     $routes->get('logout', 'Auth::logout');
     
+    // Profile
+    $routes->get('profile', 'Users::profile');
+    $routes->post('profile/update', 'Users::updateProfile');
+    $routes->post('profile/change-password', 'Users::changePassword');
+    
     // Users Management
     $routes->group('users', function($routes) {
         $routes->get('/', 'Users::index');

@@ -624,43 +624,60 @@
 
             <div class="menu-section-title">GESTION</div>
             
+            <?php if (canRead('properties')): ?>
             <a href="<?= base_url('admin/properties') ?>" class="menu-item <?= url_is('admin/properties*') && !url_is('admin/properties/assignments*') ? 'active' : '' ?>">
                 <i class="fas fa-building"></i>
                 <span>Biens Immobiliers</span>
             </a>
+            <?php endif; ?>
 
+            <?php if (canUpdate('properties') || isAdmin()): ?>
             <a href="<?= base_url('admin/properties/assignments') ?>" class="menu-item <?= url_is('admin/properties/assignments*') ? 'active' : '' ?>">
                 <i class="fas fa-exchange-alt"></i>
                 <span>Affectation des Biens</span>
             </a>
+            <?php endif; ?>
             
+            <?php if (canRead('clients')): ?>
             <a href="<?= base_url('admin/clients') ?>" class="menu-item <?= url_is('admin/clients*') ? 'active' : '' ?>">
                 <i class="fas fa-users"></i>
                 <span>Clients</span>
             </a>
+            <?php endif; ?>
             
+            <?php if (canRead('transactions')): ?>
             <a href="<?= base_url('admin/transactions') ?>" class="menu-item <?= url_is('admin/transactions*') ? 'active' : '' ?>">
                 <i class="fas fa-file-invoice-dollar"></i>
                 <span>Transactions</span>
             </a>
+            <?php endif; ?>
             
+            <?php if (canRead('commissions') || isAdmin()): ?>
             <a href="<?= base_url('admin/commissions') ?>" class="menu-item <?= url_is('admin/commissions*') ? 'active' : '' ?>">
                 <i class="fas fa-dollar-sign"></i>
                 <span>Commissions</span>
             </a>
+            <?php endif; ?>
 
+            <?php if (canRead('agencies') || canRead('users')): ?>
             <div class="menu-section-title">ORGANISATION</div>
+            <?php endif; ?>
             
+            <?php if (canRead('agencies')): ?>
             <a href="<?= base_url('admin/agencies') ?>" class="menu-item <?= url_is('admin/agencies*') ? 'active' : '' ?>">
                 <i class="fas fa-store"></i>
                 <span>Agences</span>
             </a>
+            <?php endif; ?>
             
+            <?php if (canRead('users')): ?>
             <a href="<?= base_url('admin/users') ?>" class="menu-item <?= url_is('admin/users*') ? 'active' : '' ?>">
                 <i class="fas fa-user-tie"></i>
                 <span>Utilisateurs</span>
             </a>
+            <?php endif; ?>
 
+            <?php if (isAdmin()): ?>
             <div class="menu-section-title">SÉCURITÉ</div>
             
             <a href="<?= base_url('admin/roles') ?>" class="menu-item <?= url_is('admin/roles') ? 'active' : '' ?>">
@@ -672,28 +689,37 @@
                 <i class="fas fa-table"></i>
                 <span>Matrice Permissions</span>
             </a>
+            <?php endif; ?>
 
             <div class="menu-section-title">OUTILS</div>
             
+            <?php if (canRead('properties')): ?>
             <a href="<?= base_url('admin/workflows/pipeline/property') ?>" class="menu-item <?= url_is('admin/workflows*') ? 'active' : '' ?>">
                 <i class="fas fa-project-diagram"></i>
                 <span>Pipeline Ventes</span>
             </a>
+            <?php endif; ?>
             
+            <?php if (canRead('zones') || isAdmin()): ?>
             <a href="<?= base_url('admin/zones') ?>" class="menu-item <?= url_is('admin/zones*') ? 'active' : '' ?>">
                 <i class="fas fa-map-marked-alt"></i>
                 <span>Zones</span>
             </a>
+            <?php endif; ?>
             
+            <?php if (canRead('properties')): ?>
             <a href="<?= base_url('admin/estimations') ?>" class="menu-item <?= url_is('admin/estimations*') ? 'active' : '' ?>">
                 <i class="fas fa-chart-line"></i>
                 <span>Estimation IA</span>
             </a>
+            <?php endif; ?>
             
+            <?php if (canRead('transactions') || canRead('properties')): ?>
             <a href="<?= base_url('admin/reports') ?>" class="menu-item <?= url_is('admin/reports*') ? 'active' : '' ?>">
                 <i class="fas fa-chart-bar"></i>
                 <span>Rapports & Export</span>
             </a>
+            <?php endif; ?>
             
             <a href="<?= base_url('admin/analytics') ?>" class="menu-item <?= url_is('admin/analytics*') ? 'active' : '' ?>">
                 <i class="fas fa-chart-line"></i>
@@ -715,11 +741,14 @@
                 <span>Chat</span>
             </a>
             
+            <?php if (isAdmin()): ?>
             <a href="<?= base_url('admin/objectives') ?>" class="menu-item <?= url_is('admin/objectives*') ? 'active' : '' ?>">
                 <i class="fas fa-bullseye"></i>
                 <span>Objectifs</span>
             </a>
+            <?php endif; ?>
 
+            <?php if (isAdmin()): ?>
             <div class="menu-section-title">SYSTÈME</div>
             
             <a href="<?= base_url('admin/system') ?>" class="menu-item <?= url_is('admin/system*') ? 'active' : '' ?>">
@@ -751,6 +780,7 @@
                 <i class="fas fa-bell"></i>
                 <span>Notifications</span>
             </a>
+            <?php endif; ?>
             
             <a href="<?= base_url('admin/logout') ?>" class="menu-item" style="margin-top: 2rem; color: #ef4444;">
                 <i class="fas fa-sign-out-alt"></i>

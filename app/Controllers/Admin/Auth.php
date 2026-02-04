@@ -46,12 +46,34 @@ class Auth extends BaseController
             return redirect()->back()->withInput()->with('error', 'Votre compte est désactivé');
         }
 
+        // Récupérer le rôle par défaut ou actif
+        $defaultRole = $userModel->getDefaultRole($user['id']);
+        if (!$defaultRole) {
+            // Si pas de rôle par défaut, chercher n'importe quel rôle
+            $userWithRoles = $userModel->getUserWithRoles($user['id']);
+            if (!empty($userWithRoles['roles'])) {
+                $defaultRole = $userWithRoles['roles'][0];
+                // Définir comme actif
+                $userModel->switchRole($user['id'], $defaultRole['role_id']);
+            }
+        }
+
+        // Construire le nom complet
+        $fullName = trim($user['first_name'] . ' ' . $user['last_name']);
+        if (empty($fullName)) {
+            $fullName = $user['username'] ?? $user['email'];
+        }
+
         // Set session
         session()->set([
             'user_id' => $user['id'],
             'username' => $user['username'],
+            'user_name' => $fullName,
             'email' => $user['email'],
-            'role_id' => $user['role_id'],
+            'role_id' => $defaultRole['role_id'] ?? $user['role_id'],
+            'role_name' => $defaultRole['name'] ?? null,
+            'role_display_name' => $defaultRole['display_name'] ?? 'Utilisateur',
+            'role_level' => $defaultRole['level'] ?? 0,
             'agency_id' => $user['agency_id'],
             'is_logged_in' => true
         ]);

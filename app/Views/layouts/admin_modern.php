@@ -624,9 +624,14 @@
 
             <div class="menu-section-title">GESTION</div>
             
-            <a href="<?= base_url('admin/properties') ?>" class="menu-item <?= url_is('admin/properties*') ? 'active' : '' ?>">
+            <a href="<?= base_url('admin/properties') ?>" class="menu-item <?= url_is('admin/properties*') && !url_is('admin/properties/assignments*') ? 'active' : '' ?>">
                 <i class="fas fa-building"></i>
                 <span>Biens Immobiliers</span>
+            </a>
+
+            <a href="<?= base_url('admin/properties/assignments') ?>" class="menu-item <?= url_is('admin/properties/assignments*') ? 'active' : '' ?>">
+                <i class="fas fa-exchange-alt"></i>
+                <span>Affectation des Biens</span>
             </a>
             
             <a href="<?= base_url('admin/clients') ?>" class="menu-item <?= url_is('admin/clients*') ? 'active' : '' ?>">

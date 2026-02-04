@@ -57,7 +57,8 @@
                                     <tr>
                                         <th>Rôle</th>
                                         <th>Niveau</th>
-                                        <th>Statut</th>
+                                        <th>Par Défaut</th>
+                                        <th>Actif</th>
                                         <th>Assigné le</th>
                                         <th>Actions</th>
                                     </tr>
@@ -76,6 +77,21 @@
                                             </span>
                                         </td>
                                         <td>
+                                            <?php if ($role['is_default'] == 1): ?>
+                                                <span class="badge badge-primary">
+                                                    <i class="fas fa-star"></i> Par défaut
+                                                </span>
+                                            <?php else: ?>
+                                                <form action="<?= base_url('admin/users/set-default-role/' . $user['id']) ?>" method="post" class="d-inline">
+                                                    <?= csrf_field() ?>
+                                                    <input type="hidden" name="role_id" value="<?= $role['role_id'] ?>">
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary" title="Définir comme rôle par défaut">
+                                                        <i class="far fa-star"></i>
+                                                    </button>
+                                                </form>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
                                             <?php if ($role['is_active'] == 1): ?>
                                                 <span class="badge badge-success">
                                                     <i class="fas fa-check-circle"></i> Actif
@@ -90,13 +106,14 @@
                                             </small>
                                         </td>
                                         <td class="text-nowrap">
-                                            <?php if (count($user['roles']) > 1): ?>
+                                            <?php if (count($user['roles']) > 1 && $role['is_default'] != 1): ?>
                                                 <button type="button" class="btn btn-sm btn-danger" 
                                                         onclick="confirmRemove(<?= $user['id'] ?>, <?= $role['role_id'] ?>, '<?= esc($role['display_name']) ?>')">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             <?php else: ?>
-                                                <button type="button" class="btn btn-sm btn-secondary" disabled title="Au moins un rôle requis">
+                                                <button type="button" class="btn btn-sm btn-secondary" disabled 
+                                                        title="<?= $role['is_default'] == 1 ? 'Rôle par défaut protégé' : 'Au moins un rôle requis' ?>">
                                                     <i class="fas fa-lock"></i>
                                                 </button>
                                             <?php endif; ?>
@@ -143,7 +160,7 @@
                         </div>
 
                         <div class="form-group">
-                            <div class="custom-control custom-checkbox">
+                            <div class="custom-control custom-checkbox mb-2">
                                 <input type="checkbox" class="custom-control-input" id="set_active" name="set_active" value="1">
                                 <label class="custom-control-label" for="set_active">
                                     Définir comme rôle actif
@@ -151,6 +168,18 @@
                             </div>
                             <small class="form-text text-muted">
                                 Si coché, ce rôle deviendra le rôle actif de l'utilisateur
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox mb-2">
+                                <input type="checkbox" class="custom-control-input" id="set_default" name="set_default" value="1">
+                                <label class="custom-control-label" for="set_default">
+                                    <i class="fas fa-star text-warning"></i> Définir comme rôle par défaut
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">
+                                Le rôle par défaut est automatiquement chargé lors de la connexion
                             </small>
                         </div>
 
@@ -169,10 +198,12 @@
                     </h6>
                     <ul class="small mb-0">
                         <li>Un utilisateur peut avoir <strong>plusieurs rôles</strong></li>
-                        <li>Un seul rôle peut être <strong>actif</strong> à la fois</li>
+                        <li><strong>Rôle par défaut</strong> <i class="fas fa-star text-warning"></i> : chargé automatiquement au login</li>
+                        <li><strong>Rôle actif</strong> <i class="fas fa-check-circle text-success"></i> : utilisé actuellement dans la session</li>
                         <li>L'utilisateur peut <strong>switcher</strong> entre ses rôles</li>
                         <li>Les permissions sont basées sur le <strong>rôle actif</strong></li>
                         <li>Au moins <strong>un rôle</strong> doit être assigné</li>
+                        <li>Le <strong>rôle par défaut</strong> ne peut pas être supprimé</li>
                     </ul>
                 </div>
             </div>

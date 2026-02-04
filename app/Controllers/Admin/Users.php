@@ -361,12 +361,43 @@ class Users extends BaseController
     {
         $roleId = $this->request->getPost('role_id');
         $setActive = $this->request->getPost('set_active') == '1';
+        $setDefault = $this->request->getPost('set_default') == '1';
 
-        if ($this->userModel->assignRole($userId, $roleId, $setActive)) {
+        if ($this->userModel->assignRole($userId, $roleId, $setActive, $setDefault)) {
             return redirect()->back()->with('success', 'Rôle assigné avec succès');
         }
 
         return redirect()->back()->with('error', 'Ce rôle est déjà assigné à cet utilisateur');
+    }
+
+    /**
+     * Set default role for user
+     */
+    public function setDefaultRole($userId)
+    {
+        $roleId = $this->request->getPost('role_id');
+
+        if (!$roleId) {
+            return redirect()->back()->with('error', 'Rôle non spécifié');
+        }
+
+        // Verify user has this role
+        $db = \Config\Database::connect();
+        $userRole = $db->table('user_roles')
+            ->where('user_id', $userId)
+            ->where('role_id', $roleId)
+            ->get()
+            ->getRowArray();
+
+        if (!$userRole) {
+            return redirect()->back()->with('error', 'L\'utilisateur n\'a pas ce rôle');
+        }
+
+        if ($this->userModel->setDefaultRole($userId, $roleId)) {
+            return redirect()->back()->with('success', 'Rôle par défaut défini avec succès');
+        }
+
+        return redirect()->back()->with('error', 'Erreur lors de la définition du rôle par défaut');
     }
 
     /**

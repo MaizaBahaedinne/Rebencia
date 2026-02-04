@@ -38,6 +38,7 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->delete('delete/(:num)', 'Users::delete/$1');
         $routes->get('manage-roles/(:num)', 'Users::manageRoles/$1');
         $routes->post('assign-role/(:num)', 'Users::assignRole/$1');
+        $routes->post('set-default-role/(:num)', 'Users::setDefaultRole/$1');
         $routes->get('remove-role/(:num)/(:num)', 'Users::removeRole/$1/$2');
     });
 

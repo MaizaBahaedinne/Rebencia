@@ -26,6 +26,12 @@ class CreateUserRolesTable extends Migration
                 'constraint' => 11,
                 'unsigned' => true,
             ],
+            'is_default' => [
+                'type' => 'TINYINT',
+                'constraint' => 1,
+                'default' => 0,
+                'comment' => '1 = rôle par défaut (utilisé au login)',
+            ],
             'is_active' => [
                 'type' => 'TINYINT',
                 'constraint' => 1,
@@ -60,6 +66,7 @@ class CreateUserRolesTable extends Migration
                 $db->table('user_roles')->insert([
                     'user_id' => $user['id'],
                     'role_id' => $user['role_id'],
+                    'is_default' => 1, // Premier rôle = rôle par défaut
                     'is_active' => 1,
                     'assigned_at' => date('Y-m-d H:i:s'),
                 ]);

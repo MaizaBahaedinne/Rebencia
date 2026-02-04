@@ -124,6 +124,43 @@ class UserModel extends Model
     }
 
     /**
+     * Get default role for user
+     */
+    public function getDefaultRole($userId)
+    {
+        $db = \Config\Database::connect();
+        
+        return $db->table('user_roles')
+            ->select('user_roles.*, roles.name, roles.display_name, roles.level')
+            ->join('roles', 'roles.id = user_roles.role_id')
+            ->where('user_roles.user_id', $userId)
+            ->where('user_roles.is_default', 1)
+            ->get()
+            ->getRowArray();
+    }
+
+    /**
+     * Set default role for user
+     */
+    public function setDefaultRole($userId, $roleId)
+    {
+        $db = \Config\Database::connect();
+        
+        // Remove is_default from all roles
+        $db->table('user_roles')
+            ->where('user_id', $userId)
+            ->update(['is_default' => 0]);
+        
+        // Set new default role
+        $db->table('user_roles')
+            ->where('user_id', $userId)
+            ->where('role_id', $roleId)
+            ->update(['is_default' => 1]);
+        
+        return true;
+    }
+
+    /**
      * Switch active role for user
      */
     public function switchRole($userId, $roleId)
@@ -147,7 +184,7 @@ class UserModel extends Model
     /**
      * Assign role to user
      */
-    public function assignRole($userId, $roleId, $setActive = false)
+    public function assignRole($userId, $roleId, $setActive = false, $setDefault = false)
     {
         $db = \Config\Database::connect();
         
@@ -162,7 +199,27 @@ class UserModel extends Model
             return false; // Already assigned
         }
         
-        // If this is the first role or setActive is true, deactivate others
+        // Check if this is the first role
+        $roleCount = $db->table('user_roles')
+            ->where('user_id', $userId)
+            ->countAllResults();
+        
+        $isFirstRole = ($roleCount == 0);
+        
+        // If this is the first role, make it default and active
+        if ($isFirstRole) {
+            $setDefault = true;
+            $setActive = true;
+        }
+        
+        // If setDefault is true, remove default from other roles
+        if ($setDefault) {
+            $db->table('user_roles')
+                ->where('user_id', $userId)
+                ->update(['is_default' => 0]);
+        }
+        
+        // If setActive is true, deactivate others
         if ($setActive) {
             $db->table('user_roles')
                 ->where('user_id', $userId)
@@ -173,6 +230,7 @@ class UserModel extends Model
         $db->table('user_roles')->insert([
             'user_id' => $userId,
             'role_id' => $roleId,
+            'is_default' => $setDefault ? 1 : 0,
             'is_active' => $setActive ? 1 : 0,
             'assigned_at' => date('Y-m-d H:i:s'),
             'assigned_by' => session()->get('user_id'),

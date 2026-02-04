@@ -59,6 +59,16 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->get('view/(:num)', 'Agencies::view/$1');
     });
     
+    // Zones
+    $routes->group('zones', function($routes) {
+        $routes->get('/', 'Zones::index');
+        $routes->get('create', 'Zones::create');
+        $routes->post('store', 'Zones::store');
+        $routes->get('edit/(:num)', 'Zones::edit/$1');
+        $routes->post('update/(:num)', 'Zones::update/$1');
+        $routes->get('delete/(:num)', 'Zones::delete/$1');
+    });
+    
     // Properties
     $routes->group('properties', function($routes) {
         $routes->get('/', 'Properties::index');

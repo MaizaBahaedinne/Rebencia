@@ -143,11 +143,11 @@
                             <div class="col-md-6">
                                 <label for="notary" class="form-label">Notaire</label>
                                 <input type="text" class="form-control" id="notary" name="notary" 
-                                       value="<?= old('notary', $transaction['notary']) ?>" placeholder="Nom du notaire">
+                                       value="<?= old('notary', $transaction['notary'] ?? '') ?>" placeholder="Nom du notaire">
                             </div>
                             <div class="col-12">
                                 <label for="notes" class="form-label">Notes et Commentaires</label>
-                                <textarea class="form-control" id="notes" name="notes" rows="3"><?= old('notes', $transaction['notes']) ?></textarea>
+                                <textarea class="form-control" id="notes" name="notes" rows="3"><?= old('notes', $transaction['notes'] ?? '') ?></textarea>
                             </div>
                         </div>
                     </div>

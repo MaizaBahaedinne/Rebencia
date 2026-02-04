@@ -120,8 +120,8 @@
                             <div class="col-md-4">
                                 <label for="commission_paid" class="form-label">Statut Paiement</label>
                                 <select class="form-select" id="commission_paid" name="commission_paid">
-                                    <option value="0" <?= old('commission_paid', $transaction['commission_paid']) == '0' ? 'selected' : '' ?>>Non Payée</option>
-                                    <option value="1" <?= old('commission_paid', $transaction['commission_paid']) == '1' ? 'selected' : '' ?>>Payée</option>
+                                    <option value="0" <?= old('commission_paid', $transaction['commission_paid'] ?? '0') == '0' ? 'selected' : '' ?>>Non Payée</option>
+                                    <option value="1" <?= old('commission_paid', $transaction['commission_paid'] ?? '0') == '1' ? 'selected' : '' ?>>Payée</option>
                                 </select>
                             </div>
                         </div>
@@ -234,9 +234,9 @@
                                 <th>Total Commission:</th>
                                 <td id="summary_commission" class="text-end fw-bold"><?= number_format($transaction['commission_amount'], 2) ?> TND</td>
                             </tr>
-                            <tr class="<?= $transaction['commission_paid'] ? 'table-success' : 'table-danger' ?>">
+                            <tr class="<?= ($transaction['commission_paid'] ?? 0) ? 'table-success' : 'table-danger' ?>">
                                 <th>Paiement:</th>
-                                <td class="text-end"><?= $transaction['commission_paid'] ? '✓ Payée' : '✗ Non Payée' ?></td>
+                                <td class="text-end"><?= ($transaction['commission_paid'] ?? 0) ? '✓ Payée' : '✗ Non Payée' ?></td>
                             </tr>
                         </table>
                     </div>

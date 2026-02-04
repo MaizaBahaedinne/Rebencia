@@ -40,7 +40,7 @@ class Transactions extends BaseController
         
         $data = [
             'title' => 'Nouvelle Transaction',
-            'properties' => $this->propertyModel->where('is_published', 1)->findAll(),
+            'properties' => $this->propertyModel->where('status', 'published')->findAll(),
             'buyers' => $this->clientModel->whereIn('type', ['buyer', 'tenant'])->findAll(),
             'sellers' => $this->clientModel->whereIn('type', ['seller', 'landlord'])->findAll(),
             'agents' => $userModel->where('role_id >=', 6)->findAll(),
@@ -118,7 +118,7 @@ class Transactions extends BaseController
         $data = [
             'title' => 'Modifier Transaction',
             'transaction' => $transaction,
-            'properties' => $this->propertyModel->where('is_published', 1)->findAll(),
+            'properties' => $this->propertyModel->where('status', 'published')->findAll(),
             'buyers' => $this->clientModel->whereIn('type', ['buyer', 'tenant'])->findAll(),
             'sellers' => $this->clientModel->whereIn('type', ['seller', 'landlord'])->findAll(),
             'agents' => $userModel->where('role_id >=', 6)->findAll(),

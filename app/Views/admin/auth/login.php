@@ -145,16 +145,16 @@
             <p>Plateforme Immobilière Multi-Agences</p>
         </div>
 
-        <?php if i class="fas fa-exclamation-circle me-2"></i>
+        <?php if (session()->getFlashdata('error')): ?>
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle me-2"></i>
                 <?= session()->getFlashdata('error') ?>
             </div>
         <?php endif; ?>
 
         <?php if (session()->getFlashdata('success')): ?>
             <div class="alert alert-success">
-                <i class="fas fa-check-circle me-2"></i
-        <?php if (session()->getFlashdata('success')): ?>
-            <div class="alert alert-success">
+                <i class="fas fa-check-circle me-2"></i>
                 <?= session()->getFlashdata('success') ?>
             </div>
         <?php endif; ?>

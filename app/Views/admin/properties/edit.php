@@ -145,7 +145,7 @@
                         <div class="col-md-3 mb-3">
                             <label for="area" class="form-label">Surface (m²) <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="area" name="area" 
-                                   value="<?= $property['area'] ?>" min="0" step="0.01" required>
+                                   value="<?= $property['area_total'] ?? '' ?>" min="0" step="0.01" required>
                         </div>
                         <div class="col-md-3 mb-3">
                             <label for="floor" class="form-label">Étage</label>

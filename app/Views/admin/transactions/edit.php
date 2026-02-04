@@ -138,7 +138,7 @@
                             <div class="col-md-6">
                                 <label for="contract_number" class="form-label">Numéro de Contrat</label>
                                 <input type="text" class="form-control" id="contract_number" name="contract_number" 
-                                       value="<?= old('contract_number', $transaction['contract_number']) ?>" placeholder="CONT-XXXXXX">
+                                       value="<?= old('contract_number', $transaction['contract_number'] ?? '') ?>" placeholder="CONT-XXXXXX">
                             </div>
                             <div class="col-md-6">
                                 <label for="notary" class="form-label">Notaire</label>

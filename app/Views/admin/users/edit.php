@@ -74,7 +74,7 @@
                             <div class="col-md-6">
                                 <label for="cin" class="form-label">CIN</label>
                                 <input type="text" class="form-control" id="cin" name="cin" 
-                                       value="<?= old('cin', $user['cin']) ?>" placeholder="12345678">
+                                       value="<?= old('cin', $user['cin'] ?? '') ?>" placeholder="12345678">
                             </div>
                         </div>
                     </div>

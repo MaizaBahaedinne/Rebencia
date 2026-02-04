@@ -134,8 +134,12 @@ class Settings extends BaseController
     private function formatSettings($settings)
     {
         $formatted = [];
-        foreach ($settings as $setting) {
-            $formatted[$setting['key']] = $setting['value'];
+        if (is_array($settings)) {
+            foreach ($settings as $setting) {
+                if (isset($setting['key']) && isset($setting['value'])) {
+                    $formatted[$setting['key']] = $setting['value'];
+                }
+            }
         }
         return $formatted;
     }

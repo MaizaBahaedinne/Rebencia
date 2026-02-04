@@ -57,7 +57,7 @@
                                     <tr>
                                         <th>Rôle</th>
                                         <th>Niveau</th>
-                                        <th>Par Défaut</th>
+a                                        <th>Par Défaut</th>
                                         <th>Actif</th>
                                         <th>Assigné le</th>
                                         <th>Actions</th>
@@ -77,7 +77,7 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <?php if ($role['is_default'] == 1): ?>
+                                            <?php if (($role['is_default'] ?? 0) == 1): ?>
                                                 <span class="badge badge-primary">
                                                     <i class="fas fa-star"></i> Par défaut
                                                 </span>
@@ -106,14 +106,14 @@
                                             </small>
                                         </td>
                                         <td class="text-nowrap">
-                                            <?php if (count($user['roles']) > 1 && $role['is_default'] != 1): ?>
+                                            <?php if (count($user['roles']) > 1 && ($role['is_default'] ?? 0) != 1): ?>
                                                 <button type="button" class="btn btn-sm btn-danger" 
                                                         onclick="confirmRemove(<?= $user['id'] ?>, <?= $role['role_id'] ?>, '<?= esc($role['display_name']) ?>')">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             <?php else: ?>
                                                 <button type="button" class="btn btn-sm btn-secondary" disabled 
-                                                        title="<?= $role['is_default'] == 1 ? 'Rôle par défaut protégé' : 'Au moins un rôle requis' ?>">
+                                                        title="<?= ($role['is_default'] ?? 0) == 1 ? 'Rôle par défaut protégé' : 'Au moins un rôle requis' ?>">
                                                     <i class="fas fa-lock"></i>
                                                 </button>
                                             <?php endif; ?>

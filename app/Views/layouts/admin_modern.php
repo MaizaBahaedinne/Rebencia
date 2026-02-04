@@ -819,27 +819,42 @@
                         if (!empty($userWithRoles['roles']) && count($userWithRoles['roles']) > 1):
                     ?>
                     <li><hr class="dropdown-divider"></li>
-                    <li class="px-3 py-1">
-                        <small class="text-muted text-uppercase" style="font-size: 0.7rem; font-weight: 600;">
-                            <i class="fas fa-user-shield"></i> Changer de Rôle
-                        </small>
+                    <li class="px-3 py-2">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">
+                                <i class="fas fa-user-shield"></i> Changer de Rôle
+                            </small>
+                        </div>
+                        <div class="list-group list-group-flush">
+                            <?php foreach ($userWithRoles['roles'] as $role): ?>
+                            <form action="<?= base_url('admin/switch-role') ?>" method="post" class="m-0">
+                                <?= csrf_field() ?>
+                                <input type="hidden" name="role_id" value="<?= $role['role_id'] ?>">
+                                <button type="submit" 
+                                        class="list-group-item list-group-item-action border-0 py-2 px-3 <?= $role['is_active'] == 1 ? 'active bg-primary text-white' : '' ?>" 
+                                        <?= $role['is_active'] == 1 ? 'disabled' : '' ?>
+                                        style="border-radius: 8px; margin-bottom: 4px; <?= $role['is_active'] == 1 ? '' : 'background: #f8f9fa;' ?>">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-<?= $role['is_active'] == 1 ? 'check-circle' : 'circle' ?> me-2"></i>
+                                            <div>
+                                                <div class="fw-semibold" style="font-size: 0.9rem;">
+                                                    <?= esc($role['display_name']) ?>
+                                                </div>
+                                                <small class="<?= $role['is_active'] == 1 ? 'text-white-50' : 'text-muted' ?>" style="font-size: 0.75rem;">
+                                                    Niveau <?= $role['level'] ?>
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <?php if ($role['is_active'] == 1): ?>
+                                            <span class="badge bg-light text-primary" style="font-size: 0.7rem;">Actif</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </button>
+                            </form>
+                            <?php endforeach; ?>
+                        </div>
                     </li>
-                    <?php foreach ($userWithRoles['roles'] as $role): ?>
-                    <li>
-                        <form action="<?= base_url('admin/switch-role') ?>" method="post" class="m-0">
-                            <?= csrf_field() ?>
-                            <input type="hidden" name="role_id" value="<?= $role['role_id'] ?>">
-                            <button type="submit" class="dropdown-item <?= $role['is_active'] == 1 ? 'active' : '' ?>" 
-                                    <?= $role['is_active'] == 1 ? 'disabled' : '' ?>>
-                                <i class="fas fa-<?= $role['is_active'] == 1 ? 'check-circle' : 'circle' ?> me-2"></i>
-                                <?= esc($role['display_name']) ?>
-                                <?php if ($role['is_active'] == 1): ?>
-                                    <span class="badge bg-success ms-2" style="font-size: 0.65rem;">Actif</span>
-                                <?php endif; ?>
-                            </button>
-                        </form>
-                    </li>
-                    <?php endforeach; ?>
                     <?php 
                         endif;
                     }

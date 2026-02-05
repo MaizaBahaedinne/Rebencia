@@ -210,47 +210,63 @@
                                 <label class="form-label">Acheteur/Locataire <span class="text-danger">*</span></label>
                                 <select class="form-select" name="buyer_id" id="buyer_id" required>
                                     <option value="">-- Sélectionner --</option>
-                                    <?php foreach ($buyers as $buyer): ?>
-                                        <option value="<?= $buyer['id'] ?>">
-                                            <?= esc($buyer['first_name'] . ' ' . $buyer['last_name']) ?> - <?= esc($buyer['phone']) ?>
-                                        </option>
-                                    <?php endforeach; ?>
+                                    <?php if (!empty($buyers)): ?>
+                                        <?php foreach ($buyers as $buyer): ?>
+                                            <option value="<?= $buyer['id'] ?>">
+                                                <?= esc($buyer['first_name'] . ' ' . $buyer['last_name']) ?> - <?= esc($buyer['phone']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <option value="">Aucun acheteur disponible</option>
+                                    <?php endif; ?>
                                 </select>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Vendeur/Propriétaire</label>
                                 <select class="form-select" name="seller_id" id="seller_id">
                                     <option value="">-- Sélectionner --</option>
-                                    <?php foreach ($sellers as $seller): ?>
-                                        <option value="<?= $seller['id'] ?>">
-                                            <?= esc($seller['first_name'] . ' ' . $seller['last_name']) ?> - <?= esc($seller['phone']) ?>
-                                        </option>
-                                    <?php endforeach; ?>
+                                    <?php if (!empty($sellers)): ?>
+                                        <?php foreach ($sellers as $seller): ?>
+                                            <option value="<?= $seller['id'] ?>">
+                                                <?= esc($seller['first_name'] . ' ' . $seller['last_name']) ?> - <?= esc($seller['phone']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <option value="">Aucun vendeur disponible</option>
+                                    <?php endif; ?>
                                 </select>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Agent Responsable <span class="text-danger">*</span></label>
                                 <select class="form-select" name="agent_id" id="agent_id" required onchange="updateCommission()">
                                     <option value="">-- Sélectionner --</option>
-                                    <?php foreach ($agents as $agent): ?>
-                                        <option value="<?= $agent['id'] ?>" 
-                                                data-role="<?= $agent['role_id'] ?>"
-                                                data-agency="<?= $agent['agency_id'] ?>"
-                                                <?= $agent['id'] == session()->get('user_id') ? 'selected' : '' ?>>
-                                            <?= esc($agent['first_name'] . ' ' . $agent['last_name']) ?>
-                                        </option>
-                                    <?php endforeach; ?>
+                                    <?php if (!empty($agents)): ?>
+                                        <?php foreach ($agents as $agent): ?>
+                                            <option value="<?= $agent['id'] ?>" 
+                                                    data-role="<?= $agent['role_id'] ?? '' ?>"
+                                                    data-agency="<?= $agent['agency_id'] ?? '' ?>"
+                                                    <?= $agent['id'] == session()->get('user_id') ? 'selected' : '' ?>>
+                                                <?= esc($agent['first_name'] . ' ' . $agent['last_name']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <option value="">Aucun agent disponible</option>
+                                    <?php endif; ?>
                                 </select>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Agence</label>
                                 <select class="form-select" name="agency_id" id="agency_id">
                                     <option value="">-- Sélectionner --</option>
-                                    <?php foreach ($agencies as $agency): ?>
-                                        <option value="<?= $agency['id'] ?>">
-                                            <?= esc($agency['name']) ?>
-                                        </option>
-                                    <?php endforeach; ?>
+                                    <?php if (!empty($agencies)): ?>
+                                        <?php foreach ($agencies as $agency): ?>
+                                            <option value="<?= $agency['id'] ?>">
+                                                <?= esc($agency['name']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <option value="">Aucune agence disponible</option>
+                                    <?php endif; ?>
                                 </select>
                             </div>
                         </div>

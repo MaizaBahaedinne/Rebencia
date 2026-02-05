@@ -48,9 +48,9 @@ class Transactions extends BaseController
         $data = [
             'title' => 'Nouvelle Transaction',
             'properties' => $this->propertyModel->where('status', 'published')->findAll(),
-            'buyers' => $this->clientModel->whereIn('type', ['buyer', 'tenant'])->findAll(),
-            'sellers' => $this->clientModel->whereIn('type', ['seller', 'landlord'])->findAll(),
-            'agents' => $userModel->where('role_id >=', 6)->findAll(),
+            'buyers' => $this->clientModel->whereIn('type', ['buyer', 'tenant'])->where('status', 'active')->findAll(),
+            'sellers' => $this->clientModel->whereIn('type', ['seller', 'landlord'])->where('status', 'active')->findAll(),
+            'agents' => $userModel->whereIn('role_id', [6, 7, 8])->where('status', 'active')->findAll(),
             'agencies' => $agencyModel->where('status', 'active')->findAll()
         ];
 

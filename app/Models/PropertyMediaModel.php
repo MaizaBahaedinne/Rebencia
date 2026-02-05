@@ -28,7 +28,7 @@ class PropertyMediaModel extends Model
     protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
+    protected $updatedField  = '';
 
     // Validation
     protected $validationRules      = [

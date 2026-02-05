@@ -34,7 +34,7 @@ class Clients extends BaseController
         
         $data = [
             'title' => 'Nouveau Client',
-            'agents' => $this->userModel->where('role_id >=', 6)->findAll(),
+            'agents' => $this->userModel->whereIn('role_id', [6, 7, 8])->where('status', 'active')->findAll(),
             'agencies' => $this->agencyModel->where('status', 'active')->findAll(),
             'zones' => $zoneModel->findAll()
         ];
@@ -108,7 +108,7 @@ class Clients extends BaseController
         $data = [
             'title' => 'Modifier Client',
             'client' => $client,
-            'agents' => $this->userModel->where('role_id >=', 6)->findAll(),
+            'agents' => $this->userModel->whereIn('role_id', [6, 7, 8])->where('status', 'active')->findAll(),
             'agencies' => $this->agencyModel->where('status', 'active')->findAll(),
             'zones' => $zoneModel->findAll()
         ];

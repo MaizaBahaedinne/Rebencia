@@ -19,32 +19,9 @@
 <?php endif; ?>
 
 <div class="card">
-    <div class="card-header bg-white">
-        <div class="row">
-            <div class="col-md-3">
-                <input type="text" class="form-control" placeholder="Rechercher...">
-            </div>
-            <div class="col-md-2">
-                <select class="form-select">
-                    <option value="">Tous les types</option>
-                    <option value="sale">Vente</option>
-                    <option value="rent">Location</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <select class="form-select">
-                    <option value="">Tous les statuts</option>
-                    <option value="draft">Brouillon</option>
-                    <option value="pending">En attente</option>
-                    <option value="signed">Signé</option>
-                    <option value="completed">Complété</option>
-                </select>
-            </div>
-        </div>
-    </div>
-    <div class="card-body p-0">
+    <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
+            <table class="table table-hover mb-0" id="transactionsTable">
                 <thead class="table-light">
                     <tr>
                         <th>Référence</th>
@@ -55,7 +32,7 @@
                         <th>Commission</th>
                         <th>Statut</th>
                         <th>Date</th>
-                        <th>Actions</th>
+                        <th class="no-filter">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -120,7 +97,17 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
+<script src="<?= base_url('assets/js/datatable-filters.js') ?>"></script>
 <script>
+$(document).ready(function() {
+    initDataTableWithFilters('transactionsTable', {
+        order: [[7, 'desc']],
+        columnDefs: [
+            { orderable: false, targets: 8 }
+        ]
+    });
+});
+
 function confirmDelete(transactionId) {
     if (confirm('Êtes-vous sûr de vouloir supprimer cette transaction ? Les commissions associées seront également supprimées.')) {
         fetch(`<?= base_url('admin/transactions/delete/') ?>${transactionId}`, {

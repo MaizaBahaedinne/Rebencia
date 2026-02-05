@@ -19,29 +19,9 @@
 <?php endif; ?>
 
 <div class="card">
-    <div class="card-header bg-white">
-        <div class="row">
-            <div class="col-md-4">
-                <input type="text" class="form-control" placeholder="Rechercher...">
-            </div>
-            <div class="col-md-2">
-                <select class="form-select">
-                    <option value="">Tous les rôles</option>
-                    <option>Admin</option>
-                    <option>Agent</option>
-                    <option>Coordinateur</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <select class="form-select">
-                    <option value="">Toutes les agences</option>
-                </select>
-            </div>
-        </div>
-    </div>
-    <div class="card-body p-0">
+    <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
+            <table class="table table-hover mb-0" id="usersTable">
                 <thead class="table-light">
                     <tr>
                         <th>ID</th>
@@ -51,7 +31,7 @@
                         <th>Rôle</th>
                         <th>Agence</th>
                         <th>Statut</th>
-                        <th>Actions</th>
+                        <th class="no-filter">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -108,7 +88,17 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
+<script src="<?= base_url('assets/js/datatable-filters.js') ?>"></script>
 <script>
+$(document).ready(function() {
+    initDataTableWithFilters('usersTable', {
+        order: [[0, 'desc']],
+        columnDefs: [
+            { orderable: false, targets: 7 }
+        ]
+    });
+});
+
 function confirmDelete(id) {
     if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
         fetch(`<?= base_url('admin/users/delete/') ?>${id}`, {

@@ -43,7 +43,7 @@
                             <th>Parent</th>
                             <th>Popularité</th>
                             <th>GPS</th>
-                            <th class="text-center">Actions</th>
+                            <th class="text-center no-filter">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -128,6 +128,7 @@
     </div>
 </div>
 
+<script src="<?= base_url('assets/js/datatable-filters.js') ?>"></script>
 <script>
 function confirmDelete(id) {
     if (confirm('Êtes-vous sûr de vouloir supprimer cette zone ?')) {
@@ -136,11 +137,11 @@ function confirmDelete(id) {
 }
 
 $(document).ready(function() {
-    $('#zonesTable').DataTable({
-        language: {
-            url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json'
-        },
-        order: [[3, 'asc'], [1, 'asc']]
+    initDataTableWithFilters('zonesTable', {
+        order: [[3, 'asc'], [1, 'asc']],
+        columnDefs: [
+            { orderable: false, targets: 7 }
+        ]
     });
 });
 </script>

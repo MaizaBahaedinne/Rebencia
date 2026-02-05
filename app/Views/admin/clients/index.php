@@ -19,25 +19,9 @@
 <?php endif; ?>
 
 <div class="card">
-    <div class="card-header bg-white">
-        <div class="row">
-            <div class="col-md-4">
-                <input type="text" class="form-control" placeholder="Rechercher par nom, email, téléphone...">
-            </div>
-            <div class="col-md-2">
-                <select class="form-select">
-                    <option value="">Tous les statuts</option>
-                    <option value="lead">Lead</option>
-                    <option value="prospect">Prospect</option>
-                    <option value="active">Actif</option>
-                    <option value="inactive">Inactif</option>
-                </select>
-            </div>
-        </div>
-    </div>
-    <div class="card-body p-0">
+    <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
+            <table class="table table-hover mb-0" id="clientsTable">
                 <thead class="table-light">
                     <tr>
                         <th>ID</th>
@@ -47,7 +31,7 @@
                         <th>Agent</th>
                         <th>Statut</th>
                         <th>Date</th>
-                        <th>Actions</th>
+                        <th class="no-filter">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -100,4 +84,18 @@
     </div>
 </div>
 
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+<script src="<?= base_url('assets/js/datatable-filters.js') ?>"></script>
+<script>
+$(document).ready(function() {
+    initDataTableWithFilters('clientsTable', {
+        order: [[0, 'desc']],
+        columnDefs: [
+            { orderable: false, targets: 7 }
+        ]
+    });
+});
+</script>
 <?= $this->endSection() ?>

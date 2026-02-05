@@ -106,7 +106,7 @@
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
+            <table class="table table-hover mb-0" id="documentsTable">
                 <thead class="table-light">
                     <tr>
                         <th>Type</th>
@@ -116,7 +116,7 @@
                         <th>Version</th>
                         <th>Uploadé par</th>
                         <th>Date</th>
-                        <th>Actions</th>
+                        <th class="no-filter">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -180,7 +180,17 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
+<script src="<?= base_url('assets/js/datatable-filters.js') ?>"></script>
 <script>
+$(document).ready(function() {
+    initDataTableWithFilters('documentsTable', {
+        order: [[6, 'desc']],
+        columnDefs: [
+            { orderable: false, targets: 7 }
+        ]
+    });
+});
+
 function deleteDocument(id) {
     if (confirm('Voulez-vous vraiment supprimer ce document ?')) {
         const form = document.createElement('form');

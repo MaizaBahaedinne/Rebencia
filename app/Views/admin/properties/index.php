@@ -21,34 +21,9 @@
 <?php endif; ?>
 
 <div class="card">
-    <div class="card-header bg-white">
-        <div class="row">
-            <div class="col-md-3">
-                <input type="text" class="form-control" placeholder="Rechercher...">
-            </div>
-            <div class="col-md-2">
-                <select class="form-select">
-                    <option value="">Tous les types</option>
-                    <option>Appartement</option>
-                    <option>Villa</option>
-                    <option>Maison</option>
-                    <option>Terrain</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <select class="form-select">
-                    <option value="">Tous les statuts</option>
-                    <option>Brouillon</option>
-                    <option>Publié</option>
-                    <option>Réservé</option>
-                    <option>Vendu</option>
-                </select>
-            </div>
-        </div>
-    </div>
-    <div class="card-body p-0">
+    <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
+            <table class="table table-hover mb-0" id="propertiesTable">
                 <thead class="table-light">
                     <tr>
                         <th>Réf</th>
@@ -58,7 +33,7 @@
                         <th>Prix</th>
                         <th>Agent</th>
                         <th>Statut</th>
-                        <th>Actions</th>
+                        <th class="no-filter">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -113,7 +88,17 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
+<script src="<?= base_url('assets/js/datatable-filters.js') ?>"></script>
 <script>
+$(document).ready(function() {
+    initDataTableWithFilters('propertiesTable', {
+        order: [[0, 'desc']],
+        columnDefs: [
+            { orderable: false, targets: 7 }
+        ]
+    });
+});
+
 function confirmDelete(id) {
     if (confirm('Êtes-vous sûr de vouloir supprimer cette propriété ?')) {
         fetch(`<?= base_url('admin/properties/delete/') ?>${id}`, {

@@ -45,7 +45,7 @@
                             <th>Utilisateurs</th>
                             <th>Propriétés</th>
                             <th>Statut</th>
-                            <th class="text-center">Actions</th>
+                            <th class="text-center no-filter">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -116,6 +116,7 @@
     </div>
 </div>
 
+<script src="<?= base_url('assets/js/datatable-filters.js') ?>"></script>
 <script>
 function confirmDelete(id) {
     if (confirm('Êtes-vous sûr de vouloir supprimer cette agence ?')) {
@@ -124,11 +125,11 @@ function confirmDelete(id) {
 }
 
 $(document).ready(function() {
-    $('#agenciesTable').DataTable({
-        language: {
-            url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/fr-FR.json'
-        },
-        order: [[0, 'desc']]
+    initDataTableWithFilters('agenciesTable', {
+        order: [[0, 'desc']],
+        columnDefs: [
+            { orderable: false, targets: 9 }
+        ]
     });
 });
 </script>

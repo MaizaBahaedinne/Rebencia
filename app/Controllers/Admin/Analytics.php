@@ -74,11 +74,12 @@ class Analytics extends BaseController
     private function getAverageSaleTime()
     {
         $result = $this->db->query(
-            "SELECT AVG(DATEDIFF(t.created_at, c.created_at)) as avg_days
+            "SELECT AVG(DATEDIFF(t.signature_date, c.created_at)) as avg_days
              FROM transactions t
-             JOIN clients c ON t.buyer_id = c.id
+             JOIN clients c ON t.client_id = c.id
              WHERE t.status IN ('signed', 'completed')
-             AND t.created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)"
+             AND t.signature_date IS NOT NULL
+             AND t.signature_date >= DATE_SUB(NOW(), INTERVAL 6 MONTH)"
         )->getRow();
 
         return round($result->avg_days ?? 0);

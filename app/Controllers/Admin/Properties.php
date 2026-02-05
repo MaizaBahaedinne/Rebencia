@@ -51,7 +51,7 @@ class Properties extends BaseController
             'description' => 'required|min_length[10]',
             'type' => 'required|in_list[apartment,villa,house,land,commercial,office]',
             'transaction_type' => 'required|in_list[sale,rent,both]',
-            'area_total' => 'required|decimal',
+            'area' => 'required|decimal',
             'zone_id' => 'required|is_natural_no_zero',
             'address' => 'required|min_length[5]',
         ];
@@ -175,7 +175,7 @@ class Properties extends BaseController
             'description' => 'required|min_length[10]',
             'type' => 'required|in_list[apartment,villa,house,land,commercial,office]',
             'transaction_type' => 'required|in_list[sale,rent,both]',
-            'area_total' => 'required|decimal',
+            'area' => 'required|decimal',
             'zone_id' => 'required|is_natural_no_zero',
             'address' => 'required|min_length[5]',
         ];

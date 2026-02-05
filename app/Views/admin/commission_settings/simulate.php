@@ -327,44 +327,96 @@ document.getElementById('simulationForm').addEventListener('submit', function(e)
 });
 
 function displayResults(commission) {
+    // Récupérer le montant de la transaction du formulaire
+    const transactionAmount = parseFloat(document.querySelector('input[name="amount"]').value) || 0;
+    
     // Afficher le conteneur de résultats
     document.getElementById('resultsContainer').style.display = 'block';
     document.getElementById('waitingMessage').style.display = 'none';
     
-    // Règle appliquée
-    document.getElementById('ruleInfo').innerHTML = `
-        <strong>Niveau :</strong> ${commission.override_level || 'system'}<br>
-        <strong>Type :</strong> ${commission.buyer_commission_type || 'N/A'}<br>
-        <strong>Valeur acheteur :</strong> ${commission.buyer_commission_value || 0}<br>
-        <strong>Valeur vendeur :</strong> ${commission.seller_commission_value || 0}
-    `;
+    // Règle appliquée - Informations détaillées
+    const levelLabels = {
+        'user': 'Utilisateur (Priorité maximale)',
+        'role': 'Rôle',
+        'agency': 'Agence',
+        'system': 'Système (Par défaut)'
+    };
     
-    // Commission acheteur
+    const typeLabels = {
+        'percentage': 'Pourcentage',
+        'fixed': 'Montant Fixe',
+        'months': 'Mois de loyer'
+    };
+    
+    document.getElementById('ruleLevel').textContent = levelLabels[commission.override_level] || 'Système';
+    document.getElementById('ruleLevel').className = 'badge bg-' + 
+        (commission.override_level === 'user' ? 'danger' : 
+         commission.override_level === 'role' ? 'warning' : 
+         commission.override_level === 'agency' ? 'info' : 'secondary');
+    
+    document.getElementById('ruleType').textContent = typeLabels[commission.buyer_commission_type] || 'N/A';
+    
+    // Bases de calcul
+    const buyerUnit = commission.buyer_commission_type === 'percentage' ? '%' : 
+                      commission.buyer_commission_type === 'months' ? ' mois' : ' TND';
+    const sellerUnit = commission.seller_commission_type === 'percentage' ? '%' : 
+                       commission.seller_commission_type === 'months' ? ' mois' : ' TND';
+    
+    document.getElementById('buyerBase').textContent = commission.buyer_commission_value + buyerUnit;
+    document.getElementById('sellerBase').textContent = commission.seller_commission_value + sellerUnit;
+    
+    document.getElementById('buyerCalcBase').textContent = commission.buyer_commission_value + buyerUnit;
+    document.getElementById('sellerCalcBase').textContent = commission.seller_commission_value + sellerUnit;
+    
+    // Commission acheteur avec pourcentages
+    const buyerHTPercent = transactionAmount > 0 ? ((commission.buyer_commission_ht / transactionAmount) * 100).toFixed(2) : 0;
+    const buyerTTCPercent = transactionAmount > 0 ? ((commission.buyer_commission_ttc / transactionAmount) * 100).toFixed(2) : 0;
+    
     document.getElementById('buyerHT').textContent = formatMoney(commission.buyer_commission_ht);
+    document.getElementById('buyerHTPercent').textContent = `(${buyerHTPercent}% du montant transaction)`;
     document.getElementById('buyerVAT').textContent = formatMoney(commission.buyer_commission_vat);
     document.getElementById('buyerTTC').textContent = formatMoney(commission.buyer_commission_ttc);
+    document.getElementById('buyerTTCPercent').textContent = `(${buyerTTCPercent}% du montant transaction)`;
     
-    // Commission vendeur
+    // Commission vendeur avec pourcentages
+    const sellerHTPercent = transactionAmount > 0 ? ((commission.seller_commission_ht / transactionAmount) * 100).toFixed(2) : 0;
+    const sellerTTCPercent = transactionAmount > 0 ? ((commission.seller_commission_ttc / transactionAmount) * 100).toFixed(2) : 0;
+    
     document.getElementById('sellerHT').textContent = formatMoney(commission.seller_commission_ht);
+    document.getElementById('sellerHTPercent').textContent = `(${sellerHTPercent}% du montant transaction)`;
     document.getElementById('sellerVAT').textContent = formatMoney(commission.seller_commission_vat);
     document.getElementById('sellerTTC').textContent = formatMoney(commission.seller_commission_ttc);
+    document.getElementById('sellerTTCPercent').textContent = `(${sellerTTCPercent}% du montant transaction)`;
     
-    // Totaux
+    // Totaux avec pourcentages
+    const totalHTPercent = transactionAmount > 0 ? ((commission.total_commission_ht / transactionAmount) * 100).toFixed(2) : 0;
+    const totalTTCPercent = transactionAmount > 0 ? ((commission.total_commission_ttc / transactionAmount) * 100).toFixed(2) : 0;
+    
     document.getElementById('totalHT').textContent = formatMoney(commission.total_commission_ht);
+    document.getElementById('totalHTPercent').textContent = `${totalHTPercent}% du montant`;
     document.getElementById('totalVAT').textContent = formatMoney(commission.total_commission_vat);
     document.getElementById('totalTTC').textContent = formatMoney(commission.total_commission_ttc);
+    document.getElementById('totalTTCPercent').textContent = `${totalTTCPercent}% du montant`;
     
-    // Répartition (si disponible)
-    if (commission.agent_commission_amount && commission.agency_commission_amount) {
-        document.getElementById('splitCard').style.display = 'block';
-        document.getElementById('agentAmount').textContent = formatMoney(commission.agent_commission_amount);
-        document.getElementById('agencyAmount').textContent = formatMoney(commission.agency_commission_amount);
-        document.getElementById('agentPercent').textContent = commission.agent_commission_percentage || 50;
-        document.getElementById('agencyPercent').textContent = (100 - (commission.agent_commission_percentage || 50));
-    }
+    // Répartition Agent/Agence
+    const agentPercentage = commission.agent_commission_percentage || 50;
+    const agencyPercentage = 100 - agentPercentage;
+    
+    // Calculer les montants si non fournis
+    const agentAmount = commission.agent_commission_amount || (commission.total_commission_ttc * agentPercentage / 100);
+    const agencyAmount = commission.agency_commission_amount || (commission.total_commission_ttc * agencyPercentage / 100);
+    
+    document.getElementById('agentAmount').textContent = formatMoney(agentAmount);
+    document.getElementById('agencyAmount').textContent = formatMoney(agencyAmount);
+    document.getElementById('agentPercent').textContent = agentPercentage + '%';
+    document.getElementById('agencyPercent').textContent = agencyPercentage + '%';
+    
+    // Mettre à jour les barres de progression
+    document.getElementById('agentProgressBar').style.width = agentPercentage + '%';
+    document.getElementById('agencyProgressBar').style.width = agencyPercentage + '%';
     
     // Scroll vers les résultats
-    document.getElementById('resultsContainer').scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('resultsContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function formatMoney(amount) {
@@ -373,6 +425,10 @@ function formatMoney(amount) {
         currency: 'TND',
         minimumFractionDigits: 2
     }).format(amount || 0);
+}
+
+function formatPercent(value) {
+    return parseFloat(value || 0).toFixed(2) + '%';
 }
 
 // Reset form

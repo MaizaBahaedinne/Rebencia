@@ -1,311 +1,415 @@
 <?= $this->extend('layouts/admin_modern') ?>
 
+<?= $this->section('styles') ?>
+<style>
+.wizard-steps {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    position: relative;
+}
+.wizard-steps::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e0e0e0;
+    z-index: 0;
+}
+.wizard-step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+.wizard-step-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    color: #666;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+.wizard-step.active .wizard-step-circle {
+    background: #0d6efd;
+    color: white;
+}
+.wizard-step.completed .wizard-step-circle {
+    background: #28a745;
+    color: white;
+}
+.wizard-content {
+    display: none;
+}
+.wizard-content.active {
+    display: block;
+}
+.summary-card {
+    position: sticky;
+    top: 20px;
+}
+.property-card {
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+.property-card:hover {
+    border-color: #0d6efd;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.property-card.selected {
+    border-color: #28a745;
+    background-color: #f0f9f4;
+}
+</style>
+<?= $this->endSection() ?>
+
 <?= $this->section('content') ?>
 
-<div class="container-fluid">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 mb-1">Nouvelle Transaction</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="<?= base_url('admin/dashboard') ?>">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="<?= base_url('admin/transactions') ?>">Transactions</a></li>
-                    <li class="breadcrumb-item active">Nouvelle</li>
-                </ol>
-            </nav>
-        </div>
-        <a href="<?= base_url('admin/transactions') ?>" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left me-2"></i>Retour
-        </a>
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fas fa-file-contract"></i> Nouvelle Transaction
+    </h1>
+    <a href="<?= base_url('admin/transactions') ?>" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Retour
+    </a>
+</div>
+
+<?php if (session()->has('errors')): ?>
+    <div class="alert alert-danger alert-dismissible fade show">
+        <strong>Erreurs :</strong>
+        <ul class="mb-0">
+            <?php foreach (session('errors') as $error): ?>
+                <li><?= esc($error) ?></li>
+            <?php endforeach ?>
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
+<?php endif ?>
 
-    <?php if (session()->has('errors')): ?>
-        <div class="alert alert-danger alert-dismissible fade show">
-            <i class="fas fa-exclamation-circle me-2"></i>
-            <strong>Erreurs de validation:</strong>
-            <ul class="mb-0 mt-2">
-                <?php foreach (session('errors') as $error): ?>
-                    <li><?= esc($error) ?></li>
-                <?php endforeach ?>
-            </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    <?php endif ?>
+<form action="<?= base_url('admin/transactions/store') ?>" method="post" id="transactionForm">
+    <?= csrf_field() ?>
+    
+    <div class="row">
+        <!-- Zone Principale - Wizard -->
+        <div class="col-lg-8">
+            <!-- Steps -->
+            <div class="wizard-steps">
+                <div class="wizard-step active" data-step="1">
+                    <div class="wizard-step-circle">1</div>
+                    <div class="wizard-step-title">Bien</div>
+                </div>
+                <div class="wizard-step" data-step="2">
+                    <div class="wizard-step-circle">2</div>
+                    <div class="wizard-step-title">Parties</div>
+                </div>
+                <div class="wizard-step" data-step="3">
+                    <div class="wizard-step-circle">3</div>
+                    <div class="wizard-step-title">Détails</div>
+                </div>
+                <div class="wizard-step" data-step="4">
+                    <div class="wizard-step-circle">4</div>
+                    <div class="wizard-step-title">Commission</div>
+                </div>
+            </div>
 
-    <form action="<?= base_url('admin/transactions/store') ?>" method="post" id="transactionForm">
-        <?= csrf_field() ?>
-
-        <div class="row">
-            <!-- Section 1: Informations Transaction -->
-            <div class="col-lg-8">
-                <div class="card shadow-sm mb-4">
+            <!-- Step 1: Sélection du Bien -->
+            <div class="wizard-content active" data-step="1">
+                <div class="card">
                     <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="fas fa-exchange-alt me-2"></i>Informations Transaction</h5>
+                        <h5 class="mb-0"><i class="fas fa-building"></i> Étape 1 : Sélection du Bien</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Filtre de recherche -->
+                        <div class="mb-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" id="searchProperty" placeholder="🔍 Rechercher par référence ou titre...">
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select" id="filterType">
+                                        <option value="">Tous les types</option>
+                                        <option value="apartment">Appartement</option>
+                                        <option value="villa">Villa</option>
+                                        <option value="house">Maison</option>
+                                        <option value="land">Terrain</option>
+                                        <option value="commercial">Commercial</option>
+                                        <option value="office">Bureau</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select" id="filterTransaction">
+                                        <option value="">Toutes transactions</option>
+                                        <option value="sale">À vendre</option>
+                                        <option value="rent">À louer</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Liste des biens -->
+                        <div class="row g-3" id="propertiesList">
+                            <?php foreach ($properties as $property): ?>
+                                <div class="col-md-6 property-item" 
+                                     data-reference="<?= strtolower($property['reference']) ?>"
+                                     data-title="<?= strtolower($property['title']) ?>"
+                                     data-type="<?= $property['type'] ?>"
+                                     data-transaction="<?= $property['transaction_type'] ?>"
+                                     data-property-id="<?= $property['id'] ?>"
+                                     data-price="<?= $property['price'] ?>"
+                                     data-rental="<?= $property['rental_price'] ?? 0 ?>">
+                                    <div class="property-card card h-100" onclick="selectProperty(<?= $property['id'] ?>, this)">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="mb-0"><?= esc($property['reference']) ?></h6>
+                                                <span class="badge bg-info"><?= ucfirst($property['type']) ?></span>
+                                            </div>
+                                            <p class="text-muted small mb-2"><?= esc($property['title']) ?></p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="text-primary fw-bold">
+                                                    <?= number_format($property['price'], 0, ',', ' ') ?> TND
+                                                </span>
+                                                <?php if ($property['rental_price']): ?>
+                                                    <span class="text-success small">
+                                                        <?= number_format($property['rental_price'], 0, ',', ' ') ?> TND/mois
+                                                    </span>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                        
+                        <input type="hidden" name="property_id" id="property_id" required>
+                    </div>
+                    <div class="card-footer">
+                        <button type="button" class="btn btn-primary float-end" onclick="nextStep()">
+                            Suivant <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Parties -->
+            <div class="wizard-content" data-step="2">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-users"></i> Étape 2 : Les Parties</h5>
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label for="property_id" class="form-label">Bien <span class="text-danger">*</span></label>
-                                <select class="form-select" id="property_id" name="property_id" required onchange="updatePropertyDetails()">
-                                    <option value="">-- Sélectionner un bien --</option>
-                                    <?php foreach ($properties as $property): ?>
-                                        <option value="<?= $property['id'] ?>" 
-                                                data-price="<?= $property['price'] ?>"
-                                                data-rent="<?= $property['rental_price'] ?? 0 ?>"
-                                                data-type="<?= $property['transaction_type'] ?>"
-                                                <?= old('property_id') == $property['id'] ? 'selected' : '' ?>>
-                                            <?= esc($property['reference']) ?> - <?= esc($property['title']) ?>
-                                        </option>
-                                    <?php endforeach ?>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="type" class="form-label">Type de Transaction <span class="text-danger">*</span></label>
-                                <select class="form-select" id="type" name="type" required onchange="updatePriceField()">
-                                    <option value="sale" <?= old('type') == 'sale' ? 'selected' : '' ?>>Vente</option>
-                                    <option value="rent" <?= old('type') == 'rent' ? 'selected' : '' ?>>Location</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="buyer_id" class="form-label">Acheteur/Locataire <span class="text-danger">*</span></label>
-                                <select class="form-select" id="buyer_id" name="buyer_id" required>
-                                    <option value="">-- Sélectionner un client --</option>
+                                <label class="form-label">Acheteur/Locataire <span class="text-danger">*</span></label>
+                                <select class="form-select" name="buyer_id" id="buyer_id" required>
+                                    <option value="">-- Sélectionner --</option>
                                     <?php foreach ($buyers as $buyer): ?>
-                                        <option value="<?= $buyer['id'] ?>" <?= old('buyer_id') == $buyer['id'] ? 'selected' : '' ?>>
+                                        <option value="<?= $buyer['id'] ?>">
                                             <?= esc($buyer['first_name'] . ' ' . $buyer['last_name']) ?> - <?= esc($buyer['phone']) ?>
                                         </option>
-                                    <?php endforeach ?>
+                                    <?php endforeach; ?>
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label for="seller_id" class="form-label">Vendeur/Bailleur</label>
-                                <select class="form-select" id="seller_id" name="seller_id">
-                                    <option value="">-- Sélectionner un client --</option>
+                                <label class="form-label">Vendeur/Propriétaire</label>
+                                <select class="form-select" name="seller_id" id="seller_id">
+                                    <option value="">-- Sélectionner --</option>
                                     <?php foreach ($sellers as $seller): ?>
-                                        <option value="<?= $seller['id'] ?>" <?= old('seller_id') == $seller['id'] ? 'selected' : '' ?>>
+                                        <option value="<?= $seller['id'] ?>">
                                             <?= esc($seller['first_name'] . ' ' . $seller['last_name']) ?> - <?= esc($seller['phone']) ?>
                                         </option>
-                                    <?php endforeach ?>
+                                    <?php endforeach; ?>
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label for="transaction_date" class="form-label">Date de Transaction <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" id="transaction_date" name="transaction_date" 
-                                       value="<?= old('transaction_date', date('Y-m-d')) ?>" required>
+                                <label class="form-label">Agent Responsable <span class="text-danger">*</span></label>
+                                <select class="form-select" name="agent_id" id="agent_id" required onchange="updateCommission()">
+                                    <option value="">-- Sélectionner --</option>
+                                    <?php foreach ($agents as $agent): ?>
+                                        <option value="<?= $agent['id'] ?>" 
+                                                data-role="<?= $agent['role_id'] ?>"
+                                                data-agency="<?= $agent['agency_id'] ?>"
+                                                <?= $agent['id'] == session()->get('user_id') ? 'selected' : '' ?>>
+                                            <?= esc($agent['first_name'] . ' ' . $agent['last_name']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
                             <div class="col-md-6">
-                                <label for="amount" class="form-label">Montant (TND) <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="amount" name="amount" 
-                                       value="<?= old('amount') ?>" step="0.01" required onchange="calculateCommission()">
+                                <label class="form-label">Agence</label>
+                                <select class="form-select" name="agency_id" id="agency_id">
+                                    <option value="">-- Sélectionner --</option>
+                                    <?php foreach ($agencies as $agency): ?>
+                                        <option value="<?= $agency['id'] ?>">
+                                            <?= esc($agency['name']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
                         </div>
                     </div>
+                    <div class="card-footer">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep()">
+                            <i class="fas fa-arrow-left"></i> Précédent
+                        </button>
+                        <button type="button" class="btn btn-primary float-end" onclick="nextStep()">
+                            Suivant <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
+            </div>
 
-                <!-- Section 2: Commission -->
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="mb-0"><i class="fas fa-percentage me-2"></i>Calcul de Commission</h5>
+            <!-- Step 3: Détails -->
+            <div class="wizard-content" data-step="3">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-file-alt"></i> Étape 3 : Détails de la Transaction</h5>
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
-                            <div class="col-md-4">
-                                <label for="commission_percentage" class="form-label">Taux de Commission (%)</label>
-                                <input type="number" class="form-control" id="commission_percentage" name="commission_percentage" 
-                                       value="<?= old('commission_percentage', '3') ?>" step="0.1" onchange="calculateCommission()">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="commission_amount" class="form-label">Montant Commission (TND)</label>
-                                <input type="number" class="form-control" id="commission_amount" name="commission_amount" 
-                                       value="<?= old('commission_amount') ?>" step="0.01" readonly>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="commission_paid" class="form-label">Statut Paiement</label>
-                                <select class="form-select" id="commission_paid" name="commission_paid">
-                                    <option value="0" <?= old('commission_paid', '0') == '0' ? 'selected' : '' ?>>Non Payée</option>
-                                    <option value="1" <?= old('commission_paid') == '1' ? 'selected' : '' ?>>Payée</option>
+                            <div class="col-md-6">
+                                <label class="form-label">Type de Transaction <span class="text-danger">*</span></label>
+                                <select class="form-select" name="type" id="type" required onchange="updateAmount()">
+                                    <option value="sale">Vente</option>
+                                    <option value="rent">Location</option>
                                 </select>
                             </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Montant (TND) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="amount" id="amount" step="0.01" required onchange="updateCommission()">
+                                <small class="text-muted">Pour location : loyer mensuel HT</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Date Transaction <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="transaction_date" id="transaction_date" 
+                                       value="<?= date('Y-m-d') ?>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Statut</label>
+                                <select class="form-select" name="status" id="status">
+                                    <option value="pending">En attente</option>
+                                    <option value="signed">Signé</option>
+                                    <option value="completed">Complété</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Numéro de Contrat</label>
+                                <input type="text" class="form-control" name="contract_number" id="contract_number">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Notaire</label>
+                                <input type="text" class="form-control" name="notary" id="notary">
+                            </div>
                             <div class="col-12">
-                                <div class="alert alert-info">
-                                    <i class="fas fa-info-circle me-2"></i>
-                                    <strong>Répartition de commission:</strong> Le montant sera automatiquement réparti entre l'agent, le superviseur et l'agence selon les règles définies.
+                                <label class="form-label">Notes</label>
+                                <textarea class="form-control" name="notes" id="notes" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep()">
+                            <i class="fas fa-arrow-left"></i> Précédent
+                        </button>
+                        <button type="button" class="btn btn-primary float-end" onclick="nextStep()">
+                            Suivant <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Commission -->
+            <div class="wizard-content" data-step="4">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-dollar-sign"></i> Étape 4 : Calcul de la Commission</h5>
+                    </div>
+                    <div class="card-body" id="commissionPreview">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Chargement...</span>
+                            </div>
+                            <p class="mt-3 text-muted">Calcul de la commission en cours...</p>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep()">
+                            <i class="fas fa-arrow-left"></i> Précédent
+                        </button>
+                        <button type="submit" class="btn btn-success float-end">
+                            <i class="fas fa-save"></i> Créer la Transaction
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Zone Récapitulatif -->
+        <div class="col-lg-4">
+            <div class="summary-card">
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0"><i class="fas fa-clipboard-list"></i> Récapitulatif</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Bien -->
+                        <div class="mb-3" id="summaryProperty">
+                            <h6 class="text-muted mb-2"><i class="fas fa-building"></i> Bien</h6>
+                            <p class="text-muted small mb-0">Non sélectionné</p>
+                        </div>
+                        <hr>
+                        
+                        <!-- Parties -->
+                        <div class="mb-3" id="summaryParties">
+                            <h6 class="text-muted mb-2"><i class="fas fa-users"></i> Parties</h6>
+                            <p class="text-muted small mb-1"><strong>Acheteur:</strong> <span id="summaryBuyer">-</span></p>
+                            <p class="text-muted small mb-1"><strong>Vendeur:</strong> <span id="summarySeller">-</span></p>
+                            <p class="text-muted small mb-0"><strong>Agent:</strong> <span id="summaryAgent">-</span></p>
+                        </div>
+                        <hr>
+                        
+                        <!-- Transaction -->
+                        <div class="mb-3" id="summaryTransaction">
+                            <h6 class="text-muted mb-2"><i class="fas fa-file-contract"></i> Transaction</h6>
+                            <p class="text-muted small mb-1"><strong>Type:</strong> <span id="summaryType">-</span></p>
+                            <p class="text-muted small mb-1"><strong>Montant:</strong> <span id="summaryAmount">-</span></p>
+                            <p class="text-muted small mb-0"><strong>Date:</strong> <span id="summaryDate">-</span></p>
+                        </div>
+                        <hr>
+                        
+                        <!-- Commission -->
+                        <div id="summaryCommission">
+                            <h6 class="text-success mb-2"><i class="fas fa-dollar-sign"></i> Commission</h6>
+                            <div class="bg-light p-3 rounded">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="small">Total HT:</span>
+                                    <strong id="summaryCommHT">-</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="small">TVA (19%):</span>
+                                    <strong id="summaryCommVAT">-</strong>
+                                </div>
+                                <div class="d-flex justify-content-between border-top pt-2">
+                                    <span><strong>Total TTC:</strong></span>
+                                    <strong class="text-success" id="summaryCommTTC">-</strong>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Section 3: Documents et Notes -->
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-info text-white">
-                        <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Documents et Notes</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label for="contract_number" class="form-label">Numéro de Contrat</label>
-                                <input type="text" class="form-control" id="contract_number" name="contract_number" 
-                                       value="<?= old('contract_number') ?>" placeholder="CONT-XXXXXX">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="notary" class="form-label">Notaire</label>
-                                <input type="text" class="form-control" id="notary" name="notary" 
-                                       value="<?= old('notary') ?>" placeholder="Nom du notaire">
-                            </div>
-                            <div class="col-12">
-                                <label for="notes" class="form-label">Notes et Commentaires</label>
-                                <textarea class="form-control" id="notes" name="notes" rows="3"><?= old('notes') ?></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sidebar: Statut et Attribution -->
-            <div class="col-lg-4">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-secondary text-white">
-                        <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Configuration</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label for="status" class="form-label">Statut</label>
-                            <select class="form-select" id="status" name="status">
-                                <option value="pending" <?= old('status', 'pending') == 'pending' ? 'selected' : '' ?>>En Attente</option>
-                                <option value="completed" <?= old('status') == 'completed' ? 'selected' : '' ?>>Complétée</option>
-                                <option value="cancelled" <?= old('status') == 'cancelled' ? 'selected' : '' ?>>Annulée</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="agent_id" class="form-label">Agent Responsable <span class="text-danger">*</span></label>
-                            <select class="form-select" id="agent_id" name="agent_id" required>
-                                <option value="">-- Sélectionner --</option>
-                                <?php foreach ($agents as $agent): ?>
-                                    <option value="<?= $agent['id'] ?>" <?= old('agent_id', session()->get('user_id')) == $agent['id'] ? 'selected' : '' ?>>
-                                        <?= esc($agent['first_name'] . ' ' . $agent['last_name']) ?>
-                                    </option>
-                                <?php endforeach ?>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="agency_id" class="form-label">Agence</label>
-                            <select class="form-select" id="agency_id" name="agency_id">
-                                <option value="">-- Agence par défaut --</option>
-                                <?php foreach ($agencies as $agency): ?>
-                                    <option value="<?= $agency['id'] ?>" <?= old('agency_id') == $agency['id'] ? 'selected' : '' ?>>
-                                        <?= esc($agency['name']) ?>
-                                    </option>
-                                <?php endforeach ?>
-                            </select>
-                        </div>
-
-                        <hr>
-
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save me-2"></i>Enregistrer la Transaction
-                            </button>
-                            <a href="<?= base_url('admin/transactions') ?>" class="btn btn-outline-secondary">
-                                <i class="fas fa-times me-2"></i>Annuler
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Récapitulatif -->
-                <div class="card shadow-sm">
-                    <div class="card-header bg-warning text-dark">
-                        <h5 class="mb-0"><i class="fas fa-calculator me-2"></i>Récapitulatif</h5>
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-sm">
-                            <tr>
-                                <th>Montant Transaction:</th>
-                                <td id="summary_amount" class="text-end">0 TND</td>
-                            </tr>
-                            <tr>
-                                <th>Commission (%):</th>
-                                <td id="summary_percentage" class="text-end">3%</td>
-                            </tr>
-                            <tr class="table-success">
-                                <th>Total Commission:</th>
-                                <td id="summary_commission" class="text-end fw-bold">0 TND</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
             </div>
         </div>
-    </form>
-</div>
+    </div>
+</form>
 
-<script>
-function updatePropertyDetails() {
-    const select = document.getElementById('property_id');
-    const option = select.options[select.selectedIndex];
-    
-    if (option.value) {
-        const type = option.dataset.type;
-        const price = parseFloat(option.dataset.price || 0);
-        const rent = parseFloat(option.dataset.rent || 0);
-        
-        // Auto-sélectionner le type de transaction
-        document.getElementById('type').value = type === 'both' ? 'sale' : type;
-        
-        // Pré-remplir le montant
-        if (type === 'rent') {
-            document.getElementById('amount').value = rent;
-        } else {
-            document.getElementById('amount').value = price;
-        }
-        
-        calculateCommission();
-    }
-}
+<?= $this->endSection() ?>
 
-function updatePriceField() {
-    const select = document.getElementById('property_id');
-    const option = select.options[select.selectedIndex];
-    const type = document.getElementById('type').value;
-    
-    if (option.value) {
-        const price = parseFloat(option.dataset.price || 0);
-        const rent = parseFloat(option.dataset.rent || 0);
-        
-        if (type === 'rent') {
-            document.getElementById('amount').value = rent;
-        } else {
-            document.getElementById('amount').value = price;
-        }
-        
-        calculateCommission();
-    }
-}
-
-function calculateCommission() {
-    const amount = parseFloat(document.getElementById('amount').value || 0);
-    const percentage = parseFloat(document.getElementById('commission_percentage').value || 3);
-    
-    const commission = (amount * percentage) / 100;
-    
-    document.getElementById('commission_amount').value = commission.toFixed(2);
-    
-    // Mise à jour du récapitulatif
-    document.getElementById('summary_amount').textContent = amount.toLocaleString('fr-TN') + ' TND';
-    document.getElementById('summary_percentage').textContent = percentage + '%';
-    document.getElementById('summary_commission').textContent = commission.toLocaleString('fr-TN', {minimumFractionDigits: 2}) + ' TND';
-}
-
-// Calculer au chargement si des valeurs existent
-document.addEventListener('DOMContentLoaded', function() {
-    if (document.getElementById('amount').value) {
-        calculateCommission();
-    }
-});
-</script>
-
+<?= $this->section('scripts') ?>
+<script src="<?= base_url('assets/js/transactions-wizard.js') ?>"></script>
 <?= $this->endSection() ?>

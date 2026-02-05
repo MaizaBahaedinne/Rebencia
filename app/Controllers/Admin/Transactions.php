@@ -3,6 +3,7 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
+use App\Services\CommissionCalculatorService;
 
 class Transactions extends BaseController
 {
@@ -10,6 +11,9 @@ class Transactions extends BaseController
     protected $propertyModel;
     protected $clientModel;
     protected $commissionModel;
+    protected $transactionCommissionModel;
+    protected $commissionCalculator;
+    protected $userModel;
 
     public function __construct()
     {
@@ -17,6 +21,9 @@ class Transactions extends BaseController
         $this->propertyModel = model('PropertyModel');
         $this->clientModel = model('ClientModel');
         $this->commissionModel = model('CommissionModel');
+        $this->transactionCommissionModel = model('TransactionCommissionModel');
+        $this->userModel = model('UserModel');
+        $this->commissionCalculator = new CommissionCalculatorService();
     }
 
     public function index()
@@ -67,38 +74,75 @@ class Transactions extends BaseController
             return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
 
-        // Calcul de la commission
+        // Récupérer les informations nécessaires
+        $propertyId = $this->request->getPost('property_id');
+        $agentId = $this->request->getPost('agent_id');
         $amount = $this->request->getPost('amount');
-        $commissionPercentage = $this->request->getPost('commission_percentage') ?? 3;
-        $commissionAmount = ($amount * $commissionPercentage) / 100;
+        $type = $this->request->getPost('type');
+        
+        // Récupérer le bien et l'agent
+        $property = $this->propertyModel->find($propertyId);
+        $agent = $this->userModel->find($agentId);
+        
+        if (!$property || !$agent) {
+            return redirect()->back()->withInput()->with('error', 'Bien ou agent non trouvé');
+        }
 
-        $data = [
-            'property_id' => $this->request->getPost('property_id'),
+        // Créer la transaction
+        $transactionData = [
+            'property_id' => $propertyId,
             'buyer_id' => $this->request->getPost('buyer_id'),
             'seller_id' => $this->request->getPost('seller_id'),
-            'agent_id' => $this->request->getPost('agent_id'),
-            'agency_id' => $this->request->getPost('agency_id') ?? session()->get('agency_id'),
-            'type' => $this->request->getPost('type'),
+            'agent_id' => $agentId,
+            'agency_id' => $this->request->getPost('agency_id') ?? $agent['agency_id'] ?? session()->get('agency_id'),
+            'type' => $type,
             'transaction_date' => $this->request->getPost('transaction_date'),
             'amount' => $amount,
-            'commission_percentage' => $commissionPercentage,
-            'commission_amount' => $commissionAmount,
-            'commission_paid' => $this->request->getPost('commission_paid') ?? 0,
             'contract_number' => $this->request->getPost('contract_number'),
             'notary' => $this->request->getPost('notary'),
             'status' => $this->request->getPost('status') ?? 'pending',
             'notes' => $this->request->getPost('notes')
         ];
 
-        if ($transactionId = $this->transactionModel->insert($data)) {
-            // Créer l'entrée de commission
-            $this->createCommissionEntry($transactionId, $data['agent_id'], $commissionAmount);
+        if ($transactionId = $this->transactionModel->insert($transactionData)) {
+            // Calculer automatiquement la commission avec le nouveau système
+            try {
+                $commissionData = [
+                    'transaction_id' => $transactionId,
+                    'property_id' => $propertyId,
+                    'transaction_type' => $type,
+                    'property_type' => $property['type'],
+                    'transaction_amount' => $amount
+                ];
+                
+                $commission = $this->commissionCalculator->calculateCommission(
+                    $commissionData,
+                    $agentId,
+                    $agent['role_id'],
+                    $agent['agency_id'],
+                    persist: true
+                );
+                
+                // Mettre à jour la transaction avec les montants de commission (pour compatibilité)
+                $this->transactionModel->update($transactionId, [
+                    'commission_percentage' => ($commission['total_commission_ht'] / $amount) * 100,
+                    'commission_amount' => $commission['total_commission_ttc'],
+                    'commission_paid' => 0
+                ]);
+                
+                session()->setFlashdata('success', 'Transaction créée avec succès. Commission calculée : ' . 
+                    number_format($commission['total_commission_ttc'], 2) . ' TND TTC');
+                
+            } catch (\Exception $e) {
+                log_message('error', 'Erreur calcul commission: ' . $e->getMessage());
+                session()->setFlashdata('warning', 'Transaction créée mais erreur lors du calcul de commission: ' . $e->getMessage());
+            }
             
             // Trigger notification
             $notificationHelper = new \App\Libraries\NotificationHelper();
-            $notificationHelper->notifyTransactionCreated($transactionId, $data, session()->get('user_id'));
+            $notificationHelper->notifyTransactionCreated($transactionId, $transactionData, session()->get('user_id'));
             
-            return redirect()->to('/admin/transactions')->with('success', 'Transaction créée avec succès');
+            return redirect()->to('/admin/transactions');
         }
 
         return redirect()->back()->withInput()->with('error', 'Erreur lors de la création');
@@ -151,23 +195,24 @@ class Transactions extends BaseController
             return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
 
-        // Recalcul de la commission si montant ou pourcentage modifié
+        // Récupérer les informations
+        $propertyId = $this->request->getPost('property_id');
+        $agentId = $this->request->getPost('agent_id');
         $amount = $this->request->getPost('amount');
-        $commissionPercentage = $this->request->getPost('commission_percentage');
-        $commissionAmount = ($amount * $commissionPercentage) / 100;
+        $type = $this->request->getPost('type');
+        
+        $property = $this->propertyModel->find($propertyId);
+        $agent = $this->userModel->find($agentId);
 
         $data = [
-            'property_id' => $this->request->getPost('property_id'),
+            'property_id' => $propertyId,
             'buyer_id' => $this->request->getPost('buyer_id'),
             'seller_id' => $this->request->getPost('seller_id'),
-            'agent_id' => $this->request->getPost('agent_id'),
+            'agent_id' => $agentId,
             'agency_id' => $this->request->getPost('agency_id'),
-            'type' => $this->request->getPost('type'),
+            'type' => $type,
             'transaction_date' => $this->request->getPost('transaction_date'),
             'amount' => $amount,
-            'commission_percentage' => $commissionPercentage,
-            'commission_amount' => $commissionAmount,
-            'commission_paid' => $this->request->getPost('commission_paid'),
             'contract_number' => $this->request->getPost('contract_number'),
             'notary' => $this->request->getPost('notary'),
             'status' => $this->request->getPost('status'),
@@ -175,7 +220,54 @@ class Transactions extends BaseController
         ];
 
         if ($this->transactionModel->update($id, $data)) {
-            return redirect()->to('/admin/transactions')->with('success', 'Transaction modifiée avec succès');
+            // Recalculer la commission si le montant, le type ou l'agent a changé
+            $shouldRecalculate = (
+                $transaction['amount'] != $amount ||
+                $transaction['type'] != $type ||
+                $transaction['agent_id'] != $agentId ||
+                $transaction['property_id'] != $propertyId
+            );
+            
+            if ($shouldRecalculate && $property && $agent) {
+                try {
+                    // Supprimer l'ancienne commission
+                    $this->transactionCommissionModel->where('transaction_id', $id)->delete();
+                    
+                    // Recalculer
+                    $commissionData = [
+                        'transaction_id' => $id,
+                        'property_id' => $propertyId,
+                        'transaction_type' => $type,
+                        'property_type' => $property['type'],
+                        'transaction_amount' => $amount
+                    ];
+                    
+                    $commission = $this->commissionCalculator->calculateCommission(
+                        $commissionData,
+                        $agentId,
+                        $agent['role_id'],
+                        $agent['agency_id'],
+                        persist: true
+                    );
+                    
+                    // Mettre à jour les montants
+                    $this->transactionModel->update($id, [
+                        'commission_percentage' => ($commission['total_commission_ht'] / $amount) * 100,
+                        'commission_amount' => $commission['total_commission_ttc']
+                    ]);
+                    
+                    session()->setFlashdata('success', 'Transaction modifiée. Commission recalculée : ' . 
+                        number_format($commission['total_commission_ttc'], 2) . ' TND TTC');
+                        
+                } catch (\Exception $e) {
+                    log_message('error', 'Erreur recalcul commission: ' . $e->getMessage());
+                    session()->setFlashdata('success', 'Transaction modifiée');
+                }
+            } else {
+                session()->setFlashdata('success', 'Transaction modifiée avec succès');
+            }
+            
+            return redirect()->to('/admin/transactions');
         }
 
         return redirect()->back()->withInput()->with('error', 'Erreur lors de la modification');
@@ -184,6 +276,9 @@ class Transactions extends BaseController
     public function delete($id)
     {
         if ($this->transactionModel->delete($id)) {
+            // Supprimer aussi les commissions associées
+            $this->transactionCommissionModel->where('transaction_id', $id)->delete();
+            
             return redirect()->to('/admin/transactions')->with('success', 'Transaction supprimée');
         }
 
@@ -191,19 +286,125 @@ class Transactions extends BaseController
     }
 
     /**
-     * Créer une entrée de commission pour la transaction
+     * Voir les détails de commission d'une transaction
      */
-    private function createCommissionEntry($transactionId, $agentId, $commissionAmount)
+    public function viewCommission($id)
     {
-        $commissionData = [
-            'transaction_id' => $transactionId,
-            'user_id' => $agentId,
-            'amount' => $commissionAmount,
-            'percentage' => $this->request->getPost('commission_percentage') ?? 3,
-            'status' => 'pending',
-            'type' => 'agent_commission'
+        $transaction = $this->transactionModel->find($id);
+        
+        if (!$transaction) {
+            return redirect()->to('/admin/transactions')->with('error', 'Transaction non trouvée');
+        }
+        
+        // Récupérer la commission calculée
+        $commission = $this->transactionCommissionModel->where('transaction_id', $id)->first();
+        
+        // Récupérer les détails de la transaction
+        $property = $this->propertyModel->find($transaction['property_id']);
+        $agent = $this->userModel->find($transaction['agent_id']);
+        $buyer = $this->clientModel->find($transaction['buyer_id']);
+        $seller = $transaction['seller_id'] ? $this->clientModel->find($transaction['seller_id']) : null;
+        
+        $data = [
+            'title' => 'Détails Commission - Transaction #' . $transaction['reference'],
+            'transaction' => $transaction,
+            'commission' => $commission,
+            'property' => $property,
+            'agent' => $agent,
+            'buyer' => $buyer,
+            'seller' => $seller
         ];
-
-        return $this->commissionModel->insert($commissionData);
+        
+        return view('admin/transactions/commission_details', $data);
+    }
+    
+    /**
+     * Marquer une commission comme payée
+     */
+    public function markCommissionPaid($id)
+    {
+        if (!canUpdate('transactions')) {
+            return redirect()->back()->with('error', 'Accès refusé');
+        }
+        
+        $commission = $this->transactionCommissionModel->where('transaction_id', $id)->first();
+        
+        if (!$commission) {
+            return redirect()->back()->with('error', 'Commission non trouvée');
+        }
+        
+        try {
+            $this->commissionCalculator->markCommissionPaid(
+                $commission['id'],
+                $commission['total_commission_ttc'],
+                session()->get('user_id')
+            );
+            
+            // Mettre à jour aussi la transaction
+            $this->transactionModel->update($id, [
+                'commission_paid' => 1
+            ]);
+            
+            return redirect()->back()->with('success', 'Commission marquée comme payée');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Erreur : ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Recalculer la commission d'une transaction
+     */
+    public function recalculateCommission($id)
+    {
+        if (!canUpdate('transactions')) {
+            return redirect()->back()->with('error', 'Accès refusé');
+        }
+        
+        $transaction = $this->transactionModel->find($id);
+        
+        if (!$transaction) {
+            return redirect()->back()->with('error', 'Transaction non trouvée');
+        }
+        
+        $property = $this->propertyModel->find($transaction['property_id']);
+        $agent = $this->userModel->find($transaction['agent_id']);
+        
+        if (!$property || !$agent) {
+            return redirect()->back()->with('error', 'Données incomplètes');
+        }
+        
+        try {
+            // Supprimer l'ancienne commission
+            $this->transactionCommissionModel->where('transaction_id', $id)->delete();
+            
+            // Recalculer
+            $commissionData = [
+                'transaction_id' => $id,
+                'property_id' => $transaction['property_id'],
+                'transaction_type' => $transaction['type'],
+                'property_type' => $property['type'],
+                'transaction_amount' => $transaction['amount']
+            ];
+            
+            $commission = $this->commissionCalculator->calculateCommission(
+                $commissionData,
+                $transaction['agent_id'],
+                $agent['role_id'],
+                $agent['agency_id'],
+                persist: true
+            );
+            
+            // Mettre à jour la transaction
+            $this->transactionModel->update($id, [
+                'commission_percentage' => ($commission['total_commission_ht'] / $transaction['amount']) * 100,
+                'commission_amount' => $commission['total_commission_ttc']
+            ]);
+            
+            return redirect()->back()->with('success', 'Commission recalculée : ' . 
+                number_format($commission['total_commission_ttc'], 2) . ' TND TTC');
+                
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Erreur : ' . $e->getMessage());
+        }
     }
 }

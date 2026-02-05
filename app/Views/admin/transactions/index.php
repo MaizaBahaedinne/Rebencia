@@ -85,9 +85,22 @@
                                 </td>
                                 <td><?= date('d/m/Y', strtotime($transaction['created_at'])) ?></td>
                                 <td>
-                                    <a href="<?= base_url('admin/transactions/edit/' . $transaction['id']) ?>" class="btn btn-sm btn-warning">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
+                                    <div class="btn-group" role="group">
+                                        <a href="<?= base_url('admin/transactions/view-commission/' . $transaction['id']) ?>" 
+                                           class="btn btn-sm btn-info" title="Voir commission">
+                                            <i class="fas fa-dollar-sign"></i>
+                                        </a>
+                                        <a href="<?= base_url('admin/transactions/edit/' . $transaction['id']) ?>" 
+                                           class="btn btn-sm btn-warning" title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <?php if (canDelete('transactions')): ?>
+                                        <button onclick="confirmDelete(<?= $transaction['id'] ?>)" 
+                                                class="btn btn-sm btn-danger" title="Supprimer">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

@@ -111,6 +111,11 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->get('edit/(:num)', 'Transactions::edit/$1');
         $routes->post('update/(:num)', 'Transactions::update/$1');
         $routes->delete('delete/(:num)', 'Transactions::delete/$1');
+        
+        // Commission management
+        $routes->get('view-commission/(:num)', 'Transactions::viewCommission/$1');
+        $routes->get('mark-commission-paid/(:num)', 'Transactions::markCommissionPaid/$1');
+        $routes->get('recalculate-commission/(:num)', 'Transactions::recalculateCommission/$1');
     });
     
     // Commissions

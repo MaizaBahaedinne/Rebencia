@@ -265,7 +265,8 @@ class Users extends BaseController
             $data['avatar'] = $newName;
         }
 
-        if ($this->userModel->update($userId, $data)) {
+        // Skip model validation since we're only updating profile fields
+        if ($this->userModel->skipValidation(true)->update($userId, $data)) {
             return redirect()->to('/admin/profile')->with('success', 'Profil mis à jour avec succès');
         }
 

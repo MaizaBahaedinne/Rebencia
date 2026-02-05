@@ -23,7 +23,7 @@
                         <strong><?= round($progress['properties']) ?>%</strong>
                     </div>
                     <div class="progress" style="height: 8px;">
-                        <div class="progress-bar bg-primary" style="width: <?= min(100, $progress['properties']) ?>%"></div>
+                        <div class="progress-bar bg-primary" style="width: <?= min(100, $progress['properties']) ?>%;"></div>
                     </div>
                 </div>
             </div>
@@ -38,7 +38,7 @@
                         <strong><?= round($progress['clients']) ?>%</strong>
                     </div>
                     <div class="progress" style="height: 8px;">
-                        <div class="progress-bar bg-success" style="width: <?= min(100, $progress['clients']) %>%"></div>
+                        <div class="progress-bar bg-success" style="width: <?= min(100, $progress['clients']) ?>%;"></div>
                     </div>
                 </div>
             </div>
@@ -53,7 +53,7 @@
                         <strong><?= round($progress['deals']) ?>%</strong>
                     </div>
                     <div class="progress" style="height: 8px;">
-                        <div class="progress-bar bg-warning" style="width: <?= min(100, $progress['deals']) ?>%"></div>
+                        <div class="progress-bar bg-warning" style="width: <?= min(100, $progress['deals']) ?>%;"></div>
                     </div>
                 </div>
             </div>
@@ -68,7 +68,7 @@
                         <strong><?= round($progress['revenue']) ?>%</strong>
                     </div>
                     <div class="progress" style="height: 8px;">
-                        <div class="progress-bar bg-info" style="width: <?= min(100, $progress['revenue']) ?>%"></div>
+                        <div class="progress-bar bg-info" style="width: <?= min(100, $progress['revenue']) ?>%;"></div>
                     </div>
                 </div>
             </div>
@@ -139,7 +139,7 @@
                             </td>
                             <td class="text-center">
                                 <div class="progress" style="height: 20px; min-width: 100px;">
-                                    <div class="progress-bar bg-success" style="width: <?= min(100, round($agentProgress)) ?>%">
+                                    <div class="progress-bar bg-success" style="width: <?= min(100, round($agentProgress)) ?>%;">
                                         <?= round($agentProgress) ?>%
                                     </div>
                                 </div>

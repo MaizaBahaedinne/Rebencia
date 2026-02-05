@@ -55,8 +55,38 @@
             background: linear-gradient(180deg, var(--sidebar-bg) 0%, #151820 100%);
             z-index: 1050;
             box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow-y: auto;
+        }
+
+        body.sidebar-collapsed .admin-sidebar {
+            transform: translateX(-100%);
+        }
+
+        body.sidebar-collapsed .admin-header,
+        body.sidebar-collapsed .admin-main {
+            margin-left: 0;
+            left: 0;
+        }
+
+        .sidebar-toggle-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f9fafb;
+            border: none;
+            border-radius: 10px;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 1rem;
+        }
+
+        .sidebar-toggle-btn:hover {
+            background: #e5e7eb;
+            color: var(--primary-color);
         }
 
         .sidebar-header {
@@ -167,6 +197,7 @@
             align-items: center;
             padding: 0 2rem;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .header-search {
@@ -794,6 +825,10 @@
 
     <!-- Header -->
     <header class="admin-header">
+        <button class="sidebar-toggle-btn" id="sidebarToggle" title="Masquer/Afficher le menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        
         <div class="header-search position-relative">
             <i class="fas fa-search"></i>
             <input type="text" placeholder="Rechercher un bien, client, transaction...">
@@ -1087,6 +1122,26 @@
         
         // Auto-refresh every 30 seconds
         setInterval(loadNotifications, 30000);
+    });
+
+    // ========== SIDEBAR TOGGLE ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const body = document.body;
+        
+        // Charger l'état sauvegardé
+        const sidebarState = localStorage.getItem('sidebarCollapsed');
+        if (sidebarState === 'true') {
+            body.classList.add('sidebar-collapsed');
+        }
+        
+        sidebarToggle.addEventListener('click', function() {
+            body.classList.toggle('sidebar-collapsed');
+            
+            // Sauvegarder l'état
+            const isCollapsed = body.classList.contains('sidebar-collapsed');
+            localStorage.setItem('sidebarCollapsed', isCollapsed);
+        });
     });
     </script>
     

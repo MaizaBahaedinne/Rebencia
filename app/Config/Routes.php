@@ -123,6 +123,32 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->get('agent-report/(:num)', 'Commissions::agentReport/$1');
     });
     
+    // Commission Settings (Configuration & Rules)
+    $routes->group('commission-settings', function($routes) {
+        // Rules Management
+        $routes->get('/', 'CommissionSettings::index');
+        $routes->get('rules', 'CommissionSettings::rules');
+        $routes->get('create-rule', 'CommissionSettings::createRule');
+        $routes->post('store-rule', 'CommissionSettings::storeRule');
+        $routes->get('edit-rule/(:num)', 'CommissionSettings::editRule/$1');
+        $routes->post('update-rule/(:num)', 'CommissionSettings::updateRule/$1');
+        $routes->delete('delete-rule/(:num)', 'CommissionSettings::deleteRule/$1');
+        $routes->post('set-default-rule/(:num)', 'CommissionSettings::setDefaultRule/$1');
+        
+        // Overrides Management
+        $routes->get('overrides', 'CommissionSettings::overrides');
+        $routes->get('create-override', 'CommissionSettings::createOverride');
+        $routes->post('store-override', 'CommissionSettings::storeOverride');
+        $routes->get('edit-override/(:num)', 'CommissionSettings::editOverride/$1');
+        $routes->post('update-override/(:num)', 'CommissionSettings::updateOverride/$1');
+        $routes->delete('delete-override/(:num)', 'CommissionSettings::deleteOverride/$1');
+        
+        // Simulation & Logs
+        $routes->get('simulate', 'CommissionSettings::simulate');
+        $routes->post('process-simulation', 'CommissionSettings::processSimulation');
+        $routes->get('logs', 'CommissionSettings::logs');
+    });
+    
     // Notifications
     $routes->group('notifications', function($routes) {
         $routes->get('/', 'Notifications::index');

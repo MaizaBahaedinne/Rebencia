@@ -78,6 +78,7 @@ class Auth extends BaseController
             'username' => $user['username'],
             'user_name' => $fullName,
             'email' => $user['email'],
+            'user_avatar' => $user['avatar'] ?? null,
             'role_id' => $defaultRole['role_id'] ?? $user['role_id'],
             'role_name' => $defaultRole['name'] ?? null,
             'role_display_name' => $defaultRole['display_name'] ?? 'Utilisateur',

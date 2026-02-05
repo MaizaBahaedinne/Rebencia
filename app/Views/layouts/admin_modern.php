@@ -827,8 +827,16 @@
 
             <div class="dropdown">
                 <div class="user-menu" data-bs-toggle="dropdown">
-                    <img src="https://ui-avatars.com/api/?name=<?= urlencode(session()->get('user_name') ?? 'Admin') ?>&background=0d6efd&color=fff&size=40" 
-                         alt="Avatar" class="user-avatar">
+                    <?php 
+                    $userAvatar = session()->get('user_avatar');
+                    if (!empty($userAvatar) && file_exists(FCPATH . 'uploads/avatars/' . $userAvatar)): 
+                    ?>
+                        <img src="<?= base_url('uploads/avatars/' . $userAvatar) ?>" 
+                             alt="Avatar" class="user-avatar" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
+                    <?php else: ?>
+                        <img src="https://ui-avatars.com/api/?name=<?= urlencode(session()->get('user_name') ?? 'Admin') ?>&background=0d6efd&color=fff&size=40" 
+                             alt="Avatar" class="user-avatar">
+                    <?php endif; ?>
                     <div class="user-info d-none d-md-block">
                         <div class="user-name"><?= esc(session()->get('user_name') ?? 'Admin') ?></div>
                         <div class="user-role">

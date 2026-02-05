@@ -250,7 +250,7 @@ class Users extends BaseController
             }
             
             // Create upload directory if it doesn't exist
-            $uploadPath = WRITEPATH . 'uploads/avatars';
+            $uploadPath = FCPATH . 'uploads/avatars';
             if (!is_dir($uploadPath)) {
                 mkdir($uploadPath, 0755, true);
             }
@@ -267,6 +267,16 @@ class Users extends BaseController
 
         // Skip model validation since we're only updating profile fields
         if ($this->userModel->skipValidation(true)->update($userId, $data)) {
+            // Update session with new avatar if changed
+            if (isset($data['avatar'])) {
+                session()->set('user_avatar', $data['avatar']);
+            }
+            // Update session with new name if changed
+            if (isset($data['first_name']) || isset($data['last_name'])) {
+                $fullName = trim(($data['first_name'] ?? $user['first_name']) . ' ' . ($data['last_name'] ?? $user['last_name']));
+                session()->set('user_name', $fullName);
+            }
+            
             return redirect()->to('/admin/profile')->with('success', 'Profil mis à jour avec succès');
         }
 

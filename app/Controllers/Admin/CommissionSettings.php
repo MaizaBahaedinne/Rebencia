@@ -31,6 +31,22 @@ class CommissionSettings extends BaseController
     }
 
     // ========================================================================
+    // DASHBOARD
+    // ========================================================================
+
+    /**
+     * Commission settings dashboard
+     */
+    public function index()
+    {
+        $data = [
+            'title' => 'Gestion des Commissions'
+        ];
+
+        return view('admin/commission_settings/index', $data);
+    }
+
+    // ========================================================================
     // COMMISSION RULES MANAGEMENT
     // ========================================================================
 

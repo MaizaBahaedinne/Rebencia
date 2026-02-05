@@ -239,13 +239,29 @@ class Users extends BaseController
         // Handle avatar upload
         $avatar = $this->request->getFile('avatar');
         if ($avatar && $avatar->isValid() && !$avatar->hasMoved()) {
+            // Validate file size (max 2MB)
+            if ($avatar->getSizeByUnit('mb') > 2) {
+                return redirect()->back()->withInput()->with('error', 'La taille de l\'image ne doit pas dépasser 2MB');
+            }
+            
+            // Validate file type
+            if (!in_array($avatar->getMimeType(), ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'])) {
+                return redirect()->back()->withInput()->with('error', 'Format d\'image non supporté. Utilisez JPG, PNG ou GIF');
+            }
+            
+            // Create upload directory if it doesn't exist
+            $uploadPath = WRITEPATH . 'uploads/avatars';
+            if (!is_dir($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+            
             // Delete old avatar if exists
-            if ($user['avatar'] && file_exists(ROOTPATH . 'public/uploads/avatars/' . $user['avatar'])) {
-                unlink(ROOTPATH . 'public/uploads/avatars/' . $user['avatar']);
+            if (!empty($user['avatar']) && file_exists($uploadPath . '/' . $user['avatar'])) {
+                @unlink($uploadPath . '/' . $user['avatar']);
             }
             
             $newName = $avatar->getRandomName();
-            $avatar->move(ROOTPATH . 'public/uploads/avatars', $newName);
+            $avatar->move($uploadPath, $newName);
             $data['avatar'] = $newName;
         }
 

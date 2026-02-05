@@ -102,12 +102,21 @@
                 </div>
                 <div class="card-body">
                     <!-- Règle appliquée -->
-                    <div class="alert alert-light border">
-                        <h6 class="mb-2"><i class="fas fa-info-circle"></i> Règle Appliquée</h6>
-                        <div id="ruleInfo"></div>
+                    <div class="alert alert-light border mb-3">
+                        <h6 class="mb-3"><i class="fas fa-info-circle"></i> Règle Appliquée</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Niveau :</strong> <span id="ruleLevel" class="badge bg-secondary">-</span></p>
+                                <p class="mb-1"><strong>Base Acheteur :</strong> <span id="buyerBase" class="text-primary">-</span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Type :</strong> <span id="ruleType" class="badge bg-info">-</span></p>
+                                <p class="mb-1"><strong>Base Vendeur :</strong> <span id="sellerBase" class="text-success">-</span></p>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Détails du calcul -->
+                    <!-- Détails du calcul avec pourcentages -->
                     <div class="row">
                         <div class="col-md-6">
                             <div class="card bg-light mb-3">
@@ -117,8 +126,17 @@
                                     </h6>
                                     <table class="table table-sm table-borderless mb-0">
                                         <tr>
+                                            <td>Base de calcul :</td>
+                                            <td class="text-end">
+                                                <strong id="buyerCalcBase" class="text-primary">-</strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <td>Montant HT :</td>
-                                            <td class="text-end"><strong id="buyerHT">-</strong></td>
+                                            <td class="text-end">
+                                                <strong id="buyerHT">-</strong>
+                                                <small class="text-muted d-block" id="buyerHTPercent"></small>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td>TVA (19%) :</td>
@@ -126,7 +144,10 @@
                                         </tr>
                                         <tr class="border-top">
                                             <td><strong>Total TTC :</strong></td>
-                                            <td class="text-end"><strong class="text-primary" id="buyerTTC">-</strong></td>
+                                            <td class="text-end">
+                                                <strong class="text-primary fs-5" id="buyerTTC">-</strong>
+                                                <small class="text-muted d-block" id="buyerTTCPercent"></small>
+                                            </td>
                                         </tr>
                                     </table>
                                 </div>
@@ -141,8 +162,17 @@
                                     </h6>
                                     <table class="table table-sm table-borderless mb-0">
                                         <tr>
+                                            <td>Base de calcul :</td>
+                                            <td class="text-end">
+                                                <strong id="sellerCalcBase" class="text-success">-</strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <td>Montant HT :</td>
-                                            <td class="text-end"><strong id="sellerHT">-</strong></td>
+                                            <td class="text-end">
+                                                <strong id="sellerHT">-</strong>
+                                                <small class="text-muted d-block" id="sellerHTPercent"></small>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td>TVA (19%) :</td>
@@ -150,7 +180,10 @@
                                         </tr>
                                         <tr class="border-top">
                                             <td><strong>Total TTC :</strong></td>
-                                            <td class="text-end"><strong class="text-success" id="sellerTTC">-</strong></td>
+                                            <td class="text-end">
+                                                <strong class="text-success fs-5" id="sellerTTC">-</strong>
+                                                <small class="text-muted d-block" id="sellerTTCPercent"></small>
+                                            </td>
                                         </tr>
                                     </table>
                                 </div>
@@ -159,41 +192,71 @@
                     </div>
 
                     <!-- Total général -->
-                    <div class="card bg-primary text-white">
+                    <div class="card bg-primary text-white mb-3">
                         <div class="card-body">
                             <h5 class="mb-3"><i class="fas fa-coins"></i> Commission Totale</h5>
                             <div class="row">
                                 <div class="col-4 text-center">
-                                    <div class="mb-1">HT</div>
+                                    <div class="mb-1 small">Hors Taxes</div>
                                     <h4 id="totalHT" class="mb-0">-</h4>
+                                    <small id="totalHTPercent" class="opacity-75">-</small>
                                 </div>
                                 <div class="col-4 text-center">
-                                    <div class="mb-1">TVA</div>
+                                    <div class="mb-1 small">TVA (19%)</div>
                                     <h4 id="totalVAT" class="mb-0">-</h4>
+                                    <small class="opacity-75">du montant HT</small>
                                 </div>
                                 <div class="col-4 text-center">
-                                    <div class="mb-1">TTC</div>
+                                    <div class="mb-1 small">Toutes Taxes Comprises</div>
                                     <h3 id="totalTTC" class="mb-0 fw-bold">-</h3>
+                                    <small id="totalTTCPercent" class="opacity-75">-</small>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Répartition Agent/Agence -->
-                    <div class="card mt-3" id="splitCard" style="display: none;">
+                    <div class="card" id="splitCard">
                         <div class="card-header bg-warning">
-                            <h6 class="mb-0"><i class="fas fa-percentage"></i> Répartition Agent / Agence</h6>
+                            <h5 class="mb-0"><i class="fas fa-percentage"></i> Répartition Agent / Agence</h5>
                         </div>
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-6 text-center">
-                                    <div class="mb-1 text-muted">Part Agent (<span id="agentPercent">50</span>%)</div>
-                                    <h5 id="agentAmount" class="text-primary mb-0">-</h5>
+                            <div class="row text-center mb-3">
+                                <div class="col-6">
+                                    <div class="border-end">
+                                        <div class="mb-2">
+                                            <i class="fas fa-user-tie fa-2x text-primary"></i>
+                                        </div>
+                                        <h6 class="text-muted mb-1">Part Agent</h6>
+                                        <h4 class="text-primary mb-1" id="agentAmount">-</h4>
+                                        <div class="progress mx-auto" style="width: 80%; height: 25px;">
+                                            <div id="agentProgressBar" class="progress-bar bg-primary" style="width: 50%;">
+                                                <strong id="agentPercent">50%</strong>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-6 text-center">
-                                    <div class="mb-1 text-muted">Part Agence (<span id="agencyPercent">50</span>%)</div>
-                                    <h5 id="agencyAmount" class="text-success mb-0">-</h5>
+                                <div class="col-6">
+                                    <div class="mb-2">
+                                        <i class="fas fa-building fa-2x text-success"></i>
+                                    </div>
+                                    <h6 class="text-muted mb-1">Part Agence</h6>
+                                    <h4 class="text-success mb-1" id="agencyAmount">-</h4>
+                                    <div class="progress mx-auto" style="width: 80%; height: 25px;">
+                                        <div id="agencyProgressBar" class="progress-bar bg-success" style="width: 50%;">
+                                            <strong id="agencyPercent">50%</strong>
+                                        </div>
+                                    </div>
                                 </div>
+                            </div>
+                            
+                            <!-- Détails répartition -->
+                            <div class="alert alert-info mb-0">
+                                <small>
+                                    <i class="fas fa-info-circle"></i>
+                                    <strong>Répartition par défaut :</strong> 50% agent / 50% agence sur la commission TTC totale.
+                                    Cette répartition peut être personnalisée par transaction.
+                                </small>
                             </div>
                         </div>
                     </div>

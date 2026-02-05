@@ -653,7 +653,7 @@
             <?php endif; ?>
             
             <?php if (canRead('commissions') || isAdmin()): ?>
-            <a href="<?= base_url('admin/commissions') ?>" class="menu-item <?= url_is('admin/commissions*') ? 'active' : '' ?>">
+            <a href="<?= base_url('admin/commission-settings') ?>" class="menu-item <?= url_is('admin/commission-settings*') ? 'active' : '' ?>">
                 <i class="fas fa-dollar-sign"></i>
                 <span>Commissions</span>
             </a>

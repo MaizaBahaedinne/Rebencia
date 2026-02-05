@@ -47,11 +47,11 @@ class Transactions extends BaseController
         
         $data = [
             'title' => 'Nouvelle Transaction',
-            'properties' => $this->propertyModel->where('status', 'published')->findAll(),
-            'buyers' => $this->clientModel->whereIn('type', ['buyer', 'tenant'])->where('status', 'active')->findAll(),
-            'sellers' => $this->clientModel->whereIn('type', ['seller', 'landlord'])->where('status', 'active')->findAll(),
-            'agents' => $userModel->whereIn('role_id', [6, 7, 8])->where('status', 'active')->findAll(),
-            'agencies' => $agencyModel->where('status', 'active')->findAll()
+            'properties' => $this->propertyModel->findAll(),
+            'buyers' => $this->clientModel->findAll(), // Tous les clients pour acheteurs
+            'sellers' => $this->clientModel->findAll(), // Tous les clients pour vendeurs
+            'agents' => $userModel->where('status', 'active')->findAll(),
+            'agencies' => $agencyModel->findAll()
         ];
 
         return view('admin/transactions/create', $data);

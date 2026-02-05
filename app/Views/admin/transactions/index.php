@@ -118,3 +118,31 @@
 </div>
 
 <?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+<script>
+function confirmDelete(transactionId) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette transaction ? Les commissions associées seront également supprimées.')) {
+        fetch(`<?= base_url('admin/transactions/delete/') ?>${transactionId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                '<?= csrf_header() ?>': '<?= csrf_hash() ?>'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message || 'Erreur lors de la suppression');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Erreur lors de la suppression');
+        });
+    }
+}
+</script>
+<?= $this->endSection() ?>

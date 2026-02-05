@@ -228,9 +228,13 @@ class Users extends BaseController
             'last_name' => $this->request->getPost('last_name'),
             'email' => $this->request->getPost('email'),
             'phone' => $this->request->getPost('phone'),
-            'cin' => $this->request->getPost('cin'),
-            'agency_id' => $this->request->getPost('agency_id'),
         ];
+        
+        // Only allow agency_id change for super admins
+        $roleLevel = session()->get('role_level');
+        if ($roleLevel >= 100) {
+            $data['agency_id'] = $this->request->getPost('agency_id');
+        }
 
         // Handle avatar upload
         $avatar = $this->request->getFile('avatar');

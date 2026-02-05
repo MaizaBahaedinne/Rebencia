@@ -68,12 +68,7 @@
                                        value="<?= old('phone', $user['phone'] ?? '') ?>" placeholder="+216 XX XXX XXX">
                             </div>
 
-                            <div class="col-md-6">
-                                <label for="cin" class="form-label">CIN</label>
-                                <input type="text" class="form-control" id="cin" name="cin" 
-                                       value="<?= old('cin', $user['cin'] ?? '') ?>" placeholder="12345678">
-                            </div>
-
+                            <?php if (session()->get('role_level') >= 100): ?>
                             <div class="col-md-6">
                                 <label for="agency_id" class="form-label">Agence</label>
                                 <select class="form-select" id="agency_id" name="agency_id">
@@ -85,6 +80,7 @@
                                     <?php endforeach ?>
                                 </select>
                             </div>
+                            <?php endif ?>
 
                             <div class="col-md-12">
                                 <label for="avatar" class="form-label">Photo de Profil</label>

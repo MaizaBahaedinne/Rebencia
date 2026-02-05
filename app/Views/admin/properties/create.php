@@ -182,29 +182,96 @@
                                             <select class="form-select" id="zone_id" name="zone_id" required>
                                                 <option value="">-- Sélectionner --</option>
                                                 <?php foreach ($zones as $zone): ?>
-                                                    <option value="<?= $zone['id'] ?>" <?= old('zone_id') == $zone['id'] ? 'selected' : '' ?>>
+                                                    <option value="<?= $zone['id'] ?>" 
+                                                            data-lat="<?= $zone['latitude'] ?? '' ?>" 
+                                                            data-lng="<?= $zone['longitude'] ?? '' ?>"
+                                                            <?= old('zone_id') == $zone['id'] ? 'selected' : '' ?>>
                                                         <?= esc($zone['name']) ?>
+                                                        <?php if (!empty($zone['latitude']) && !empty($zone['longitude'])): ?>
+                                                            <i class="fas fa-map-marker-alt text-success"></i>
+                                                        <?php endif; ?>
                                                     </option>
                                                 <?php endforeach ?>
                                             </select>
                                         </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="address" class="form-label">Adresse <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" id="address" name="address" 
-                                                   value="<?= old('address') ?>" required>
+                                        <div class="col-md-12 mb-3">
+                                            <label class="form-label">Adresse <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="address" name="address" 
+                                                       value="<?= old('address') ?>" placeholder="Adresse complète du bien" required>
+                                                <button class="btn btn-outline-secondary" type="button" id="toggleAddressVisibility">
+                                                    <i class="fas fa-eye" id="addressVisibilityIcon"></i>
+                                                </button>
+                                            </div>
+                                            <div class="form-check mt-2">
+                                                <input class="form-check-input" type="checkbox" id="hide_address" name="hide_address" value="1" <?= old('hide_address') ? 'checked' : '' ?>>
+                                                <label class="form-check-label" for="hide_address">
+                                                    <i class="fas fa-shield-alt"></i> Masquer l'adresse exacte sur les annonces publiques
+                                                    <small class="text-muted d-block">L'adresse ne sera visible que pour les agents et les clients confirmés</small>
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
 
+                                    <!-- GPS Configuration -->
                                     <div class="row">
+                                        <div class="col-12 mb-3">
+                                            <label class="form-label fw-bold">
+                                                <i class="fas fa-map-marked-alt"></i> Localisation GPS
+                                            </label>
+                                            <div class="btn-group w-100 mb-3" role="group">
+                                                <input type="radio" class="btn-check" name="gps_mode" id="gps_manual" value="manual" checked>
+                                                <label class="btn btn-outline-primary" for="gps_manual">
+                                                    <i class="fas fa-keyboard"></i> Saisie manuelle
+                                                </label>
+                                                
+                                                <input type="radio" class="btn-check" name="gps_mode" id="gps_zone" value="zone">
+                                                <label class="btn btn-outline-primary" for="gps_zone">
+                                                    <i class="fas fa-map"></i> Utiliser la zone
+                                                </label>
+                                                
+                                                <input type="radio" class="btn-check" name="gps_mode" id="gps_map" value="map">
+                                                <label class="btn btn-outline-primary" for="gps_map">
+                                                    <i class="fas fa-mouse-pointer"></i> Cliquer sur carte
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Manual GPS Input -->
+                                    <div class="row" id="gps_manual_fields">
                                         <div class="col-md-6 mb-3">
                                             <label for="latitude" class="form-label">Latitude</label>
                                             <input type="number" class="form-control" id="latitude" name="latitude" 
-                                                   value="<?= old('latitude') ?>" step="0.000001">
+                                                   value="<?= old('latitude') ?>" step="0.000001" placeholder="Ex: 36.8065">
+                                            <small class="text-muted">Format: 36.8065</small>
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label for="longitude" class="form-label">Longitude</label>
                                             <input type="number" class="form-control" id="longitude" name="longitude" 
-                                                   value="<?= old('longitude') ?>" step="0.000001">
+                                                   value="<?= old('longitude') ?>" step="0.000001" placeholder="Ex: 10.1815">
+                                            <small class="text-muted">Format: 10.1815</small>
+                                        </div>
+                                    </div>
+
+                                    <!-- Zone GPS Info -->
+                                    <div class="row d-none" id="gps_zone_info">
+                                        <div class="col-12 mb-3">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-info-circle"></i> 
+                                                <strong>Utilisation GPS de la zone</strong>
+                                                <p class="mb-0" id="zone_gps_text">Sélectionnez une zone pour utiliser ses coordonnées GPS</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Interactive Map -->
+                                    <div class="row d-none" id="gps_map_container">
+                                        <div class="col-12 mb-3">
+                                            <div class="alert alert-success">
+                                                <i class="fas fa-hand-pointer"></i> Cliquez sur la carte pour définir la position exacte
+                                            </div>
+                                            <div id="gps_picker_map" style="height: 400px; border-radius: 8px;"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -306,30 +373,149 @@
 
 <?= $this->endSection() ?>
 
+<?= $this->section('styles') ?>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<?= $this->endSection() ?>
+
 <?= $this->section('scripts') ?>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-        // Preview des images sélectionnées
-        document.getElementById('images').addEventListener('change', function(e) {
-            const preview = document.getElementById('image-preview');
-            preview.innerHTML = '';
-            
-            Array.from(e.target.files).forEach((file, index) => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const col = document.createElement('div');
-                        col.className = 'col-6';
-                        col.innerHTML = `
-                            <div class="position-relative">
-                                <img src="${e.target.result}" class="img-thumbnail" alt="Preview ${index + 1}">
-                                ${index === 0 ? '<span class="badge bg-primary position-absolute top-0 start-0 m-1">Principal</span>' : ''}
-                            </div>
-                        `;
-                        preview.appendChild(col);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
+let gpsPickerMap = null;
+let gpsMarker = null;
+
+// GPS Mode Toggle
+document.querySelectorAll('input[name="gps_mode"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const mode = this.value;
+        
+        // Hide all sections
+        document.getElementById('gps_manual_fields').classList.add('d-none');
+        document.getElementById('gps_zone_info').classList.add('d-none');
+        document.getElementById('gps_map_container').classList.add('d-none');
+        
+        // Show selected section
+        if (mode === 'manual') {
+            document.getElementById('gps_manual_fields').classList.remove('d-none');
+        } else if (mode === 'zone') {
+            document.getElementById('gps_zone_info').classList.remove('d-none');
+            updateZoneGPS();
+        } else if (mode === 'map') {
+            document.getElementById('gps_map_container').classList.remove('d-none');
+            initGPSPickerMap();
+        }
+    });
+});
+
+// Zone GPS Update
+document.getElementById('zone_id').addEventListener('change', function() {
+    if (document.getElementById('gps_zone').checked) {
+        updateZoneGPS();
+    }
+});
+
+function updateZoneGPS() {
+    const zoneSelect = document.getElementById('zone_id');
+    const selectedOption = zoneSelect.options[zoneSelect.selectedIndex];
+    
+    if (zoneSelect.value && selectedOption.dataset.lat && selectedOption.dataset.lng) {
+        const lat = selectedOption.dataset.lat;
+        const lng = selectedOption.dataset.lng;
+        const zoneName = selectedOption.text;
+        
+        document.getElementById('latitude').value = lat;
+        document.getElementById('longitude').value = lng;
+        document.getElementById('zone_gps_text').innerHTML = `
+            <strong>Zone : ${zoneName}</strong><br>
+            GPS : ${lat}, ${lng}
+        `;
+    } else {
+        document.getElementById('zone_gps_text').innerHTML = 
+            'La zone sélectionnée n\'a pas de coordonnées GPS définies. Veuillez choisir une autre zone ou utiliser la saisie manuelle.';
+    }
+}
+
+// Initialize GPS Picker Map
+function initGPSPickerMap() {
+    if (!gpsPickerMap) {
+        const lat = document.getElementById('latitude').value || 36.8065;
+        const lng = document.getElementById('longitude').value || 10.1815;
+        
+        gpsPickerMap = L.map('gps_picker_map').setView([lat, lng], 13);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(gpsPickerMap);
+        
+        // Add marker
+        gpsMarker = L.marker([lat, lng], { draggable: true }).addTo(gpsPickerMap);
+        
+        // Update coordinates on marker drag
+        gpsMarker.on('dragend', function(e) {
+            const position = e.target.getLatLng();
+            document.getElementById('latitude').value = position.lat.toFixed(6);
+            document.getElementById('longitude').value = position.lng.toFixed(6);
         });
-    </script>
+        
+        // Update marker on map click
+        gpsPickerMap.on('click', function(e) {
+            const lat = e.latlng.lat.toFixed(6);
+            const lng = e.latlng.lng.toFixed(6);
+            
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+            
+            gpsMarker.setLatLng(e.latlng);
+        });
+    }
+    
+    // Fix map size
+    setTimeout(() => gpsPickerMap.invalidateSize(), 100);
+}
+
+// Address Visibility Toggle
+document.getElementById('toggleAddressVisibility').addEventListener('click', function() {
+    const addressInput = document.getElementById('address');
+    const icon = document.getElementById('addressVisibilityIcon');
+    
+    if (addressInput.type === 'password') {
+        addressInput.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        addressInput.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+});
+
+// Preview des images sélectionnées
+document.getElementById('images').addEventListener('change', function(e) {
+    const preview = document.getElementById('image-preview');
+    preview.innerHTML = '';
+    
+    Array.from(e.target.files).forEach((file, index) => {
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const col = document.createElement('div');
+                col.className = 'col-6';
+                col.innerHTML = `
+                    <div class="position-relative">
+                        <img src="${e.target.result}" class="img-thumbnail" alt="Preview ${index + 1}">
+                        ${index === 0 ? '<span class="badge bg-primary position-absolute top-0 start-0 m-1">Principal</span>' : ''}
+                    </div>
+                `;
+                preview.appendChild(col);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+});
+
+// Add data attributes to zone options
+document.addEventListener('DOMContentLoaded', function() {
+    // This will be populated from PHP in the next step
+    console.log('Property Create Form Initialized');
+});
+</script>
 <?= $this->endSection() ?>

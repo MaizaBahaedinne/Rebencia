@@ -17,7 +17,12 @@ $orientation = $extended->getOrientation($propertyId);
 $mediaFiles = $extended->getMediaExtension($propertyId);
 
 // Vérifier features activées
-$enabledFeatures = $config->getVisibleSections($propertyType);
+if ($config === null) {
+    echo '<div class="alert alert-danger">Erreur : le service PropertyConfigService n\'est pas disponible.</div>';
+    $enabledFeatures = [];
+} else {
+    $enabledFeatures = $config->getVisibleSections($propertyType);
+}
 ?>
 
 <ul class="nav nav-tabs" id="extendedDataTabs" role="tablist">

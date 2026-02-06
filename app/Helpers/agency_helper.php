@@ -24,9 +24,9 @@ if (!function_exists('getAccessibleAgencies')) {
             return [];
         }
 
-        // Super admin voit tout
+        // Super admin et directeur siège voient tout
         $activeRole = $userModel->getActiveRole($userId);
-        if ($activeRole && $activeRole['level'] >= 100) {
+        if ($activeRole && $activeRole['level'] >= 90) {
             $agencyModel = model('AgencyModel');
             $allAgencies = $agencyModel->findAll();
             return array_column($allAgencies, 'id');
@@ -163,8 +163,8 @@ if (!function_exists('applyAgencyFilter')) {
         $userModel = model('UserModel');
         $activeRole = $userModel->getActiveRole($userId);
         
-        if ($activeRole && $activeRole['level'] >= 100) {
-            return $builder; // Pas de filtre pour super admin
+        if ($activeRole && $activeRole['level'] >= 90) {
+            return $builder; // Pas de filtre pour super admin et directeur siège
         }
 
         // Appliquer le filtre d'agences accessibles

@@ -33,6 +33,7 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->get('/', 'Users::index');
         $routes->get('create', 'Users::create');
         $routes->post('store', 'Users::store');
+        $routes->get('view/(:num)', 'Users::view/$1');
         $routes->get('edit/(:num)', 'Users::edit/$1');
         $routes->post('update/(:num)', 'Users::update/$1');
         $routes->delete('delete/(:num)', 'Users::delete/$1');

@@ -72,7 +72,7 @@ class Hierarchy extends BaseController
         
         $data = [
             'title' => 'Assigner un manager',
-            'users' => $this->userModel->where('role !=', 'admin')->findAll(),
+            'users' => $this->userModel->where('role_id >', 1)->findAll(),
             'managers' => $this->userModel->findAll()
         ];
         

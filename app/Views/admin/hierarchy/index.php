@@ -240,14 +240,14 @@ function renderHierarchyTree($tree, $level = 0) {
                 $html .= '<div class="user-avatar">' . $initials . '</div>';
                 $html .= '<div class="user-info">';
                 $html .= '<div class="user-name">' . esc($user['first_name'] . ' ' . $user['last_name']) . '</div>';
-                $html .= '<div class="user-role">' . esc($user['role']) . '</div>';
+                $html .= '<div class="user-role">Role ID: ' . esc($user['role_id'] ?? 'N/A') . '</div>';
                 
                 if ($user['manager_id']) {
                     $html .= '<span class="user-manager"><i class="fas fa-user-tie"></i> A un manager</span>';
                 }
                 $html .= '</div>';
                 
-                if (!$user['manager_id'] && $user['role'] !== 'admin') {
+                if (!$user['manager_id'] && $user['role_id'] != 1) {
                     $html .= '<span class="warning-badge"><i class="fas fa-exclamation-triangle"></i> Sans manager</span>';
                 }
                 

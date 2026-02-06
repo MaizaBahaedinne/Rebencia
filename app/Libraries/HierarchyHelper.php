@@ -101,9 +101,9 @@ class HierarchyHelper
      */
     public function canManageUser($managerId, $userId)
     {
-        // Admin peut tout gérer
+        // Admin peut tout gérer (role_id = 1)
         $manager = $this->userModel->find($managerId);
-        if ($manager && $manager['role'] === 'admin') {
+        if ($manager && $manager['role_id'] == 1) {
             return true;
         }
         
@@ -222,9 +222,10 @@ class HierarchyHelper
      */
     public function getUsersWithoutManager()
     {
+        // role_id = 1 est généralement admin/super-admin
         return $this->userModel
             ->where('manager_id IS NULL')
-            ->where('role !=', 'admin')
+            ->where('role_id >', 1)
             ->findAll();
     }
     
@@ -259,8 +260,8 @@ class HierarchyHelper
     {
         $user = $this->userModel->find($userId);
         
-        // Admin voit tout
-        if ($user && $user['role'] === 'admin') {
+        // Admin voit tout (role_id = 1)
+        if ($user && $user['role_id'] == 1) {
             $allUsers = $this->userModel->findAll();
             return array_column($allUsers, 'id');
         }

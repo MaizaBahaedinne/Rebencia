@@ -3,62 +3,104 @@
 <?= $this->section('styles') ?>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
+    .split-view-wrapper {
+        position: relative;
+        height: calc(100vh - 160px);
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
     .split-view-container {
         display: flex;
-        height: calc(100vh - 140px);
-        gap: 0;
-        margin: 0 -2rem;
+        height: 100%;
         position: relative;
+    }
+    .list-panel, .map-panel {
+        height: 100%;
+        transition: all 0.3s ease;
     }
     .list-panel {
         width: 50%;
         overflow-y: auto;
-        padding: 2rem;
-        background: #f5f6fa;
+        background: white;
     }
     .map-panel {
         width: 50%;
         position: relative;
-        background: #e5e7eb;
+    }
+    .list-panel.fullscreen {
+        width: 100%;
+    }
+    .map-panel.fullscreen {
+        width: 100%;
+    }
+    .list-panel.hidden, .map-panel.hidden {
+        width: 0;
+        overflow: hidden;
     }
     #zonesMap {
         width: 100%;
         height: 100%;
     }
     .resize-handle {
-        width: 5px;
+        width: 4px;
         cursor: ew-resize;
-        background: #cbd5e1;
-        transition: background 0.3s;
+        background: linear-gradient(90deg, #e5e7eb 0%, #cbd5e1 50%, #e5e7eb 100%);
+        transition: all 0.3s;
         position: relative;
         z-index: 10;
+        flex-shrink: 0;
     }
     .resize-handle:hover {
         background: #3b82f6;
+        width: 6px;
     }
-    .view-toggle {
+    .resize-handle.hidden {
+        display: none;
+    }
+    .view-controls {
         position: absolute;
-        top: 20px;
-        right: 20px;
+        top: 10px;
+        right: 10px;
         z-index: 1000;
-        background: white;
-        border-radius: 10px;
-        padding: 0.5rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        display: flex;
+        gap: 5px;
     }
-    .zone-card {
+    .view-toggle-btn {
+        background: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         cursor: pointer;
         transition: all 0.3s;
-        border-left: 4px solid transparent;
+        font-size: 14px;
     }
-    .zone-card:hover {
+    .view-toggle-btn:hover {
+        background: #f3f4f6;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .view-toggle-btn.active {
+        background: #3b82f6;
+        color: white;
+    }
+    .zone-row {
+        cursor: pointer;
+        transition: all 0.2s;
+        border-left: 3px solid transparent;
+    }
+    .zone-row:hover {
         border-left-color: #3b82f6;
-        transform: translateX(5px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        background: #f9fafb;
     }
-    .zone-card.active {
+    .zone-row.active {
         border-left-color: #10b981;
         background: #f0fdf4;
+    }
+    .table-responsive {
+        max-height: none !important;
     }
 </style>
 <?= $this->endSection() ?>
@@ -90,15 +132,23 @@
         </div>
     <?php endif ?>
 
-    <div class="split-view-container">
-        <div class="list-panel">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Liste des Zones</h6>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0" id="zonesTable">
+    <div class="split-view-wrapper">
+        <div class="view-controls">
+            <button class="view-toggle-btn" onclick="toggleView('split')" title="Vue partagée">
+                <i class="fas fa-columns"></i>
+            </button>
+            <button class="view-toggle-btn" onclick="toggleView('table')" title="Tableau plein écran">
+                <i class="fas fa-table"></i>
+            </button>
+            <button class="view-toggle-btn" onclick="toggleView('map')" title="Carte plein écran">
+                <i class="fas fa-map"></i>
+            </button>
+        </div>
+
+        <div class="split-view-container">
+            <div class="list-panel">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="zonesTable">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -162,24 +212,20 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>
-                                    <?php if (!empty($zone['latitude']) && !empty($zone['longitude'])): ?>
-                                        <a href="https://www.google.com/maps?q=<?= $zone['latitude'] ?>,<?= $zone['longitude'] ?>" 
-                                           target="_blank" class="btn btn-sm btn-outline-secondary" title="Voir sur Google Maps">
-                                            <i class="fas fa-map-marker-alt"></i>
-                                        </a>
-                                    <?php else: ?>
-                                        <span class="text-muted">-</span>
-                                    <?php endif ?>
-                                </td>
-                                <td>
+                                <td class="text-center">
                                     <div class="btn-group" role="group">
+                                        <?php if (!empty($zone['latitude']) && !empty($zone['longitude'])): ?>
+                                            <a href="https://www.google.com/maps?q=<?= $zone['latitude'] ?>,<?= $zone['longitude'] ?>" 
+                                               target="_blank" class="btn btn-sm btn-outline-secondary" title="Voir sur Google Maps">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                            </a>
+                                        <?php endif ?>
                                         <a href="<?= base_url('admin/zones/edit/' . $zone['id']) ?>" 
                                            class="btn btn-sm btn-warning" title="Modifier">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <button type="button" class="btn btn-sm btn-danger" 
-                                                onclick="confirmDelete(<?= $zone['id'] ?>)" title="Supprimer">
+                                                onclick="event.stopPropagation(); confirmDelete(<?= $zone['id'] ?>)" title="Supprimer">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
@@ -189,9 +235,6 @@
                     </tbody>
                 </table>
             </div>
-                </div>
-            </div>
-        </div>
         
         <div class="resize-handle" id="resizeHandle"></div>
         
@@ -305,11 +348,40 @@ const listPanel = document.querySelector('.list-panel');
 const mapPanel = document.querySelector('.map-panel');
 const resizeHandle = document.getElementById('resizeHandle');
 let isResizing = false;
+let currentView = 'split';
+
+// Toggle view modes
+function toggleView(mode) {
+    currentView = mode;
+    
+    // Update button states
+    document.querySelectorAll('.view-toggle-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.closest('.view-toggle-btn').classList.add('active');
+    
+    listPanel.classList.remove('fullscreen', 'hidden');
+    mapPanel.classList.remove('fullscreen', 'hidden');
+    resizeHandle.classList.remove('hidden');
+    
+    if (mode === 'split') {
+        listPanel.style.width = '50%';
+        mapPanel.style.width = '50%';
+    } else if (mode === 'table') {
+        listPanel.classList.add('fullscreen');
+        mapPanel.classList.add('hidden');
+        resizeHandle.classList.add('hidden');
+    } else if (mode === 'map') {
+        listPanel.classList.add('hidden');
+        mapPanel.classList.add('fullscreen');
+        resizeHandle.classList.add('hidden');
+    }
+    
+    setTimeout(() => map.invalidateSize(), 100);
+}
 
 resizeHandle.addEventListener('mousedown', () => isResizing = true);
 
 document.addEventListener('mousemove', (e) => {
-    if (!isResizing) return;
+    if (!isResizing || currentView !== 'split') return;
     
     const containerWidth = document.querySelector('.split-view-container').offsetWidth;
     const listWidth = (e.clientX / containerWidth) * 100;

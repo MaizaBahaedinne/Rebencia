@@ -8,26 +8,50 @@ class AddParentAgencyId extends Migration
 {
     public function up()
     {
-        // Ajouter parent_agency_id pour créer une hiérarchie d'agences
-        $this->forge->addColumn('agencies', [
-            'parent_agency_id' => [
+        // Vérifier si les colonnes existent déjà
+        $fields = $this->db->getFieldNames('agencies');
+        
+        $columnsToAdd = [];
+        
+        if (!in_array('parent_agency_id', $fields)) {
+            $columnsToAdd['parent_agency_id'] = [
                 'type' => 'INT',
                 'constraint' => 11,
                 'unsigned' => true,
                 'null' => true,
                 'after' => 'id',
-            ],
-            'is_headquarters' => [
+            ];
+        }
+        
+        if (!in_array('is_headquarters', $fields)) {
+            $columnsToAdd['is_headquarters'] = [
                 'type' => 'TINYINT',
                 'constraint' => 1,
                 'default' => 0,
                 'comment' => '1 = Siège, 0 = Agence locale',
                 'after' => 'parent_agency_id',
-            ],
-        ]);
+            ];
+        }
+        
+        // Ajouter les colonnes seulement si elles n'existent pas
+        if (!empty($columnsToAdd)) {
+            $this->forge->addColumn('agencies', $columnsToAdd);
+        }
 
-        // Ajouter une clé étrangère
-        $this->forge->addForeignKey('parent_agency_id', 'agencies', 'id', 'SET NULL', 'CASCADE', 'fk_agencies_parent');
+        // Vérifier si la clé étrangère existe déjà
+        $foreignKeys = $this->db->getForeignKeyData('agencies');
+        $fkExists = false;
+        foreach ($foreignKeys as $fk) {
+            if ($fk->constraint_name === 'fk_agencies_parent') {
+                $fkExists = true;
+                break;
+            }
+        }
+        
+        // Ajouter la clé étrangère seulement si elle n'existe pas
+        if (!$fkExists && in_array('parent_agency_id', $this->db->getFieldNames('agencies'))) {
+            $this->forge->addForeignKey('parent_agency_id', 'agencies', 'id', 'SET NULL', 'CASCADE', 'fk_agencies_parent');
+        }
     }
 
     public function down()

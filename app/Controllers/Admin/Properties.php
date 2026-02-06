@@ -3,25 +3,37 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
+use App\Libraries\HierarchyHelper;
 
 class Properties extends BaseController
 {
     protected $propertyModel;
     protected $zoneModel;
     protected $agencyModel;
+    protected $hierarchyHelper;
 
     public function __construct()
     {
         $this->propertyModel = model('PropertyModel');
         $this->zoneModel = model('ZoneModel');
         $this->agencyModel = model('AgencyModel');
+        $this->hierarchyHelper = new HierarchyHelper();
     }
 
     public function index()
     {
+        // Récupérer les IDs des utilisateurs accessibles
+        $currentUserId = session()->get('user_id');
+        $accessibleUserIds = $this->hierarchyHelper->getAccessibleUserIds($currentUserId);
+        
+        // Filtrer les propriétés selon la hiérarchie
+        $properties = $this->propertyModel
+            ->whereIn('user_id', $accessibleUserIds)
+            ->paginate(20);
+        
         $data = [
             'title' => 'Gestion des Propriétés',
-            'properties' => $this->propertyModel->getAllWithAgencyFilter(20),
+            'properties' => $properties,
             'pager' => $this->propertyModel->pager
         ];
 

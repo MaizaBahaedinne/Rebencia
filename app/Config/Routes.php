@@ -197,6 +197,14 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->get('unread-count', 'Notifications::getUnreadCount');
     });
     
+    // Hierarchy Management
+    $routes->group('hierarchy', function($routes) {
+        $routes->get('/', 'Hierarchy::index');
+        $routes->get('assign-manager', 'Hierarchy::assignManager');
+        $routes->post('assign-manager', 'Hierarchy::assignManager');
+        $routes->get('view-user/(:num)', 'Hierarchy::viewUser/$1');
+    });
+    
     // Reports & Export
     $routes->group('reports', function($routes) {
         $routes->get('/', 'Reports::index');

@@ -175,7 +175,16 @@ class CommissionCalculatorService
             $rule = $this->ruleModel->getDefaultRule($transactionType, $propertyType);
             
             if (!$rule) {
-                throw new \Exception("No default rule found for {$transactionType} - {$propertyType}");
+                // Si pas de règle par défaut, chercher n'importe quelle règle active pour ce type
+                $rule = $this->ruleModel->where([
+                    'transaction_type' => $transactionType,
+                    'property_type' => $propertyType,
+                    'is_active' => 1
+                ])->first();
+                
+                if (!$rule) {
+                    throw new \Exception("Aucune règle de commission trouvée pour {$transactionType} - {$propertyType}. Veuillez créer une règle dans les paramètres.");
+                }
             }
 
             // Override values if specified
@@ -200,6 +209,19 @@ class CommissionCalculatorService
 
         // No override - use default system rule
         $rule = $this->ruleModel->getDefaultRule($transactionType, $propertyType);
+        
+        if (!$rule) {
+            // Si pas de règle par défaut, chercher n'importe quelle règle active pour ce type
+            $rule = $this->ruleModel->where([
+                'transaction_type' => $transactionType,
+                'property_type' => $propertyType,
+                'is_active' => 1
+            ])->first();
+            
+            if (!$rule) {
+                throw new \Exception("Aucune règle de commission trouvée pour {$transactionType} - {$propertyType}. Veuillez créer une règle dans les paramètres.");
+            }
+        }
         
         if ($rule) {
             $rule['override_level'] = 'system';

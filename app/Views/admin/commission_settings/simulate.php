@@ -310,19 +310,38 @@ document.getElementById('simulationForm').addEventListener('submit', function(e)
         if (result.success && result.commission) {
             displayResults(result.commission);
         } else {
-            alert('Erreur : ' + (result.error || 'Calcul impossible'));
+            const errorMessage = result.error || 'Calcul impossible';
+            console.error('Simulation error:', result);
+            
+            alert('Erreur : ' + errorMessage);
+            
             document.getElementById('waitingMessage').innerHTML = `
                 <div class="card-body text-center py-5">
                     <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
                     <h5 class="text-danger">Erreur de calcul</h5>
-                    <p class="text-muted">${result.error || 'Une erreur est survenue'}</p>
+                    <p class="text-muted mb-3">${errorMessage}</p>
+                    ${result.details ? '<pre class="text-start small bg-light p-3" style="max-height: 300px; overflow-y: auto;">' + result.details + '</pre>' : ''}
+                    <button class="btn btn-primary mt-3" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Réessayer
+                    </button>
                 </div>
             `;
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Erreur de communication avec le serveur');
+        alert('Erreur de communication avec le serveur : ' + error.message);
+        
+        document.getElementById('waitingMessage').innerHTML = `
+            <div class="card-body text-center py-5">
+                <i class="fas fa-exclamation-circle fa-3x text-warning mb-3"></i>
+                <h5 class="text-warning">Erreur de communication</h5>
+                <p class="text-muted">Impossible de contacter le serveur</p>
+                <button class="btn btn-primary mt-3" onclick="location.reload()">
+                    <i class="fas fa-redo"></i> Réessayer
+                </button>
+            </div>
+        `;
     });
 });
 

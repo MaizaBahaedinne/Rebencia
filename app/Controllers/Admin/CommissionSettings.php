@@ -279,19 +279,42 @@ class CommissionSettings extends BaseController
             return $this->response->setJSON(['error' => 'Invalid request']);
         }
 
-        $transactionType = $this->request->getPost('transaction_type');
-        $propertyType = $this->request->getPost('property_type');
-        $amount = (float) $this->request->getPost('amount');
-        $userId = (int) $this->request->getPost('user_id') ?: session()->get('user_id');
-        
-        $userModel = model('UserModel');
-        $user = $userModel->find($userId);
-
-        if (!$user) {
-            return $this->response->setJSON(['error' => 'User not found']);
-        }
-
         try {
+            // Get JSON input
+            $json = $this->request->getJSON(true);
+            
+            // Fallback to POST if JSON is empty
+            if (empty($json)) {
+                $transactionType = $this->request->getPost('transaction_type');
+                $propertyType = $this->request->getPost('property_type');
+                $amount = (float) $this->request->getPost('amount');
+                $userId = (int) $this->request->getPost('user_id');
+            } else {
+                $transactionType = $json['transaction_type'] ?? null;
+                $propertyType = $json['property_type'] ?? null;
+                $amount = (float) ($json['amount'] ?? 0);
+                $userId = (int) ($json['user_id'] ?? 0);
+            }
+            
+            // Validation basique
+            if (empty($transactionType) || empty($propertyType) || $amount <= 0) {
+                return $this->response->setJSON([
+                    'error' => 'Veuillez remplir tous les champs requis (type de transaction, type de bien, montant)'
+                ]);
+            }
+            
+            // Si pas d'utilisateur spécifié, utiliser la session
+            if (empty($userId)) {
+                $userId = (int) session()->get('user_id');
+            }
+            
+            $userModel = model('UserModel');
+            $user = $userModel->find($userId);
+
+            if (!$user) {
+                return $this->response->setJSON(['error' => 'Utilisateur non trouvé']);
+            }
+
             $result = $this->calculator->simulateCommission(
                 $transactionType,
                 $propertyType,
@@ -305,9 +328,14 @@ class CommissionSettings extends BaseController
                 'success' => true,
                 'commission' => $result
             ]);
+            
         } catch (\Exception $e) {
+            log_message('error', 'Commission simulation error: ' . $e->getMessage());
+            log_message('error', 'Stack trace: ' . $e->getTraceAsString());
+            
             return $this->response->setJSON([
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'details' => ENVIRONMENT === 'development' ? $e->getTraceAsString() : null
             ]);
         }
     }

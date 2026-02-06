@@ -3,7 +3,7 @@
 
 <?php
 $extended = model(\App\Models\PropertyExtendedModel::class);
-$config = isset($config) && $config !== null ? $config : service(\App\Services\PropertyConfigService::class);
+$config = service(\App\Services\PropertyConfigService::class);
 $propertyType = $property['type'] ?? 'apartment';
 $propertyId = $property['id'] ?? 0;
 

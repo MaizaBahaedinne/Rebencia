@@ -103,7 +103,7 @@ class Hierarchy extends BaseController
         
         // Récupérer les biens gérés par cet utilisateur
         $propertyModel = new \App\Models\PropertyModel();
-        $properties = $propertyModel->where('user_id', $userId)->findAll();
+        $properties = $propertyModel->where('agent_id', $userId)->findAll();
         
         $data = [
             'title' => 'Hiérarchie de ' . $user['first_name'] . ' ' . $user['last_name'],

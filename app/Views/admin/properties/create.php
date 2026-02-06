@@ -50,9 +50,13 @@
                                 <span class="step-number">3</span>
                                 <span class="step-label">Médias & publication</span>
                             </div>
+                            <div class="wizard-step-item" data-step="4">
+                                <span class="step-number">4</span>
+                                <span class="step-label">Données étendues</span>
+                            </div>
                         </div>
                         <div class="progress mt-2">
-                            <div class="progress-bar" id="wizardProgress" role="progressbar" style="width: 33%"></div>
+                            <div class="progress-bar" id="wizardProgress" role="progressbar" style="width: 25%"></div>
                         </div>
                     </div>
 
@@ -372,7 +376,7 @@
                     </div>
 
                     <!-- Boutons d'action -->
-                    <div class="card" data-wizard-step="3">
+                    <div class="card" data-wizard-step="4">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                 <a href="<?= base_url('admin/properties') ?>" class="btn btn-secondary">
@@ -394,6 +398,15 @@
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" data-wizard-step="4">
+                        <div class="card-body">
+                            <div class="alert alert-info mb-0">
+                                <i class="fas fa-info-circle"></i>
+                                Enregistrez d’abord le bien. Vous pourrez ensuite compléter les données étendues dans l’édition.
                             </div>
                         </div>
                     </div>
@@ -443,7 +456,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 let currentStep = 1;
-const totalSteps = 3;
+const totalSteps = 4;
 const stepItems = document.querySelectorAll('.wizard-step-item');
 const stepBlocks = document.querySelectorAll('[data-wizard-step]');
 const prevBtn = document.querySelector('.wizard-prev');

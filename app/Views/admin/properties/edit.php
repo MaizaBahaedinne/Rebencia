@@ -62,7 +62,7 @@
             </div>
         </div>
         <div class="progress mt-2">
-            <div class="progress-bar" id="wizardProgress" role="progressbar" style="width: 33%"></div>
+            <div class="progress-bar" id="wizardProgress" role="progressbar" style="width: 25%"></div>
         </div>
     </div>
 
@@ -357,7 +357,7 @@
     </div>
 
     <!-- Boutons d'action -->
-    <div class="card" data-wizard-step="3">
+    <div class="card" data-wizard-step="4">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <button type="button" class="btn btn-danger" onclick="confirmDelete()">

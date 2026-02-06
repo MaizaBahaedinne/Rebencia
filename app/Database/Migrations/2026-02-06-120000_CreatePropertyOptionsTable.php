@@ -69,7 +69,7 @@ class CreatePropertyOptionsTable extends Migration
             ],
         ]);
 
-        $this->forge->addKey('id', false, false, 'PRIMARY');
+        $this->forge->addKey('id', true);
         $this->forge->createTable('property_options', true);
     }
 

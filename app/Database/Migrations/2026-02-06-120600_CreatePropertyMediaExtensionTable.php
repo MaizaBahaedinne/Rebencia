@@ -101,7 +101,7 @@ class CreatePropertyMediaExtensionTable extends Migration
             ],
         ]);
 
-        $this->forge->addKey('id', false, false, 'PRIMARY');
+        $this->forge->addKey('id', true);
         $this->forge->addKey('property_id');
         $this->forge->addKey('file_type');
         $this->forge->addKey('uploaded_by');

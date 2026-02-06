@@ -38,7 +38,7 @@ class CreatePropertyOptionValuesTable extends Migration
             ],
         ]);
 
-        $this->forge->addKey('id', false, false, 'PRIMARY');
+        $this->forge->addKey('id', true);
         $this->forge->addKey('property_id');
         $this->forge->addKey('option_id');
         $this->forge->addUniqueKey(['property_id', 'option_id']);

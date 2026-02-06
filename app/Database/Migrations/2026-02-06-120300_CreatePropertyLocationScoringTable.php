@@ -101,7 +101,7 @@ class CreatePropertyLocationScoringTable extends Migration
             ],
         ]);
 
-        $this->forge->addKey('id', false, false, 'PRIMARY');
+        $this->forge->addKey('id', true);
         $this->forge->addKey('property_id', false, true);
         $this->forge->addForeignKey('property_id', 'properties', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('property_location_scoring', true);

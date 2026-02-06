@@ -88,7 +88,7 @@ class CreatePropertyRoomsTable extends Migration
             ],
         ]);
 
-        $this->forge->addKey('id', false, false, 'PRIMARY');
+        $this->forge->addKey('id', true);
         $this->forge->addKey('property_id');
         $this->forge->addForeignKey('property_id', 'properties', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('property_rooms', true);

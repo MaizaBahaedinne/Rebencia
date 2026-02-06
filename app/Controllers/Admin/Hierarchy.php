@@ -14,8 +14,19 @@ class Hierarchy extends BaseController
     public function __construct()
     {
         $this->hierarchyHelper = new HierarchyHelper();
-        $this->userModel = model('UserModel');
-        $this->entityModel = model('EntityModel');
+        $this->userModel = new \App\Models\UserModel();
+        
+        // EntityModel peut ne pas exister
+        $db = \Config\Database::connect();
+        if ($db->tableExists('entities')) {
+            try {
+                $this->entityModel = new \App\Models\EntityModel();
+            } catch (\Exception $e) {
+                $this->entityModel = null;
+            }
+        } else {
+            $this->entityModel = null;
+        }
     }
     
     /**

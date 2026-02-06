@@ -11,8 +11,18 @@ class HierarchyHelper
     
     public function __construct()
     {
-        $this->userModel = model('UserModel');
-        $this->entityModel = model('EntityModel');
+        $this->userModel = new \App\Models\UserModel();
+        // EntityModel peut ne pas exister, on utilise une alternative
+        $db = \Config\Database::connect();
+        if ($db->tableExists('entities')) {
+            try {
+                $this->entityModel = new \App\Models\EntityModel();
+            } catch (\Exception $e) {
+                $this->entityModel = null;
+            }
+        } else {
+            $this->entityModel = null;
+        }
     }
     
     /**
@@ -52,6 +62,10 @@ class HierarchyHelper
      */
     public function getAllSubEntities($entityId)
     {
+        if (!$this->entityModel) {
+            return [];
+        }
+        
         $subEntities = [];
         $directSubEntities = $this->getDirectSubEntities($entityId);
         
@@ -71,6 +85,10 @@ class HierarchyHelper
      */
     public function getDirectSubEntities($entityId)
     {
+        if (!$this->entityModel) {
+            return [];
+        }
+        
         $entities = $this->entityModel->where('parent_id', $entityId)->findAll();
         return array_column($entities, 'id');
     }
@@ -135,6 +153,11 @@ class HierarchyHelper
      */
     public function getHierarchyTree($parentId = null)
     {
+        // Si pas de table entities, on retourne une structure basée sur les agences
+        if (!$this->entityModel) {
+            return $this->getAgencyBasedTree();
+        }
+        
         $entities = $this->entityModel
             ->where('parent_id', $parentId)
             ->orderBy('name', 'ASC')
@@ -151,6 +174,42 @@ class HierarchyHelper
                 'entity' => $entity,
                 'users' => $users,
                 'children' => $this->getHierarchyTree($entity['id'])
+            ];
+        }
+        
+        return $tree;
+    }
+    
+    /**
+     * Get tree based on agencies (fallback when no entities table)
+     * @return array
+     */
+    protected function getAgencyBasedTree()
+    {
+        $db = \Config\Database::connect();
+        if (!$db->tableExists('agencies')) {
+            return [];
+        }
+        
+        $agencyModel = new \App\Models\AgencyModel();
+        $agencies = $agencyModel->orderBy('name', 'ASC')->findAll();
+        
+        $tree = [];
+        foreach ($agencies as $agency) {
+            $users = $this->userModel
+                ->where('agency_id', $agency['id'])
+                ->orderBy('first_name', 'ASC')
+                ->findAll();
+            
+            $tree[] = [
+                'entity' => [
+                    'id' => $agency['id'],
+                    'name' => $agency['name'],
+                    'type' => 'agency',
+                    'parent_id' => null
+                ],
+                'users' => $users,
+                'children' => []
             ];
         }
         

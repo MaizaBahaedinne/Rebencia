@@ -2,158 +2,190 @@
 
 <?= $this->section('styles') ?>
 <style>
+    .filters-section {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .filters-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.75rem;
+    }
     .agency-tree {
         list-style: none;
         padding-left: 0;
     }
     .agency-tree > li {
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
     }
     .agency-item {
         background: white;
-        border: 2px solid #e5e7eb;
-        border-radius: 10px;
-        padding: 1.5rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0.75rem;
         margin-bottom: 0.5rem;
-        transition: all 0.3s;
+        transition: all 0.2s;
         position: relative;
     }
     .agency-item:hover {
         border-color: #3b82f6;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
     }
     .agency-item.siege {
-        border-left: 5px solid #3b82f6;
-        background: linear-gradient(135deg, #fff 0%, #f0f7ff 100%);
+        border-left: 3px solid #3b82f6;
+        background: linear-gradient(135deg, #fff 0%, #f8faff 100%);
     }
     .agency-item.agence {
-        border-left: 5px solid #10b981;
+        border-left: 3px solid #10b981;
+    }
+    .agency-item.hidden {
+        display: none;
     }
     .agency-header {
         display: flex;
         align-items: center;
-        gap: 1rem;
-        margin-bottom: 1rem;
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
     }
     .agency-logo {
-        width: 60px;
-        height: 60px;
-        border-radius: 10px;
+        width: 45px;
+        height: 45px;
+        border-radius: 6px;
         object-fit: cover;
-        border: 2px solid #e5e7eb;
+        border: 1px solid #e5e7eb;
     }
     .agency-logo-placeholder {
-        width: 60px;
-        height: 60px;
-        border-radius: 10px;
+        width: 45px;
+        height: 45px;
+        border-radius: 6px;
         background: linear-gradient(135deg, #e5e7eb 0%, #cbd5e1 100%);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 24px;
+        font-size: 18px;
         color: #94a3b8;
     }
     .agency-title {
         flex: 1;
+        min-width: 0;
     }
     .agency-title h5 {
         margin: 0;
-        font-size: 1.25rem;
+        font-size: 1rem;
         font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .agency-code {
-        font-size: 0.875rem;
+        font-size: 0.75rem;
         color: #6b7280;
         font-weight: 500;
     }
     .agency-stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin: 1rem 0;
+        display: flex;
+        gap: 0.5rem;
+        margin: 0.5rem 0;
+        flex-wrap: wrap;
     }
     .stat-card {
         background: #f9fafb;
-        padding: 1rem;
-        border-radius: 8px;
-        border-left: 3px solid #d1d5db;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        border-left: 2px solid #d1d5db;
+        flex: 1;
+        min-width: 80px;
     }
     .stat-card.users { border-left-color: #3b82f6; }
     .stat-card.properties { border-left-color: #10b981; }
     .stat-card.transactions { border-left-color: #f59e0b; }
     .stat-card .stat-value {
-        font-size: 1.5rem;
+        font-size: 1.1rem;
         font-weight: 700;
         margin: 0;
+        line-height: 1.2;
     }
     .stat-card .stat-label {
-        font-size: 0.875rem;
+        font-size: 0.7rem;
         color: #6b7280;
         margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     .agency-contact {
         display: flex;
         flex-wrap: wrap;
-        gap: 1.5rem;
-        margin: 1rem 0;
+        gap: 1rem;
+        margin: 0.5rem 0;
+        font-size: 0.875rem;
     }
     .contact-item {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.4rem;
         color: #4b5563;
     }
     .contact-item i {
         color: #9ca3af;
+        font-size: 0.75rem;
     }
     .agency-actions {
         display: flex;
-        gap: 0.5rem;
+        gap: 0.4rem;
         justify-content: flex-end;
+        margin-top: 0.5rem;
+    }
+    .agency-actions .btn {
+        padding: 0.35rem 0.75rem;
+        font-size: 0.8rem;
     }
     .children-agencies {
         list-style: none;
-        padding-left: 3rem;
-        margin-top: 1rem;
+        padding-left: 2.5rem;
+        margin-top: 0.5rem;
         position: relative;
     }
     .children-agencies::before {
         content: '';
         position: absolute;
-        left: 1.5rem;
+        left: 1.25rem;
         top: 0;
         bottom: 0;
-        width: 2px;
+        width: 1px;
         background: linear-gradient(180deg, #cbd5e1 0%, transparent 100%);
     }
     .children-agencies > li {
         position: relative;
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
     }
     .children-agencies > li::before {
         content: '';
         position: absolute;
-        left: -1.5rem;
-        top: 2.5rem;
-        width: 1.5rem;
-        height: 2px;
+        left: -1.25rem;
+        top: 1.5rem;
+        width: 1.25rem;
+        height: 1px;
         background: #cbd5e1;
     }
     .toggle-children {
         position: absolute;
-        top: 1rem;
-        right: 1rem;
+        top: 0.5rem;
+        right: 0.5rem;
         background: white;
-        border: 2px solid #e5e7eb;
+        border: 1px solid #e5e7eb;
         border-radius: 50%;
-        width: 35px;
-        height: 35px;
+        width: 28px;
+        height: 28px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: all 0.3s;
+        transition: all 0.2s;
         z-index: 10;
+        font-size: 0.75rem;
     }
     .toggle-children:hover {
         border-color: #3b82f6;
@@ -167,6 +199,11 @@
     }
     .children-agencies.collapsed {
         display: none;
+    }
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        color: #6b7280;
     }
 </style>
 <?= $this->endSection() ?>
@@ -206,6 +243,44 @@
         </div>
     <?php endif ?>
 
+    <!-- Filtres de recherche -->
+    <div class="filters-section">
+        <div class="filters-row">
+            <div>
+                <label class="form-label small mb-1">Recherche</label>
+                <input type="text" id="searchName" class="form-control form-control-sm" 
+                       placeholder="Nom ou code agence..." onkeyup="applyFilters()">
+            </div>
+            <div>
+                <label class="form-label small mb-1">Type</label>
+                <select id="filterType" class="form-select form-select-sm" onchange="applyFilters()">
+                    <option value="">Tous les types</option>
+                    <option value="siege">Siège</option>
+                    <option value="agence">Agence</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label small mb-1">Ville</label>
+                <input type="text" id="filterCity" class="form-control form-control-sm" 
+                       placeholder="Filtrer par ville..." onkeyup="applyFilters()">
+            </div>
+            <div>
+                <label class="form-label small mb-1">Statut</label>
+                <select id="filterStatus" class="form-select form-select-sm" onchange="applyFilters()">
+                    <option value="">Tous les statuts</option>
+                    <option value="active">Actif</option>
+                    <option value="inactive">Inactif</option>
+                </select>
+            </div>
+            <div class="d-flex align-items-end">
+                <button class="btn btn-outline-secondary btn-sm w-100" onclick="resetFilters()">
+                    <i class="fas fa-redo me-1"></i>Réinitialiser
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="agencyTreeContainer">
     <?php
     // Function to render agency tree recursively
     function renderAgencyTree($agencies, $level = 0) {
@@ -241,15 +316,15 @@
                         
                         <div>
                             <?php if ($agency['type'] === 'siege'): ?>
-                                <span class="badge bg-primary fs-6">Siège</span>
+                                <span class="badge bg-primary">Siège</span>
                             <?php else: ?>
-                                <span class="badge bg-success fs-6">Agence</span>
+                                <span class="badge bg-success">Agence</span>
                             <?php endif; ?>
                             
                             <?php if ($agency['status'] === 'active'): ?>
-                                <span class="badge bg-success fs-6 ms-2">Actif</span>
+                                <span class="badge bg-success ms-1">Actif</span>
                             <?php else: ?>
-                                <span class="badge bg-danger fs-6 ms-2">Inactif</span>
+                                <span class="badge bg-danger ms-1">Inactif</span>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -281,6 +356,13 @@
                             </div>
                         <?php endif; ?>
                         <?php if (!empty($agency['email'])): ?>
+    </div>
+    
+    <div id="noResults" class="no-results" style="display: none;">
+        <i class="fas fa-search fa-3x mb-3"></i>
+        <h5>Aucune agence trouvée</h5>
+        <p>Essayez de modifier vos critères de recherche</p>
+    </div>
                             <div class="contact-item">
                                 <i class="fas fa-envelope"></i>
                                 <span><?= esc($agency['email']) ?></span>
@@ -351,6 +433,64 @@ function collapseAll() {
     document.querySelectorAll('.toggle-children').forEach(btn => {
         btn.classList.remove('active');
     });
+
+function applyFilters() {
+    const searchName = document.getElementById('searchName').value.toLowerCase();
+    const filterType = document.getElementById('filterType').value.toLowerCase();
+    const filterCity = document.getElementById('filterCity').value.toLowerCase();
+    const filterStatus = document.getElementById('filterStatus').value.toLowerCase();
+    
+    let visibleCount = 0;
+    
+    // Parcourir toutes les agences
+    document.querySelectorAll('.agency-item').forEach(item => {
+        const name = item.querySelector('.agency-title h5').textContent.toLowerCase();
+        const code = item.querySelector('.agency-code').textContent.toLowerCase();
+        const type = item.classList.contains('siege') ? 'siege' : 'agence';
+        const city = item.querySelector('.contact-item .fa-map-marker-alt')?.parentElement.textContent.toLowerCase() || '';
+        
+        // Trouver le statut
+        const badges = item.querySelectorAll('.badge');
+        let status = '';
+        badges.forEach(badge => {
+            if (badge.textContent.toLowerCase().includes('actif')) status = 'active';
+            if (badge.textContent.toLowerCase().includes('inactif')) status = 'inactive';
+        });
+        
+        // Appliquer les filtres
+        const matchName = !searchName || name.includes(searchName) || code.includes(searchName);
+        const matchType = !filterType || type === filterType;
+        const matchCity = !filterCity || city.includes(filterCity);
+        const matchStatus = !filterStatus || status === filterStatus;
+        
+        if (matchName && matchType && matchCity && matchStatus) {
+            item.closest('li').style.display = '';
+            visibleCount++;
+        } else {
+            item.closest('li').style.display = 'none';
+        }
+    });
+    
+    // Afficher le message si aucun résultat
+    const noResults = document.getElementById('noResults');
+    const treeContainer = document.getElementById('agencyTreeContainer');
+    
+    if (visibleCount === 0) {
+        treeContainer.style.display = 'none';
+        noResults.style.display = 'block';
+    } else {
+        treeContainer.style.display = 'block';
+        noResults.style.display = 'none';
+    }
+}
+
+function resetFilters() {
+    document.getElementById('searchName').value = '';
+    document.getElementById('filterType').value = '';
+    document.getElementById('filterCity').value = '';
+    document.getElementById('filterStatus').value = '';
+    applyFilters();
+}
 }
 
 function confirmDelete(id) {

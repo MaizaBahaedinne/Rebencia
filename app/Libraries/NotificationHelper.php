@@ -187,6 +187,8 @@ class NotificationHelper
      */
     public function checkPropertyClientMatches($propertyId, $propertyData)
     {
+        // TODO: Uncomment when search_preferences column is added to clients table
+        /*
         $clientModel = model('ClientModel');
         $clients = $clientModel->where('status', 'active')
                                ->where('search_preferences IS NOT NULL')
@@ -221,5 +223,6 @@ class NotificationHelper
                 $this->notifyPropertyMatchesClient($propertyId, $propertyData, $client['id'], $client);
             }
         }
+        */
     }
 }

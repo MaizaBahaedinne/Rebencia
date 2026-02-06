@@ -44,22 +44,26 @@
                             </div>
                             <form action="<?= base_url('admin/properties/store') ?>" method="post" enctype="multipart/form-data" id="propertyWizardForm">
                                 <?= csrf_field() ?>
-                                <div class="row">
-                                    <div class="col-lg-8">
-                                        <div class="wizard-simple mb-4">
-                                            <div class="wizard-steps">
-                                                <div class="wizard-step-item active" data-step="1">1. Infos</div>
-                                                <div class="wizard-step-item" data-step="2">2. Localisation</div>
-                                                <div class="wizard-step-item" data-step="3">3. Caractéristiques & prix</div>
-                                                <div class="wizard-step-item" data-step="4">4. Médias</div>
-                                            </div>
-                                            <div class="progress mt-2">
-                                                <div class="progress-bar" id="wizardProgress" role="progressbar" style="width: 25%"></div>
-                                            </div>
-                                        </div>
-                                        <div class="wizard-content">
-                                            <div class="wizard-step-block active-step" data-wizard-step="1">
-                                                <!-- Infos générales -->
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <ul class="nav nav-tabs card-header-tabs" id="wizardTabs">
+                                            <li class="nav-item">
+                                                <a class="nav-link active" data-step="1" href="#step1">Infos</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-step="2" href="#step2">Localisation</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-step="3" href="#step3">Caractéristiques & prix</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" data-step="4" href="#step4">Médias</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="tab-content">
+                                            <div class="tab-pane fade show active" id="step1">
                                                 <div class="mb-3">
                                                     <label for="title" class="form-label">Titre <span class="text-danger">*</span></label>
                                                     <input type="text" class="form-control" id="title" name="title" value="<?= old('title') ?>" required>
@@ -90,8 +94,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="wizard-step-block" data-wizard-step="2">
-                                                <!-- Localisation -->
+                                            <div class="tab-pane fade" id="step2">
                                                 <div class="mb-3">
                                                     <label for="zone_id" class="form-label">Zone</label>
                                                     <select class="form-select" id="zone_id" name="zone_id">
@@ -106,8 +109,7 @@
                                                     <input type="text" class="form-control" id="address" name="address" value="<?= old('address') ?>">
                                                 </div>
                                             </div>
-                                            <div class="wizard-step-block" data-wizard-step="3">
-                                                <!-- Caractéristiques & prix -->
+                                            <div class="tab-pane fade" id="step3">
                                                 <div class="row mb-3">
                                                     <div class="col-md-6">
                                                         <label for="price" class="form-label">Prix de vente (TND)</label>
@@ -133,40 +135,33 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="wizard-step-block" data-wizard-step="4">
-                                                <!-- Médias -->
+                                            <div class="tab-pane fade" id="step4">
                                                 <div class="mb-3">
                                                     <label for="images" class="form-label">Photos</label>
                                                     <input type="file" class="form-control" id="images" name="images[]" accept="image/*" multiple>
                                                 </div>
+                                                <!-- Récapitulatif affiché ici -->
+                                                <div class="mt-4">
+                                                    <h5>Récapitulatif</h5>
+                                                    <ul class="list-group">
+                                                        <li class="list-group-item"><strong>Titre :</strong> <span id="recapTitle"></span></li>
+                                                        <li class="list-group-item"><strong>Type :</strong> <span id="recapType"></span></li>
+                                                        <li class="list-group-item"><strong>Transaction :</strong> <span id="recapTransaction"></span></li>
+                                                        <li class="list-group-item"><strong>Zone :</strong> <span id="recapZone"></span></li>
+                                                        <li class="list-group-item"><strong>Adresse :</strong> <span id="recapAddress"></span></li>
+                                                        <li class="list-group-item"><strong>Prix vente :</strong> <span id="recapPrice"></span></li>
+                                                        <li class="list-group-item"><strong>Prix location :</strong> <span id="recapRent"></span></li>
+                                                        <li class="list-group-item"><strong>Chambres :</strong> <span id="recapBedrooms"></span></li>
+                                                        <li class="list-group-item"><strong>Salles de bain :</strong> <span id="recapBathrooms"></span></li>
+                                                        <li class="list-group-item"><strong>Surface :</strong> <span id="recapArea"></span></li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="wizard-actions d-flex justify-content-between align-items-center mt-4">
-                                            <button type="button" class="btn btn-outline-secondary wizard-prev"><i class="fas fa-arrow-left"></i> Précédent</button>
-                                            <button type="button" class="btn btn-primary wizard-next">Suivant <i class="fas fa-arrow-right"></i></button>
-                                            <button type="submit" class="btn btn-success wizard-submit d-none"><i class="fas fa-check"></i> Valider et créer le bien</button>
-                                        </div>
-                                    </div>
-                                    <!-- Récapitulatif à droite -->
-                                    <div class="col-lg-4">
-                                        <div class="card sticky-top" style="top:80px">
-                                            <div class="card-header bg-info text-white">
-                                                <h5 class="mb-0"><i class="fas fa-list-ul"></i> Récapitulatif</h5>
-                                            </div>
-                                            <div class="card-body" id="wizardRecap">
-                                                <ul class="list-group list-group-flush">
-                                                    <li class="list-group-item"><strong>Titre :</strong> <span id="recapTitle"></span></li>
-                                                    <li class="list-group-item"><strong>Type :</strong> <span id="recapType"></span></li>
-                                                    <li class="list-group-item"><strong>Transaction :</strong> <span id="recapTransaction"></span></li>
-                                                    <li class="list-group-item"><strong>Zone :</strong> <span id="recapZone"></span></li>
-                                                    <li class="list-group-item"><strong>Adresse :</strong> <span id="recapAddress"></span></li>
-                                                    <li class="list-group-item"><strong>Prix vente :</strong> <span id="recapPrice"></span></li>
-                                                    <li class="list-group-item"><strong>Prix location :</strong> <span id="recapRent"></span></li>
-                                                    <li class="list-group-item"><strong>Chambres :</strong> <span id="recapBedrooms"></span></li>
-                                                    <li class="list-group-item"><strong>Salles de bain :</strong> <span id="recapBathrooms"></span></li>
-                                                    <li class="list-group-item"><strong>Surface :</strong> <span id="recapArea"></span></li>
-                                                </ul>
-                                            </div>
+                                        <div class="d-flex justify-content-between mt-4">
+                                            <button type="button" class="btn btn-outline-secondary" id="wizardPrev">Précédent</button>
+                                            <button type="button" class="btn btn-primary" id="wizardNext">Suivant</button>
+                                            <button type="submit" class="btn btn-success d-none" id="wizardSubmit">Valider et créer le bien</button>
                                         </div>
                                     </div>
                                 </div>

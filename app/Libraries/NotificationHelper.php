@@ -39,7 +39,6 @@ class NotificationHelper
             }
         }
     }
-    }
 
     /**
      * Send notification when client is created

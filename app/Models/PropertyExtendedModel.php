@@ -73,7 +73,8 @@ class PropertyExtendedModel extends Model
     {
         return $this->db->table('property_location_scoring')
             ->where('property_id', $propertyId)
-            ->first();
+            ->get()
+            ->getRowArray();
     }
 
     /**
@@ -85,7 +86,8 @@ class PropertyExtendedModel extends Model
     {
         return $this->db->table('property_financial_data')
             ->where('property_id', $propertyId)
-            ->first();
+            ->get()
+            ->getRowArray();
     }
 
     /**
@@ -97,7 +99,8 @@ class PropertyExtendedModel extends Model
     {
         return $this->db->table('property_estimated_costs')
             ->where('property_id', $propertyId)
-            ->first();
+            ->get()
+            ->getRowArray();
     }
 
     /**
@@ -109,7 +112,8 @@ class PropertyExtendedModel extends Model
     {
         return $this->db->table('property_orientation')
             ->where('property_id', $propertyId)
-            ->first();
+            ->get()
+            ->getRowArray();
     }
 
     /**
@@ -146,7 +150,8 @@ class PropertyExtendedModel extends Model
             ->where('file_type', 'floor_plan')
             ->where('is_primary', 1)
             ->where('is_published', 1)
-            ->first();
+            ->get()
+            ->getRowArray();
     }
 
     /**

@@ -11,16 +11,22 @@ class NotificationHelper
     {
         $this->notificationModel = model('NotificationModel');
         $this->emailService = new \App\Libraries\EmailService();
-        // Notify all active agents in the same agency
+        // La logique de notification pour les agents doit être appelée via une méthode dédiée
+        // Exemple : $helper->notifyPropertyCreated($propertyId, $propertyData, $creatorId);
+    }
+
+    /**
+     * Notifier tous les agents de l'agence lors de la création d'un bien
+     */
+    public function notifyPropertyCreated($propertyId, $propertyData, $creatorId)
+    {
         $userModel = model('UserModel');
         $creator = $userModel->find($creatorId);
-        
         if ($creator && $creator['agency_id']) {
             $agents = $userModel->where('agency_id', $creator['agency_id'])
-                                ->where('status', 'active')
-                                ->where('id !=', $creatorId)
-                                ->findAll();
-            
+                ->where('status', 'active')
+                ->where('id !=', $creatorId)
+                ->findAll();
             foreach ($agents as $agent) {
                 $this->notificationModel->createNotification(
                     $agent['id'],
@@ -32,6 +38,7 @@ class NotificationHelper
                 );
             }
         }
+    }
     }
 
     /**

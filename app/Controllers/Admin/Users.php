@@ -149,6 +149,9 @@ class Users extends BaseController
             $data['password_hash'] = password_hash($newPassword, PASSWORD_BCRYPT);
         }
 
+        // Skip model validation since we already validated in controller
+        $this->userModel->skipValidation(true);
+        
         if ($this->userModel->update($id, $data)) {
             return redirect()->to('/admin/users')->with('success', 'Utilisateur modifié avec succès');
         }

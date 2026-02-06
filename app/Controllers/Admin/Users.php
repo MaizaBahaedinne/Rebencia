@@ -68,10 +68,8 @@ class Users extends BaseController
             'first_name' => $this->request->getPost('first_name'),
             'last_name' => $this->request->getPost('last_name'),
             'phone' => $this->request->getPost('phone'),
-            'cin' => $this->request->getPost('cin'),
             'role_id' => $this->request->getPost('role_id'),
             'agency_id' => $this->request->getPost('agency_id'),
-            'hire_date' => $this->request->getPost('hire_date'),
             'status' => $this->request->getPost('status') ?? 'active',
             'email_verified' => true
         ];
@@ -137,10 +135,8 @@ class Users extends BaseController
             'first_name' => $this->request->getPost('first_name'),
             'last_name' => $this->request->getPost('last_name'),
             'phone' => $this->request->getPost('phone'),
-            'cin' => $this->request->getPost('cin'),
             'role_id' => $this->request->getPost('role_id'),
             'agency_id' => $this->request->getPost('agency_id'),
-            'hire_date' => $this->request->getPost('hire_date'),
             'status' => $this->request->getPost('status')
         ];
 

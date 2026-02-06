@@ -71,11 +71,6 @@
                                 <input type="tel" class="form-control" id="phone" name="phone" 
                                        value="<?= old('phone') ?>" placeholder="+216 XX XXX XXX">
                             </div>
-                            <div class="col-md-6">
-                                <label for="cin" class="form-label">CIN</label>
-                                <input type="text" class="form-control" id="cin" name="cin" 
-                                       value="<?= old('cin') ?>" placeholder="12345678">
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -146,12 +141,6 @@
                                 <option value="inactive" <?= old('status') == 'inactive' ? 'selected' : '' ?>>Inactif</option>
                                 <option value="suspended" <?= old('status') == 'suspended' ? 'selected' : '' ?>>Suspendu</option>
                             </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="hire_date" class="form-label">Date d'Embauche</label>
-                            <input type="date" class="form-control" id="hire_date" name="hire_date" 
-                                   value="<?= old('hire_date', date('Y-m-d')) ?>">
                         </div>
 
                         <hr>

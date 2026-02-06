@@ -341,6 +341,61 @@ $extended = model(PropertyExtendedModel::class);
 | `PROPERTY_EXTENSION_INVENTORY.md` | Inventaire fichiers |
 | `PROPERTY_EXTENSION_IMPLEMENTATION_CHECKLIST.md` | Checklist intégration |
 
+## 🧭 Guide Utilisateur (Module Property Extension)
+
+### 1. Accès & Pré-requis
+- Être connecté avec un rôle autorisé.
+- Les migrations doivent être appliquées (✅ déjà fait).
+- Les sections visibles dépendent du type de bien et de sa configuration.
+
+### 2. Configurer les sections par type de bien
+- Ouvrir la page de configuration du module (Admin → Propriétés → Configuration).
+- Activer ou désactiver les sections : pièces, options, localisation, finances, coûts, orientation, médias.
+- Définir les champs obligatoires avant publication.
+
+### 3. Saisir les données étendues d’un bien
+Dans la fiche d’un bien, ouvrir l’onglet “Données étendues” :
+
+**Pièces**
+- Ajouter les pièces (type, nom, surface).
+- Le total des surfaces se calcule automatiquement.
+
+**Options / Équipements**
+- Cocher les équipements disponibles (piscine, parking, sécurité, etc.).
+
+**Localisation**
+- Renseigner les scores de proximité (écoles, transports, santé, commerces...).
+- Le score global se met à jour en temps réel.
+
+**Financier**
+- Indiquer prix d’achat, loyer estimé, charges.
+- Rendement brut/net, cap rate, prix/m² et ROI sont calculés automatiquement.
+
+**Coûts estimés**
+- Saisir les charges mensuelles/annuelles.
+- Le total mensuel et annuel est mis à jour automatiquement.
+
+**Orientation & Exposition**
+- Choisir l’orientation principale et l’exposition au soleil.
+
+**Médias**
+- Ajouter plans, rendus 3D, vidéos (selon configuration).
+- Possibilité de supprimer un média à tout moment.
+
+### 4. Valider avant publication
+- Le module peut exiger certaines sections avant publication.
+- Si des champs obligatoires manquent, un message d’erreur s’affiche.
+
+### 5. Consulter l’analyse investisseur
+- Ouvrir l’onglet “Analyse”.
+- Visualiser : rendement net, cap rate, prix/m², période de retour.
+- Voir l’attractivité globale et la comparaison marché.
+
+### 6. Résolution rapide de problèmes
+- **Une section n’apparaît pas** : vérifier la configuration du type de bien.
+- **Calculs à zéro** : vérifier que prix/loyer/surface sont renseignés.
+- **Accès refusé** : vérifier les permissions du rôle (RBAC).
+
 ## ✅ Next Steps
 
 1. **Déployer:** `php spark migrate`

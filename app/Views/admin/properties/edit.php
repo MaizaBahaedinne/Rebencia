@@ -42,11 +42,35 @@
 <form action="<?= base_url('admin/properties/update/' . $property['id']) ?>" method="post" enctype="multipart/form-data">
     <?= csrf_field() ?>
 
+    <div class="property-wizard mb-4">
+        <div class="wizard-steps">
+            <div class="wizard-step-item active" data-step="1">
+                <span class="step-number">1</span>
+                <span class="step-label">Infos & prix</span>
+            </div>
+            <div class="wizard-step-item" data-step="2">
+                <span class="step-number">2</span>
+                <span class="step-label">Localisation</span>
+            </div>
+            <div class="wizard-step-item" data-step="3">
+                <span class="step-number">3</span>
+                <span class="step-label">Médias & publication</span>
+            </div>
+            <div class="wizard-step-item" data-step="4">
+                <span class="step-number">4</span>
+                <span class="step-label">Données étendues</span>
+            </div>
+        </div>
+        <div class="progress mt-2">
+            <div class="progress-bar" id="wizardProgress" role="progressbar" style="width: 33%"></div>
+        </div>
+    </div>
+
     <div class="row">
         <!-- Colonne Gauche -->
         <div class="col-lg-8">
             <!-- Informations Générales -->
-            <div class="card mb-4">
+            <div class="card mb-4" data-wizard-step="1">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0"><i class="fas fa-info-circle"></i> Informations Générales</h5>
                 </div>
@@ -105,7 +129,7 @@
             </div>
 
             <!-- Prix -->
-            <div class="card mb-4">
+            <div class="card mb-4" data-wizard-step="1">
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0"><i class="fas fa-money-bill-wave"></i> Prix</h5>
                 </div>
@@ -126,7 +150,7 @@
             </div>
 
             <!-- Caractéristiques -->
-            <div class="card mb-4">
+            <div class="card mb-4" data-wizard-step="1">
                 <div class="card-header bg-info text-white">
                     <h5 class="mb-0"><i class="fas fa-ruler-combined"></i> Caractéristiques</h5>
                 </div>
@@ -157,7 +181,7 @@
             </div>
 
             <!-- Localisation -->
-            <div class="card mb-4">
+            <div class="card mb-4" data-wizard-step="2">
                 <div class="card-header bg-warning text-dark">
                     <h5 class="mb-0"><i class="fas fa-map-marker-alt"></i> Localisation</h5>
                 </div>
@@ -264,7 +288,7 @@
         <!-- Colonne Droite -->
         <div class="col-lg-4">
             <!-- Images Actuelles -->
-            <div class="card mb-4">
+            <div class="card mb-4" data-wizard-step="3">
                 <div class="card-header bg-dark text-white">
                     <h5 class="mb-0"><i class="fas fa-images"></i> Images Actuelles</h5>
                 </div>
@@ -293,7 +317,7 @@
             </div>
 
             <!-- Ajouter des Images -->
-            <div class="card mb-4">
+            <div class="card mb-4" data-wizard-step="3">
                 <div class="card-header bg-dark text-white">
                     <h5 class="mb-0"><i class="fas fa-plus"></i> Ajouter des Images</h5>
                 </div>
@@ -308,7 +332,7 @@
             </div>
 
             <!-- Visibilité -->
-            <div class="card mb-4">
+            <div class="card mb-4" data-wizard-step="3">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="fas fa-eye"></i> Visibilité</h5>
                 </div>
@@ -333,9 +357,9 @@
     </div>
 
     <!-- Boutons d'action -->
-    <div class="card">
+    <div class="card" data-wizard-step="3">
         <div class="card-body">
-            <div class="d-flex justify-content-between">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <button type="button" class="btn btn-danger" onclick="confirmDelete()">
                     <i class="fas fa-trash"></i> Supprimer ce bien
                 </button>
@@ -343,11 +367,23 @@
                     <a href="<?= base_url('admin/properties') ?>" class="btn btn-secondary me-2">
                         <i class="fas fa-times"></i> Annuler
                     </a>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="button" class="btn btn-outline-secondary wizard-prev me-2">
+                        <i class="fas fa-arrow-left"></i> Précédent
+                    </button>
+                    <button type="button" class="btn btn-primary wizard-next me-2">
+                        Suivant <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button type="submit" class="btn btn-primary wizard-submit d-none">
                         <i class="fas fa-save"></i> Enregistrer les modifications
                     </button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="card" data-wizard-step="4">
+        <div class="card-body">
+            <?= $this->include('admin/properties/extended_tabs') ?>
         </div>
     </div>
 </form>
@@ -356,11 +392,97 @@
 
 <?= $this->section('styles') ?>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    .property-wizard .wizard-steps {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .property-wizard .wizard-step-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: #f1f5f9;
+        color: #64748b;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .property-wizard .wizard-step-item.active {
+        background: #2563eb;
+        color: #fff;
+    }
+    .property-wizard .step-number {
+        width: 24px;
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        font-size: 12px;
+    }
+    [data-wizard-step] { display: none; }
+    [data-wizard-step].active-step { display: block; }
+</style>
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+let currentStep = 1;
+const totalSteps = 4;
+const stepItems = document.querySelectorAll('.wizard-step-item');
+const stepBlocks = document.querySelectorAll('[data-wizard-step]');
+const prevBtn = document.querySelector('.wizard-prev');
+const nextBtn = document.querySelector('.wizard-next');
+const submitBtn = document.querySelector('.wizard-submit');
+const progressBar = document.getElementById('wizardProgress');
+
+function setStep(step) {
+    currentStep = step;
+    stepItems.forEach(item => {
+        item.classList.toggle('active', Number(item.dataset.step) === step);
+    });
+    stepBlocks.forEach(block => {
+        block.classList.toggle('active-step', Number(block.dataset.wizardStep) === step);
+    });
+    prevBtn.classList.toggle('d-none', step === 1);
+    nextBtn.classList.toggle('d-none', step === totalSteps);
+    submitBtn.classList.toggle('d-none', step !== totalSteps);
+    progressBar.style.width = `${Math.round((step / totalSteps) * 100)}%`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function validateStep(step) {
+    const currentFields = document.querySelectorAll(`[data-wizard-step="${step}"] input[required], [data-wizard-step="${step}"] select[required], [data-wizard-step="${step}"] textarea[required]`);
+    for (const field of currentFields) {
+        if (!field.reportValidity()) {
+            return false;
+        }
+    }
+    return true;
+}
+
+stepItems.forEach(item => {
+    item.addEventListener('click', () => {
+        const step = Number(item.dataset.step);
+        if (step <= currentStep || validateStep(currentStep)) {
+            setStep(step);
+        }
+    });
+});
+
+prevBtn.addEventListener('click', () => setStep(Math.max(1, currentStep - 1)));
+nextBtn.addEventListener('click', () => {
+    if (validateStep(currentStep)) {
+        setStep(Math.min(totalSteps, currentStep + 1));
+    }
+});
+
+setStep(1);
+
 let gpsPickerMap = null;
 let gpsMarker = null;
 

@@ -164,17 +164,41 @@ class Agencies extends BaseController
             return redirect()->to(base_url('admin/agencies'))->with('error', 'Agence introuvable');
         }
 
-        // Get agency stats
+        // Get agency data with details
         $userModel = model('UserModel');
         $propertyModel = model('PropertyModel');
+        $clientModel = model('ClientModel');
         $transactionModel = model('TransactionModel');
 
         $data = [
-            'title' => 'Détails Agence',
+            'title' => 'Détails Agence - ' . $agency['name'],
             'agency' => $agency,
-            'users' => $userModel->where('agency_id', $id)->findAll(),
-            'properties' => $propertyModel->where('agency_id', $id)->countAllResults(),
-            'transactions' => $transactionModel->where('agency_id', $id)->countAllResults(),
+            'users' => $userModel->select('users.*, roles.display_name as role_name')
+                ->join('roles', 'roles.id = users.role_id', 'left')
+                ->where('users.agency_id', $id)
+                ->findAll(),
+            'properties' => $propertyModel->select('properties.*, zones.name as zone_name, users.first_name as agent_name, users.last_name as agent_lastname')
+                ->join('zones', 'zones.id = properties.zone_id', 'left')
+                ->join('users', 'users.id = properties.agent_id', 'left')
+                ->where('properties.agency_id', $id)
+                ->orderBy('properties.created_at', 'DESC')
+                ->findAll(),
+            'clients' => $clientModel->select('clients.*, users.first_name as agent_name, users.last_name as agent_lastname')
+                ->join('users', 'users.id = clients.agent_id', 'left')
+                ->where('clients.agency_id', $id)
+                ->orderBy('clients.created_at', 'DESC')
+                ->findAll(),
+            'transactions' => $transactionModel->select('transactions.*, properties.title as property_title, properties.reference as property_ref,
+                CONCAT(buyer.first_name, " ", buyer.last_name) as buyer_name,
+                CONCAT(seller.first_name, " ", seller.last_name) as seller_name,
+                CONCAT(agent.first_name, " ", agent.last_name) as agent_name')
+                ->join('properties', 'properties.id = transactions.property_id', 'left')
+                ->join('clients as buyer', 'buyer.id = transactions.buyer_id', 'left')
+                ->join('clients as seller', 'seller.id = transactions.seller_id', 'left')
+                ->join('users as agent', 'agent.id = transactions.agent_id', 'left')
+                ->where('transactions.agency_id', $id)
+                ->orderBy('transactions.created_at', 'DESC')
+                ->findAll(),
             'subAgencies' => $this->agencyModel->where('parent_id', $id)->findAll()
         ];
 

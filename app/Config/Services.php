@@ -29,4 +29,11 @@ class Services extends BaseService
      *     return new \CodeIgniter\Example();
      * }
      */
+    public static function propertyConfigService($getShared = true)
+    {
+        if ($getShared) {
+            return static::getSharedInstance('propertyConfigService');
+        }
+        return new \App\Services\PropertyConfigService();
+    }
 }

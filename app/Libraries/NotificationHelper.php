@@ -189,7 +189,8 @@ class NotificationHelper
     {
         $clientModel = model('ClientModel');
         $clients = $clientModel->where('status', 'active')
-                               ->whereNotNull('search_preferences')
+                               ->where('search_preferences IS NOT NULL')
+                               ->where('search_preferences !=', '')
                                ->findAll();
 
         foreach ($clients as $client) {

@@ -178,6 +178,89 @@ class Users extends BaseController
     }
 
     /**
+     * View user details with all related data
+     */
+    public function view($id)
+    {
+        // Get user with role and agency info
+        $user = $this->userModel->select('users.*, roles.display_name as role_name, roles.level as role_level, agencies.name as agency_name, agencies.id as agency_id')
+            ->join('roles', 'roles.id = users.role_id')
+            ->join('agencies', 'agencies.id = users.agency_id', 'left')
+            ->where('users.id', $id)
+            ->first();
+        
+        if (!$user) {
+            return redirect()->to('/admin/users')->with('error', 'Utilisateur non trouvé');
+        }
+
+        $db = \Config\Database::connect();
+        
+        // Get properties assigned to this user
+        $properties = $db->table('properties')
+            ->select('properties.*, zones.name as zone_name, property_types.name_fr as type_name')
+            ->join('zones', 'zones.id = properties.zone_id', 'left')
+            ->join('property_types', 'property_types.id = properties.property_type_id', 'left')
+            ->where('properties.agent_id', $id)
+            ->orderBy('properties.created_at', 'DESC')
+            ->get()
+            ->getResultArray();
+        
+        // Get clients assigned to this user
+        $clients = $db->table('clients')
+            ->select('clients.*, CONCAT(clients.first_name, " ", clients.last_name) as full_name')
+            ->where('clients.assigned_to', $id)
+            ->orderBy('clients.created_at', 'DESC')
+            ->get()
+            ->getResultArray();
+        
+        // Get transactions where user is the agent
+        $transactions = $db->table('transactions')
+            ->select('transactions.*, properties.reference as property_reference, properties.title as property_title,
+                     clients.first_name as client_first_name, clients.last_name as client_last_name')
+            ->join('properties', 'properties.id = transactions.property_id', 'left')
+            ->join('clients', 'clients.id = transactions.client_id', 'left')
+            ->where('transactions.agent_id', $id)
+            ->orderBy('transactions.created_at', 'DESC')
+            ->get()
+            ->getResultArray();
+        
+        // Get appointments assigned to this user
+        $appointments = $db->table('appointments')
+            ->select('appointments.*, properties.reference as property_reference, properties.title as property_title,
+                     clients.first_name as client_first_name, clients.last_name as client_last_name')
+            ->join('properties', 'properties.id = appointments.property_id', 'left')
+            ->join('clients', 'clients.id = appointments.client_id', 'left')
+            ->where('appointments.assigned_to', $id)
+            ->orderBy('appointments.scheduled_at', 'DESC')
+            ->limit(50)
+            ->get()
+            ->getResultArray();
+        
+        // Get commissions earned by this user
+        $commissions = $db->table('transaction_commissions')
+            ->select('transaction_commissions.*, transactions.reference as transaction_reference,
+                     properties.reference as property_reference')
+            ->join('transactions', 'transactions.id = transaction_commissions.transaction_id', 'left')
+            ->join('properties', 'properties.id = transaction_commissions.property_id', 'left')
+            ->where('transaction_commissions.agent_id', $id)
+            ->orderBy('transaction_commissions.created_at', 'DESC')
+            ->get()
+            ->getResultArray();
+
+        $data = [
+            'title' => 'Détails Utilisateur - ' . $user['first_name'] . ' ' . $user['last_name'],
+            'user' => $user,
+            'properties' => $properties,
+            'clients' => $clients,
+            'transactions' => $transactions,
+            'appointments' => $appointments,
+            'commissions' => $commissions
+        ];
+
+        return view('admin/users/view', $data);
+    }
+
+    /**
      * User profile page
      */
     public function profile()

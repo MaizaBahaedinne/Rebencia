@@ -184,7 +184,7 @@ class Agencies extends BaseController
                 ->orderBy('properties.created_at', 'DESC')
                 ->findAll(),
             'clients' => $clientModel->select('clients.*, users.first_name as agent_name, users.last_name as agent_lastname')
-                ->join('users', 'users.id = clients.agent_id', 'left')
+                ->join('users', 'users.id = clients.assigned_to', 'left')
                 ->where('clients.agency_id', $id)
                 ->orderBy('clients.created_at', 'DESC')
                 ->findAll(),

@@ -91,6 +91,40 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->post('deleteImage/(:num)', 'Properties::deleteImage/$1');
         $routes->get('assignments', 'Properties::assignments');
         $routes->post('reassign', 'Properties::reassign');
+        
+        // Property Extended Data Routes
+        $routes->post('(:num)/rooms/save', 'PropertyExtendedController::saveRooms/$1');
+        $routes->post('(:num)/options/save', 'PropertyExtendedController::saveOptions/$1');
+        $routes->post('(:num)/location/save', 'PropertyExtendedController::saveLocationScoring/$1');
+        $routes->post('(:num)/financial/save', 'PropertyExtendedController::saveFinancialData/$1');
+        $routes->post('(:num)/costs/save', 'PropertyExtendedController::saveEstimatedCosts/$1');
+        $routes->post('(:num)/orientation/save', 'PropertyExtendedController::saveOrientation/$1');
+        $routes->post('(:num)/media/upload', 'PropertyExtendedController::saveMediaExtension/$1');
+        
+        $routes->delete('rooms/(:num)', 'PropertyExtendedController::deleteRoom/$1');
+        $routes->delete('media/(:num)', 'PropertyExtendedController::deleteMediaFile/$1');
+    });
+    
+    // Property Configuration (Admin)
+    $routes->group('properties/config', function($routes) {
+        $routes->get('/', 'PropertyConfigController::index');
+        $routes->get('(:alpha)', 'PropertyConfigController::edit/$1');
+        $routes->post('(:alpha)', 'PropertyConfigController::update/$1');
+        $routes->post('(:alpha)/toggle/(:alpha)', 'PropertyConfigController::toggleFeature/$1/$2');
+        $routes->get('(:alpha)/sections', 'PropertyConfigController::getSections/$1');
+        $routes->post('validate/(:num)', 'PropertyConfigController::validateProperty/$1');
+        $routes->post('(:alpha)/reset', 'PropertyConfigController::reset/$1');
+    });
+    
+    // Property Analysis & Reports
+    $routes->group('properties', function($routes) {
+        $routes->get('(:num)/analysis', 'PropertyAnalysisController::dashboard/$1');
+        $routes->get('(:num)/financial-report', 'PropertyAnalysisController::financialReport/$1');
+        $routes->get('compare/(:num)/(:num)', 'PropertyAnalysisController::comparison/$1/$2');
+        $routes->get('portfolio', 'PropertyAnalysisController::portfolio');
+        $routes->post('(:num)/export-report', 'PropertyAnalysisController::exportReport/$1');
+        $routes->get('(:num)/metrics', 'PropertyAnalysisController::getMetrics/$1');
+        $routes->get('(:num)/projection/(:num)', 'PropertyAnalysisController::getProjection/$1/$2');
     });
     
     // Clients & CRM

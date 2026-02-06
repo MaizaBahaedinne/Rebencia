@@ -461,22 +461,23 @@
                                     <td>
                                         <?php
                                         $typeIcons = [
-                                            'visit' => 'home',
+                                            'visite' => 'home',
                                             'meeting' => 'handshake',
-                                            'call' => 'phone',
-                                            'follow_up' => 'redo',
-                                            'other' => 'calendar'
+                                            'appel' => 'phone',
+                                            'signature' => 'pen',
+                                            'autre' => 'calendar'
                                         ];
                                         $typeLabels = [
-                                            'visit' => 'Visite',
+                                            'visite' => 'Visite',
                                             'meeting' => 'Réunion',
-                                            'call' => 'Appel',
-                                            'follow_up' => 'Suivi',
-                                            'other' => 'Autre'
+                                            'appel' => 'Appel',
+                                            'signature' => 'Signature',
+                                            'autre' => 'Autre'
                                         ];
+                                        $type = $appointment['appointment_type'] ?? 'autre';
                                         ?>
-                                        <i class="fas fa-<?= $typeIcons[$appointment['type']] ?? 'calendar' ?> me-1"></i>
-                                        <?= $typeLabels[$appointment['type']] ?? $appointment['type'] ?>
+                                        <i class="fas fa-<?= $typeIcons[$type] ?? 'calendar' ?> me-1"></i>
+                                        <?= $typeLabels[$type] ?? ucfirst($type) ?>
                                     </td>
                                     <td><?= esc($appointment['client_first_name'] . ' ' . $appointment['client_last_name']) ?></td>
                                     <td><?= esc($appointment['property_reference'] ?? 'N/A') ?></td>

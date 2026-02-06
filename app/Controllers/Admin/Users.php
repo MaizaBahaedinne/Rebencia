@@ -229,7 +229,7 @@ class Users extends BaseController
                      clients.first_name as client_first_name, clients.last_name as client_last_name')
             ->join('properties', 'properties.id = appointments.property_id', 'left')
             ->join('clients', 'clients.id = appointments.client_id', 'left')
-            ->where('appointments.assigned_to', $id)
+            ->where('appointments.user_id', $id)
             ->orderBy('appointments.scheduled_at', 'DESC')
             ->limit(50)
             ->get()

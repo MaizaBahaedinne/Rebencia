@@ -18,7 +18,23 @@
 
     <!-- Info Cards -->
     <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-3">
+        <div class="col-xl-2 col-md-6 mb-3">
+            <div class="card border-left-secondary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">Sous-agences</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?= count($subAgencies ?? []) ?></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-sitemap fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-6 mb-3">
             <div class="card border-left-primary shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
@@ -34,7 +50,7 @@
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6 mb-3">
+        <div class="col-xl-2 col-md-6 mb-3">
             <div class="card border-left-success shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
@@ -50,7 +66,7 @@
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6 mb-3">
+        <div class="col-xl-2 col-md-6 mb-3">
             <div class="card border-left-info shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
@@ -66,7 +82,7 @@
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6 mb-3">
+        <div class="col-xl-2 col-md-6 mb-3">
             <div class="card border-left-warning shadow h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
@@ -85,8 +101,15 @@
 
     <!-- Tabs -->
     <ul class="nav nav-tabs" id="agencyTabs" role="tablist">
+        <?php if (!empty($subAgencies)): ?>
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="properties-tab" data-bs-toggle="tab" data-bs-target="#properties" type="button" role="tab">
+            <button class="nav-link active" id="subagencies-tab" data-bs-toggle="tab" data-bs-target="#subagencies" type="button" role="tab">
+                <i class="fas fa-sitemap me-2"></i>Sous-agences (<?= count($subAgencies) ?>)
+            </button>
+        </li>
+        <?php endif; ?>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link <?= empty($subAgencies) ? 'active' : '' ?>" id="properties-tab" data-bs-toggle="tab" data-bs-target="#properties" type="button" role="tab">
                 <i class="fas fa-building me-2"></i>Biens (<?= count($properties) ?>)
             </button>
         </li>
@@ -108,8 +131,77 @@
     </ul>
 
     <div class="tab-content" id="agencyTabsContent">
+        <!-- Sous-agences Tab -->
+        <?php if (!empty($subAgencies)): ?>
+        <div class="tab-pane fade show active" id="subagencies" role="tabpanel">
+            <div class="card shadow mt-3">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-sitemap me-2"></i>Agences Dépendantes</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <?php foreach ($subAgencies as $subAgency): ?>
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card h-100 border-left-secondary">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <?php if (!empty($subAgency['logo'])): ?>
+                                            <img src="<?= base_url('uploads/agencies/' . $subAgency['logo']) ?>" 
+                                                 alt="Logo" class="me-3" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                                        <?php else: ?>
+                                            <div class="me-3" style="width: 50px; height: 50px; background: #e9ecef; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-building fa-2x text-secondary"></i>
+                                            </div>
+                                        <?php endif; ?>
+                                        <div>
+                                            <h6 class="mb-1"><?= esc($subAgency['name']) ?></h6>
+                                            <small class="text-muted">Code: <?= esc($subAgency['code']) ?></small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-2">
+                                        <span class="badge bg-<?= $subAgency['type'] === 'siege' ? 'primary' : 'success' ?>">
+                                            <?= $subAgency['type'] === 'siege' ? 'Siège' : 'Agence' ?>
+                                        </span>
+                                        <span class="badge bg-<?= $subAgency['status'] === 'active' ? 'success' : 'secondary' ?> ms-1">
+                                            <?= $subAgency['status'] === 'active' ? 'Actif' : 'Inactif' ?>
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="small text-muted mb-2">
+                                        <i class="fas fa-map-marker-alt me-1"></i>
+                                        <?= esc($subAgency['city'] ?? 'Non renseigné') ?>
+                                    </div>
+                                    
+                                    <?php if (!empty($subAgency['phone'])): ?>
+                                    <div class="small text-muted mb-2">
+                                        <i class="fas fa-phone me-1"></i>
+                                        <?= esc($subAgency['phone']) ?>
+                                    </div>
+                                    <?php endif; ?>
+                                    
+                                    <div class="mt-3 d-flex gap-2">
+                                        <a href="<?= base_url('admin/agencies/view/' . $subAgency['id']) ?>" 
+                                           class="btn btn-sm btn-info flex-fill">
+                                            <i class="fas fa-eye me-1"></i>Voir
+                                        </a>
+                                        <a href="<?= base_url('admin/agencies/edit/' . $subAgency['id']) ?>" 
+                                           class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+        
         <!-- Biens Tab -->
-        <div class="tab-pane fade show active" id="properties" role="tabpanel">
+        <div class="tab-pane fade <?= empty($subAgencies) ? 'show active' : '' ?>" id="properties" role="tabpanel">
             <div class="card shadow mt-3">
                 <div class="card-body">
                     <?php if (!empty($properties)): ?>

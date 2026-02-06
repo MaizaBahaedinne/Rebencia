@@ -237,8 +237,7 @@
                                 <thead>
                                     <tr>
                                         <th>Bien</th>
-                                        <th>Acheteur</th>
-                                        <th>Vendeur</th>
+                                        <th>Client</th>
                                         <th>Agent</th>
                                         <th>Montant</th>
                                         <th>Type</th>
@@ -253,16 +252,16 @@
                                                 <strong><?= esc($transaction['property_ref']) ?></strong><br>
                                                 <small class="text-muted"><?= esc($transaction['property_title']) ?></small>
                                             </td>
-                                            <td><?= esc($transaction['buyer_name'] ?? '-') ?></td>
-                                            <td><?= esc($transaction['seller_name'] ?? '-') ?></td>
+                                            <td><?= esc($transaction['client_name'] ?? '-') ?></td>
                                             <td><?= esc($transaction['agent_name'] ?? '-') ?></td>
                                             <td><strong><?= number_format($transaction['amount'], 0, ',', ' ') ?> TND</strong></td>
                                             <td><span class="badge bg-primary"><?= ucfirst($transaction['type']) ?></span></td>
                                             <td>
                                                 <?php
                                                 $statusColors = [
+                                                    'draft' => 'secondary',
                                                     'pending' => 'warning',
-                                                    'in_progress' => 'info',
+                                                    'signed' => 'info',
                                                     'completed' => 'success',
                                                     'cancelled' => 'danger'
                                                 ];

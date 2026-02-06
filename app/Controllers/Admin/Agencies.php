@@ -189,12 +189,10 @@ class Agencies extends BaseController
                 ->orderBy('clients.created_at', 'DESC')
                 ->findAll(),
             'transactions' => $transactionModel->select('transactions.*, properties.title as property_title, properties.reference as property_ref,
-                CONCAT(buyer.first_name, " ", buyer.last_name) as buyer_name,
-                CONCAT(seller.first_name, " ", seller.last_name) as seller_name,
+                CONCAT(client.first_name, " ", client.last_name) as client_name,
                 CONCAT(agent.first_name, " ", agent.last_name) as agent_name')
                 ->join('properties', 'properties.id = transactions.property_id', 'left')
-                ->join('clients as buyer', 'buyer.id = transactions.buyer_id', 'left')
-                ->join('clients as seller', 'seller.id = transactions.seller_id', 'left')
+                ->join('clients as client', 'client.id = transactions.client_id', 'left')
                 ->join('users as agent', 'agent.id = transactions.agent_id', 'left')
                 ->where('transactions.agency_id', $id)
                 ->orderBy('transactions.created_at', 'DESC')

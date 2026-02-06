@@ -257,9 +257,15 @@ class Properties extends BaseController
 
     public function view($id)
     {
+        $property = $this->propertyModel->getPropertyWithDetails($id);
+        
+        if (!$property) {
+            return redirect()->to(base_url('admin/properties'))->with('error', 'Propriété non trouvée');
+        }
+
         $data = [
-            'title' => 'Détails Propriété',
-            'property' => $this->propertyModel->getPropertyWithDetails($id)
+            'title' => 'Détails Propriété - ' . $property['reference'],
+            'property' => $property
         ];
 
         return view('admin/properties/view', $data);

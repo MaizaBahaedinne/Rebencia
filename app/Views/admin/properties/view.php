@@ -92,7 +92,7 @@
                                 </div>
                             </div>
                         </div>
-                        <?php if ($property['floor']): ?>
+                        <?php if (!empty($property['floor'])): ?>
                             <div class="col-md-4">
                                 <div class="d-flex align-items-center">
                                     <i class="fas fa-building text-primary me-2"></i>
@@ -103,40 +103,40 @@
                                 </div>
                             </div>
                         <?php endif ?>
-                        <?php if ($property['parking_spaces'] > 0): ?>
+                        <?php if (!empty($property['parking_spaces']) && $property['parking_spaces'] > 0): ?>
                             <div class="col-md-4">
                                 <div class="d-flex align-items-center">
                                     <i class="fas fa-car text-primary me-2"></i>
                                     <div>
                                         <small class="text-muted">Parking</small>
-                                        <div><strong><?= $property['parking_spaces'] ?> place(s)</strong></div>
+                                        <div><strong><?= esc($property['parking_spaces']) ?> place(s)</strong></div>
                                     </div>
                                 </div>
                             </div>
                         <?php endif ?>
-                        <?php if ($property['construction_year']): ?>
+                        <?php if (!empty($property['construction_year'])): ?>
                             <div class="col-md-4">
                                 <div class="d-flex align-items-center">
                                     <i class="fas fa-calendar text-primary me-2"></i>
                                     <div>
                                         <small class="text-muted">Année</small>
-                                        <div><strong><?= $property['construction_year'] ?></strong></div>
+                                        <div><strong><?= esc($property['construction_year']) ?></strong></div>
                                     </div>
                                 </div>
                             </div>
                         <?php endif ?>
                     </div>
 
-                    <?php if ($property['has_elevator'] || $property['has_garden'] || $property['has_pool']): ?>
+                    <?php if (!empty($property['has_elevator']) || !empty($property['has_garden']) || !empty($property['has_pool'])): ?>
                         <hr class="my-3">
                         <div class="d-flex flex-wrap gap-2">
-                            <?php if ($property['has_elevator']): ?>
+                            <?php if (!empty($property['has_elevator'])): ?>
                                 <span class="badge bg-success"><i class="fas fa-check me-1"></i>Ascenseur</span>
                             <?php endif ?>
-                            <?php if ($property['has_garden']): ?>
+                            <?php if (!empty($property['has_garden'])): ?>
                                 <span class="badge bg-success"><i class="fas fa-check me-1"></i>Jardin</span>
                             <?php endif ?>
-                            <?php if ($property['has_pool']): ?>
+                            <?php if (!empty($property['has_pool'])): ?>
                                 <span class="badge bg-success"><i class="fas fa-check me-1"></i>Piscine</span>
                             <?php endif ?>
                         </div>

@@ -48,7 +48,7 @@
                             <option value="">-- Sélectionner un manager --</option>
                             <?php foreach ($managers as $manager): ?>
                                 <option value="<?= $manager['id'] ?>">
-                                    <?= esc($manager['first_name'] . ' ' . $manager['last_name']) ?> - <?= esc($manager['role']) ?>
+                                    <?= esc($manager['first_name'] . ' ' . $manager['last_name']) ?> - Role ID: <?= esc($manager['role_id']) ?>
                                 </option>
                             <?php endforeach ?>
                         </select>

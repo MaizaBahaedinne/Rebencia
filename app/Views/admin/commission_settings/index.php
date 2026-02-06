@@ -6,6 +6,14 @@
     <h1 class="page-title">
         <i class="fas fa-dollar-sign"></i> Gestion des Commissions
     </h1>
+    <div class="page-header-actions">
+        <a href="<?= base_url('admin/commission-settings/simulate') ?>" class="btn btn-success">
+            <i class="fas fa-calculator me-2"></i>Simulateur
+        </a>
+        <a href="<?= base_url('admin/commission-settings/logs') ?>" class="btn btn-outline-secondary">
+            <i class="fas fa-history me-2"></i>Journal
+        </a>
+    </div>
 </div>
 
 <div class="row">

@@ -140,3 +140,41 @@ if (!function_exists('getCurrentRole')) {
         return $userModel->getActiveRole($userId);
     }
 }
+
+if (!function_exists('canAccessCommissions')) {
+    /**
+     * Check if user can access commission settings
+     * Returns true if user is admin or has any commission permission with can_read
+     */
+    function canAccessCommissions()
+    {
+        // Admin bypass
+        if (isAdmin()) {
+            return true;
+        }
+        
+        $userId = session()->get('user_id');
+        if (!$userId) {
+            return false;
+        }
+
+        $userModel = model('UserModel');
+        $activeRole = $userModel->getActiveRole($userId);
+        
+        if (!$activeRole) {
+            return false;
+        }
+
+        $db = \Config\Database::connect();
+        
+        // Check if role has any commission permission with can_read = 1
+        $hasPermission = $db->table('role_permissions rp')
+            ->join('permissions p', 'p.id = rp.permission_id')
+            ->where('rp.role_id', $activeRole['role_id'])
+            ->where('p.module', 'commissions')
+            ->where('rp.can_read', 1)
+            ->countAllResults();
+        
+        return $hasPermission > 0;
+    }
+}

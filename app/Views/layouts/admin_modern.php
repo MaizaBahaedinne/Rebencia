@@ -549,6 +549,12 @@
             color: var(--primary-color);
         }
 
+        .page-header-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
         /* ========== CARDS ========== */
         .card {
             border: none;
@@ -686,7 +692,7 @@
             </a>
             <?php endif; ?>
             
-            <?php if (canRead('commissions') || isAdmin()): ?>
+            <?php if (canAccessCommissions()): ?>
             <a href="<?= base_url('admin/commission-settings') ?>" class="menu-item <?= url_is('admin/commission-settings*') ? 'active' : '' ?>">
                 <i class="fas fa-dollar-sign"></i>
                 <span>Commissions</span>

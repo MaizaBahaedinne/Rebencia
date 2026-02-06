@@ -197,9 +197,8 @@ class Users extends BaseController
         
         // Get properties assigned to this user
         $properties = $db->table('properties')
-            ->select('properties.*, zones.name as zone_name, property_types.name_fr as type_name')
+            ->select('properties.*, zones.name as zone_name')
             ->join('zones', 'zones.id = properties.zone_id', 'left')
-            ->join('property_types', 'property_types.id = properties.property_type_id', 'left')
             ->where('properties.agent_id', $id)
             ->orderBy('properties.created_at', 'DESC')
             ->get()

@@ -254,7 +254,21 @@
                                 <tr>
                                     <td><strong><?= esc($property['reference']) ?></strong></td>
                                     <td><?= esc($property['title']) ?></td>
-                                    <td><?= esc($property['type_name'] ?? 'N/A') ?></td>
+                                    <td>
+                                        <?php
+                                        $typeLabels = [
+                                            'apartment' => 'Appartement',
+                                            'villa' => 'Villa',
+                                            'house' => 'Maison',
+                                            'land' => 'Terrain',
+                                            'office' => 'Bureau',
+                                            'commercial' => 'Commercial',
+                                            'warehouse' => 'Entrepôt',
+                                            'other' => 'Autre'
+                                        ];
+                                        echo $typeLabels[$property['type']] ?? ucfirst($property['type']);
+                                        ?>
+                                    </td>
                                     <td><?= esc($property['zone_name'] ?? 'N/A') ?></td>
                                     <td><strong><?= number_format($property['price'], 0, ',', ' ') ?> TND</strong></td>
                                     <td>

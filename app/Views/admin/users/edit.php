@@ -20,6 +20,22 @@
         </a>
     </div>
 
+    <?php if (session()->has('success')): ?>
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="fas fa-check-circle me-2"></i>
+            <?= session('success') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif ?>
+
+    <?php if (session()->has('error')): ?>
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <?= session('error') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif ?>
+
     <?php if (session()->has('errors')): ?>
         <div class="alert alert-danger alert-dismissible fade show">
             <i class="fas fa-exclamation-circle me-2"></i>
@@ -201,6 +217,43 @@
 </div>
 
 <script>
+// Debug form submission
+document.getElementById('userForm').addEventListener('submit', function(e) {
+    console.log('Form submitting...');
+    console.log('Action:', this.action);
+    console.log('Method:', this.method);
+    
+    // Validate required fields
+    const requiredFields = ['first_name', 'last_name', 'username', 'email', 'role_id'];
+    let hasErrors = false;
+    
+    requiredFields.forEach(field => {
+        const input = document.getElementById(field);
+        if (!input || !input.value.trim()) {
+            console.error('Missing required field:', field);
+            hasErrors = true;
+        }
+    });
+    
+    if (hasErrors) {
+        e.preventDefault();
+        alert('Veuillez remplir tous les champs obligatoires');
+        return false;
+    }
+    
+    // Check password confirmation if password is entered
+    const password = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('password_confirm').value;
+    
+    if (password && password !== passwordConfirm) {
+        e.preventDefault();
+        alert('Les mots de passe ne correspondent pas');
+        return false;
+    }
+    
+    console.log('Form validation passed, submitting...');
+});
+
 function confirmDelete() {
     if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.')) {
         window.location.href = '<?= base_url('admin/users/delete/' . $user['id']) ?>';

@@ -153,7 +153,15 @@ class Users extends BaseController
             return redirect()->to('/admin/users')->with('success', 'Utilisateur modifié avec succès');
         }
 
-        return redirect()->back()->withInput()->with('error', 'Erreur lors de la modification');
+        // Get model errors for debugging
+        $modelErrors = $this->userModel->errors();
+        $errorMessage = 'Erreur lors de la modification';
+        
+        if (!empty($modelErrors)) {
+            return redirect()->back()->withInput()->with('errors', $modelErrors);
+        }
+        
+        return redirect()->back()->withInput()->with('error', $errorMessage);
     }
 
     public function delete($id)

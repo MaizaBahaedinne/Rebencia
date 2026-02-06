@@ -15,7 +15,8 @@ class UserModel extends Model
     protected $allowedFields = [
         'username', 'email', 'password_hash', 'first_name', 'last_name',
         'phone', 'avatar', 'role_id', 'agency_id', 'manager_id',
-        'status', 'last_login', 'email_verified'
+        'status', 'last_login', 'email_verified', 'cin', 'hire_date',
+        'last_login_at', 'last_login_ip'
     ];
 
     protected bool $allowEmptyInserts = false;
@@ -57,8 +58,12 @@ class UserModel extends Model
 
     protected function hashPassword(array $data)
     {
-        if (isset($data['data']['password_hash'])) {
-            $data['data']['password_hash'] = password_hash($data['data']['password_hash'], PASSWORD_DEFAULT);
+        // Only hash if password_hash is set AND it's not already hashed
+        if (isset($data['data']['password_hash']) && !empty($data['data']['password_hash'])) {
+            // Check if it's already a bcrypt hash (starts with $2y$ or $2a$ or $2b$)
+            if (!preg_match('/^\$2[ayb]\$.{56}$/', $data['data']['password_hash'])) {
+                $data['data']['password_hash'] = password_hash($data['data']['password_hash'], PASSWORD_DEFAULT);
+            }
         }
         return $data;
     }

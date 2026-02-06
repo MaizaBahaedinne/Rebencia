@@ -42,47 +42,133 @@
                                 <span class="step-number">1</span>
                                 <span class="step-label">Infos & prix</span>
                             </div>
-                            <!-- Nouveau wizard moderne -->
                             <form action="<?= base_url('admin/properties/store') ?>" method="post" enctype="multipart/form-data" id="propertyWizardForm">
                                 <?= csrf_field() ?>
-                                <div class="wizard-modern mb-4">
-                                    <div class="wizard-steps">
-                                        <div class="wizard-step-item active" data-step="1"><span class="step-number">1</span><span class="step-label">Infos générales</span></div>
-                                        <div class="wizard-step-item" data-step="2"><span class="step-number">2</span><span class="step-label">Localisation</span></div>
-                                        <div class="wizard-step-item" data-step="3"><span class="step-number">3</span><span class="step-label">Caractéristiques & prix</span></div>
-                                        <div class="wizard-step-item" data-step="4"><span class="step-number">4</span><span class="step-label">Médias</span></div>
-                                        <div class="wizard-step-item" data-step="5"><span class="step-number">5</span><span class="step-label">Récapitulatif</span></div>
+                                <div class="row">
+                                    <div class="col-lg-8">
+                                        <div class="wizard-simple mb-4">
+                                            <div class="wizard-steps">
+                                                <div class="wizard-step-item active" data-step="1">1. Infos</div>
+                                                <div class="wizard-step-item" data-step="2">2. Localisation</div>
+                                                <div class="wizard-step-item" data-step="3">3. Caractéristiques & prix</div>
+                                                <div class="wizard-step-item" data-step="4">4. Médias</div>
+                                            </div>
+                                            <div class="progress mt-2">
+                                                <div class="progress-bar" id="wizardProgress" role="progressbar" style="width: 25%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="wizard-content">
+                                            <div class="wizard-step-block active-step" data-wizard-step="1">
+                                                <!-- Infos générales -->
+                                                <div class="mb-3">
+                                                    <label for="title" class="form-label">Titre <span class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control" id="title" name="title" value="<?= old('title') ?>" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="description" class="form-label">Description</label>
+                                                    <textarea class="form-control" id="description" name="description" rows="3"><?= old('description') ?></textarea>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label for="type" class="form-label">Type</label>
+                                                        <select class="form-select" id="type" name="type">
+                                                            <option value="apartment">Appartement</option>
+                                                            <option value="villa">Villa</option>
+                                                            <option value="house">Maison</option>
+                                                            <option value="land">Terrain</option>
+                                                            <option value="commercial">Commercial</option>
+                                                            <option value="office">Bureau</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="transaction_type" class="form-label">Transaction</label>
+                                                        <select class="form-select" id="transaction_type" name="transaction_type">
+                                                            <option value="sale">Vente</option>
+                                                            <option value="rent">Location</option>
+                                                            <option value="both">Vente ou Location</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="wizard-step-block" data-wizard-step="2">
+                                                <!-- Localisation -->
+                                                <div class="mb-3">
+                                                    <label for="zone_id" class="form-label">Zone</label>
+                                                    <select class="form-select" id="zone_id" name="zone_id">
+                                                        <option value="">-- Sélectionner --</option>
+                                                        <?php foreach ($zones as $zone): ?>
+                                                            <option value="<?= $zone['id'] ?>" <?= old('zone_id') == $zone['id'] ? 'selected' : '' ?>><?= esc($zone['name']) ?></option>
+                                                        <?php endforeach ?>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="address" class="form-label">Adresse</label>
+                                                    <input type="text" class="form-control" id="address" name="address" value="<?= old('address') ?>">
+                                                </div>
+                                            </div>
+                                            <div class="wizard-step-block" data-wizard-step="3">
+                                                <!-- Caractéristiques & prix -->
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label for="price" class="form-label">Prix de vente (TND)</label>
+                                                        <input type="number" class="form-control" id="price" name="price" value="<?= old('price') ?>">
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="rent_price" class="form-label">Prix de location (TND/mois)</label>
+                                                        <input type="number" class="form-control" id="rent_price" name="rent_price" value="<?= old('rent_price') ?>">
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <div class="col-md-4">
+                                                        <label for="bedrooms" class="form-label">Chambres</label>
+                                                        <input type="number" class="form-control" id="bedrooms" name="bedrooms" value="<?= old('bedrooms', 0) ?>">
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label for="bathrooms" class="form-label">Salles de bain</label>
+                                                        <input type="number" class="form-control" id="bathrooms" name="bathrooms" value="<?= old('bathrooms', 0) ?>">
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label for="area" class="form-label">Surface (m²)</label>
+                                                        <input type="number" class="form-control" id="area" name="area" value="<?= old('area') ?>">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="wizard-step-block" data-wizard-step="4">
+                                                <!-- Médias -->
+                                                <div class="mb-3">
+                                                    <label for="images" class="form-label">Photos</label>
+                                                    <input type="file" class="form-control" id="images" name="images[]" accept="image/*" multiple>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="wizard-actions d-flex justify-content-between align-items-center mt-4">
+                                            <button type="button" class="btn btn-outline-secondary wizard-prev"><i class="fas fa-arrow-left"></i> Précédent</button>
+                                            <button type="button" class="btn btn-primary wizard-next">Suivant <i class="fas fa-arrow-right"></i></button>
+                                            <button type="submit" class="btn btn-success wizard-submit d-none"><i class="fas fa-check"></i> Valider et créer le bien</button>
+                                        </div>
                                     </div>
-                                    <div class="progress mt-2">
-                                        <div class="progress-bar" id="wizardProgress" role="progressbar" style="width: 20%"></div>
+                                    <!-- Récapitulatif à droite -->
+                                    <div class="col-lg-4">
+                                        <div class="card sticky-top" style="top:80px">
+                                            <div class="card-header bg-info text-white">
+                                                <h5 class="mb-0"><i class="fas fa-list-ul"></i> Récapitulatif</h5>
+                                            </div>
+                                            <div class="card-body" id="wizardRecap">
+                                                <ul class="list-group list-group-flush">
+                                                    <li class="list-group-item"><strong>Titre :</strong> <span id="recapTitle"></span></li>
+                                                    <li class="list-group-item"><strong>Type :</strong> <span id="recapType"></span></li>
+                                                    <li class="list-group-item"><strong>Transaction :</strong> <span id="recapTransaction"></span></li>
+                                                    <li class="list-group-item"><strong>Zone :</strong> <span id="recapZone"></span></li>
+                                                    <li class="list-group-item"><strong>Adresse :</strong> <span id="recapAddress"></span></li>
+                                                    <li class="list-group-item"><strong>Prix vente :</strong> <span id="recapPrice"></span></li>
+                                                    <li class="list-group-item"><strong>Prix location :</strong> <span id="recapRent"></span></li>
+                                                    <li class="list-group-item"><strong>Chambres :</strong> <span id="recapBedrooms"></span></li>
+                                                    <li class="list-group-item"><strong>Salles de bain :</strong> <span id="recapBathrooms"></span></li>
+                                                    <li class="list-group-item"><strong>Surface :</strong> <span id="recapArea"></span></li>
+                                                </ul>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="wizard-content">
-                                    <!-- Step 1: Infos générales -->
-                                    <div class="wizard-step-block active-step" data-wizard-step="1">
-                                        <?php include __DIR__.'/partials/wizard_step_infos.php'; ?>
-                                    </div>
-                                    <!-- Step 2: Localisation -->
-                                    <div class="wizard-step-block" data-wizard-step="2">
-                                        <?php include __DIR__.'/partials/wizard_step_localisation.php'; ?>
-                                    </div>
-                                    <!-- Step 3: Caractéristiques & prix -->
-                                    <div class="wizard-step-block" data-wizard-step="3">
-                                        <?php include __DIR__.'/partials/wizard_step_caracteristiques.php'; ?>
-                                    </div>
-                                    <!-- Step 4: Médias -->
-                                    <div class="wizard-step-block" data-wizard-step="4">
-                                        <?php include __DIR__.'/partials/wizard_step_medias.php'; ?>
-                                    </div>
-                                    <!-- Step 5: Récapitulatif -->
-                                    <div class="wizard-step-block" data-wizard-step="5">
-                                        <?php include __DIR__.'/partials/wizard_step_recap.php'; ?>
-                                    </div>
-                                </div>
-                                <div class="wizard-actions d-flex justify-content-between align-items-center mt-4">
-                                    <button type="button" class="btn btn-outline-secondary wizard-prev"><i class="fas fa-arrow-left"></i> Précédent</button>
-                                    <button type="button" class="btn btn-primary wizard-next">Suivant <i class="fas fa-arrow-right"></i></button>
-                                    <button type="submit" class="btn btn-success wizard-submit d-none"><i class="fas fa-check"></i> Valider et créer le bien</button>
                                 </div>
                             </form>
                                             <i class="fas fa-check"></i> Créer le bien

@@ -15,9 +15,33 @@ class Agencies extends BaseController
 
     public function index()
     {
+        $allAgencies = $this->agencyModel->getAgenciesWithStats();
+        
+        // Organiser en hiérarchie
+        $agencies = [];
+        $agenciesById = [];
+        
+        // Index by ID first
+        foreach ($allAgencies as $agency) {
+            $agency['children'] = [];
+            $agenciesById[$agency['id']] = $agency;
+        }
+        
+        // Build tree
+        foreach ($agenciesById as $id => $agency) {
+            if ($agency['parent_id'] === null) {
+                $agencies[] = &$agenciesById[$id];
+            } else {
+                if (isset($agenciesById[$agency['parent_id']])) {
+                    $agenciesById[$agency['parent_id']]['children'][] = &$agenciesById[$id];
+                }
+            }
+        }
+        
         $data = [
             'title' => 'Gestion des Agences',
-            'agencies' => $this->agencyModel->getAgenciesWithStats()
+            'agencies' => $agencies,
+            'allAgencies' => $allAgencies
         ];
 
         return view('admin/agencies/index', $data);

@@ -716,6 +716,13 @@
                 <span>Utilisateurs</span>
             </a>
             <?php endif; ?>
+            
+            <?php if (canRead('users')): ?>
+            <a href="<?= base_url('admin/hierarchy') ?>" class="menu-item <?= url_is('admin/hierarchy*') ? 'active' : '' ?>">
+                <i class="fas fa-sitemap"></i>
+                <span>Hiérarchie</span>
+            </a>
+            <?php endif; ?>
 
             <?php if (canRead('roles') || isSuperAdmin()): ?>
             <div class="menu-section-title">SÉCURITÉ</div>

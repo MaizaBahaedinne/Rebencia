@@ -28,7 +28,7 @@ class Properties extends BaseController
         
         // Filtrer les propriétés selon la hiérarchie
         $properties = $this->propertyModel
-            ->whereIn('user_id', $accessibleUserIds)
+            ->whereIn('agent_id', $accessibleUserIds)
             ->paginate(20);
         
         $data = [

@@ -24,13 +24,12 @@
             <table class="table table-hover mb-0" id="clientsTable">
                 <thead class="table-light">
                     <tr>
-                        <th>ID</th>
                         <th>Nom</th>
                         <th>Email</th>
                         <th>Téléphone</th>
                         <th>Agent</th>
+                        <th>Agence</th>
                         <th>Statut</th>
-                        <th>Date</th>
                         <th class="no-filter">Actions</th>
                     </tr>
                 </thead>
@@ -38,17 +37,17 @@
                     <?php if (!empty($clients)): ?>
                         <?php foreach ($clients as $client): ?>
                             <tr>
-                                <td><strong>#<?= $client['id'] ?></strong></td>
                                 <td>
                                     <?php if ($client['type'] === 'company'): ?>
-                                        <i class="fas fa-building text-primary"></i> <?= esc($client['company_name']) ?>
+                                        <?= esc($client['company_name']) ?>
                                     <?php else: ?>
-                                        <i class="fas fa-user"></i> <?= esc($client['first_name'] . ' ' . $client['last_name']) ?>
+                                        <?= esc($client['first_name'] . ' ' . $client['last_name']) ?>
                                     <?php endif; ?>
                                 </td>
                                 <td><?= esc($client['email'] ?? '-') ?></td>
                                 <td><?= esc($client['phone']) ?></td>
                                 <td><?= esc($client['agent_name'] . ' ' . ($client['agent_lastname'] ?? '')) ?></td>
+                                <td><?= esc($client['agency_name'] ?? '-') ?></td>
                                 <td>
                                     <?php
                                     $badgeClass = match($client['status']) {
@@ -60,7 +59,6 @@
                                     ?>
                                     <span class="badge bg-<?= $badgeClass ?>"><?= ucfirst($client['status']) ?></span>
                                 </td>
-                                <td><?= date('d/m/Y', strtotime($client['created_at'])) ?></td>
                                 <td>
                                     <a href="<?= base_url('admin/clients/view/' . $client['id']) ?>" class="btn btn-sm btn-info">
                                         <i class="fas fa-eye"></i>
@@ -73,7 +71,7 @@
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="8" class="text-center py-4 text-muted">
+                            <td colspan="7" class="text-center py-4 text-muted">
                                 Aucun client trouvé
                             </td>
                         </tr>
@@ -91,9 +89,9 @@
 <script>
 $(document).ready(function() {
     initDataTableWithFilters('clientsTable', {
-        order: [[0, 'desc']],
+        order: [[0, 'asc']],
         columnDefs: [
-            { orderable: false, targets: 7 }
+            { orderable: false, targets: 6 }
         ]
     });
 });

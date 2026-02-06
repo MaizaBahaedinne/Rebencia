@@ -89,11 +89,29 @@ class Hierarchy extends BaseController
             return redirect()->to('/admin/hierarchy')->with('error', 'Utilisateur non trouvé');
         }
         
+        // Récupérer le manager
+        $manager = null;
+        if ($user['manager_id']) {
+            $manager = $this->userModel->find($user['manager_id']);
+        }
+        
+        // Récupérer les subordonnés directs
+        $subordinates = $this->userModel->where('manager_id', $userId)->findAll();
+        
+        // Récupérer tous les subordonnés (récursif)
+        $allSubordinates = $this->hierarchyHelper->getAllSubordinates($userId);
+        
+        // Récupérer les biens gérés par cet utilisateur
+        $propertyModel = new \App\Models\PropertyModel();
+        $properties = $propertyModel->where('user_id', $userId)->findAll();
+        
         $data = [
             'title' => 'Hiérarchie de ' . $user['first_name'] . ' ' . $user['last_name'],
             'user' => $user,
-            'hierarchyPath' => $this->hierarchyHelper->getUserHierarchyPath($userId),
-            'subordinates' => $this->hierarchyHelper->getDirectSubordinates($userId)
+            'manager' => $manager,
+            'subordinates' => $subordinates,
+            'totalSubordinatesCount' => count($allSubordinates),
+            'properties' => $properties
         ];
         
         return view('admin/hierarchy/view_user', $data);

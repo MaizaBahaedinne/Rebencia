@@ -67,6 +67,11 @@
                                     <a href="<?= base_url('admin/users/manage-roles/' . $user['id']) ?>" class="btn btn-sm btn-secondary" title="Gérer les rôles">
                                         <i class="fas fa-user-shield"></i>
                                     </a>
+                                    <?php if (session()->get('role_level') == 100 && $user['id'] != session()->get('user_id')): ?>
+                                        <a href="<?= base_url('admin/users/login-as/' . $user['id']) ?>" class="btn btn-sm btn-success" title="Se connecter en tant que cet utilisateur" onclick="return confirm('Voulez-vous vous connecter en tant que <?= esc($user['first_name']) ?> ?')">
+                                            <i class="fas fa-sign-in-alt"></i>
+                                        </a>
+                                    <?php endif; ?>
                                     <?php if ($user['id'] != session()->get('user_id')): ?>
                                         <button class="btn btn-sm btn-danger" onclick="confirmDelete(<?= $user['id'] ?>)" title="Supprimer">
                                             <i class="fas fa-trash"></i>

@@ -41,7 +41,11 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->post('assign-role/(:num)', 'Users::assignRole/$1');
         $routes->post('set-default-role/(:num)', 'Users::setDefaultRole/$1');
         $routes->get('remove-role/(:num)/(:num)', 'Users::removeRole/$1/$2');
+        $routes->get('login-as/(:num)', 'Users::loginAs/$1');
     });
+    
+    // Stop impersonation
+    $routes->get('stop-impersonation', 'Users::stopImpersonation');
 
     // Switch Role
     $routes->post('switch-role', 'Users::switchRole');

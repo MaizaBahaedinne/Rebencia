@@ -541,4 +541,80 @@ class Users extends BaseController
 
         return redirect()->back()->with('error', 'Erreur lors du retrait du rôle');
     }
+    
+    /**
+     * Login as another user (admin only)
+     */
+    public function loginAs($userId)
+    {
+        // Vérifier que l'utilisateur actuel est admin
+        $currentUserRole = session()->get('role_level');
+        if ($currentUserRole != 100) {
+            return redirect()->back()->with('error', 'Accès non autorisé');
+        }
+        
+        // Récupérer l'utilisateur cible
+        $targetUser = $this->userModel->find($userId);
+        if (!$targetUser) {
+            return redirect()->back()->with('error', 'Utilisateur non trouvé');
+        }
+        
+        // Sauvegarder l'ID admin original
+        if (!session()->has('original_user_id')) {
+            session()->set('original_user_id', session()->get('user_id'));
+            session()->set('original_user_name', session()->get('user_name'));
+        }
+        
+        // Charger les informations du nouvel utilisateur
+        $role = $this->roleModel->find($targetUser['role_id']);
+        
+        // Mettre à jour la session
+        session()->set([
+            'user_id' => $targetUser['id'],
+            'user_name' => $targetUser['first_name'] . ' ' . $targetUser['last_name'],
+            'user_email' => $targetUser['email'],
+            'role_id' => $targetUser['role_id'],
+            'role_name' => $role['display_name'],
+            'role_level' => $role['level'],
+            'is_impersonating' => true
+        ]);
+        
+        return redirect()->to('/admin/dashboard')->with('info', 'Vous êtes maintenant connecté en tant que ' . $targetUser['first_name'] . ' ' . $targetUser['last_name']);
+    }
+    
+    /**
+     * Return to original admin account
+     */
+    public function stopImpersonation()
+    {
+        if (!session()->has('original_user_id')) {
+            return redirect()->to('/admin/dashboard')->with('error', 'Aucune impersonation active');
+        }
+        
+        $originalUserId = session()->get('original_user_id');
+        $originalUser = $this->userModel->find($originalUserId);
+        
+        if (!$originalUser) {
+            session()->destroy();
+            return redirect()->to('/admin/login')->with('error', 'Session invalide');
+        }
+        
+        $role = $this->roleModel->find($originalUser['role_id']);
+        
+        // Restaurer la session originale
+        session()->remove('original_user_id');
+        session()->remove('original_user_name');
+        session()->remove('is_impersonating');
+        
+        session()->set([
+            'user_id' => $originalUser['id'],
+            'user_name' => $originalUser['first_name'] . ' ' . $originalUser['last_name'],
+            'user_email' => $originalUser['email'],
+            'role_id' => $originalUser['role_id'],
+            'role_name' => $role['display_name'],
+            'role_level' => $role['level']
+        ]);
+        
+        return redirect()->to('/admin/dashboard')->with('success', 'Vous êtes de retour sur votre compte administrateur');
+    }
 }

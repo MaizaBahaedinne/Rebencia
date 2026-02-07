@@ -645,8 +645,22 @@
     <?= $this->renderSection('styles') ?>
 </head>
 <body>
+    <!-- Impersonation Banner -->
+    <?php if (session()->has('is_impersonating')): ?>
+    <div class="alert alert-warning mb-0 rounded-0 border-0 d-flex align-items-center justify-content-between" style="position: fixed; top: 0; left: 0; right: 0; z-index: 9999;">
+        <div>
+            <i class="fas fa-user-secret me-2"></i>
+            <strong>Mode Impersonation:</strong> Vous êtes connecté en tant que <strong><?= esc(session()->get('user_name')) ?></strong>
+            <small class="ms-2 text-muted">(Admin: <?= esc(session()->get('original_user_name')) ?>)</small>
+        </div>
+        <a href="<?= base_url('admin/stop-impersonation') ?>" class="btn btn-sm btn-dark">
+            <i class="fas fa-sign-out-alt me-1"></i> Retourner au compte Admin
+        </a>
+    </div>
+    <?php endif; ?>
+    
     <!-- Sidebar -->
-    <aside class="admin-sidebar">
+    <aside class="admin-sidebar" style="<?= session()->has('is_impersonating') ? 'top: 58px; height: calc(100vh - 58px);' : '' ?>">
         <div class="sidebar-header">
             <a href="<?= base_url('admin') ?>" class="sidebar-logo">
                 <i class="fas fa-building"></i>
@@ -837,7 +851,7 @@
     </aside>
 
     <!-- Header -->
-    <header class="admin-header">
+    <header class="admin-header" style="<?= session()->has('is_impersonating') ? 'top: 58px;' : '' ?>">
         <button class="sidebar-toggle-btn" id="sidebarToggle" title="Masquer/Afficher le menu">
             <i class="fas fa-bars"></i>
         </button>
@@ -968,7 +982,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="admin-main">
+    <main class="admin-main" style="<?= session()->has('is_impersonating') ? 'margin-top: 58px;' : '' ?>">
         <?= $this->renderSection('content') ?>
     </main>
 

@@ -198,7 +198,10 @@ class Menus extends BaseController
     public function updateRoleMenus()
     {
         $roleId = $this->request->getPost('role_id');
-        $menus = $this->request->getPost('menus');
+        $menusJson = $this->request->getPost('menus');
+        
+        // Decode JSON string
+        $menus = json_decode($menusJson, true);
 
         if (!$roleId) {
             return $this->response->setJSON([
@@ -210,7 +213,7 @@ class Menus extends BaseController
         if (!is_array($menus)) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Données invalides: aucun menu à assigner'
+                'message' => 'Données invalides: aucun menu à assigner (menus doit être un tableau)'
             ]);
         }
 

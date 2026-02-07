@@ -232,22 +232,35 @@ function saveMenus() {
         });
     });
     
-    // Send via AJAX
+    console.log('Sending data:', { role_id: roleId, menus: menus });
+    
+    // Send via AJAX with FormData
+    const formData = new FormData();
+    formData.append('role_id', roleId);
+    formData.append('menus', JSON.stringify(menus));
+    
     fetch('<?= base_url('admin/menus/update-role-menus') ?>', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest'
         },
-        body: JSON.stringify({
-            role_id: roleId,
-            menus: menus
-        })
+        body: formData
     })
     .then(response => response.json())
     .then(data => {
+        console.log('Response:', data);
         if (data.success) {
             alert('✅ ' + data.message);
+            location.reload();
+        } else {
+            alert('❌ ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('❌ Erreur: ' + error);
+    });
+}
             location.reload();
         } else {
             alert('❌ ' + data.message);

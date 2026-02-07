@@ -148,7 +148,7 @@
                             <label for="area" class="form-label">Surface <small class="text-muted">(m²)</small></label>
                             <div class="input-group">
                                 <input type="number" class="form-control" id="area" name="area" 
-                                       value="<?= old('area', $property['area']) ?>">
+                                       value="<?= old('area', $property['area_total'] ?? $property['area'] ?? '') ?>">
                                 <span class="input-group-text">m²</span>
                             </div>
                         </div>

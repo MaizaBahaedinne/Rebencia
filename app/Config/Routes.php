@@ -203,6 +203,7 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->get('assign-manager', 'Hierarchy::assignManager');
         $routes->get('assign-manager/(:num)', 'Hierarchy::assignManager/$1');
         $routes->post('assign-manager', 'Hierarchy::assignManager');
+        $routes->post('assign-manager/(:num)', 'Hierarchy::assignManager/$1');
         $routes->get('view-user/(:num)', 'Hierarchy::viewUser/$1');
     });
     

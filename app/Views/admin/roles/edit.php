@@ -103,13 +103,21 @@
                         <?php foreach ($modules as $moduleName => $permissions): ?>
                             <div class="mb-4">
                                 <div class="card">
-                                    <div class="card-header bg-light">
+                                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
                                         <h6 class="mb-0">
                                             <i class="fas fa-folder-open text-primary me-2"></i>
                                             <strong><?= strtoupper($moduleName) ?></strong>
                                         </h6>
+                                        <div>
+                                            <button type="button" class="btn btn-sm btn-success" onclick="selectModulePerms('<?= $moduleName ?>')">
+                                                <i class="fas fa-check-double"></i> Tout
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="deselectModulePerms('<?= $moduleName ?>')">
+                                                <i class="fas fa-times"></i> Rien
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div class="card-body">
+                                    <div class="card-body" data-module="<?= $moduleName ?>">
                                         <div class="table-responsive">
                                             <table class="table table-sm table-hover">
                                                 <thead>
@@ -187,6 +195,20 @@ function selectAllPerms() {
 
 function deselectAllPerms() {
     document.querySelectorAll('.perm-checkbox').forEach(cb => cb.checked = false);
+}
+
+function selectModulePerms(moduleName) {
+    const moduleCard = document.querySelector(`[data-module="${moduleName}"]`);
+    if (moduleCard) {
+        moduleCard.querySelectorAll('.perm-checkbox').forEach(cb => cb.checked = true);
+    }
+}
+
+function deselectModulePerms(moduleName) {
+    const moduleCard = document.querySelector(`[data-module="${moduleName}"]`);
+    if (moduleCard) {
+        moduleCard.querySelectorAll('.perm-checkbox').forEach(cb => cb.checked = false);
+    }
 }
 
 function confirmDelete() {

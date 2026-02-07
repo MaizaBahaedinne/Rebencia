@@ -64,6 +64,19 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->post('sync-permissions', 'Roles::syncPermissions');
     });
     
+    // Menus Management
+    $routes->group('menus', function($routes) {
+        $routes->get('/', 'Menus::index');
+        $routes->get('create', 'Menus::create');
+        $routes->post('store', 'Menus::store');
+        $routes->get('edit/(:num)', 'Menus::edit/$1');
+        $routes->post('update/(:num)', 'Menus::update/$1');
+        $routes->get('delete/(:num)', 'Menus::delete/$1');
+        $routes->get('role-menus', 'Menus::roleMenus');
+        $routes->get('role-menus/(:num)', 'Menus::roleMenus/$1');
+        $routes->post('update-role-menus', 'Menus::updateRoleMenus');
+    });
+    
     // Agencies
     $routes->group('agencies', function($routes) {
         $routes->get('/', 'Agencies::index');

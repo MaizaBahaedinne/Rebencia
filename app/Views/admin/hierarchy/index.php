@@ -435,16 +435,17 @@ function goToUser(userId) {
 function renderPyramidChart() {
     $userModel = new \App\Models\UserModel();
     
-    // Récupérer l'agency_id de l'utilisateur connecté
+    // Récupérer l'utilisateur connecté
     $currentUserId = session()->get('user_id');
     $currentUser = $userModel->find($currentUserId);
+    $currentRoleLevel = session()->get('role_level');
     $currentAgencyId = $currentUser['agency_id'] ?? null;
     
-    // Filtrer les utilisateurs par agency_id
-    if ($currentAgencyId) {
-        $allUsers = $userModel->where('agency_id', $currentAgencyId)->findAll();
-    } else {
+    // Admin (role_level 100) voit tout, sinon filtre par agency
+    if ($currentRoleLevel == 100 || !$currentAgencyId) {
         $allUsers = $userModel->findAll();
+    } else {
+        $allUsers = $userModel->where('agency_id', $currentAgencyId)->findAll();
     }
     
     $ceos = array_filter($allUsers, function($u) { return !$u['manager_id']; });

@@ -9,23 +9,47 @@ class Users extends BaseController
     protected $userModel;
     protected $roleModel;
     protected $agencyModel;
+    protected $hierarchyHelper;
 
     public function __construct()
     {
         $this->userModel = model('UserModel');
         $this->roleModel = model('RoleModel');
         $this->agencyModel = model('AgencyModel');
+        $this->hierarchyHelper = new \App\Libraries\HierarchyHelper();
     }
 
     public function index()
     {
-        $data = [
-            'title' => 'Gestion des Utilisateurs',
-            'users' => $this->userModel->select('users.*, roles.display_name as role_name, agencies.name as agency_name')
+        $currentUserId = session()->get('user_id');
+        $currentRoleLevel = session()->get('role_level');
+        
+        // Admin (role_level 100) voit tous les utilisateurs
+        if ($currentRoleLevel == 100) {
+            $users = $this->userModel->select('users.*, roles.display_name as role_name, agencies.name as agency_name')
                 ->join('roles', 'roles.id = users.role_id')
                 ->join('agencies', 'agencies.id = users.agency_id', 'left')
                 ->orderBy('users.created_at', 'DESC')
-                ->paginate(20)
+                ->paginate(20);
+        } else {
+            // Autres utilisateurs : voir seulement leur hiérarchie (self + subordonnés récursifs)
+            $accessibleUserIds = $this->hierarchyHelper->getAccessibleUserIds($currentUserId);
+            
+            if (empty($accessibleUserIds)) {
+                $accessibleUserIds = [$currentUserId];
+            }
+            
+            $users = $this->userModel->select('users.*, roles.display_name as role_name, agencies.name as agency_name')
+                ->join('roles', 'roles.id = users.role_id')
+                ->join('agencies', 'agencies.id = users.agency_id', 'left')
+                ->whereIn('users.id', $accessibleUserIds)
+                ->orderBy('users.created_at', 'DESC')
+                ->paginate(20);
+        }
+        
+        $data = [
+            'title' => 'Gestion des Utilisateurs',
+            'users' => $users
         ];
 
         return view('admin/users/index', $data);

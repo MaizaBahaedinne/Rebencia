@@ -750,6 +750,11 @@
                 <i class="fas fa-table"></i>
                 <span>Matrice Permissions</span>
             </a>
+            
+            <a href="<?= base_url('admin/menus/role-menus') ?>" class="menu-item <?= url_is('admin/menus*') ? 'active' : '' ?>">
+                <i class="fas fa-bars"></i>
+                <span>Gestion des Menus</span>
+            </a>
             <?php endif; ?>
 
             <div class="menu-section-title">OUTILS</div>

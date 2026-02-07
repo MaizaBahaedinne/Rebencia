@@ -437,6 +437,28 @@
         display: none;
     }
     
+    /* Message pour entités vides */
+    .empty-entity-message {
+        text-align: center;
+        padding: 40px 20px;
+        background: #f8f9fa;
+        border-radius: 12px;
+        margin: 20px 0;
+    }
+    
+    .empty-entity-message i {
+        opacity: 0.5;
+    }
+    
+    .empty-entity-message p {
+        font-size: 14px;
+        margin: 12px 0;
+    }
+    
+    .empty-entity-message .btn {
+        margin-top: 12px;
+    }
+    
     /* Responsive Design */
     @media (max-width: 1200px) {
         .agencies-section {
@@ -571,27 +593,32 @@ function renderOrgChartGrouped() {
     
     $html = '<div class="organizational-tree">';
     
-    // 1. SIÈGE (en haut de la hiérarchie)
+    // 1. SIÈGE (en haut de la hiérarchie) - Toujours affiché
+    $html .= '<div class="headquarters-section">';
+    $html .= '<div class="entity-card headquarters-card">';
+    $html .= '<div class="entity-icon"><i class="fas fa-landmark"></i></div>';
+    $html .= '<div class="entity-name">SIÈGE SOCIAL</div>';
+    $html .= '<div class="entity-count">' . count($headquartersUsers) . ' personne(s)</div>';
+    $html .= '</div>';
+    
+    // Organigramme du siège
+    $html .= '<div class="entity-orgchart">';
     if (!empty($headquartersUsers)) {
-        $html .= '<div class="headquarters-section">';
-        $html .= '<div class="entity-card headquarters-card">';
-        $html .= '<div class="entity-icon"><i class="fas fa-landmark"></i></div>';
-        $html .= '<div class="entity-name">SIÈGE SOCIAL</div>';
-        $html .= '<div class="entity-count">' . count($headquartersUsers) . ' personne(s)</div>';
-        $html .= '</div>';
-        
-        // Organigramme du siège
-        $html .= '<div class="entity-orgchart">';
         $html .= '<div class="org-tree">';
         $html .= buildAgencyTree($headquartersUsers, $userModel, $roleModel, $agencyModel);
         $html .= '</div>';
+    } else {
+        $html .= '<div class="empty-entity-message">';
+        $html .= '<i class="fas fa-users-slash fa-2x mb-2 text-muted"></i>';
+        $html .= '<p class="text-muted mb-0">Aucune personne affectée au siège</p>';
         $html .= '</div>';
-        $html .= '</div>';
-        
-        // Ligne de connexion vers les agences
-        if (!empty($agencies)) {
-            $html .= '<div class="hierarchy-connector"></div>';
-        }
+    }
+    $html .= '</div>';
+    $html .= '</div>';
+    
+    // Ligne de connexion vers les agences
+    if (!empty($agencies)) {
+        $html .= '<div class="hierarchy-connector"></div>';
     }
     
     // 2. AGENCES (branches sous le siège)
@@ -600,10 +627,6 @@ function renderOrgChartGrouped() {
         
         foreach ($agencies as $agency) {
             $agencyUsers = $userModel->where('agency_id', $agency['id'])->findAll();
-            
-            if (empty($agencyUsers)) {
-                continue;
-            }
             
             $html .= '<div class="agency-branch" id="agency-branch-' . $agency['id'] . '">';
             
@@ -621,9 +644,19 @@ function renderOrgChartGrouped() {
             
             // Organigramme de l'agence (collapsible)
             $html .= '<div class="entity-orgchart" id="agency-content-' . $agency['id'] . '" style="display: block;">';
-            $html .= '<div class="org-tree">';
-            $html .= buildAgencyTree($agencyUsers, $userModel, $roleModel, $agencyModel);
-            $html .= '</div>';
+            if (!empty($agencyUsers)) {
+                $html .= '<div class="org-tree">';
+                $html .= buildAgencyTree($agencyUsers, $userModel, $roleModel, $agencyModel);
+                $html .= '</div>';
+            } else {
+                $html .= '<div class="empty-entity-message">';
+                $html .= '<i class="fas fa-users-slash fa-2x mb-2 text-muted"></i>';
+                $html .= '<p class="text-muted mb-0">Aucune personne affectée à cette agence</p>';
+                $html .= '<a href="' . base_url('admin/users/bulk-manage') . '" class="btn btn-sm btn-outline-primary mt-2">';
+                $html .= '<i class="fas fa-user-plus"></i> Affecter des personnes';
+                $html .= '</a>';
+                $html .= '</div>';
+            }
             $html .= '</div>';
             
             $html .= '</div>'; // agency-branch
@@ -633,13 +666,6 @@ function renderOrgChartGrouped() {
     }
     
     $html .= '</div>'; // organizational-tree
-    
-    if (empty($headquartersUsers) && empty($agencies)) {
-        return '<div class="text-center text-muted py-5">
-            <i class="fas fa-sitemap fa-3x mb-3"></i>
-            <p>Aucun utilisateur trouvé.</p>
-        </div>';
-    }
     
     return $html;
 }

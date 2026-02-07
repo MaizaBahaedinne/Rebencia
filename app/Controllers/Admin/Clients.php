@@ -24,31 +24,41 @@ class Clients extends BaseController
     {
         // Récupérer l'utilisateur connecté
         $currentUserId = session()->get('user_id');
+        $currentRoleLevel = session()->get('role_level');
         
         if (!$currentUserId) {
             return redirect()->to('/login')->with('error', 'Session expirée');
         }
         
-        // Récupérer les IDs des utilisateurs accessibles (self + subordonnés récursifs)
-        $accessibleUserIds = $this->hierarchyHelper->getAccessibleUserIds($currentUserId);
-        
-        if (empty($accessibleUserIds)) {
-            $accessibleUserIds = [$currentUserId];
+        // Admin voit tous les clients
+        if ($currentRoleLevel == 100) {
+            $clients = $this->clientModel
+                ->select('clients.*, users.first_name as agent_name, users.last_name as agent_lastname, agencies.name as agency_name')
+                ->join('users', 'users.id = clients.assigned_to', 'left')
+                ->join('agencies', 'agencies.id = clients.agency_id', 'left')
+                ->orderBy('clients.created_at', 'DESC')
+                ->findAll();
+        } else {
+            // Récupérer les IDs des utilisateurs accessibles (self + subordonnés récursifs)
+            $accessibleUserIds = $this->hierarchyHelper->getAccessibleUserIds($currentUserId);
+            
+            if (empty($accessibleUserIds)) {
+                $accessibleUserIds = [$currentUserId];
+            }
+            
+            // Filtrer les clients selon la hiérarchie
+            $clients = $this->clientModel
+                ->select('clients.*, users.first_name as agent_name, users.last_name as agent_lastname, agencies.name as agency_name')
+                ->join('users', 'users.id = clients.assigned_to', 'left')
+                ->join('agencies', 'agencies.id = clients.agency_id', 'left')
+                ->whereIn('clients.assigned_to', $accessibleUserIds)
+                ->orderBy('clients.created_at', 'DESC')
+                ->findAll();
         }
-        
-        // Filtrer les clients selon la hiérarchie
-        $clients = $this->clientModel
-            ->select('clients.*, users.first_name as agent_name, users.last_name as agent_lastname, agencies.name as agency_name')
-            ->join('users', 'users.id = clients.assigned_to', 'left')
-            ->join('agencies', 'agencies.id = clients.agency_id', 'left')
-            ->whereIn('clients.assigned_to', $accessibleUserIds)
-            ->orderBy('clients.created_at', 'DESC')
-            ->paginate(20);
         
         $data = [
             'title' => 'Gestion des Clients',
-            'clients' => $clients,
-            'pager' => $this->clientModel->pager
+            'clients' => $clients
         ];
 
         return view('admin/clients/index', $data);

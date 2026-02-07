@@ -57,12 +57,18 @@ class Properties extends BaseController
         
         $data = [
             'title' => 'Nouvelle Propriété',
+            'property' => [],
+            'rooms' => [],
+            'proximities' => [],
+            'documents' => [],
+            'photos' => [],
             'zones' => $this->zoneModel->findAll(),
             'agencies' => $this->agencyModel->where('status', 'active')->findAll(),
-            'agents' => $userModel->where('role_id >=', 6)->findAll() // Agents immobiliers
+            'agents' => $userModel->where('role_id >=', 6)->findAll(),
+            'isEdit' => false
         ];
 
-        return view('admin/properties/create', $data);
+        return view('admin/properties/form', $data);
     }
 
     public function store()
@@ -70,13 +76,14 @@ class Properties extends BaseController
         $validation = \Config\Services::validation();
         
         $rules = [
-            'title' => 'required|min_length[3]|max_length[255]',
-            'description' => 'required|min_length[10]',
+            'title_fr' => 'required|min_length[3]|max_length[255]',
+            'description_fr' => 'required|min_length[10]',
             'type' => 'required|in_list[apartment,villa,house,land,commercial,office]',
             'transaction_type' => 'required|in_list[sale,rent,both]',
-            'area' => 'required|decimal',
+            'area_total' => 'required|decimal',
             'zone_id' => 'required|is_natural_no_zero',
             'address' => 'required|min_length[5]',
+            'price' => 'required|decimal',
         ];
 
         if (!$this->validate($rules)) {
@@ -90,72 +97,184 @@ class Properties extends BaseController
         }
 
         $data = [
+            // Step 1: General
             'reference' => $reference,
-            'title' => $this->request->getPost('title'),
-            'description' => $this->request->getPost('description'),
             'type' => $this->request->getPost('type'),
             'transaction_type' => $this->request->getPost('transaction_type'),
-            'price' => $this->request->getPost('price') ?: null,
-            'rental_price' => $this->request->getPost('rent_price') ?: null,
-            'area_total' => $this->request->getPost('area'),
-            'bedrooms' => $this->request->getPost('bedrooms') ?: 0,
-            'bathrooms' => $this->request->getPost('bathrooms') ?: 0,
-            'floor' => $this->request->getPost('floor'),
-            'year_built' => $this->request->getPost('year_built'),
-            'parking' => $this->request->getPost('parking') ?: 0,
-            'furnished' => $this->request->getPost('furnished') ?: 0,
+            'title_fr' => $this->request->getPost('title_fr'),
+            'title_ar' => $this->request->getPost('title_ar'),
+            'title_en' => $this->request->getPost('title_en'),
+            'description_fr' => $this->request->getPost('description_fr'),
+            'description_ar' => $this->request->getPost('description_ar'),
+            'description_en' => $this->request->getPost('description_en'),
+            'disponibilite_date' => $this->request->getPost('disponibilite_date'),
+            'status' => $this->request->getPost('status') ?: 'available',
+            'featured' => $this->request->getPost('featured') ? 1 : 0,
+            
+            // Step 2: Location
             'zone_id' => $this->request->getPost('zone_id'),
+            'governorate' => $this->request->getPost('governorate'),
+            'city' => $this->request->getPost('city'),
+            'neighborhood' => $this->request->getPost('neighborhood'),
+            'postal_code' => $this->request->getPost('postal_code'),
             'address' => $this->request->getPost('address'),
+            'hide_address' => $this->request->getPost('hide_address') ? 1 : 0,
             'latitude' => $this->request->getPost('latitude'),
             'longitude' => $this->request->getPost('longitude'),
+            
+            // Step 3: Features
+            'area_total' => $this->request->getPost('area_total'),
+            'area_living' => $this->request->getPost('area_living'),
+            'area_land' => $this->request->getPost('area_land'),
+            'rooms' => $this->request->getPost('rooms') ?: 0,
+            'bedrooms' => $this->request->getPost('bedrooms') ?: 0,
+            'bathrooms' => $this->request->getPost('bathrooms') ?: 0,
+            'parking_spaces' => $this->request->getPost('parking_spaces') ?: 0,
+            'floor' => $this->request->getPost('floor'),
+            'total_floors' => $this->request->getPost('total_floors'),
+            'construction_year' => $this->request->getPost('construction_year'),
+            'orientation' => $this->request->getPost('orientation'),
+            'floor_type' => $this->request->getPost('floor_type'),
+            'gas_type' => $this->request->getPost('gas_type') ?: 'aucun',
+            'standing' => $this->request->getPost('standing') ?: 'standard',
+            'condition_state' => $this->request->getPost('condition_state') ?: 'good',
+            'legal_status' => $this->request->getPost('legal_status') ?: 'clear',
+            'energy_class' => $this->request->getPost('energy_class'),
+            'energy_consumption_kwh' => $this->request->getPost('energy_consumption_kwh'),
+            'co2_emission' => $this->request->getPost('co2_emission'),
+            'has_elevator' => $this->request->getPost('has_elevator') ? 1 : 0,
+            'has_parking' => $this->request->getPost('has_parking') ? 1 : 0,
+            'has_garden' => $this->request->getPost('has_garden') ? 1 : 0,
+            'has_pool' => $this->request->getPost('has_pool') ? 1 : 0,
+            
+            // Step 4: Pricing
+            'price' => $this->request->getPost('price'),
+            'rental_price' => $this->request->getPost('rental_price'),
+            'promo_price' => $this->request->getPost('promo_price'),
+            'promo_start_date' => $this->request->getPost('promo_start_date'),
+            'promo_end_date' => $this->request->getPost('promo_end_date'),
+            'charge_syndic' => $this->request->getPost('charge_syndic'),
+            'charge_water' => $this->request->getPost('charge_water'),
+            'charge_gas' => $this->request->getPost('charge_gas'),
+            'charge_electricity' => $this->request->getPost('charge_electricity'),
+            'charge_other' => $this->request->getPost('charge_other'),
+            
+            // Step 6: Notes
+            'internal_notes' => $this->request->getPost('internal_notes'),
+            
+            // Meta
             'agency_id' => $this->request->getPost('agency_id') ?: null,
             'agent_id' => $this->request->getPost('agent_id') ?: session()->get('user_id'),
-            'featured' => $this->request->getPost('is_featured') ? 1 : 0,
-            'status' => $this->request->getPost('is_published') ? 'published' : 'draft'
+            'created_by' => session()->get('user_id'),
         ];
 
-        // Gestion des images (à implémenter)
-        $images = $this->request->getFiles();
+        $db = \Config\Database::connect();
+        $db->transStart();
         
-        if ($propertyId = $this->propertyModel->insert($data)) {
-            // Upload des images
-            if (!empty($images['images'])) {
-                $this->handleImageUpload($propertyId, $images['images']);
+        try {
+            // Insérer la propriété
+            $propertyId = $this->propertyModel->insert($data);
+            
+            if (!$propertyId) {
+                throw new \Exception('Erreur lors de la création de la propriété');
             }
             
-            // Trigger notifications
-            $notificationHelper = new \App\Libraries\NotificationHelper();
-            $notificationHelper->notifyPropertyCreated($propertyId, $data, session()->get('user_id'));
-            $notificationHelper->checkPropertyClientMatches($propertyId, $data);
+            // Step 5: Sauvegarder les pièces
+            $rooms = $this->request->getPost('rooms');
+            if (!empty($rooms)) {
+                $propertyRoomModel = model('PropertyRoomModel');
+                $propertyRoomModel->saveRooms($propertyId, $rooms);
+            }
+            
+            // Step 5: Sauvegarder les proximités
+            $proximities = $this->request->getPost('proximities');
+            if (!empty($proximities)) {
+                $propertyProximityModel = model('PropertyProximityModel');
+                $propertyProximityModel->saveProximities($propertyId, $proximities);
+            }
+            
+            // Step 6: Upload des photos
+            $photoFiles = $this->request->getFileMultiple('photos');
+            if (!empty($photoFiles)) {
+                $this->handlePhotoUpload($propertyId, $photoFiles);
+            }
+            
+            // Step 6: Upload des documents
+            $documents = $this->request->getFiles();
+            if (!empty($documents['documents'])) {
+                $this->handleDocumentUpload($propertyId, $documents['documents']);
+            }
+            
+            $db->transComplete();
+            
+            if ($db->transStatus() === false) {
+                throw new \Exception('Erreur lors de la transaction');
+            }
             
             return redirect()->to('/admin/properties')->with('success', 'Bien immobilier créé avec succès');
+            
+        } catch (\Exception $e) {
+            $db->transRollback();
+            return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
-
-        return redirect()->back()->withInput()->with('error', 'Erreur lors de la création du bien');
     }
     
-    private function handleImageUpload($propertyId, $files)
+    private function handlePhotoUpload($propertyId, $files)
     {
-        $propertyMediaModel = model('PropertyMediaModel');
-        $uploadPath = WRITEPATH . 'uploads/properties/' . $propertyId;
+        $propertyDocumentModel = model('PropertyDocumentModel');
+        $uploadPath = FCPATH . 'uploads/properties/' . $propertyId . '/photos';
         
         if (!is_dir($uploadPath)) {
             mkdir($uploadPath, 0755, true);
         }
         
-        $order = 1;
         foreach ($files as $file) {
             if ($file->isValid() && !$file->hasMoved()) {
                 $newName = $file->getRandomName();
                 $file->move($uploadPath, $newName);
                 
-                $propertyMediaModel->insert([
+                $propertyDocumentModel->insert([
                     'property_id' => $propertyId,
-                    'type' => 'image',
-                    'file_path' => 'uploads/properties/' . $propertyId . '/' . $newName,
-                    'display_order' => $order++,
-                    'is_primary' => ($order == 2) ? 1 : 0 // Premier fichier = image principale
+                    'document_type' => 'photo',
+                    'file_name' => $file->getClientName(),
+                    'file_path' => 'uploads/properties/' . $propertyId . '/photos/' . $newName,
+                    'file_size' => $file->getSize(),
+                    'mime_type' => $file->getMimeType(),
+                    'uploaded_by' => session()->get('user_id')
                 ]);
+            }
+        }
+    }
+    
+    private function handleDocumentUpload($propertyId, $documentsByType)
+    {
+        $propertyDocumentModel = model('PropertyDocumentModel');
+        $uploadPath = FCPATH . 'uploads/properties/' . $propertyId . '/documents';
+        
+        if (!is_dir($uploadPath)) {
+            mkdir($uploadPath, 0755, true);
+        }
+        
+        foreach ($documentsByType as $type => $files) {
+            if (!is_array($files)) {
+                $files = [$files];
+            }
+            
+            foreach ($files as $file) {
+                if ($file->isValid() && !$file->hasMoved()) {
+                    $newName = $file->getRandomName();
+                    $file->move($uploadPath, $newName);
+                    
+                    $propertyDocumentModel->insert([
+                        'property_id' => $propertyId,
+                        'document_type' => $type,
+                        'file_name' => $file->getClientName(),
+                        'file_path' => 'uploads/properties/' . $propertyId . '/documents/' . $newName,
+                        'file_size' => $file->getSize(),
+                        'mime_type' => $file->getMimeType(),
+                        'uploaded_by' => session()->get('user_id')
+                    ]);
+                }
             }
         }
     }
@@ -169,18 +288,24 @@ class Properties extends BaseController
         }
 
         $userModel = model('UserModel');
-        $propertyMediaModel = model('PropertyMediaModel');
+        $propertyRoomModel = model('PropertyRoomModel');
+        $propertyProximityModel = model('PropertyProximityModel');
+        $propertyDocumentModel = model('PropertyDocumentModel');
 
         $data = [
-            'title' => 'Modifier le Bien',
+            'title' => 'Modifier le Bien - ' . $property['reference'],
             'property' => $property,
+            'rooms' => $propertyRoomModel->getRoomsByProperty($id),
+            'proximities' => $propertyProximityModel->getProximitiesByProperty($id),
+            'documents' => $propertyDocumentModel->getDocumentsByProperty($id),
+            'photos' => $propertyDocumentModel->getPhotosByProperty($id),
             'zones' => $this->zoneModel->findAll(),
             'agencies' => $this->agencyModel->where('status', 'active')->findAll(),
             'agents' => $userModel->where('role_id >=', 6)->findAll(),
-            'property_images' => $propertyMediaModel->getPropertyImages($id)
+            'isEdit' => true
         ];
 
-        return view('admin/properties/edit', $data);
+        return view('admin/properties/form', $data);
     }
 
     public function update($id)
@@ -194,13 +319,14 @@ class Properties extends BaseController
         $validation = \Config\Services::validation();
         
         $rules = [
-            'title' => 'required|min_length[3]|max_length[255]',
-            'description' => 'required|min_length[10]',
+            'title_fr' => 'required|min_length[3]|max_length[255]',
+            'description_fr' => 'required|min_length[10]',
             'type' => 'required|in_list[apartment,villa,house,land,commercial,office]',
             'transaction_type' => 'required|in_list[sale,rent,both]',
-            'area' => 'required|decimal',
+            'area_total' => 'required|decimal',
             'zone_id' => 'required|is_natural_no_zero',
             'address' => 'required|min_length[5]',
+            'price' => 'required|decimal',
         ];
 
         if (!$this->validate($rules)) {
@@ -208,40 +334,124 @@ class Properties extends BaseController
         }
 
         $data = [
-            'title' => $this->request->getPost('title'),
-            'description' => $this->request->getPost('description'),
+            // Step 1: General
             'type' => $this->request->getPost('type'),
             'transaction_type' => $this->request->getPost('transaction_type'),
-            'price' => $this->request->getPost('price') ?: null,
-            'rental_price' => $this->request->getPost('rent_price') ?: null,
-            'area_total' => $this->request->getPost('area'),
-            'bedrooms' => $this->request->getPost('bedrooms') ?: 0,
-            'bathrooms' => $this->request->getPost('bathrooms') ?: 0,
-            'floor' => $this->request->getPost('floor'),
-            'year_built' => $this->request->getPost('year_built'),
-            'parking' => $this->request->getPost('parking') ?: 0,
-            'furnished' => $this->request->getPost('furnished') ?: 0,
+            'title_fr' => $this->request->getPost('title_fr'),
+            'title_ar' => $this->request->getPost('title_ar'),
+            'title_en' => $this->request->getPost('title_en'),
+            'description_fr' => $this->request->getPost('description_fr'),
+            'description_ar' => $this->request->getPost('description_ar'),
+            'description_en' => $this->request->getPost('description_en'),
+            'disponibilite_date' => $this->request->getPost('disponibilite_date'),
+            'status' => $this->request->getPost('status') ?: 'available',
+            'featured' => $this->request->getPost('featured') ? 1 : 0,
+            
+            // Step 2: Location
             'zone_id' => $this->request->getPost('zone_id'),
+            'governorate' => $this->request->getPost('governorate'),
+            'city' => $this->request->getPost('city'),
+            'neighborhood' => $this->request->getPost('neighborhood'),
+            'postal_code' => $this->request->getPost('postal_code'),
             'address' => $this->request->getPost('address'),
+            'hide_address' => $this->request->getPost('hide_address') ? 1 : 0,
             'latitude' => $this->request->getPost('latitude'),
             'longitude' => $this->request->getPost('longitude'),
+            
+            // Step 3: Features
+            'area_total' => $this->request->getPost('area_total'),
+            'area_living' => $this->request->getPost('area_living'),
+            'area_land' => $this->request->getPost('area_land'),
+            'rooms' => $this->request->getPost('rooms') ?: 0,
+            'bedrooms' => $this->request->getPost('bedrooms') ?: 0,
+            'bathrooms' => $this->request->getPost('bathrooms') ?: 0,
+            'parking_spaces' => $this->request->getPost('parking_spaces') ?: 0,
+            'floor' => $this->request->getPost('floor'),
+            'total_floors' => $this->request->getPost('total_floors'),
+            'construction_year' => $this->request->getPost('construction_year'),
+            'orientation' => $this->request->getPost('orientation'),
+            'floor_type' => $this->request->getPost('floor_type'),
+            'gas_type' => $this->request->getPost('gas_type') ?: 'aucun',
+            'standing' => $this->request->getPost('standing') ?: 'standard',
+            'condition_state' => $this->request->getPost('condition_state') ?: 'good',
+            'legal_status' => $this->request->getPost('legal_status') ?: 'clear',
+            'energy_class' => $this->request->getPost('energy_class'),
+            'energy_consumption_kwh' => $this->request->getPost('energy_consumption_kwh'),
+            'co2_emission' => $this->request->getPost('co2_emission'),
+            'has_elevator' => $this->request->getPost('has_elevator') ? 1 : 0,
+            'has_parking' => $this->request->getPost('has_parking') ? 1 : 0,
+            'has_garden' => $this->request->getPost('has_garden') ? 1 : 0,
+            'has_pool' => $this->request->getPost('has_pool') ? 1 : 0,
+            
+            // Step 4: Pricing
+            'price' => $this->request->getPost('price'),
+            'rental_price' => $this->request->getPost('rental_price'),
+            'promo_price' => $this->request->getPost('promo_price'),
+            'promo_start_date' => $this->request->getPost('promo_start_date'),
+            'promo_end_date' => $this->request->getPost('promo_end_date'),
+            'charge_syndic' => $this->request->getPost('charge_syndic'),
+            'charge_water' => $this->request->getPost('charge_water'),
+            'charge_gas' => $this->request->getPost('charge_gas'),
+            'charge_electricity' => $this->request->getPost('charge_electricity'),
+            'charge_other' => $this->request->getPost('charge_other'),
+            
+            // Step 6: Notes
+            'internal_notes' => $this->request->getPost('internal_notes'),
+            
+            // Meta
             'agency_id' => $this->request->getPost('agency_id') ?: null,
             'agent_id' => $this->request->getPost('agent_id') ?: session()->get('user_id'),
-            'featured' => $this->request->getPost('is_featured') ? 1 : 0,
-            'status' => $this->request->getPost('is_published') ? 'published' : 'draft'
         ];
 
-        if ($this->propertyModel->update($id, $data)) {
-            // Upload des nouvelles images
-            $newImages = $this->request->getFiles();
-            if (!empty($newImages['new_images'])) {
-                $this->handleImageUpload($id, $newImages['new_images']);
+        $db = \Config\Database::connect();
+        $db->transStart();
+        
+        try {
+            // Mettre à jour la propriété
+            if (!$this->propertyModel->update($id, $data)) {
+                throw new \Exception('Erreur lors de la mise à jour de la propriété');
+            }
+            
+            // Step 5: Mettre à jour les pièces
+            $rooms = $this->request->getPost('rooms');
+            $propertyRoomModel = model('PropertyRoomModel');
+            $propertyRoomModel->where('property_id', $id)->delete();
+            if (!empty($rooms)) {
+                $propertyRoomModel->saveRooms($id, $rooms);
+            }
+            
+            // Step 5: Mettre à jour les proximités
+            $proximities = $this->request->getPost('proximities');
+            $propertyProximityModel = model('PropertyProximityModel');
+            $propertyProximityModel->where('property_id', $id)->delete();
+            if (!empty($proximities)) {
+                $propertyProximityModel->saveProximities($id, $proximities);
+            }
+            
+            // Step 6: Upload des nouvelles photos
+            $photoFiles = $this->request->getFileMultiple('photos');
+            if (!empty($photoFiles)) {
+                $this->handlePhotoUpload($id, $photoFiles);
+            }
+            
+            // Step 6: Upload des nouveaux documents
+            $documents = $this->request->getFiles();
+            if (!empty($documents['documents'])) {
+                $this->handleDocumentUpload($id, $documents['documents']);
+            }
+            
+            $db->transComplete();
+            
+            if ($db->transStatus() === false) {
+                throw new \Exception('Erreur lors de la transaction');
             }
             
             return redirect()->to('/admin/properties')->with('success', 'Bien modifié avec succès');
+            
+        } catch (\Exception $e) {
+            $db->transRollback();
+            return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
-
-        return redirect()->back()->withInput()->with('error', 'Erreur lors de la modification');
     }
 
     public function delete($id)

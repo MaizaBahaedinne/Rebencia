@@ -252,7 +252,7 @@
         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
     
-    /* Groupes d'agences et équipes */
+    /* Groupes d'agences */
     .agency-group {
         margin-bottom: 30px;
         border: 2px solid #dee2e6;
@@ -305,70 +305,18 @@
     .agency-content {
         padding: 20px;
         display: none;
+        background: #f8f9fa;
     }
     
     .agency-content.show {
         display: block;
     }
     
-    .team-group {
-        margin-bottom: 20px;
-        border: 1px solid #e0e0e0;
-        border-radius: 10px;
-        background: #f8f9fa;
-    }
-    
-    .team-header {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        color: white;
-        padding: 12px 15px;
-        cursor: pointer;
+    .agency-tree {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-radius: 9px 9px 0 0;
-        transition: all 0.3s;
-    }
-    
-    .team-header:hover {
-        background: linear-gradient(135deg, #3d9ce8 0%, #00d8e2 100%);
-    }
-    
-    .team-header h5 {
-        margin: 0;
-        font-size: 15px;
-        font-weight: 600;
-    }
-    
-    .team-toggle {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.2);
-        display: flex;
-        align-items: center;
         justify-content: center;
-        transition: transform 0.3s;
-        font-size: 12px;
-    }
-    
-    .team-toggle.collapsed {
-        transform: rotate(-90deg);
-    }
-    
-    .team-content {
-        padding: 15px;
-        display: none;
-    }
-    
-    .team-content.show {
-        display: block;
-    }
-    
-    .team-members {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
+        padding: 20px 0;
+        min-height: 200px;
     }
     
     .no-agency-group {
@@ -378,6 +326,10 @@
     
     .no-agency-group .agency-header {
         background: linear-gradient(135deg, #ffc107 0%, #ff8c00 100%);
+    }
+    
+    .no-agency-group .agency-content {
+        background: #fffef8;
     }
 
 </style>
@@ -399,36 +351,22 @@ function toggleAgency(agencyId) {
     }
 }
 
-// Toggle team
-function toggleTeam(teamId) {
-    const content = document.getElementById('team-' + teamId);
-    const toggle = document.getElementById('toggle-team-' + teamId);
-    
-    if (content.classList.contains('show')) {
-        content.classList.remove('show');
-        toggle.classList.add('collapsed');
-    } else {
-        content.classList.add('show');
-        toggle.classList.remove('collapsed');
-    }
-}
-
 // Expand all
 function expandAll() {
-    document.querySelectorAll('.agency-content, .team-content').forEach(el => {
+    document.querySelectorAll('.agency-content').forEach(el => {
         el.classList.add('show');
     });
-    document.querySelectorAll('.agency-toggle, .team-toggle').forEach(el => {
+    document.querySelectorAll('.agency-toggle').forEach(el => {
         el.classList.remove('collapsed');
     });
 }
 
 // Collapse all
 function collapseAll() {
-    document.querySelectorAll('.agency-content, .team-content').forEach(el => {
+    document.querySelectorAll('.agency-content').forEach(el => {
         el.classList.remove('show');
     });
-    document.querySelectorAll('.agency-toggle, .team-toggle').forEach(el => {
+    document.querySelectorAll('.agency-toggle').forEach(el => {
         el.classList.add('collapsed');
     });
 }

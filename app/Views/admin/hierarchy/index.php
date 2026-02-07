@@ -332,16 +332,59 @@
     }
     
     .agencies-section {
-        display: flex;
-        gap: 40px;
-        flex-wrap: wrap;
-        justify-content: center;
-        max-width: 100%;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
     }
     
     .agency-branch {
-        flex: 0 1 auto;
-        min-width: 300px;
+        margin-bottom: 30px;
+        position: relative;
+    }
+    
+    /* Indentation par niveau */
+    .agency-branch.level-0 {
+        margin-left: 0;
+    }
+    
+    .agency-branch.level-1 {
+        margin-left: 60px;
+        position: relative;
+    }
+    
+    .agency-branch.level-2 {
+        margin-left: 120px;
+        position: relative;
+    }
+    
+    .agency-branch.level-3 {
+        margin-left: 180px;
+        position: relative;
+    }
+    
+    /* Connecteur parent-fils */
+    .parent-connector {
+        position: absolute;
+        left: -60px;
+        top: 50%;
+        width: 60px;
+        height: 2px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        transform: translateY(-50%);
+    }
+    
+    .parent-connector::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: -50px;
+        width: 2px;
+        height: 100px;
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .sub-agencies {
+        margin-top: 20px;
     }
     
     /* Cartes d'entité (siège et agences) */
@@ -400,6 +443,18 @@
         font-size: 14px;
         color: #7f8c8d;
         font-weight: 500;
+        margin-bottom: 8px;
+    }
+    
+    .entity-type {
+        margin-top: 8px;
+    }
+    
+    .entity-type .badge {
+        font-size: 11px;
+        padding: 4px 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     
     .toggle-icon {
@@ -461,12 +516,21 @@
     
     /* Responsive Design */
     @media (max-width: 1200px) {
-        .agencies-section {
-            gap: 30px;
+        .agency-branch.level-1 {
+            margin-left: 40px;
         }
         
-        .agency-branch {
-            min-width: 250px;
+        .agency-branch.level-2 {
+            margin-left: 80px;
+        }
+        
+        .agency-branch.level-3 {
+            margin-left: 120px;
+        }
+        
+        .parent-connector {
+            left: -40px;
+            width: 40px;
         }
     }
     
@@ -480,14 +544,27 @@
         }
         
         .agencies-section {
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
+            width: 100%;
         }
         
         .agency-branch {
-            width: 100%;
-            max-width: 400px;
+            margin-bottom: 20px;
+        }
+        
+        .agency-branch.level-1,
+        .agency-branch.level-2,
+        .agency-branch.level-3 {
+            margin-left: 20px;
+        }
+        
+        .parent-connector {
+            left: -20px;
+            width: 20px;
+        }
+        
+        .parent-connector::before {
+            height: 60px;
+            top: -30px;
         }
         
         .entity-card {
@@ -502,6 +579,10 @@
         
         .entity-name {
             font-size: 16px;
+        }
+        
+        .entity-count {
+            font-size: 12px;
         }
     }
     
@@ -621,51 +702,79 @@ function renderOrgChartGrouped() {
         $html .= '<div class="hierarchy-connector"></div>';
     }
     
-    // 2. AGENCES (branches sous le siège)
+    // 2. AGENCES (hiérarchie parent-fils)
     if (!empty($agencies)) {
         $html .= '<div class="agencies-section">';
-        
-        foreach ($agencies as $agency) {
-            $agencyUsers = $userModel->where('agency_id', $agency['id'])->findAll();
-            
-            $html .= '<div class="agency-branch" id="agency-branch-' . $agency['id'] . '">';
-            
-            // Carte de l'agence
-            $html .= '<div class="entity-card agency-card" onclick="toggleAgency(' . $agency['id'] . ')">';
-            $html .= '<div class="entity-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">';
-            $html .= '<i class="fas fa-building"></i>';
-            $html .= '</div>';
-            $html .= '<div class="entity-name">' . esc(strtoupper($agency['name'])) . '</div>';
-            $html .= '<div class="entity-count">' . count($agencyUsers) . ' personne(s)</div>';
-            $html .= '<div class="toggle-icon" id="agency-toggle-' . $agency['id'] . '">';
-            $html .= '<i class="fas fa-chevron-down"></i>';
-            $html .= '</div>';
-            $html .= '</div>';
-            
-            // Organigramme de l'agence (collapsible)
-            $html .= '<div class="entity-orgchart" id="agency-content-' . $agency['id'] . '" style="display: block;">';
-            if (!empty($agencyUsers)) {
-                $html .= '<div class="org-tree">';
-                $html .= buildAgencyTree($agencyUsers, $userModel, $roleModel, $agencyModel);
-                $html .= '</div>';
-            } else {
-                $html .= '<div class="empty-entity-message">';
-                $html .= '<i class="fas fa-users-slash fa-2x mb-2 text-muted"></i>';
-                $html .= '<p class="text-muted mb-0">Aucune personne affectée à cette agence</p>';
-                $html .= '<a href="' . base_url('admin/users/bulk-manage') . '" class="btn btn-sm btn-outline-primary mt-2">';
-                $html .= '<i class="fas fa-user-plus"></i> Affecter des personnes';
-                $html .= '</a>';
-                $html .= '</div>';
-            }
-            $html .= '</div>';
-            
-            $html .= '</div>'; // agency-branch
-        }
-        
-        $html .= '</div>'; // agencies-section
+        $html .= renderAgencyHierarchy(null, $agencies, $userModel, $roleModel, $agencyModel, 0);
+        $html .= '</div>';
     }
     
-    $html .= '</div>'; // organizational-tree
+    $html .= '</div>';
+    
+    return $html;
+}
+
+/**
+ * Render agency hierarchy recursively
+ */
+function renderAgencyHierarchy($parentId, $allAgencies, $userModel, $roleModel, $agencyModel, $level) {
+    $html = '';
+    
+    // Filtrer les agences qui ont ce parent
+    $agencies = array_filter($allAgencies, function($agency) use ($parentId) {
+        return $agency['parent_id'] == $parentId;
+    });
+    
+    foreach ($agencies as $agency) {
+        $agencyUsers = $userModel->where('agency_id', $agency['id'])->findAll();
+        
+        $indentClass = 'level-' . $level;
+        $html .= '<div class="agency-branch ' . $indentClass . '" id="agency-branch-' . $agency['id'] . '">';
+        
+        // Connecteur parent-fils
+        if ($level > 0) {
+            $html .= '<div class="parent-connector"></div>';
+        }
+        
+        // Carte de l'agence
+        $html .= '<div class="entity-card agency-card" onclick="toggleAgency(' . $agency['id'] . ')">';
+        $html .= '<div class="entity-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">';
+        $html .= '<i class="fas fa-building"></i>';
+        $html .= '</div>';
+        $html .= '<div class="entity-name">' . esc(strtoupper($agency['name'])) . '</div>';
+        $html .= '<div class="entity-count">' . count($agencyUsers) . ' personne(s)</div>';
+        if ($agency['type']) {
+            $html .= '<div class="entity-type"><span class="badge bg-info">' . esc($agency['type']) . '</span></div>';
+        }
+        $html .= '<div class="toggle-icon" id="agency-toggle-' . $agency['id'] . '">';
+        $html .= '<i class="fas fa-chevron-down"></i>';
+        $html .= '</div>';
+        $html .= '</div>';
+        
+        // Organigramme de l'agence (collapsible)
+        $html .= '<div class="entity-orgchart" id="agency-content-' . $agency['id'] . '" style="display: block;">';
+        if (!empty($agencyUsers)) {
+            $html .= '<div class="org-tree">';
+            $html .= buildAgencyTree($agencyUsers, $userModel, $roleModel, $agencyModel);
+            $html .= '</div>';
+        } else {
+            $html .= '<div class="empty-entity-message">';
+            $html .= '<i class="fas fa-users-slash fa-2x mb-2 text-muted"></i>';
+            $html .= '<p class="text-muted mb-0">Aucune personne affectée à cette agence</p>';
+            $html .= '<a href="' . base_url('admin/users/bulk-manage') . '" class="btn btn-sm btn-outline-primary mt-2">';
+            $html .= '<i class="fas fa-user-plus"></i> Affecter des personnes';
+            $html .= '</a>';
+            $html .= '</div>';
+        }
+        $html .= '</div>'; // entity-orgchart
+        
+        // Agences enfants (récursif)
+        $html .= '<div class="sub-agencies">';
+        $html .= renderAgencyHierarchy($agency['id'], $allAgencies, $userModel, $roleModel, $agencyModel, $level + 1);
+        $html .= '</div>';
+        
+        $html .= '</div>'; // agency-branch
+    }
     
     return $html;
 }

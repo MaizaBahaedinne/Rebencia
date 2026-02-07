@@ -17,59 +17,64 @@
     .agency-tree {
         list-style: none;
         padding-left: 0;
+        margin: 0;
     }
     .agency-tree > li {
-        margin-bottom: 0.5rem;
+        margin-bottom: 1rem;
+        position: relative;
     }
     .agency-item {
         background: white;
-        border: 1px solid #e5e7eb;
-        border-radius: 10px;
-        padding: 0.75rem 1rem;
-        margin-bottom: 0.5rem;
+        border: 2px solid #e1e1e1;
+        border-radius: 8px;
+        padding: 0.65rem 1rem;
+        margin-bottom: 0;
         transition: all 0.2s;
         position: relative;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
         gap: 0.75rem;
-        min-width: 220px;
+        min-width: 240px;
+        max-width: 280px;
     }
     .agency-item:hover {
-        border-color: #3b82f6;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
-        transform: translateY(-2px);
+        border-color: #6264a7;
+        box-shadow: 0 2px 8px rgba(98, 100, 167, 0.2);
+        background: #fafafa;
     }
     .agency-item.siege {
-        border-left: 4px solid #3b82f6;
-        background: linear-gradient(135deg, #fff 0%, #f8faff 100%);
+        border-color: #6264a7;
+        background: #f5f5ff;
     }
     .agency-item.agence {
-        border-left: 4px solid #10b981;
+        border-color: #b4b4b4;
     }
     .agency-item.hidden {
         display: none;
     }
     .agency-logo {
-        width: 50px;
-        height: 50px;
-        border-radius: 8px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
         object-fit: cover;
-        border: 2px solid #e5e7eb;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border: 2px solid #e1e1e1;
     }
     .agency-logo-placeholder {
-        width: 50px;
-        height: 50px;
-        border-radius: 8px;
-        background: linear-gradient(135deg, #e5e7eb 0%, #cbd5e1 100%);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #6264a7;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 20px;
-        color: #94a3b8;
-        border: 2px solid #e5e7eb;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        font-size: 16px;
+        color: white;
+        border: 2px solid #6264a7;
+    }
+    .agency-item.agence .agency-logo-placeholder {
+        background: #8b8b8b;
+        border-color: #8b8b8b;
     }
     .agency-title {
         flex: 1;
@@ -77,18 +82,59 @@
     }
     .agency-title h5 {
         margin: 0;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         font-weight: 600;
-        color: #1f2937;
+        color: #242424;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .agency-code {
         font-size: 0.7rem;
-        color: #6b7280;
-        font-weight: 500;
+        color: #8a8886;
+        font-weight: 400;
         margin-top: 2px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .children-agencies {
+        list-style: none;
+        padding-left: 40px;
+        margin-top: 0.75rem;
+        margin-bottom: 0;
+        position: relative;
+    }
+    .children-agencies::before {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: -10px;
+        bottom: 20px;
+        width: 2px;
+        background: #c8c6c4;
+    }
+    .children-agencies > li {
+        position: relative;
+        margin-bottom: 0.75rem;
+        padding-left: 0;
+    }
+    .children-agencies > li::before {
+        content: '';
+        position: absolute;
+        left: -20px;
+        top: 20px;
+        width: 20px;
+        height: 2px;
+        background: #c8c6c4;
+    }
+    .children-agencies > li:last-child::after {
+        content: '';
+        position: absolute;
+        left: -20px;
+        top: 20px;
+        width: 2px;
+        height: 100%;
+        background: white;
     }
     .agency-stats {
         display: flex;
@@ -152,55 +198,35 @@
         padding-left: 2.5rem;
         margin-top: 0.5rem;
         position: relative;
-    }
-    .children-agencies::before {
-        content: '';
-        position: absolute;
-        left: 1.25rem;
-        top: 0;
-        bottom: 0;
-        width: 1px;
-        background: linear-gradient(180deg, #cbd5e1 0%, transparent 100%);
-    }
-    .children-agencies > li {
-        position: relative;
-        margin-bottom: 0.5rem;
-    }
-    .children-agencies > li::before {
-        content: '';
-        position: absolute;
-        left: -1.25rem;
-        top: 1.5rem;
-        width: 1.25rem;
-        height: 1px;
-        background: #cbd5e1;
-    }
     .toggle-children {
         position: absolute;
-        top: 0.5rem;
-        right: 0.5rem;
+        top: 50%;
+        left: -30px;
+        transform: translateY(-50%);
         background: white;
-        border: 1px solid #e5e7eb;
-        border-radius: 50%;
-        width: 28px;
-        height: 28px;
+        border: 2px solid #c8c6c4;
+        border-radius: 2px;
+        width: 20px;
+        height: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         transition: all 0.2s;
         z-index: 10;
-        font-size: 0.75rem;
+        font-size: 10px;
+        color: #605e5c;
     }
     .toggle-children:hover {
-        border-color: #3b82f6;
-        background: #f0f7ff;
+        border-color: #6264a7;
+        background: #f5f5ff;
+        color: #6264a7;
     }
     .toggle-children i {
         transition: transform 0.3s;
     }
     .toggle-children.active i {
-        transform: rotate(180deg);
+        transform: rotate(90deg);
     }
     .children-agencies.collapsed {
         display: none;
@@ -216,73 +242,80 @@
         max-width: 700px;
     }
     .agency-modal .modal-header {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        background: #6264a7;
         color: white;
         border-bottom: none;
+        padding: 1.25rem 1.5rem;
     }
     .agency-modal .modal-header .btn-close {
         filter: invert(1);
     }
     .modal-agency-logo {
-        width: 80px;
-        height: 80px;
-        border-radius: 12px;
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
         object-fit: cover;
         border: 3px solid white;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
     .modal-agency-logo-placeholder {
-        width: 80px;
-        height: 80px;
-        border-radius: 12px;
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
         background: white;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 32px;
-        color: #3b82f6;
+        font-size: 28px;
+        color: #6264a7;
         border: 3px solid white;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
     .modal-stat-card {
-        background: #f9fafb;
+        background: #faf9f8;
         padding: 1rem;
-        border-radius: 8px;
-        border-left: 4px solid #e5e7eb;
+        border-radius: 4px;
+        border: 1px solid #edebe9;
         text-align: center;
     }
-    .modal-stat-card.users { border-left-color: #3b82f6; }
-    .modal-stat-card.properties { border-left-color: #10b981; }
-    .modal-stat-card.transactions { border-left-color: #f59e0b; }
+    .modal-stat-card.users { border-left: 3px solid #6264a7; }
+    .modal-stat-card.properties { border-left: 3px solid #0078d4; }
+    .modal-stat-card.transactions { border-left: 3px solid #498205; }
     .modal-stat-card .stat-value {
         font-size: 2rem;
-        font-weight: 700;
+        font-weight: 600;
         margin: 0;
         line-height: 1;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .modal-stat-card .stat-label {
-        font-size: 0.85rem;
-        color: #6b7280;
+        font-size: 0.8rem;
+        color: #605e5c;
         margin: 0.5rem 0 0 0;
-        font-weight: 500;
+        font-weight: 400;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .info-row {
         display: flex;
-        padding: 0.75rem 0;
-        border-bottom: 1px solid #f3f4f6;
+        padding: 0.65rem 0;
+        border-bottom: 1px solid #edebe9;
     }
     .info-row:last-child {
         border-bottom: none;
     }
     .info-label {
         font-weight: 600;
-        color: #6b7280;
+        color: #605e5c;
         width: 140px;
         flex-shrink: 0;
+        font-size: 0.85rem;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .info-value {
-        color: #1f2937;
+        color: #323130;
         flex: 1;
+        font-size: 0.85rem;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 </style>
 <?= $this->endSection() ?>
@@ -389,7 +422,7 @@
                      onclick="showAgencyModal(this)">
                     <?php if ($hasChildren): ?>
                         <div class="toggle-children" onclick="event.stopPropagation(); toggleChildren(this)">
-                            <i class="fas fa-chevron-down"></i>
+                            <i class="fas fa-chevron-right"></i>
                         </div>
                     <?php endif; ?>
                     
@@ -550,14 +583,14 @@ function showAgencyModal(element) {
     // Type
     document.getElementById('modalType').innerHTML = 
         type === 'siege' 
-        ? '<span class="badge bg-primary">Siège</span>' 
-        : '<span class="badge bg-success">Agence</span>';
+        ? '<span class="badge" style="background: #6264a7;">Siège</span>' 
+        : '<span class="badge" style="background: #8b8b8b;">Agence</span>';
 
     // Statut
     document.getElementById('modalStatus').innerHTML = 
         status === 'active' 
-        ? '<span class="badge bg-success">Actif</span>' 
-        : '<span class="badge bg-danger">Inactif</span>';
+        ? '<span class="badge" style="background: #498205;">Actif</span>' 
+        : '<span class="badge" style="background: #a4262c;">Inactif</span>';
 
     // Localisation
     document.getElementById('modalLocation').textContent = `${city}, ${governorate}`;

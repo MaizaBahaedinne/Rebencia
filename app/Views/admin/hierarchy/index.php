@@ -35,6 +35,24 @@
     </div>
 <?php endif ?>
 
+<?php if (!empty($usersWithoutAgency)): ?>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <h5><i class="fas fa-exclamation-circle"></i> Urgent : <?= count($usersWithoutAgency) ?> agent(s) non affecté(s) à une agence</h5>
+        <p class="mb-2">Ces collaborateurs doivent être affectés à une agence :</p>
+        <div class="d-flex flex-wrap gap-2">
+            <?php foreach ($usersWithoutAgency as $user): ?>
+                <a href="<?= base_url('admin/users/edit/' . $user['id']) ?>" class="btn btn-sm btn-outline-danger">
+                    <i class="fas fa-building me-1"></i>
+                    <?= esc($user['first_name'] . ' ' . $user['last_name']) ?> 
+                    (<?= esc($user['email']) ?>)
+                    <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            <?php endforeach ?>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif ?>
+
 <!-- Organization Chart -->
 <div class="card">
     <div class="card-body p-4">

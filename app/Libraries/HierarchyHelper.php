@@ -230,6 +230,19 @@ class HierarchyHelper
     }
     
     /**
+     * Get users without agency (agents/collaborateurs non affectés)
+     * @return array
+     */
+    public function getUsersWithoutAgency()
+    {
+        // role_id = 6 est le rôle agent/collaborateur
+        return $this->userModel
+            ->where('agency_id IS NULL')
+            ->where('role_id', 6)
+            ->findAll();
+    }
+    
+    /**
      * Get user hierarchy path (from user to top)
      * @param int $userId
      * @return array Array of user data

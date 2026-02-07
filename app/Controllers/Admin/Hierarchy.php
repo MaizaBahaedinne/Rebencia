@@ -37,7 +37,8 @@ class Hierarchy extends BaseController
         $data = [
             'title' => 'Hiérarchie organisationnelle',
             'tree' => $this->hierarchyHelper->getHierarchyTree(),
-            'usersWithoutManager' => $this->hierarchyHelper->getUsersWithoutManager()
+            'usersWithoutManager' => $this->hierarchyHelper->getUsersWithoutManager(),
+            'usersWithoutAgency' => $this->hierarchyHelper->getUsersWithoutAgency()
         ];
         
         return view('admin/hierarchy/index', $data);

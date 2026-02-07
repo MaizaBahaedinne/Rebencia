@@ -24,49 +24,52 @@
     .agency-item {
         background: white;
         border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        padding: 0.75rem;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
         margin-bottom: 0.5rem;
         transition: all 0.2s;
         position: relative;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        min-width: 220px;
     }
     .agency-item:hover {
         border-color: #3b82f6;
-        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        transform: translateY(-2px);
     }
     .agency-item.siege {
-        border-left: 3px solid #3b82f6;
+        border-left: 4px solid #3b82f6;
         background: linear-gradient(135deg, #fff 0%, #f8faff 100%);
     }
     .agency-item.agence {
-        border-left: 3px solid #10b981;
+        border-left: 4px solid #10b981;
     }
     .agency-item.hidden {
         display: none;
     }
-    .agency-header {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        margin-bottom: 0.5rem;
-    }
     .agency-logo {
-        width: 45px;
-        height: 45px;
-        border-radius: 6px;
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
         object-fit: cover;
-        border: 1px solid #e5e7eb;
+        border: 2px solid #e5e7eb;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     .agency-logo-placeholder {
-        width: 45px;
-        height: 45px;
-        border-radius: 6px;
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
         background: linear-gradient(135deg, #e5e7eb 0%, #cbd5e1 100%);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
+        font-size: 20px;
         color: #94a3b8;
+        border: 2px solid #e5e7eb;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     .agency-title {
         flex: 1;
@@ -74,16 +77,18 @@
     }
     .agency-title h5 {
         margin: 0;
-        font-size: 1rem;
+        font-size: 0.95rem;
         font-weight: 600;
+        color: #1f2937;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
     .agency-code {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         color: #6b7280;
         font-weight: 500;
+        margin-top: 2px;
     }
     .agency-stats {
         display: flex;
@@ -205,6 +210,80 @@
         padding: 3rem;
         color: #6b7280;
     }
+    
+    /* Modal Styles */
+    .agency-modal .modal-dialog {
+        max-width: 700px;
+    }
+    .agency-modal .modal-header {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        border-bottom: none;
+    }
+    .agency-modal .modal-header .btn-close {
+        filter: invert(1);
+    }
+    .modal-agency-logo {
+        width: 80px;
+        height: 80px;
+        border-radius: 12px;
+        object-fit: cover;
+        border: 3px solid white;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .modal-agency-logo-placeholder {
+        width: 80px;
+        height: 80px;
+        border-radius: 12px;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        color: #3b82f6;
+        border: 3px solid white;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .modal-stat-card {
+        background: #f9fafb;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 4px solid #e5e7eb;
+        text-align: center;
+    }
+    .modal-stat-card.users { border-left-color: #3b82f6; }
+    .modal-stat-card.properties { border-left-color: #10b981; }
+    .modal-stat-card.transactions { border-left-color: #f59e0b; }
+    .modal-stat-card .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        line-height: 1;
+    }
+    .modal-stat-card .stat-label {
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin: 0.5rem 0 0 0;
+        font-weight: 500;
+    }
+    .info-row {
+        display: flex;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    .info-label {
+        font-weight: 600;
+        color: #6b7280;
+        width: 140px;
+        flex-shrink: 0;
+    }
+    .info-value {
+        color: #1f2937;
+        flex: 1;
+    }
 </style>
 <?= $this->endSection() ?>
 
@@ -292,99 +371,40 @@
             $hasChildren = !empty($agency['children']);
             ?>
             <li>
-                <div class="agency-item <?= esc($agency['type']) ?>" data-agency-id="<?= $agency['id'] ?>">
+                <div class="agency-item <?= esc($agency['type']) ?>" 
+                     data-agency-id="<?= $agency['id'] ?>"
+                     data-agency-name="<?= esc($agency['name']) ?>"
+                     data-agency-code="<?= esc($agency['code']) ?>"
+                     data-agency-type="<?= esc($agency['type']) ?>"
+                     data-agency-status="<?= esc($agency['status']) ?>"
+                     data-agency-city="<?= esc($agency['city']) ?>"
+                     data-agency-governorate="<?= esc($agency['governorate']) ?>"
+                     data-agency-address="<?= esc($agency['address'] ?? '') ?>"
+                     data-agency-phone="<?= esc($agency['phone'] ?? '') ?>"
+                     data-agency-email="<?= esc($agency['email'] ?? '') ?>"
+                     data-agency-users="<?= $agency['users_count'] ?? 0 ?>"
+                     data-agency-properties="<?= $agency['properties_count'] ?? 0 ?>"
+                     data-agency-transactions="<?= $agency['transactions_count'] ?? 0 ?>"
+                     data-agency-logo="<?= !empty($agency['logo']) ? base_url('uploads/agencies/' . $agency['logo']) : '' ?>"
+                     onclick="showAgencyModal(this)">
                     <?php if ($hasChildren): ?>
-                        <div class="toggle-children" onclick="toggleChildren(this)">
+                        <div class="toggle-children" onclick="event.stopPropagation(); toggleChildren(this)">
                             <i class="fas fa-chevron-down"></i>
                         </div>
                     <?php endif; ?>
                     
-                    <div class="agency-header">
-                        <?php if (!empty($agency['logo'])): ?>
-                            <img src="<?= base_url('uploads/agencies/' . $agency['logo']) ?>" 
-                                 alt="Logo" class="agency-logo">
-                        <?php else: ?>
-                            <div class="agency-logo-placeholder">
-                                <i class="fas fa-building"></i>
-                            </div>
-                        <?php endif; ?>
-                        
-                        <div class="agency-title">
-                            <h5><?= esc($agency['name']) ?></h5>
-                            <div class="agency-code">Code: <?= esc($agency['code']) ?></div>
+                    <?php if (!empty($agency['logo'])): ?>
+                        <img src="<?= base_url('uploads/agencies/' . $agency['logo']) ?>" 
+                             alt="Logo" class="agency-logo">
+                    <?php else: ?>
+                        <div class="agency-logo-placeholder">
+                            <i class="fas fa-building"></i>
                         </div>
-                        
-                        <div>
-                            <?php if ($agency['type'] === 'siege'): ?>
-                                <span class="badge bg-primary">Siège</span>
-                            <?php else: ?>
-                                <span class="badge bg-success">Agence</span>
-                            <?php endif; ?>
-                            
-                            <?php if ($agency['status'] === 'active'): ?>
-                                <span class="badge bg-success ms-1">Actif</span>
-                            <?php else: ?>
-                                <span class="badge bg-danger ms-1">Inactif</span>
-                            <?php endif; ?>
-                        </div>
-                    </div>
+                    <?php endif; ?>
                     
-                    <div class="agency-stats">
-                        <div class="stat-card users">
-                            <p class="stat-value text-primary"><?= $agency['users_count'] ?? 0 ?></p>
-                            <p class="stat-label">Utilisateurs</p>
-                        </div>
-                        <div class="stat-card properties">
-                            <p class="stat-value text-success"><?= $agency['properties_count'] ?? 0 ?></p>
-                            <p class="stat-label">Biens</p>
-                        </div>
-                        <div class="stat-card transactions">
-                            <p class="stat-value text-warning"><?= $agency['transactions_count'] ?? 0 ?></p>
-                            <p class="stat-label">Transactions</p>
-                        </div>
-                    </div>
-                    
-                    <div class="agency-contact">
-                        <div class="contact-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span><?= esc($agency['city']) ?>, <?= esc($agency['governorate']) ?></span>
-                        </div>
-                        <?php if (!empty($agency['phone'])): ?>
-                            <div class="contact-item">
-                                <i class="fas fa-phone"></i>
-                                <span><?= esc($agency['phone']) ?></span>
-                            </div>
-                        <?php endif; ?>
-                        <?php if (!empty($agency['email'])): ?>
-    </div>
-    
-    <div id="noResults" class="no-results" style="display: none;">
-        <i class="fas fa-search fa-3x mb-3"></i>
-        <h5>Aucune agence trouvée</h5>
-        <p>Essayez de modifier vos critères de recherche</p>
-    </div>
-                            <div class="contact-item">
-                                <i class="fas fa-envelope"></i>
-                                <span><?= esc($agency['email']) ?></span>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                    
-                    <div class="agency-actions">
-                        <a href="<?= base_url('admin/agencies/view/' . $agency['id']) ?>" 
-                           class="btn btn-info btn-sm">
-                            <i class="fas fa-eye me-1"></i>Détails
-                        </a>
-                        <a href="<?= base_url('admin/agencies/edit/' . $agency['id']) ?>" 
-                           class="btn btn-warning btn-sm">
-                            <i class="fas fa-edit me-1"></i>Modifier
-                        </a>
-                        <?php if ($agency['users_count'] == 0): ?>
-                            <button onclick="confirmDelete(<?= $agency['id'] ?>)" 
-                                    class="btn btn-danger btn-sm">
-                                <i class="fas fa-trash me-1"></i>Supprimer
-                            </button>
-                        <?php endif; ?>
+                    <div class="agency-title">
+                        <h5><?= esc($agency['name']) ?></h5>
+                        <div class="agency-code"><?= esc($agency['code']) ?></div>
                     </div>
                 </div>
                 
@@ -403,10 +423,178 @@
     ?>
 </div>
 
+    <div id="noResults" class="no-results" style="display: none;">
+        <i class="fas fa-search fa-3x mb-3"></i>
+        <h5>Aucune agence trouvée</h5>
+        <p>Essayez de modifier vos critères de recherche</p>
+    </div>
+</div>
+
+<!-- Modal pour afficher les détails de l'agence -->
+<div class="modal fade agency-modal" id="agencyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="d-flex align-items-center gap-3">
+                    <div id="modalLogo"></div>
+                    <div>
+                        <h5 class="modal-title mb-1" id="modalName"></h5>
+                        <small id="modalCode"></small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Statistiques -->
+                <div class="row mb-4">
+                    <div class="col-4">
+                        <div class="modal-stat-card users">
+                            <p class="stat-value text-primary" id="modalUsers">0</p>
+                            <p class="stat-label">Utilisateurs</p>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="modal-stat-card properties">
+                            <p class="stat-value text-success" id="modalProperties">0</p>
+                            <p class="stat-label">Biens</p>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="modal-stat-card transactions">
+                            <p class="stat-value text-warning" id="modalTransactions">0</p>
+                            <p class="stat-label">Transactions</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informations -->
+                <h6 class="mb-3 fw-bold">Informations</h6>
+                <div class="info-row">
+                    <div class="info-label"><i class="fas fa-tag me-2"></i>Type</div>
+                    <div class="info-value" id="modalType"></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label"><i class="fas fa-circle me-2"></i>Statut</div>
+                    <div class="info-value" id="modalStatus"></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label"><i class="fas fa-map-marker-alt me-2"></i>Localisation</div>
+                    <div class="info-value" id="modalLocation"></div>
+                </div>
+                <div class="info-row" id="modalAddressRow" style="display: none;">
+                    <div class="info-label"><i class="fas fa-home me-2"></i>Adresse</div>
+                    <div class="info-value" id="modalAddress"></div>
+                </div>
+                <div class="info-row" id="modalPhoneRow" style="display: none;">
+                    <div class="info-label"><i class="fas fa-phone me-2"></i>Téléphone</div>
+                    <div class="info-value" id="modalPhone"></div>
+                </div>
+                <div class="info-row" id="modalEmailRow" style="display: none;">
+                    <div class="info-label"><i class="fas fa-envelope me-2"></i>Email</div>
+                    <div class="info-value" id="modalEmail"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Fermer
+                </button>
+                <a href="#" id="modalViewLink" class="btn btn-info">
+                    <i class="fas fa-eye me-2"></i>Plus d'infos
+                </a>
+                <a href="#" id="modalEditLink" class="btn btn-warning">
+                    <i class="fas fa-edit me-2"></i>Modifier
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
 <script>
+function showAgencyModal(element) {
+    const id = element.dataset.agencyId;
+    const name = element.dataset.agencyName;
+    const code = element.dataset.agencyCode;
+    const type = element.dataset.agencyType;
+    const status = element.dataset.agencyStatus;
+    const city = element.dataset.agencyCity;
+    const governorate = element.dataset.agencyGovernorate;
+    const address = element.dataset.agencyAddress;
+    const phone = element.dataset.agencyPhone;
+    const email = element.dataset.agencyEmail;
+    const users = element.dataset.agencyUsers;
+    const properties = element.dataset.agencyProperties;
+    const transactions = element.dataset.agencyTransactions;
+    const logo = element.dataset.agencyLogo;
+
+    // Logo
+    if (logo) {
+        document.getElementById('modalLogo').innerHTML = 
+            `<img src="${logo}" alt="Logo" class="modal-agency-logo">`;
+    } else {
+        document.getElementById('modalLogo').innerHTML = 
+            `<div class="modal-agency-logo-placeholder"><i class="fas fa-building"></i></div>`;
+    }
+
+    // Informations de base
+    document.getElementById('modalName').textContent = name;
+    document.getElementById('modalCode').textContent = 'Code: ' + code;
+    
+    // Statistiques
+    document.getElementById('modalUsers').textContent = users;
+    document.getElementById('modalProperties').textContent = properties;
+    document.getElementById('modalTransactions').textContent = transactions;
+
+    // Type
+    document.getElementById('modalType').innerHTML = 
+        type === 'siege' 
+        ? '<span class="badge bg-primary">Siège</span>' 
+        : '<span class="badge bg-success">Agence</span>';
+
+    // Statut
+    document.getElementById('modalStatus').innerHTML = 
+        status === 'active' 
+        ? '<span class="badge bg-success">Actif</span>' 
+        : '<span class="badge bg-danger">Inactif</span>';
+
+    // Localisation
+    document.getElementById('modalLocation').textContent = `${city}, ${governorate}`;
+
+    // Adresse
+    if (address) {
+        document.getElementById('modalAddress').textContent = address;
+        document.getElementById('modalAddressRow').style.display = 'flex';
+    } else {
+        document.getElementById('modalAddressRow').style.display = 'none';
+    }
+
+    // Téléphone
+    if (phone) {
+        document.getElementById('modalPhone').textContent = phone;
+        document.getElementById('modalPhoneRow').style.display = 'flex';
+    } else {
+        document.getElementById('modalPhoneRow').style.display = 'none';
+    }
+
+    // Email
+    if (email) {
+        document.getElementById('modalEmail').textContent = email;
+        document.getElementById('modalEmailRow').style.display = 'flex';
+    } else {
+        document.getElementById('modalEmailRow').style.display = 'none';
+    }
+
+    // Liens d'action
+    document.getElementById('modalViewLink').href = '<?= base_url('admin/agencies/view/') ?>' + id;
+    document.getElementById('modalEditLink').href = '<?= base_url('admin/agencies/edit/') ?>' + id;
+
+    // Ouvrir le modal
+    const modal = new bootstrap.Modal(document.getElementById('agencyModal'));
+    modal.show();
+}
+
 function toggleChildren(btn) {
     const agencyItem = btn.closest('.agency-item');
     const childrenList = agencyItem.nextElementSibling;
@@ -433,6 +621,7 @@ function collapseAll() {
     document.querySelectorAll('.toggle-children').forEach(btn => {
         btn.classList.remove('active');
     });
+}
 
 function applyFilters() {
     const searchName = document.getElementById('searchName').value.toLowerCase();
@@ -444,18 +633,11 @@ function applyFilters() {
     
     // Parcourir toutes les agences
     document.querySelectorAll('.agency-item').forEach(item => {
-        const name = item.querySelector('.agency-title h5').textContent.toLowerCase();
-        const code = item.querySelector('.agency-code').textContent.toLowerCase();
-        const type = item.classList.contains('siege') ? 'siege' : 'agence';
-        const city = item.querySelector('.contact-item .fa-map-marker-alt')?.parentElement.textContent.toLowerCase() || '';
-        
-        // Trouver le statut
-        const badges = item.querySelectorAll('.badge');
-        let status = '';
-        badges.forEach(badge => {
-            if (badge.textContent.toLowerCase().includes('actif')) status = 'active';
-            if (badge.textContent.toLowerCase().includes('inactif')) status = 'inactive';
-        });
+        const name = item.dataset.agencyName.toLowerCase();
+        const code = item.dataset.agencyCode.toLowerCase();
+        const type = item.dataset.agencyType;
+        const city = item.dataset.agencyCity.toLowerCase();
+        const status = item.dataset.agencyStatus;
         
         // Appliquer les filtres
         const matchName = !searchName || name.includes(searchName) || code.includes(searchName);
@@ -490,7 +672,6 @@ function resetFilters() {
     document.getElementById('filterCity').value = '';
     document.getElementById('filterStatus').value = '';
     applyFilters();
-}
 }
 
 function confirmDelete(id) {

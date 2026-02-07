@@ -137,7 +137,7 @@
                             <label for="rent_price" class="form-label">Prix de location <small class="text-muted">(TND/mois)</small></label>
                             <div class="input-group">
                                 <input type="number" class="form-control" id="rent_price" name="rent_price" 
-                                       value="<?= old('rent_price', $property['rent_price']) ?>" step="0.01">
+                                       value="<?= old('rent_price', $property['rental_price'] ?? $property['rent_price'] ?? '') ?>" step="0.01">
                                 <span class="input-group-text">TND/mois</span>
                             </div>
                         </div>

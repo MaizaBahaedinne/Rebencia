@@ -86,13 +86,13 @@
     .org-card {
         background: white;
         border: 2px solid #e0e0e0;
-        border-radius: 12px;
-        padding: 16px 20px;
-        min-width: 200px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border-radius: 10px;
+        padding: 12px 14px;
+        min-width: 160px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.06);
         transition: all 0.3s;
         position: relative;
-        margin: 0 10px 30px;
+        margin: 0 8px 25px;
         cursor: pointer;
     }
     
@@ -126,15 +126,15 @@
     }
     
     .org-avatar {
-        width: 60px;
-        height: 60px;
+        width: 45px;
+        height: 45px;
         border-radius: 50%;
         background: rgba(255,255,255,0.3);
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 12px;
-        font-size: 24px;
+        margin: 0 auto 8px;
+        font-size: 18px;
         font-weight: 600;
     }
     
@@ -145,25 +145,34 @@
     
     .org-name {
         font-weight: 600;
-        font-size: 16px;
-        margin-bottom: 4px;
+        font-size: 14px;
+        margin-bottom: 3px;
+        line-height: 1.2;
     }
     
     .org-role {
-        font-size: 13px;
+        font-size: 11px;
         opacity: 0.9;
+        margin-bottom: 2px;
     }
     
-    .org-card.member .org-role {
+    .org-agency {
+        font-size: 10px;
+        opacity: 0.85;
+        font-style: italic;
+    }
+    
+    .org-card.member .org-role,
+    .org-card.member .org-agency {
         color: #6c757d;
     }
     
     .org-stats {
         display: flex;
         justify-content: center;
-        gap: 16px;
-        margin-top: 12px;
-        padding-top: 12px;
+        gap: 12px;
+        margin-top: 8px;
+        padding-top: 8px;
         border-top: 1px solid rgba(255,255,255,0.3);
     }
     
@@ -177,20 +186,20 @@
     
     .org-stat-value {
         font-weight: 600;
-        font-size: 18px;
+        font-size: 15px;
     }
     
     .org-stat-label {
-        font-size: 11px;
+        font-size: 9px;
         opacity: 0.8;
     }
     
     .org-children {
         display: flex;
         justify-content: center;
-        gap: 20px;
+        gap: 15px;
         flex-wrap: wrap;
-        margin-top: 20px;
+        margin-top: 15px;
         position: relative;
     }
     
@@ -288,14 +297,23 @@ function renderUserNode($user, $level = 'member', $userModel = null) {
     
     $initials = strtoupper(substr($user['first_name'], 0, 1) . substr($user['last_name'], 0, 1));
     
+    // Récupérer le rôle et l'agence
+    $roleModel = new \App\Models\RoleModel();
+    $agencyModel = new \App\Models\AgencyModel();
+    
+    $role = $roleModel->find($user['role_id']);
+    $agency = $user['agency_id'] ? $agencyModel->find($user['agency_id']) : null;
+    
+    $roleLabel = $role ? ucfirst(str_replace('_', ' ', $role['name'])) : 'Non défini';
+    $agencyLabel = $agency ? $agency['name'] : 'Non affecté';
+    
     // Compter les subordonnés directs
     $subordinates = $userModel->where('manager_id', $user['id'])->findAll();
     $subordinateCount = count($subordinates);
     
-    // Déterminer le niveau
+    // Déterminer le niveau pour le style
     if (!$user['manager_id']) {
         $levelClass = 'ceo';
-        $roleLabel = 'CEO / Directeur';
     } else if ($subordinateCount > 0) {
         // Vérifier si c'est un manager de niveau supérieur
         $hasManagerSubordinates = false;
@@ -307,10 +325,8 @@ function renderUserNode($user, $level = 'member', $userModel = null) {
             }
         }
         $levelClass = $hasManagerSubordinates ? 'manager' : 'team-lead';
-        $roleLabel = $hasManagerSubordinates ? 'Manager' : 'Chef d\'équipe';
     } else {
         $levelClass = 'member';
-        $roleLabel = 'Membre de l\'équipe';
     }
     
     $html = '<div class="org-card ' . $levelClass . '" data-user-id="' . $user['id'] . '">';
@@ -321,7 +337,8 @@ function renderUserNode($user, $level = 'member', $userModel = null) {
     
     $html .= '<div class="org-avatar">' . $initials . '</div>';
     $html .= '<div class="org-name">' . esc($user['first_name'] . ' ' . $user['last_name']) . '</div>';
-    $html .= '<div class="org-role">' . $roleLabel . '</div>';
+    $html .= '<div class="org-role">' . esc($roleLabel) . '</div>';
+    $html .= '<div class="org-agency"><i class="fas fa-building"></i> ' . esc($agencyLabel) . '</div>';
     
     if ($subordinateCount > 0) {
         $html .= '<div class="org-stats">';

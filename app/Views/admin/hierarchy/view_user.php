@@ -213,20 +213,24 @@
                                     <?php foreach ($properties as $property): ?>
                                         <tr>
                                             <td><strong><?= esc($property['reference']) ?></strong></td>
-                                            <td><?= esc($property['property_type']) ?></td>
+                                            <td><?= esc($property['type']) ?></td>
                                             <td><?= esc($property['address']) ?></td>
                                             <td>
-                                                <?php if ($property['transaction_type'] === 'vente'): ?>
-                                                    <?= number_format($property['price'], 0, ',', ' ') ?> €
+                                                <?php if ($property['transaction_type'] === 'sale'): ?>
+                                                    <?= number_format($property['price'], 0, ',', ' ') ?> DT
                                                 <?php else: ?>
-                                                    <?= number_format($property['price'], 0, ',', ' ') ?> €/mois
+                                                    <?= number_format($property['rental_price'] ?? $property['price'], 0, ',', ' ') ?> DT/mois
                                                 <?php endif; ?>
                                             </td>
                                             <td>
-                                                <?php if ($property['is_active']): ?>
-                                                    <span class="badge bg-success">Actif</span>
+                                                <?php if ($property['status'] === 'available'): ?>
+                                                    <span class="badge bg-success">Disponible</span>
+                                                <?php elseif ($property['status'] === 'sold'): ?>
+                                                    <span class="badge bg-danger">Vendu</span>
+                                                <?php elseif ($property['status'] === 'rented'): ?>
+                                                    <span class="badge bg-warning">Loué</span>
                                                 <?php else: ?>
-                                                    <span class="badge bg-secondary">Inactif</span>
+                                                    <span class="badge bg-secondary"><?= ucfirst($property['status']) ?></span>
                                                 <?php endif; ?>
                                             </td>
                                             <td>

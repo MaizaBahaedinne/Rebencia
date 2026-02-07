@@ -157,35 +157,39 @@ class Menus extends BaseController
      */
     public function roleMenus($roleId = null)
     {
-        $roles = $this->roleModel->findAll();
-        
-        if (!$roleId && !empty($roles)) {
-            $roleId = $roles[0]['id'];
+        try {
+            $roles = $this->roleModel->findAll();
+            
+            if (!$roleId && !empty($roles)) {
+                $roleId = $roles[0]['id'];
+            }
+
+            $role = $this->roleModel->find($roleId);
+            
+            if (!$role) {
+                return redirect()->to('/admin/menus')->with('error', 'Rôle non trouvé');
+            }
+
+            // Get all available menus
+            $allMenus = $this->menuModel->getMenuHierarchy();
+            
+            // Get menus assigned to this role
+            $roleMenus = $this->roleMenuModel->getRoleMenus($roleId);
+            $assignedMenuIds = array_column($roleMenus, 'menu_id');
+
+            $data = [
+                'title' => 'Gestion des Menus par Rôle',
+                'roles' => $roles,
+                'currentRole' => $role,
+                'allMenus' => $allMenus,
+                'assignedMenuIds' => $assignedMenuIds,
+                'roleMenus' => $roleMenus
+            ];
+
+            return view('admin/menus/role_menus', $data);
+        } catch (\Exception $e) {
+            return redirect()->to('/admin/menus')->with('error', 'Erreur: Les tables menus n\'existent pas encore. Veuillez exécuter le fichier menus_tables.sql via phpMyAdmin. Détails: ' . $e->getMessage());
         }
-
-        $role = $this->roleModel->find($roleId);
-        
-        if (!$role) {
-            return redirect()->to('/admin/menus')->with('error', 'Rôle non trouvé');
-        }
-
-        // Get all available menus
-        $allMenus = $this->menuModel->getMenuHierarchy();
-        
-        // Get menus assigned to this role
-        $roleMenus = $this->roleMenuModel->getRoleMenus($roleId);
-        $assignedMenuIds = array_column($roleMenus, 'menu_id');
-
-        $data = [
-            'title' => 'Gestion des Menus par Rôle',
-            'roles' => $roles,
-            'currentRole' => $role,
-            'allMenus' => $allMenus,
-            'assignedMenuIds' => $assignedMenuIds,
-            'roleMenus' => $roleMenus
-        ];
-
-        return view('admin/menus/role_menus', $data);
     }
 
     /**
@@ -196,10 +200,17 @@ class Menus extends BaseController
         $roleId = $this->request->getPost('role_id');
         $menus = $this->request->getPost('menus');
 
-        if (!$roleId || !is_array($menus)) {
+        if (!$roleId) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Données invalides'
+                'message' => 'Données invalides: role_id manquant'
+            ]);
+        }
+        
+        if (!is_array($menus)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Données invalides: aucun menu à assigner'
             ]);
         }
 

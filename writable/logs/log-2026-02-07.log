@@ -26,3 +26,9 @@ Stack trace:
 #8 /Users/mac/Documents/Rebencia/system/CLI/Console.php(46): CodeIgniter\CLI\Commands->run('migrate', Array)
 #9 /Users/mac/Documents/Rebencia/spark(102): CodeIgniter\CLI\Console->run()
 #10 {main}
+CRITICAL - 2026-02-07 21:38:27 --> ErrorException: Cannot declare class CodeIgniter\Config\Filters, because the name is already in use
+in SYSTEMPATH/Config/Filters.php on line 29.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+CRITICAL - 2026-02-07 21:38:48 --> ErrorException: Cannot declare class CodeIgniter\Config\Filters, because the name is already in use
+in SYSTEMPATH/Config/Filters.php on line 29.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()

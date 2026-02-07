@@ -196,7 +196,7 @@
                         <div class="col-md-6">
                             <div class="form-check form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" 
-                                       value="1" <?= old('is_featured', $property['is_featured']) ? 'checked' : '' ?>>
+                                       value="1" <?= old('is_featured', $property['featured'] ?? 0) ? 'checked' : '' ?>>
                                 <label class="form-check-label" for="is_featured">
                                     <i class="fas fa-star text-warning"></i> Bien à la une
                                 </label>

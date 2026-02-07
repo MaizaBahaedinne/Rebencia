@@ -52,6 +52,17 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
     // Switch Role
     $routes->post('switch-role', 'Users::switchRole');
     
+    // Menus Management (routes directes pour éviter problème de cache)
+    $routes->get('menus', 'Menus::index');
+    $routes->get('menus/create', 'Menus::create');
+    $routes->post('menus/store', 'Menus::store');
+    $routes->get('menus/edit/(:num)', 'Menus::edit/$1');
+    $routes->post('menus/update/(:num)', 'Menus::update/$1');
+    $routes->get('menus/delete/(:num)', 'Menus::delete/$1');
+    $routes->get('menus/role-menus', 'Menus::roleMenus');
+    $routes->get('menus/role-menus/(:num)', 'Menus::roleMenus/$1');
+    $routes->post('menus/update-role-menus', 'Menus::updateRoleMenus');
+    
     // Roles & Permissions
     $routes->group('roles', function($routes) {
         $routes->get('/', 'Roles::index');
@@ -62,19 +73,6 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->get('delete/(:num)', 'Roles::delete/$1');
         $routes->get('matrix', 'Roles::matrix');
         $routes->post('sync-permissions', 'Roles::syncPermissions');
-    });
-    
-    // Menus Management
-    $routes->group('menus', function($routes) {
-        $routes->get('/', 'Menus::index');
-        $routes->get('create', 'Menus::create');
-        $routes->post('store', 'Menus::store');
-        $routes->get('edit/(:num)', 'Menus::edit/$1');
-        $routes->post('update/(:num)', 'Menus::update/$1');
-        $routes->get('delete/(:num)', 'Menus::delete/$1');
-        $routes->get('role-menus', 'Menus::roleMenus');
-        $routes->get('role-menus/(:num)', 'Menus::roleMenus/$1');
-        $routes->post('update-role-menus', 'Menus::updateRoleMenus');
     });
     
     // Agencies

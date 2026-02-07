@@ -434,7 +434,18 @@ function goToUser(userId) {
 <?php
 function renderPyramidChart() {
     $userModel = new \App\Models\UserModel();
-    $allUsers = $userModel->findAll();
+    
+    // Récupérer l'agency_id de l'utilisateur connecté
+    $currentUserId = session()->get('user_id');
+    $currentUser = $userModel->find($currentUserId);
+    $currentAgencyId = $currentUser['agency_id'] ?? null;
+    
+    // Filtrer les utilisateurs par agency_id
+    if ($currentAgencyId) {
+        $allUsers = $userModel->where('agency_id', $currentAgencyId)->findAll();
+    } else {
+        $allUsers = $userModel->findAll();
+    }
     
     $ceos = array_filter($allUsers, function($u) { return !$u['manager_id']; });
     
@@ -453,7 +464,8 @@ function renderPyramidChart() {
             $html .= renderSubordinates($ceo['id'], $allUsers, new \App\Models\RoleModel(), 'ceo-' . $ceo['id']);
         }
     } else {
-        $html = '<div class="empty-message"><i class="fas fa-sitemap fa-3x mb-3"></i><p>Aucune structure hiérarchique trouvée</p></div>';
+        $agencyName = $currentAgencyId ? ' pour votre agence' : '';
+        $html = '<div class="empty-message"><i class="fas fa-sitemap fa-3x mb-3"></i><p>Aucune structure hiérarchique trouvée' . $agencyName . '</p></div>';
     }
     return $html;
 }

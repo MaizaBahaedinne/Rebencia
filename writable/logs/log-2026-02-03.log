@@ -1,0 +1,1238 @@
+ERROR - 2026-02-03 15:01:18 --> Error connecting to the database: mysqli_sql_exception: Access denied for user 'root'@'localhost' (using password: YES) in /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php:184
+Stack trace:
+#0 /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php(184): mysqli->real_connect()
+#1 /home/rebencia.com/public_html/system/Database/BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect()
+#2 /home/rebencia.com/public_html/system/Database/BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 /home/rebencia.com/public_html/system/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+#4 /home/rebencia.com/public_html/system/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+#5 /home/rebencia.com/public_html/system/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+#6 /home/rebencia.com/public_html/app/Controllers/Home.php(16): CodeIgniter\BaseModel->findAll()
+#7 /home/rebencia.com/public_html/system/CodeIgniter.php(941): App\Controllers\Home->index()
+#8 /home/rebencia.com/public_html/system/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+#9 /home/rebencia.com/public_html/system/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+#10 /home/rebencia.com/public_html/public/index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: Access denied for user '****'@'localhost' (using password: YES) in /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php:229
+Stack trace:
+#0 /home/rebencia.com/public_html/system/Database/BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect()
+#1 /home/rebencia.com/public_html/system/Database/BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 /home/rebencia.com/public_html/system/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+#3 /home/rebencia.com/public_html/system/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+#4 /home/rebencia.com/public_html/system/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+#5 /home/rebencia.com/public_html/app/Controllers/Home.php(16): CodeIgniter\BaseModel->findAll()
+#6 /home/rebencia.com/public_html/system/CodeIgniter.php(941): App\Controllers\Home->index()
+#7 /home/rebencia.com/public_html/system/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+#8 /home/rebencia.com/public_html/system/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+#9 /home/rebencia.com/public_html/public/index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2026-02-03 15:01:18 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: Access denied for user '****'@'localhost' (using password: YES)
+in SYSTEMPATH/Database/BaseConnection.php on line 428.
+ 1 SYSTEMPATH/Database/BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 3 SYSTEMPATH/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+ 5 APPPATH/Controllers/Home.php(16): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Home->index()
+ 7 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 8 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 9 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 15:01:18 --> ErrorException: Uncaught ErrorException: Undefined property: Config\App::$proxyIPs in /home/rebencia.com/public_html/system/HTTP/RequestTrait.php:62
+Stack trace:
+#0 /home/rebencia.com/public_html/system/HTTP/RequestTrait.php(62): CodeIgniter\Debug\Exceptions->errorHandler()
+#1 /home/rebencia.com/public_html/app/Views/errors/html/error_exception.php(235): CodeIgniter\HTTP\Request->getIPAddress()
+#2 /home/rebencia.com/public_html/system/Debug/BaseExceptionHandler.php(258): include('...')
+#3 /home/rebencia.com/public_html/system/Debug/BaseExceptionHandler.php(261): CodeIgniter\Debug\BaseExceptionHandler->CodeIgniter\Debug\{closure}()
+#4 /home/rebencia.com/public_html/system/Debug/ExceptionHandler.php(112): CodeIgniter\Debug\BaseExceptionHandler->render()
+#5 /home/rebencia.com/public_html/system/Debug/Exceptions.php(156): CodeIgniter\Debug\ExceptionHandler->handle()
+#6 [internal function]: CodeIgniter\Debug\Exceptions->exceptionHandler()
+#7 {main}
+  thrown
+【Previous Exception】
+CodeIgniter\Database\Exceptions\DatabaseException
+Unable to connect to the database.
+Main connection [MySQLi]: Access denied for user '****'@'localhost' (using password: YES)
+#0 /home/rebencia.com/public_html/system/Database/BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#1 /home/rebencia.com/public_html/system/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+#2 /home/rebencia.com/public_html/system/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+#3 /home/rebencia.com/public_html/system/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+#4 /home/rebencia.com/public_html/app/Controllers/Home.php(16): CodeIgniter\BaseModel->findAll()
+#5 /home/rebencia.com/public_html/system/CodeIgniter.php(941): App\Controllers\Home->index()
+#6 /home/rebencia.com/public_html/system/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+#7 /home/rebencia.com/public_html/system/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+#8 /home/rebencia.com/public_html/public/index.php(79): CodeIgniter\CodeIgniter->run()
+#9 {main}
+in SYSTEMPATH/HTTP/RequestTrait.php on line 62.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+ERROR - 2026-02-03 15:04:36 --> Error connecting to the database: mysqli_sql_exception: Access denied for user 'root'@'localhost' (using password: YES) in /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php:184
+Stack trace:
+#0 /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php(184): mysqli->real_connect()
+#1 /home/rebencia.com/public_html/system/Database/BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect()
+#2 /home/rebencia.com/public_html/system/Database/BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 /home/rebencia.com/public_html/system/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+#4 /home/rebencia.com/public_html/system/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+#5 /home/rebencia.com/public_html/system/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+#6 /home/rebencia.com/public_html/app/Controllers/Home.php(16): CodeIgniter\BaseModel->findAll()
+#7 /home/rebencia.com/public_html/system/CodeIgniter.php(941): App\Controllers\Home->index()
+#8 /home/rebencia.com/public_html/system/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+#9 /home/rebencia.com/public_html/system/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+#10 /home/rebencia.com/public_html/public/index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: Access denied for user '****'@'localhost' (using password: YES) in /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php:229
+Stack trace:
+#0 /home/rebencia.com/public_html/system/Database/BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect()
+#1 /home/rebencia.com/public_html/system/Database/BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 /home/rebencia.com/public_html/system/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+#3 /home/rebencia.com/public_html/system/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+#4 /home/rebencia.com/public_html/system/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+#5 /home/rebencia.com/public_html/app/Controllers/Home.php(16): CodeIgniter\BaseModel->findAll()
+#6 /home/rebencia.com/public_html/system/CodeIgniter.php(941): App\Controllers\Home->index()
+#7 /home/rebencia.com/public_html/system/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+#8 /home/rebencia.com/public_html/system/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+#9 /home/rebencia.com/public_html/public/index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2026-02-03 15:04:36 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: Access denied for user '****'@'localhost' (using password: YES)
+in SYSTEMPATH/Database/BaseConnection.php on line 428.
+ 1 SYSTEMPATH/Database/BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 3 SYSTEMPATH/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+ 5 APPPATH/Controllers/Home.php(16): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Home->index()
+ 7 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 8 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 9 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 15:04:36 --> ErrorException: Uncaught ErrorException: Undefined property: Config\App::$proxyIPs in /home/rebencia.com/public_html/system/HTTP/RequestTrait.php:62
+Stack trace:
+#0 /home/rebencia.com/public_html/system/HTTP/RequestTrait.php(62): CodeIgniter\Debug\Exceptions->errorHandler()
+#1 /home/rebencia.com/public_html/app/Views/errors/html/error_exception.php(235): CodeIgniter\HTTP\Request->getIPAddress()
+#2 /home/rebencia.com/public_html/system/Debug/BaseExceptionHandler.php(258): include('...')
+#3 /home/rebencia.com/public_html/system/Debug/BaseExceptionHandler.php(261): CodeIgniter\Debug\BaseExceptionHandler->CodeIgniter\Debug\{closure}()
+#4 /home/rebencia.com/public_html/system/Debug/ExceptionHandler.php(112): CodeIgniter\Debug\BaseExceptionHandler->render()
+#5 /home/rebencia.com/public_html/system/Debug/Exceptions.php(156): CodeIgniter\Debug\ExceptionHandler->handle()
+#6 [internal function]: CodeIgniter\Debug\Exceptions->exceptionHandler()
+#7 {main}
+  thrown
+【Previous Exception】
+CodeIgniter\Database\Exceptions\DatabaseException
+Unable to connect to the database.
+Main connection [MySQLi]: Access denied for user '****'@'localhost' (using password: YES)
+#0 /home/rebencia.com/public_html/system/Database/BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#1 /home/rebencia.com/public_html/system/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+#2 /home/rebencia.com/public_html/system/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+#3 /home/rebencia.com/public_html/system/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+#4 /home/rebencia.com/public_html/app/Controllers/Home.php(16): CodeIgniter\BaseModel->findAll()
+#5 /home/rebencia.com/public_html/system/CodeIgniter.php(941): App\Controllers\Home->index()
+#6 /home/rebencia.com/public_html/system/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+#7 /home/rebencia.com/public_html/system/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+#8 /home/rebencia.com/public_html/public/index.php(79): CodeIgniter\CodeIgniter->run()
+#9 {main}
+in SYSTEMPATH/HTTP/RequestTrait.php on line 62.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+ERROR - 2026-02-03 15:05:52 --> Error connecting to the database: mysqli_sql_exception: Access denied for user 'root'@'localhost' (using password: YES) in /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php:184
+Stack trace:
+#0 /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php(184): mysqli->real_connect()
+#1 /home/rebencia.com/public_html/system/Database/BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect()
+#2 /home/rebencia.com/public_html/system/Database/BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 /home/rebencia.com/public_html/system/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+#4 /home/rebencia.com/public_html/system/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+#5 /home/rebencia.com/public_html/system/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+#6 /home/rebencia.com/public_html/app/Controllers/Home.php(16): CodeIgniter\BaseModel->findAll()
+#7 /home/rebencia.com/public_html/system/CodeIgniter.php(941): App\Controllers\Home->index()
+#8 /home/rebencia.com/public_html/system/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+#9 /home/rebencia.com/public_html/system/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+#10 /home/rebencia.com/public_html/public/index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: Access denied for user '****'@'localhost' (using password: YES) in /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php:229
+Stack trace:
+#0 /home/rebencia.com/public_html/system/Database/BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect()
+#1 /home/rebencia.com/public_html/system/Database/BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 /home/rebencia.com/public_html/system/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+#3 /home/rebencia.com/public_html/system/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+#4 /home/rebencia.com/public_html/system/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+#5 /home/rebencia.com/public_html/app/Controllers/Home.php(16): CodeIgniter\BaseModel->findAll()
+#6 /home/rebencia.com/public_html/system/CodeIgniter.php(941): App\Controllers\Home->index()
+#7 /home/rebencia.com/public_html/system/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+#8 /home/rebencia.com/public_html/system/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+#9 /home/rebencia.com/public_html/public/index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2026-02-03 15:05:52 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: Access denied for user '****'@'localhost' (using password: YES)
+in SYSTEMPATH/Database/BaseConnection.php on line 428.
+ 1 SYSTEMPATH/Database/BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 3 SYSTEMPATH/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+ 5 APPPATH/Controllers/Home.php(16): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Home->index()
+ 7 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 8 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 9 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 15:05:52 --> ErrorException: Uncaught ErrorException: Undefined property: Config\App::$proxyIPs in /home/rebencia.com/public_html/system/HTTP/RequestTrait.php:62
+Stack trace:
+#0 /home/rebencia.com/public_html/system/HTTP/RequestTrait.php(62): CodeIgniter\Debug\Exceptions->errorHandler()
+#1 /home/rebencia.com/public_html/app/Views/errors/html/error_exception.php(235): CodeIgniter\HTTP\Request->getIPAddress()
+#2 /home/rebencia.com/public_html/system/Debug/BaseExceptionHandler.php(258): include('...')
+#3 /home/rebencia.com/public_html/system/Debug/BaseExceptionHandler.php(261): CodeIgniter\Debug\BaseExceptionHandler->CodeIgniter\Debug\{closure}()
+#4 /home/rebencia.com/public_html/system/Debug/ExceptionHandler.php(112): CodeIgniter\Debug\BaseExceptionHandler->render()
+#5 /home/rebencia.com/public_html/system/Debug/Exceptions.php(156): CodeIgniter\Debug\ExceptionHandler->handle()
+#6 [internal function]: CodeIgniter\Debug\Exceptions->exceptionHandler()
+#7 {main}
+  thrown
+【Previous Exception】
+CodeIgniter\Database\Exceptions\DatabaseException
+Unable to connect to the database.
+Main connection [MySQLi]: Access denied for user '****'@'localhost' (using password: YES)
+#0 /home/rebencia.com/public_html/system/Database/BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#1 /home/rebencia.com/public_html/system/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+#2 /home/rebencia.com/public_html/system/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+#3 /home/rebencia.com/public_html/system/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+#4 /home/rebencia.com/public_html/app/Controllers/Home.php(16): CodeIgniter\BaseModel->findAll()
+#5 /home/rebencia.com/public_html/system/CodeIgniter.php(941): App\Controllers\Home->index()
+#6 /home/rebencia.com/public_html/system/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+#7 /home/rebencia.com/public_html/system/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+#8 /home/rebencia.com/public_html/public/index.php(79): CodeIgniter\CodeIgniter->run()
+#9 {main}
+in SYSTEMPATH/HTTP/RequestTrait.php on line 62.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+ERROR - 2026-02-03 15:07:25 --> Error connecting to the database: mysqli_sql_exception: Access denied for user 'root'@'localhost' (using password: YES) in /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php:184
+Stack trace:
+#0 /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php(184): mysqli->real_connect()
+#1 /home/rebencia.com/public_html/system/Database/BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect()
+#2 /home/rebencia.com/public_html/system/Database/BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#3 /home/rebencia.com/public_html/system/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+#4 /home/rebencia.com/public_html/system/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+#5 /home/rebencia.com/public_html/system/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+#6 /home/rebencia.com/public_html/app/Controllers/Home.php(16): CodeIgniter\BaseModel->findAll()
+#7 /home/rebencia.com/public_html/system/CodeIgniter.php(941): App\Controllers\Home->index()
+#8 /home/rebencia.com/public_html/system/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+#9 /home/rebencia.com/public_html/system/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+#10 /home/rebencia.com/public_html/public/index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: Access denied for user '****'@'localhost' (using password: YES) in /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php:229
+Stack trace:
+#0 /home/rebencia.com/public_html/system/Database/BaseConnection.php(392): CodeIgniter\Database\MySQLi\Connection->connect()
+#1 /home/rebencia.com/public_html/system/Database/BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#2 /home/rebencia.com/public_html/system/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+#3 /home/rebencia.com/public_html/system/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+#4 /home/rebencia.com/public_html/system/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+#5 /home/rebencia.com/public_html/app/Controllers/Home.php(16): CodeIgniter\BaseModel->findAll()
+#6 /home/rebencia.com/public_html/system/CodeIgniter.php(941): App\Controllers\Home->index()
+#7 /home/rebencia.com/public_html/system/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+#8 /home/rebencia.com/public_html/system/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+#9 /home/rebencia.com/public_html/public/index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2026-02-03 15:07:25 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: Access denied for user '****'@'localhost' (using password: YES)
+in SYSTEMPATH/Database/BaseConnection.php on line 428.
+ 1 SYSTEMPATH/Database/BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 3 SYSTEMPATH/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+ 4 SYSTEMPATH/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+ 5 APPPATH/Controllers/Home.php(16): CodeIgniter\BaseModel->findAll()
+ 6 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Home->index()
+ 7 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 8 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 9 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 15:07:25 --> ErrorException: Uncaught ErrorException: Undefined property: Config\App::$proxyIPs in /home/rebencia.com/public_html/system/HTTP/RequestTrait.php:62
+Stack trace:
+#0 /home/rebencia.com/public_html/system/HTTP/RequestTrait.php(62): CodeIgniter\Debug\Exceptions->errorHandler()
+#1 /home/rebencia.com/public_html/app/Views/errors/html/error_exception.php(235): CodeIgniter\HTTP\Request->getIPAddress()
+#2 /home/rebencia.com/public_html/system/Debug/BaseExceptionHandler.php(258): include('...')
+#3 /home/rebencia.com/public_html/system/Debug/BaseExceptionHandler.php(261): CodeIgniter\Debug\BaseExceptionHandler->CodeIgniter\Debug\{closure}()
+#4 /home/rebencia.com/public_html/system/Debug/ExceptionHandler.php(112): CodeIgniter\Debug\BaseExceptionHandler->render()
+#5 /home/rebencia.com/public_html/system/Debug/Exceptions.php(156): CodeIgniter\Debug\ExceptionHandler->handle()
+#6 [internal function]: CodeIgniter\Debug\Exceptions->exceptionHandler()
+#7 {main}
+  thrown
+【Previous Exception】
+CodeIgniter\Database\Exceptions\DatabaseException
+Unable to connect to the database.
+Main connection [MySQLi]: Access denied for user '****'@'localhost' (using password: YES)
+#0 /home/rebencia.com/public_html/system/Database/BaseConnection.php(575): CodeIgniter\Database\BaseConnection->initialize()
+#1 /home/rebencia.com/public_html/system/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+#2 /home/rebencia.com/public_html/system/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+#3 /home/rebencia.com/public_html/system/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+#4 /home/rebencia.com/public_html/app/Controllers/Home.php(16): CodeIgniter\BaseModel->findAll()
+#5 /home/rebencia.com/public_html/system/CodeIgniter.php(941): App\Controllers\Home->index()
+#6 /home/rebencia.com/public_html/system/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+#7 /home/rebencia.com/public_html/system/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+#8 /home/rebencia.com/public_html/public/index.php(79): CodeIgniter\CodeIgniter->run()
+#9 {main}
+in SYSTEMPATH/HTTP/RequestTrait.php on line 62.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+CRITICAL - 2026-02-03 15:07:30 --> ErrorException: Undefined property: Config\App::$proxyIPs
+in SYSTEMPATH/HTTP/RequestTrait.php on line 62.
+ 1 SYSTEMPATH/HTTP/RequestTrait.php(62): CodeIgniter\Debug\Exceptions->errorHandler()
+ 2 SYSTEMPATH/Config/Services.php(686): CodeIgniter\HTTP\Request->getIPAddress()
+ 3 SYSTEMPATH/Config/BaseService.php(258): CodeIgniter\Config\Services::session()
+ 4 SYSTEMPATH/Config/BaseService.php(199): CodeIgniter\Config\BaseService::__callStatic()
+ 5 SYSTEMPATH/Config/Services.php(664): CodeIgniter\Config\BaseService::getSharedInstance()
+ 6 SYSTEMPATH/Config/BaseService.php(258): CodeIgniter\Config\Services::session()
+ 7 SYSTEMPATH/Common.php(982): CodeIgniter\Config\BaseService::__callStatic()
+ 8 APPPATH/Controllers/Admin/Auth.php(11): session()
+ 9 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Auth->login()
+10 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+11 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+12 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 15:07:30 --> ErrorException: Uncaught ErrorException: Undefined property: Config\App::$proxyIPs in /home/rebencia.com/public_html/system/HTTP/RequestTrait.php:62
+Stack trace:
+#0 /home/rebencia.com/public_html/system/HTTP/RequestTrait.php(62): CodeIgniter\Debug\Exceptions->errorHandler()
+#1 /home/rebencia.com/public_html/app/Views/errors/html/error_exception.php(235): CodeIgniter\HTTP\Request->getIPAddress()
+#2 /home/rebencia.com/public_html/system/Debug/BaseExceptionHandler.php(258): include('...')
+#3 /home/rebencia.com/public_html/system/Debug/BaseExceptionHandler.php(261): CodeIgniter\Debug\BaseExceptionHandler->CodeIgniter\Debug\{closure}()
+#4 /home/rebencia.com/public_html/system/Debug/ExceptionHandler.php(112): CodeIgniter\Debug\BaseExceptionHandler->render()
+#5 /home/rebencia.com/public_html/system/Debug/Exceptions.php(156): CodeIgniter\Debug\ExceptionHandler->handle()
+#6 [internal function]: CodeIgniter\Debug\Exceptions->exceptionHandler()
+#7 {main}
+  thrown
+【Previous Exception】
+ErrorException
+Undefined property: Config\App::$proxyIPs
+#0 /home/rebencia.com/public_html/system/HTTP/RequestTrait.php(62): CodeIgniter\Debug\Exceptions->errorHandler()
+#1 /home/rebencia.com/public_html/system/Config/Services.php(686): CodeIgniter\HTTP\Request->getIPAddress()
+#2 /home/rebencia.com/public_html/system/Config/BaseService.php(258): CodeIgniter\Config\Services::session()
+#3 /home/rebencia.com/public_html/system/Config/BaseService.php(199): CodeIgniter\Config\BaseService::__callStatic()
+#4 /home/rebencia.com/public_html/system/Config/Services.php(664): CodeIgniter\Config\BaseService::getSharedInstance()
+#5 /home/rebencia.com/public_html/system/Config/BaseService.php(258): CodeIgniter\Config\Services::session()
+#6 /home/rebencia.com/public_html/system/Common.php(982): CodeIgniter\Config\BaseService::__callStatic()
+#7 /home/rebencia.com/public_html/app/Controllers/Admin/Auth.php(11): session()
+#8 /home/rebencia.com/public_html/system/CodeIgniter.php(941): App\Controllers\Admin\Auth->login()
+#9 /home/rebencia.com/public_html/system/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+#10 /home/rebencia.com/public_html/system/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+#11 /home/rebencia.com/public_html/public/index.php(79): CodeIgniter\CodeIgniter->run()
+#12 {main}
+in SYSTEMPATH/HTTP/RequestTrait.php on line 62.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+INFO - 2026-02-03 15:08:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:08:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:08:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:08:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:08:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:08:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:08:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:09:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:09:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:12:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:12:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:16:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:16:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:18:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:18:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:18:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:21:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:21:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:21:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:21:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:21:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:23:14 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:23:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:23:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:23:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:23:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 15:23:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 17:11:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 21:33:13 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/users/edit.php"
+in SYSTEMPATH/Exceptions/FrameworkException.php on line 39.
+ 1 SYSTEMPATH/View/View.php(216): CodeIgniter\Exceptions\FrameworkException::forInvalidFile()
+ 2 SYSTEMPATH/Common.php(1178): CodeIgniter\View\View->render()
+ 3 APPPATH/Controllers/Admin/Users.php(98): view()
+ 4 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Users->edit()
+ 5 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 6 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 21:35:22 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/users/edit.php"
+in SYSTEMPATH/Exceptions/FrameworkException.php on line 39.
+ 1 SYSTEMPATH/View/View.php(216): CodeIgniter\Exceptions\FrameworkException::forInvalidFile()
+ 2 SYSTEMPATH/Common.php(1178): CodeIgniter\View\View->render()
+ 3 APPPATH/Controllers/Admin/Users.php(98): view()
+ 4 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Users->edit()
+ 5 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 6 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 21:35:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:35:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:35:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:35:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:35:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:35:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:35:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:36:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:36:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:37:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:37:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:37:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:37:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:37:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:40:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:40:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:40:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:40:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:40:29 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:40:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:43:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:43:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:45:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:45:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:45:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:45:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 21:49:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 21:50:07 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/transactions/create.php"
+in SYSTEMPATH/Exceptions/FrameworkException.php on line 39.
+ 1 SYSTEMPATH/View/View.php(216): CodeIgniter\Exceptions\FrameworkException::forInvalidFile()
+ 2 SYSTEMPATH/Common.php(1178): CodeIgniter\View\View->render()
+ 3 APPPATH/Controllers/Admin/Transactions.php(44): view()
+ 4 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Transactions->create()
+ 5 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 6 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 22:01:29 --> ParseError: Unmatched '}'
+in APPPATH/Controllers/Admin/Transactions.php on line 182.
+ 1 SYSTEMPATH/Autoloader/Autoloader.php(288): CodeIgniter\Autoloader\Autoloader->includeFile()
+ 2 SYSTEMPATH/Autoloader/Autoloader.php(266): CodeIgniter\Autoloader\Autoloader->loadInNamespace()
+ 3 [internal function]: CodeIgniter\Autoloader\Autoloader->loadClass()
+ 4 SYSTEMPATH/CodeIgniter.php(899): class_exists()
+ 5 SYSTEMPATH/CodeIgniter.php(489): CodeIgniter\CodeIgniter->startController()
+ 6 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 22:01:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:01:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:01:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 22:01:48 --> ParseError: Unmatched '}'
+in APPPATH/Controllers/Admin/Transactions.php on line 182.
+ 1 SYSTEMPATH/Autoloader/Autoloader.php(288): CodeIgniter\Autoloader\Autoloader->includeFile()
+ 2 SYSTEMPATH/Autoloader/Autoloader.php(266): CodeIgniter\Autoloader\Autoloader->loadInNamespace()
+ 3 [internal function]: CodeIgniter\Autoloader\Autoloader->loadClass()
+ 4 SYSTEMPATH/CodeIgniter.php(899): class_exists()
+ 5 SYSTEMPATH/CodeIgniter.php(489): CodeIgniter\CodeIgniter->startController()
+ 6 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 22:04:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:04:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-02-03 22:04:40 --> mysqli_sql_exception: Unknown column 'is_published' in 'WHERE' in /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php:306
+Stack trace:
+#0 /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php(306): mysqli->query()
+#1 /home/rebencia.com/public_html/system/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+#2 /home/rebencia.com/public_html/system/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+#3 /home/rebencia.com/public_html/system/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+#4 /home/rebencia.com/public_html/system/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+#5 /home/rebencia.com/public_html/system/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+#6 /home/rebencia.com/public_html/app/Controllers/Admin/Transactions.php(43): CodeIgniter\BaseModel->findAll()
+#7 /home/rebencia.com/public_html/system/CodeIgniter.php(941): App\Controllers\Admin\Transactions->create()
+#8 /home/rebencia.com/public_html/system/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+#9 /home/rebencia.com/public_html/system/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+#10 /home/rebencia.com/public_html/public/index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+CRITICAL - 2026-02-03 22:04:40 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'is_published' in 'WHERE'
+in SYSTEMPATH/Database/BaseConnection.php on line 647.
+ 1 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 2 SYSTEMPATH/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+ 4 APPPATH/Controllers/Admin/Transactions.php(43): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Transactions->create()
+ 6 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 7 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 8 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 22:04:40 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'is_published' in 'WHERE'
+in SYSTEMPATH/Database/MySQLi/Connection.php on line 311.
+ 1 SYSTEMPATH/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+ 2 SYSTEMPATH/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+ 3 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 4 SYSTEMPATH/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+ 6 APPPATH/Controllers/Admin/Transactions.php(43): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Transactions->create()
+ 8 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 9 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+10 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 22:04:40 --> [Caused by] mysqli_sql_exception: Unknown column 'is_published' in 'WHERE'
+in SYSTEMPATH/Database/MySQLi/Connection.php on line 306.
+ 1 SYSTEMPATH/Database/MySQLi/Connection.php(306): mysqli->query()
+ 2 SYSTEMPATH/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+ 3 SYSTEMPATH/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+ 4 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 5 SYSTEMPATH/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+ 7 APPPATH/Controllers/Admin/Transactions.php(43): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Transactions->create()
+ 9 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+10 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+11 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 22:04:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:07:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-02-03 22:07:39 --> mysqli_sql_exception: Unknown column 'is_published' in 'WHERE' in /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php:306
+Stack trace:
+#0 /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php(306): mysqli->query()
+#1 /home/rebencia.com/public_html/system/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+#2 /home/rebencia.com/public_html/system/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+#3 /home/rebencia.com/public_html/system/Database/BaseBuilder.php(1700): CodeIgniter\Database\BaseConnection->query()
+#4 /home/rebencia.com/public_html/app/Controllers/Admin/Dashboard.php(45): CodeIgniter\Database\BaseBuilder->countAllResults()
+#5 /home/rebencia.com/public_html/app/Controllers/Admin/Dashboard.php(19): App\Controllers\Admin\Dashboard->getDashboardStats()
+#6 /home/rebencia.com/public_html/system/CodeIgniter.php(941): App\Controllers\Admin\Dashboard->index()
+#7 /home/rebencia.com/public_html/system/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+#8 /home/rebencia.com/public_html/system/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+#9 /home/rebencia.com/public_html/public/index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2026-02-03 22:07:39 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'is_published' in 'WHERE'
+in SYSTEMPATH/Database/BaseConnection.php on line 647.
+ 1 SYSTEMPATH/Database/BaseBuilder.php(1700): CodeIgniter\Database\BaseConnection->query()
+ 2 APPPATH/Controllers/Admin/Dashboard.php(45): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 3 APPPATH/Controllers/Admin/Dashboard.php(19): App\Controllers\Admin\Dashboard->getDashboardStats()
+ 4 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Dashboard->index()
+ 5 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 6 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 22:07:39 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'is_published' in 'WHERE'
+in SYSTEMPATH/Database/MySQLi/Connection.php on line 311.
+ 1 SYSTEMPATH/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+ 2 SYSTEMPATH/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+ 3 SYSTEMPATH/Database/BaseBuilder.php(1700): CodeIgniter\Database\BaseConnection->query()
+ 4 APPPATH/Controllers/Admin/Dashboard.php(45): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 5 APPPATH/Controllers/Admin/Dashboard.php(19): App\Controllers\Admin\Dashboard->getDashboardStats()
+ 6 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Dashboard->index()
+ 7 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 8 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 9 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 22:07:39 --> [Caused by] mysqli_sql_exception: Unknown column 'is_published' in 'WHERE'
+in SYSTEMPATH/Database/MySQLi/Connection.php on line 306.
+ 1 SYSTEMPATH/Database/MySQLi/Connection.php(306): mysqli->query()
+ 2 SYSTEMPATH/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+ 3 SYSTEMPATH/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+ 4 SYSTEMPATH/Database/BaseBuilder.php(1700): CodeIgniter\Database\BaseConnection->query()
+ 5 APPPATH/Controllers/Admin/Dashboard.php(45): CodeIgniter\Database\BaseBuilder->countAllResults()
+ 6 APPPATH/Controllers/Admin/Dashboard.php(19): App\Controllers\Admin\Dashboard->getDashboardStats()
+ 7 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Dashboard->index()
+ 8 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 9 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+10 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 22:17:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-02-03 22:17:11 --> mysqli_sql_exception: Unknown column 'transaction_date' in 'WHERE' in /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php:306
+Stack trace:
+#0 /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php(306): mysqli->query()
+#1 /home/rebencia.com/public_html/system/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+#2 /home/rebencia.com/public_html/system/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+#3 /home/rebencia.com/public_html/system/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+#4 /home/rebencia.com/public_html/app/Controllers/Admin/Dashboard.php(74): CodeIgniter\Database\BaseBuilder->get()
+#5 /home/rebencia.com/public_html/app/Controllers/Admin/Dashboard.php(20): App\Controllers\Admin\Dashboard->getRevenueStats()
+#6 /home/rebencia.com/public_html/system/CodeIgniter.php(941): App\Controllers\Admin\Dashboard->index()
+#7 /home/rebencia.com/public_html/system/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+#8 /home/rebencia.com/public_html/system/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+#9 /home/rebencia.com/public_html/public/index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2026-02-03 22:17:11 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'transaction_date' in 'WHERE'
+in SYSTEMPATH/Database/BaseConnection.php on line 647.
+ 1 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 2 APPPATH/Controllers/Admin/Dashboard.php(74): CodeIgniter\Database\BaseBuilder->get()
+ 3 APPPATH/Controllers/Admin/Dashboard.php(20): App\Controllers\Admin\Dashboard->getRevenueStats()
+ 4 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Dashboard->index()
+ 5 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 6 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 22:17:11 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'transaction_date' in 'WHERE'
+in SYSTEMPATH/Database/MySQLi/Connection.php on line 311.
+ 1 SYSTEMPATH/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+ 2 SYSTEMPATH/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+ 3 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 4 APPPATH/Controllers/Admin/Dashboard.php(74): CodeIgniter\Database\BaseBuilder->get()
+ 5 APPPATH/Controllers/Admin/Dashboard.php(20): App\Controllers\Admin\Dashboard->getRevenueStats()
+ 6 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Dashboard->index()
+ 7 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 8 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 9 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 22:17:11 --> [Caused by] mysqli_sql_exception: Unknown column 'transaction_date' in 'WHERE'
+in SYSTEMPATH/Database/MySQLi/Connection.php on line 306.
+ 1 SYSTEMPATH/Database/MySQLi/Connection.php(306): mysqli->query()
+ 2 SYSTEMPATH/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+ 3 SYSTEMPATH/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+ 4 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 5 APPPATH/Controllers/Admin/Dashboard.php(74): CodeIgniter\Database\BaseBuilder->get()
+ 6 APPPATH/Controllers/Admin/Dashboard.php(20): App\Controllers\Admin\Dashboard->getRevenueStats()
+ 7 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Dashboard->index()
+ 8 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 9 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+10 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 22:17:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-02-03 22:17:15 --> mysqli_sql_exception: Unknown column 'transaction_date' in 'WHERE' in /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php:306
+Stack trace:
+#0 /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php(306): mysqli->query()
+#1 /home/rebencia.com/public_html/system/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+#2 /home/rebencia.com/public_html/system/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+#3 /home/rebencia.com/public_html/system/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+#4 /home/rebencia.com/public_html/app/Controllers/Admin/Dashboard.php(74): CodeIgniter\Database\BaseBuilder->get()
+#5 /home/rebencia.com/public_html/app/Controllers/Admin/Dashboard.php(20): App\Controllers\Admin\Dashboard->getRevenueStats()
+#6 /home/rebencia.com/public_html/system/CodeIgniter.php(941): App\Controllers\Admin\Dashboard->index()
+#7 /home/rebencia.com/public_html/system/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+#8 /home/rebencia.com/public_html/system/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+#9 /home/rebencia.com/public_html/public/index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2026-02-03 22:17:15 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'transaction_date' in 'WHERE'
+in SYSTEMPATH/Database/BaseConnection.php on line 647.
+ 1 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 2 APPPATH/Controllers/Admin/Dashboard.php(74): CodeIgniter\Database\BaseBuilder->get()
+ 3 APPPATH/Controllers/Admin/Dashboard.php(20): App\Controllers\Admin\Dashboard->getRevenueStats()
+ 4 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Dashboard->index()
+ 5 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 6 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 22:17:15 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'transaction_date' in 'WHERE'
+in SYSTEMPATH/Database/MySQLi/Connection.php on line 311.
+ 1 SYSTEMPATH/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+ 2 SYSTEMPATH/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+ 3 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 4 APPPATH/Controllers/Admin/Dashboard.php(74): CodeIgniter\Database\BaseBuilder->get()
+ 5 APPPATH/Controllers/Admin/Dashboard.php(20): App\Controllers\Admin\Dashboard->getRevenueStats()
+ 6 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Dashboard->index()
+ 7 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 8 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 9 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 22:17:15 --> [Caused by] mysqli_sql_exception: Unknown column 'transaction_date' in 'WHERE'
+in SYSTEMPATH/Database/MySQLi/Connection.php on line 306.
+ 1 SYSTEMPATH/Database/MySQLi/Connection.php(306): mysqli->query()
+ 2 SYSTEMPATH/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+ 3 SYSTEMPATH/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+ 4 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 5 APPPATH/Controllers/Admin/Dashboard.php(74): CodeIgniter\Database\BaseBuilder->get()
+ 6 APPPATH/Controllers/Admin/Dashboard.php(20): App\Controllers\Admin\Dashboard->getRevenueStats()
+ 7 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Dashboard->index()
+ 8 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 9 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+10 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 22:20:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-02-03 22:20:44 --> mysqli_sql_exception: Unknown column 't.buyer_id' in 'ON' in /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php:306
+Stack trace:
+#0 /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php(306): mysqli->query()
+#1 /home/rebencia.com/public_html/system/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+#2 /home/rebencia.com/public_html/system/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+#3 /home/rebencia.com/public_html/system/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+#4 /home/rebencia.com/public_html/app/Controllers/Admin/Dashboard.php(98): CodeIgniter\Database\BaseBuilder->get()
+#5 /home/rebencia.com/public_html/app/Controllers/Admin/Dashboard.php(21): App\Controllers\Admin\Dashboard->getRecentTransactions()
+#6 /home/rebencia.com/public_html/system/CodeIgniter.php(941): App\Controllers\Admin\Dashboard->index()
+#7 /home/rebencia.com/public_html/system/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+#8 /home/rebencia.com/public_html/system/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+#9 /home/rebencia.com/public_html/public/index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2026-02-03 22:20:44 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 't.buyer_id' in 'ON'
+in SYSTEMPATH/Database/BaseConnection.php on line 647.
+ 1 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 2 APPPATH/Controllers/Admin/Dashboard.php(98): CodeIgniter\Database\BaseBuilder->get()
+ 3 APPPATH/Controllers/Admin/Dashboard.php(21): App\Controllers\Admin\Dashboard->getRecentTransactions()
+ 4 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Dashboard->index()
+ 5 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 6 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 22:20:44 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 't.buyer_id' in 'ON'
+in SYSTEMPATH/Database/MySQLi/Connection.php on line 311.
+ 1 SYSTEMPATH/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+ 2 SYSTEMPATH/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+ 3 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 4 APPPATH/Controllers/Admin/Dashboard.php(98): CodeIgniter\Database\BaseBuilder->get()
+ 5 APPPATH/Controllers/Admin/Dashboard.php(21): App\Controllers\Admin\Dashboard->getRecentTransactions()
+ 6 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Dashboard->index()
+ 7 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 8 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 9 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 22:20:44 --> [Caused by] mysqli_sql_exception: Unknown column 't.buyer_id' in 'ON'
+in SYSTEMPATH/Database/MySQLi/Connection.php on line 306.
+ 1 SYSTEMPATH/Database/MySQLi/Connection.php(306): mysqli->query()
+ 2 SYSTEMPATH/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+ 3 SYSTEMPATH/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+ 4 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 5 APPPATH/Controllers/Admin/Dashboard.php(98): CodeIgniter\Database\BaseBuilder->get()
+ 6 APPPATH/Controllers/Admin/Dashboard.php(21): App\Controllers\Admin\Dashboard->getRecentTransactions()
+ 7 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Dashboard->index()
+ 8 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 9 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+10 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 22:21:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-02-03 22:21:56 --> mysqli_sql_exception: Unknown column 'z.city' in 'SELECT' in /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php:306
+Stack trace:
+#0 /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php(306): mysqli->query()
+#1 /home/rebencia.com/public_html/system/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+#2 /home/rebencia.com/public_html/system/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+#3 /home/rebencia.com/public_html/system/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+#4 /home/rebencia.com/public_html/app/Controllers/Admin/Dashboard.php(127): CodeIgniter\Database\BaseBuilder->get()
+#5 /home/rebencia.com/public_html/app/Controllers/Admin/Dashboard.php(23): App\Controllers\Admin\Dashboard->getPopularProperties()
+#6 /home/rebencia.com/public_html/system/CodeIgniter.php(941): App\Controllers\Admin\Dashboard->index()
+#7 /home/rebencia.com/public_html/system/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+#8 /home/rebencia.com/public_html/system/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+#9 /home/rebencia.com/public_html/public/index.php(79): CodeIgniter\CodeIgniter->run()
+#10 {main}
+CRITICAL - 2026-02-03 22:21:56 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'z.city' in 'SELECT'
+in SYSTEMPATH/Database/BaseConnection.php on line 647.
+ 1 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 2 APPPATH/Controllers/Admin/Dashboard.php(127): CodeIgniter\Database\BaseBuilder->get()
+ 3 APPPATH/Controllers/Admin/Dashboard.php(23): App\Controllers\Admin\Dashboard->getPopularProperties()
+ 4 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Dashboard->index()
+ 5 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 6 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 22:21:56 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'z.city' in 'SELECT'
+in SYSTEMPATH/Database/MySQLi/Connection.php on line 311.
+ 1 SYSTEMPATH/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+ 2 SYSTEMPATH/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+ 3 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 4 APPPATH/Controllers/Admin/Dashboard.php(127): CodeIgniter\Database\BaseBuilder->get()
+ 5 APPPATH/Controllers/Admin/Dashboard.php(23): App\Controllers\Admin\Dashboard->getPopularProperties()
+ 6 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Dashboard->index()
+ 7 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 8 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 9 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 22:21:56 --> [Caused by] mysqli_sql_exception: Unknown column 'z.city' in 'SELECT'
+in SYSTEMPATH/Database/MySQLi/Connection.php on line 306.
+ 1 SYSTEMPATH/Database/MySQLi/Connection.php(306): mysqli->query()
+ 2 SYSTEMPATH/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+ 3 SYSTEMPATH/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+ 4 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 5 APPPATH/Controllers/Admin/Dashboard.php(127): CodeIgniter\Database\BaseBuilder->get()
+ 6 APPPATH/Controllers/Admin/Dashboard.php(23): App\Controllers\Admin\Dashboard->getPopularProperties()
+ 7 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Dashboard->index()
+ 8 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 9 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+10 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 22:27:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:29:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:29:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:46:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:47:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 22:47:59 --> ParseError: syntax error, unexpected end of file
+in APPPATH/Views/admin/properties/create.php on line 336.
+ 1 SYSTEMPATH/View/View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 2 SYSTEMPATH/Common.php(1178): CodeIgniter\View\View->render()
+ 3 APPPATH/Controllers/Admin/Properties.php(45): view()
+ 4 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Properties->create()
+ 5 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 6 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 22:48:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 22:48:16 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/properties/view.php"
+in SYSTEMPATH/Exceptions/FrameworkException.php on line 39.
+ 1 SYSTEMPATH/View/View.php(216): CodeIgniter\Exceptions\FrameworkException::forInvalidFile()
+ 2 SYSTEMPATH/Common.php(1178): CodeIgniter\View\View->render()
+ 3 APPPATH/Controllers/Admin/Properties.php(263): view()
+ 4 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Properties->view()
+ 5 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 6 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 22:48:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:48:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:51:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:51:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:51:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:51:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:51:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:51:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:51:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:51:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:51:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:51:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:51:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:51:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 22:51:54 --> BadMethodCallException: Call to undefined method App\Models\WorkflowInstanceModel::whereNull
+in SYSTEMPATH/Model.php on line 874.
+ 1 APPPATH/Models/WorkflowInstanceModel.php(69): CodeIgniter\Model->__call()
+ 2 APPPATH/Controllers/Admin/Workflows.php(36): App\Models\WorkflowInstanceModel->getByStage()
+ 3 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Workflows->pipeline()
+ 4 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 5 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 6 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 22:51:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:51:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 22:52:19 --> ErrorException: Undefined array key "full_name"
+in APPPATH/Views/admin/reports/index.php on line 210.
+ 1 APPPATH/Views/admin/reports/index.php(210): CodeIgniter\Debug\Exceptions->errorHandler()
+ 2 SYSTEMPATH/View/View.php(228): include('/home/rebencia.com/public_html/app/Views/admin/reports/index.php')
+ 3 SYSTEMPATH/View/View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH/Common.php(1178): CodeIgniter\View\View->render()
+ 5 APPPATH/Controllers/Admin/Reports.php(37): view()
+ 6 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Reports->index()
+ 7 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 8 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 9 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 22:52:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:52:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:52:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:52:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:52:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:52:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:52:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:52:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:53:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:53:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:54:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:54:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:55:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:55:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:56:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:56:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:57:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:57:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:58:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:58:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:59:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 22:59:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:00:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:00:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 23:00:24 --> BadMethodCallException: Call to undefined method App\Models\WorkflowInstanceModel::whereNull
+in SYSTEMPATH/Model.php on line 874.
+ 1 APPPATH/Models/WorkflowInstanceModel.php(69): CodeIgniter\Model->__call()
+ 2 APPPATH/Controllers/Admin/Workflows.php(36): App\Models\WorkflowInstanceModel->getByStage()
+ 3 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Workflows->pipeline()
+ 4 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 5 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 6 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 23:00:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:00:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:00:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:00:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 23:00:44 --> ErrorException: Declaration of App\Models\SettingModel::set($key, $value) must be compatible with CodeIgniter\Model::set($key, $value = '', ?bool $escape = null)
+in APPPATH/Models/SettingModel.php on line 44.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+INFO - 2026-02-03 23:00:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:00:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:00:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:00:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:01:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:01:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:01:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:01:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:01:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:01:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:01:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 23:01:52 --> ErrorException: Declaration of App\Models\SettingModel::set($key, $value) must be compatible with CodeIgniter\Model::set($key, $value = '', ?bool $escape = null)
+in APPPATH/Models/SettingModel.php on line 44.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+INFO - 2026-02-03 23:01:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:01:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:01:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:01:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 23:02:01 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/properties/view.php"
+in SYSTEMPATH/Exceptions/FrameworkException.php on line 39.
+ 1 SYSTEMPATH/View/View.php(216): CodeIgniter\Exceptions\FrameworkException::forInvalidFile()
+ 2 SYSTEMPATH/Common.php(1178): CodeIgniter\View\View->render()
+ 3 APPPATH/Controllers/Admin/Properties.php(268): view()
+ 4 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Properties->view()
+ 5 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 6 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 23:02:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:02:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:02:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:03:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:03:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:03:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 23:03:19 --> ErrorException: Declaration of App\Models\SettingModel::set($key, $value) must be compatible with CodeIgniter\Model::set($key, $value = '', ?bool $escape = null)
+in APPPATH/Models/SettingModel.php on line 44.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+INFO - 2026-02-03 23:04:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:04:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:05:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:05:18 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:05:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:05:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:05:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:05:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:05:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:05:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:05:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:05:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:05:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:05:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:05:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 23:05:57 --> BadMethodCallException: Call to undefined method App\Models\WorkflowInstanceModel::whereNull
+in SYSTEMPATH/Model.php on line 874.
+ 1 APPPATH/Models/WorkflowInstanceModel.php(69): CodeIgniter\Model->__call()
+ 2 APPPATH/Controllers/Admin/Workflows.php(36): App\Models\WorkflowInstanceModel->getByStage()
+ 3 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Workflows->pipeline()
+ 4 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 5 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 6 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 23:08:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:08:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:08:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:08:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:08:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:08:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:08:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:08:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:08:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 23:08:41 --> CodeIgniter\Database\Exceptions\DatabaseException: Updates are not allowed unless they contain a "where" or "like" clause.
+in SYSTEMPATH/Model.php on line 388.
+ 1 SYSTEMPATH/BaseModel.php(987): CodeIgniter\Model->doUpdate()
+ 2 SYSTEMPATH/Model.php(807): CodeIgniter\BaseModel->update()
+ 3 APPPATH/Models/WorkflowInstanceModel.php(47): CodeIgniter\Model->update()
+ 4 APPPATH/Controllers/Admin/Workflows.php(72): App\Models\WorkflowInstanceModel->moveToStage()
+ 5 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Workflows->moveStage()
+ 6 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 7 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 8 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 23:08:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:08:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:08:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:08:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:09:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:09:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:10:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:10:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:11:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:11:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:12:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:12:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:12:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:13:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:13:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:14:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:14:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:15:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:15:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:16:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:17:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:18:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:18:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:18:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:18:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:18:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:18:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 23:18:38 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/appointments/form.php"
+in SYSTEMPATH/Exceptions/FrameworkException.php on line 39.
+ 1 SYSTEMPATH/View/View.php(216): CodeIgniter\Exceptions\FrameworkException::forInvalidFile()
+ 2 SYSTEMPATH/Common.php(1178): CodeIgniter\View\View->render()
+ 3 APPPATH/Controllers/Admin/Appointments.php(62): view()
+ 4 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Appointments->create()
+ 5 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 6 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 23:18:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:18:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:18:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:18:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:18:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:19:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:19:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:19:13 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:19:43 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:19:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:19:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:19:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:20:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:20:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:20:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:20:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:20:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:20:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:20:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:20:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:20:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:20:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:20:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:20:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:20:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:21:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:21:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:22:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:22:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:22:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:22:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:22:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:22:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:22:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:22:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:23:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:23:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:23:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:23:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:23:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:24:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:24:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:24:37 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:24:47 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:24:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:24:56 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:25:01 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:25:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:25:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 23:25:03 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/properties/view.php"
+in SYSTEMPATH/Exceptions/FrameworkException.php on line 39.
+ 1 SYSTEMPATH/View/View.php(216): CodeIgniter\Exceptions\FrameworkException::forInvalidFile()
+ 2 SYSTEMPATH/Common.php(1178): CodeIgniter\View\View->render()
+ 3 APPPATH/Controllers/Admin/Properties.php(268): view()
+ 4 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Properties->view()
+ 5 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 6 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 23:25:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:25:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:25:24 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:25:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:25:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:25:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:25:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:25:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:25:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:25:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:26:03 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:26:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:26:06 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:26:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:26:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:26:08 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-02-03 23:26:11 --> mysqli_sql_exception: Unknown column 'is_primary' in 'ORDER BY' in /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php:306
+Stack trace:
+#0 /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php(306): mysqli->query()
+#1 /home/rebencia.com/public_html/system/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+#2 /home/rebencia.com/public_html/system/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+#3 /home/rebencia.com/public_html/system/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+#4 /home/rebencia.com/public_html/system/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+#5 /home/rebencia.com/public_html/system/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+#6 /home/rebencia.com/public_html/app/Models/PropertyMediaModel.php(53): CodeIgniter\BaseModel->findAll()
+#7 /home/rebencia.com/public_html/app/Controllers/Admin/Properties.php(160): App\Models\PropertyMediaModel->getPropertyImages()
+#8 /home/rebencia.com/public_html/system/CodeIgniter.php(941): App\Controllers\Admin\Properties->edit()
+#9 /home/rebencia.com/public_html/system/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+#10 /home/rebencia.com/public_html/system/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+#11 /home/rebencia.com/public_html/public/index.php(79): CodeIgniter\CodeIgniter->run()
+#12 {main}
+CRITICAL - 2026-02-03 23:26:11 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'is_primary' in 'ORDER BY'
+in SYSTEMPATH/Database/BaseConnection.php on line 647.
+ 1 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 2 SYSTEMPATH/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+ 4 APPPATH/Models/PropertyMediaModel.php(53): CodeIgniter\BaseModel->findAll()
+ 5 APPPATH/Controllers/Admin/Properties.php(160): App\Models\PropertyMediaModel->getPropertyImages()
+ 6 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Properties->edit()
+ 7 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 8 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 9 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 23:26:11 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'is_primary' in 'ORDER BY'
+in SYSTEMPATH/Database/MySQLi/Connection.php on line 311.
+ 1 SYSTEMPATH/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+ 2 SYSTEMPATH/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+ 3 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 4 SYSTEMPATH/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+ 6 APPPATH/Models/PropertyMediaModel.php(53): CodeIgniter\BaseModel->findAll()
+ 7 APPPATH/Controllers/Admin/Properties.php(160): App\Models\PropertyMediaModel->getPropertyImages()
+ 8 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Properties->edit()
+ 9 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+10 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+11 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 23:26:11 --> [Caused by] mysqli_sql_exception: Unknown column 'is_primary' in 'ORDER BY'
+in SYSTEMPATH/Database/MySQLi/Connection.php on line 306.
+ 1 SYSTEMPATH/Database/MySQLi/Connection.php(306): mysqli->query()
+ 2 SYSTEMPATH/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+ 3 SYSTEMPATH/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+ 4 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 5 SYSTEMPATH/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+ 7 APPPATH/Models/PropertyMediaModel.php(53): CodeIgniter\BaseModel->findAll()
+ 8 APPPATH/Controllers/Admin/Properties.php(160): App\Models\PropertyMediaModel->getPropertyImages()
+ 9 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Properties->edit()
+10 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+11 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+12 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 23:26:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:26:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:26:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:26:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:27:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:27:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:28:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:28:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:29:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:29:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:30:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:30:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:30:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:30:21 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 23:30:21 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/chat/index.php"
+in SYSTEMPATH/Exceptions/FrameworkException.php on line 39.
+ 1 SYSTEMPATH/View/View.php(216): CodeIgniter\Exceptions\FrameworkException::forInvalidFile()
+ 2 SYSTEMPATH/Common.php(1178): CodeIgniter\View\View->render()
+ 3 APPPATH/Controllers/Admin/Chat.php(30): view()
+ 4 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Chat->index()
+ 5 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 6 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 23:30:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:30:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 23:30:26 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/system/index.php"
+in SYSTEMPATH/Exceptions/FrameworkException.php on line 39.
+ 1 SYSTEMPATH/View/View.php(216): CodeIgniter\Exceptions\FrameworkException::forInvalidFile()
+ 2 SYSTEMPATH/Common.php(1178): CodeIgniter\View\View->render()
+ 3 APPPATH/Controllers/Admin/System.php(28): view()
+ 4 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\System->index()
+ 5 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 6 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 23:30:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:30:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:30:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:30:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:30:54 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:30:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:31:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:31:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:31:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:32:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:32:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:33:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:33:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:34:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:34:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:34:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:34:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:34:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:35:04 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:35:05 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:35:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:35:07 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:35:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:35:11 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:35:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 23:35:17 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/objectives/index.php"
+in SYSTEMPATH/Exceptions/FrameworkException.php on line 39.
+ 1 SYSTEMPATH/View/View.php(216): CodeIgniter\Exceptions\FrameworkException::forInvalidFile()
+ 2 SYSTEMPATH/Common.php(1178): CodeIgniter\View\View->render()
+ 3 APPPATH/Controllers/Admin/Objectives.php(38): view()
+ 4 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Objectives->index()
+ 5 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 6 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 23:35:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:35:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:35:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:35:23 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:35:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:35:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 23:35:28 --> CodeIgniter\View\Exceptions\ViewException: Invalid file: "admin/system/index.php"
+in SYSTEMPATH/Exceptions/FrameworkException.php on line 39.
+ 1 SYSTEMPATH/View/View.php(216): CodeIgniter\Exceptions\FrameworkException::forInvalidFile()
+ 2 SYSTEMPATH/Common.php(1178): CodeIgniter\View\View->render()
+ 3 APPPATH/Controllers/Admin/System.php(28): view()
+ 4 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\System->index()
+ 5 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 6 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 23:35:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:35:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:36:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:36:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:37:00 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:37:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:37:20 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:37:26 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 23:37:26 --> ParseError: syntax error, unexpected token ">"
+in APPPATH/Views/admin/objectives/index.php on line 41.
+ 1 SYSTEMPATH/View/View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 2 SYSTEMPATH/Common.php(1178): CodeIgniter\View\View->render()
+ 3 APPPATH/Controllers/Admin/Objectives.php(38): view()
+ 4 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Objectives->index()
+ 5 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 6 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 23:37:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:37:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:37:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:37:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:37:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:37:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:37:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:37:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:38:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:38:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:39:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:39:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:39:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:39:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:39:41 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:39:42 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:39:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:39:48 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:39:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:39:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:40:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:40:31 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:40:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:40:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:40:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 23:40:42 --> ParseError: syntax error, unexpected end of file
+in APPPATH/Views/admin/properties/create.php on line 336.
+ 1 SYSTEMPATH/View/View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 2 SYSTEMPATH/Common.php(1178): CodeIgniter\View\View->render()
+ 3 APPPATH/Controllers/Admin/Properties.php(45): view()
+ 4 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Properties->create()
+ 5 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 6 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 7 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 23:41:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:41:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:41:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:41:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:41:35 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2026-02-03 23:41:35 --> ErrorException: Undefined array key "governorate"
+in APPPATH/Views/admin/clients/create.php on line 127.
+ 1 APPPATH/Views/admin/clients/create.php(127): CodeIgniter\Debug\Exceptions->errorHandler()
+ 2 SYSTEMPATH/View/View.php(228): include('/home/rebencia.com/public_html/app/Views/admin/clients/create.php')
+ 3 SYSTEMPATH/View/View.php(231): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH/Common.php(1178): CodeIgniter\View\View->render()
+ 5 APPPATH/Controllers/Admin/Clients.php(44): view()
+ 6 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Clients->create()
+ 7 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 8 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 9 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+INFO - 2026-02-03 23:41:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:41:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:41:51 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+INFO - 2026-02-03 23:41:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2026-02-03 23:41:53 --> mysqli_sql_exception: Unknown column 'is_published' in 'WHERE' in /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php:306
+Stack trace:
+#0 /home/rebencia.com/public_html/system/Database/MySQLi/Connection.php(306): mysqli->query()
+#1 /home/rebencia.com/public_html/system/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+#2 /home/rebencia.com/public_html/system/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+#3 /home/rebencia.com/public_html/system/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+#4 /home/rebencia.com/public_html/system/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+#5 /home/rebencia.com/public_html/system/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+#6 /home/rebencia.com/public_html/app/Controllers/Admin/Transactions.php(43): CodeIgniter\BaseModel->findAll()
+#7 /home/rebencia.com/public_html/system/CodeIgniter.php(941): App\Controllers\Admin\Transactions->create()
+#8 /home/rebencia.com/public_html/system/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+#9 /home/rebencia.com/public_html/system/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+#10 /home/rebencia.com/public_html/public/index.php(79): CodeIgniter\CodeIgniter->run()
+#11 {main}
+CRITICAL - 2026-02-03 23:41:53 --> CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'is_published' in 'WHERE'
+in SYSTEMPATH/Database/BaseConnection.php on line 647.
+ 1 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 2 SYSTEMPATH/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+ 3 SYSTEMPATH/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+ 4 APPPATH/Controllers/Admin/Transactions.php(43): CodeIgniter\BaseModel->findAll()
+ 5 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Transactions->create()
+ 6 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 7 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+ 8 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 23:41:53 --> [Caused by] CodeIgniter\Database\Exceptions\DatabaseException: Unknown column 'is_published' in 'WHERE'
+in SYSTEMPATH/Database/MySQLi/Connection.php on line 311.
+ 1 SYSTEMPATH/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+ 2 SYSTEMPATH/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+ 3 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 4 SYSTEMPATH/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+ 5 SYSTEMPATH/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+ 6 APPPATH/Controllers/Admin/Transactions.php(43): CodeIgniter\BaseModel->findAll()
+ 7 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Transactions->create()
+ 8 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+ 9 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+10 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()
+CRITICAL - 2026-02-03 23:41:53 --> [Caused by] mysqli_sql_exception: Unknown column 'is_published' in 'WHERE'
+in SYSTEMPATH/Database/MySQLi/Connection.php on line 306.
+ 1 SYSTEMPATH/Database/MySQLi/Connection.php(306): mysqli->query()
+ 2 SYSTEMPATH/Database/BaseConnection.php(693): CodeIgniter\Database\MySQLi\Connection->execute()
+ 3 SYSTEMPATH/Database/BaseConnection.php(607): CodeIgniter\Database\BaseConnection->simpleQuery()
+ 4 SYSTEMPATH/Database/BaseBuilder.php(1616): CodeIgniter\Database\BaseConnection->query()
+ 5 SYSTEMPATH/Model.php(242): CodeIgniter\Database\BaseBuilder->get()
+ 6 SYSTEMPATH/BaseModel.php(638): CodeIgniter\Model->doFindAll()
+ 7 APPPATH/Controllers/Admin/Transactions.php(43): CodeIgniter\BaseModel->findAll()
+ 8 SYSTEMPATH/CodeIgniter.php(941): App\Controllers\Admin\Transactions->create()
+ 9 SYSTEMPATH/CodeIgniter.php(502): CodeIgniter\CodeIgniter->runController()
+10 SYSTEMPATH/CodeIgniter.php(361): CodeIgniter\CodeIgniter->handleRequest()
+11 FCPATH/index.php(79): CodeIgniter\CodeIgniter->run()

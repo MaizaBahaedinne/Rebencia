@@ -3,25 +3,51 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
+use App\Libraries\HierarchyHelper;
 
 class Clients extends BaseController
 {
     protected $clientModel;
     protected $userModel;
     protected $agencyModel;
+    protected $hierarchyHelper;
 
     public function __construct()
     {
         $this->clientModel = model('ClientModel');
         $this->userModel = model('UserModel');
         $this->agencyModel = model('AgencyModel');
+        $this->hierarchyHelper = new HierarchyHelper();
     }
 
     public function index()
     {
+        // Récupérer l'utilisateur connecté
+        $currentUserId = session()->get('user_id');
+        
+        if (!$currentUserId) {
+            return redirect()->to('/login')->with('error', 'Session expirée');
+        }
+        
+        // Récupérer les IDs des utilisateurs accessibles (self + subordonnés récursifs)
+        $accessibleUserIds = $this->hierarchyHelper->getAccessibleUserIds($currentUserId);
+        
+        if (empty($accessibleUserIds)) {
+            $accessibleUserIds = [$currentUserId];
+        }
+        
+        // Filtrer les clients selon la hiérarchie
+        $clients = $this->clientModel
+            ->select('clients.*, users.first_name as agent_name, users.last_name as agent_lastname, agencies.name as agency_name')
+            ->join('users', 'users.id = clients.assigned_to', 'left')
+            ->join('agencies', 'agencies.id = clients.agency_id', 'left')
+            ->whereIn('clients.assigned_to', $accessibleUserIds)
+            ->orderBy('clients.created_at', 'DESC')
+            ->paginate(20);
+        
         $data = [
             'title' => 'Gestion des Clients',
-            'clients' => $this->clientModel->getAllWithAgencyFilter(20),
+            'clients' => $clients,
             'pager' => $this->clientModel->pager
         ];
 

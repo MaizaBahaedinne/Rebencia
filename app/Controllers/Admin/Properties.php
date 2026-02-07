@@ -22,13 +22,24 @@ class Properties extends BaseController
 
     public function index()
     {
-        // Récupérer les IDs des utilisateurs accessibles
+        // Récupérer l'utilisateur connecté
         $currentUserId = session()->get('user_id');
+        
+        if (!$currentUserId) {
+            return redirect()->to('/login')->with('error', 'Session expirée');
+        }
+        
+        // Récupérer les IDs des utilisateurs accessibles (self + subordonnés récursifs)
         $accessibleUserIds = $this->hierarchyHelper->getAccessibleUserIds($currentUserId);
         
         // Filtrer les propriétés selon la hiérarchie
+        if (empty($accessibleUserIds)) {
+            $accessibleUserIds = [$currentUserId]; // Au minimum, l'utilisateur voit ses propres biens
+        }
+        
         $properties = $this->propertyModel
             ->whereIn('agent_id', $accessibleUserIds)
+            ->orderBy('created_at', 'DESC')
             ->paginate(20);
         
         $data = [

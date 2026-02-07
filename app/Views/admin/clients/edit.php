@@ -337,12 +337,12 @@
                         <!-- Préférences -->
                         <div class="mb-3">
                             <h6 class="text-muted mb-2"><i class="fas fa-search"></i> Préférences</h6>
-                            <p class="text-muted small mb-1"><strong>Type:</strong> <span id="summaryPropertyType"><?= $client['property_type_preference'] ? ucfirst($client['property_type_preference']) : '-' ?></span></p>
-                            <p class="text-muted small mb-1"><strong>Transaction:</strong> <span id="summaryTransType"><?= $client['transaction_type_preference'] ? ucfirst($client['transaction_type_preference']) : '-' ?></span></p>
+                            <p class="text-muted small mb-1"><strong>Type:</strong> <span id="summaryPropertyType"><?= isset($client['property_type_preference']) && $client['property_type_preference'] ? ucfirst($client['property_type_preference']) : '-' ?></span></p>
+                            <p class="text-muted small mb-1"><strong>Transaction:</strong> <span id="summaryTransType"><?= isset($client['transaction_type_preference']) && $client['transaction_type_preference'] ? ucfirst($client['transaction_type_preference']) : '-' ?></span></p>
                             <p class="text-muted small mb-0"><strong>Budget:</strong> <span id="summaryBudget">
                                 <?php 
-                                if ($client['budget_min'] || $client['budget_max']) {
-                                    echo ($client['budget_min'] ? number_format($client['budget_min']) : '0') . ' - ' . ($client['budget_max'] ? number_format($client['budget_max']) : '∞') . ' TND';
+                                if ((isset($client['budget_min']) && $client['budget_min']) || (isset($client['budget_max']) && $client['budget_max'])) {
+                                    echo (isset($client['budget_min']) && $client['budget_min'] ? number_format($client['budget_min']) : '0') . ' - ' . (isset($client['budget_max']) && $client['budget_max'] ? number_format($client['budget_max']) : '∞') . ' TND';
                                 } else {
                                     echo '-';
                                 }

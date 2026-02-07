@@ -54,7 +54,43 @@
                     <h5 class="mb-0"><i class="fas fa-align-left me-2"></i>Description</h5>
                 </div>
                 <div class="card-body">
+                    <?php if (!empty($property['title_ar']) || !empty($property['title_en'])): ?>
+                        <h6 class="mb-3"><i class="fas fa-language me-2"></i>Titres multilingues</h6>
+                        <?php if (!empty($property['title'])): ?>
+                            <div class="mb-2">
+                                <span class="badge bg-primary">FR</span>
+                                <strong><?= esc($property['title']) ?></strong>
+                            </div>
+                        <?php endif ?>
+                        <?php if (!empty($property['title_ar'])): ?>
+                            <div class="mb-2">
+                                <span class="badge bg-info">AR</span>
+                                <strong><?= esc($property['title_ar']) ?></strong>
+                            </div>
+                        <?php endif ?>
+                        <?php if (!empty($property['title_en'])): ?>
+                            <div class="mb-2">
+                                <span class="badge bg-success">EN</span>
+                                <strong><?= esc($property['title_en']) ?></strong>
+                            </div>
+                        <?php endif ?>
+                        <hr class="my-3">
+                    <?php endif ?>
+                    
+                    <h6 class="mb-2"><i class="fas fa-file-alt me-2"></i>Description (FR)</h6>
                     <p><?= nl2br(esc($property['description'])) ?></p>
+                    
+                    <?php if (!empty($property['description_ar'])): ?>
+                        <hr class="my-3">
+                        <h6 class="mb-2"><i class="fas fa-file-alt me-2"></i>Description (AR)</h6>
+                        <p dir="rtl"><?= nl2br(esc($property['description_ar'])) ?></p>
+                    <?php endif ?>
+                    
+                    <?php if (!empty($property['description_en'])): ?>
+                        <hr class="my-3">
+                        <h6 class="mb-2"><i class="fas fa-file-alt me-2"></i>Description (EN)</h6>
+                        <p><?= nl2br(esc($property['description_en'])) ?></p>
+                    <?php endif ?>
                 </div>
             </div>
 
@@ -69,11 +105,44 @@
                             <div class="d-flex align-items-center">
                                 <i class="fas fa-ruler-combined text-primary me-2"></i>
                                 <div>
-                                    <small class="text-muted">Surface</small>
+                                    <small class="text-muted">Surface totale</small>
                                     <div><strong><?= number_format($property['area_total'] ?? 0) ?> m²</strong></div>
                                 </div>
                             </div>
                         </div>
+                        <?php if (!empty($property['area_living'])): ?>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-home text-primary me-2"></i>
+                                    <div>
+                                        <small class="text-muted">Surface habitable</small>
+                                        <div><strong><?= number_format($property['area_living']) ?> m²</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif ?>
+                        <?php if (!empty($property['area_land'])): ?>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-map text-primary me-2"></i>
+                                    <div>
+                                        <small class="text-muted">Surface terrain</small>
+                                        <div><strong><?= number_format($property['area_land']) ?> m²</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif ?>
+                        <?php if (!empty($property['rooms'])): ?>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-door-open text-primary me-2"></i>
+                                    <div>
+                                        <small class="text-muted">Nombre de pièces</small>
+                                        <div><strong><?= $property['rooms'] ?></strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif ?>
                         <div class="col-md-4">
                             <div class="d-flex align-items-center">
                                 <i class="fas fa-bed text-primary me-2"></i>
@@ -119,8 +188,41 @@
                                 <div class="d-flex align-items-center">
                                     <i class="fas fa-calendar text-primary me-2"></i>
                                     <div>
-                                        <small class="text-muted">Année</small>
+                                        <small class="text-muted">Année construction</small>
                                         <div><strong><?= esc($property['construction_year']) ?></strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif ?>
+                        <?php if (!empty($property['total_floors'])): ?>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-layer-group text-primary me-2"></i>
+                                    <div>
+                                        <small class="text-muted">Nombre d'étages</small>
+                                        <div><strong><?= esc($property['total_floors']) ?></strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif ?>
+                        <?php if (!empty($property['standing'])): ?>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-star text-warning me-2"></i>
+                                    <div>
+                                        <small class="text-muted">Standing</small>
+                                        <div><strong><?= ucfirst(esc($property['standing'])) ?></strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif ?>
+                        <?php if (!empty($property['condition_state'])): ?>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-tools text-info me-2"></i>
+                                    <div>
+                                        <small class="text-muted">État</small>
+                                        <div><strong><?= ucfirst(esc($property['condition_state'])) ?></strong></div>
                                     </div>
                                 </div>
                             </div>
@@ -158,12 +260,27 @@
                         <p class="mb-2">
                             <i class="fas fa-city text-primary me-2"></i>
                             <?= esc($property['city']) ?><?= $property['governorate'] ? ', ' . esc($property['governorate']) : '' ?>
+                            <?php if (!empty($property['postal_code'])): ?>
+                                - <?= esc($property['postal_code']) ?>
+                            <?php endif ?>
                         </p>
                     <?php endif ?>
                     <?php if ($property['zone_name']): ?>
-                        <p class="mb-0">
+                        <p class="mb-2">
                             <i class="fas fa-map text-primary me-2"></i>
                             Zone: <?= esc($property['zone_name']) ?>
+                        </p>
+                    <?php endif ?>
+                    <?php if (!empty($property['latitude']) && !empty($property['longitude'])): ?>
+                        <p class="mb-2">
+                            <i class="fas fa-globe text-primary me-2"></i>
+                            Coordonnées GPS: <code><?= number_format($property['latitude'], 6) ?>, <?= number_format($property['longitude'], 6) ?></code>
+                        </p>
+                    <?php endif ?>
+                    <?php if (!empty($property['legal_status'])): ?>
+                        <p class="mb-0">
+                            <i class="fas fa-gavel text-primary me-2"></i>
+                            Statut légal: <strong><?= ucfirst(esc($property['legal_status'])) ?></strong>
                         </p>
                     <?php endif ?>
                 </div>
@@ -230,14 +347,26 @@
                             <div><strong><?= esc($property['agency_name']) ?></strong></div>
                         </div>
                     <?php endif ?>
+                    <?php if (!empty($property['internal_estimation'])): ?>
+                        <div class="mb-3">
+                            <small class="text-muted">Estimation interne</small>
+                            <div><strong><?= number_format($property['internal_estimation']) ?> TND</strong></div>
+                        </div>
+                    <?php endif ?>
                     <div class="mb-3">
                         <small class="text-muted">Vues</small>
                         <div><strong><?= number_format($property['views_count'] ?? 0) ?></strong></div>
                     </div>
-                    <div class="mb-0">
+                    <div class="mb-3">
                         <small class="text-muted">Créé le</small>
                         <div><strong><?= date('d/m/Y', strtotime($property['created_at'])) ?></strong></div>
                     </div>
+                    <?php if (!empty($property['published_at'])): ?>
+                        <div class="mb-0">
+                            <small class="text-muted">Publié le</small>
+                            <div><strong><?= date('d/m/Y', strtotime($property['published_at'])) ?></strong></div>
+                        </div>
+                    <?php endif ?>
                 </div>
             </div>
 

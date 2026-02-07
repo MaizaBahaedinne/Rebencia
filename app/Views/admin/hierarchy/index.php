@@ -385,7 +385,7 @@ document.querySelectorAll('.org-card').forEach(card => {
 
 <?php
 /**
- * Helper function to render organization chart grouped by agency and team
+ * Helper function to render organization chart grouped by agency
  */
 function renderOrgChartGrouped() {
     $userModel = new \App\Models\UserModel();
@@ -419,84 +419,10 @@ function renderOrgChartGrouped() {
         
         $html .= '<div class="agency-content show" id="agency-' . $agency['id'] . '">';
         
-        // Grouper par manager (équipes)
-        $managers = [];
-        $noManagerUsers = [];
-        
-        foreach ($agencyUsers as $user) {
-            if ($user['manager_id']) {
-                if (!isset($managers[$user['manager_id']])) {
-                    $managers[$user['manager_id']] = [];
-                }
-                $managers[$user['manager_id']][] = $user;
-            } else {
-                $noManagerUsers[] = $user;
-            }
-        }
-        
-        // Afficher les managers et leurs équipes
-        foreach ($managers as $managerId => $teamMembers) {
-            $manager = $userModel->find($managerId);
-            if (!$manager) continue;
-            
-            $role = $roleModel->find($manager['role_id']);
-            $roleLabel = $role ? ucfirst(str_replace('_', ' ', $role['name'])) : 'Manager';
-            
-            $html .= '<div class="team-group">';
-            $html .= '<div class="team-header" onclick="toggleTeam(' . $managerId . ')">';
-            $html .= '<div class="d-flex align-items-center gap-2">';
-            $html .= '<h5><i class="fas fa-users"></i> Équipe de ' . esc($manager['first_name'] . ' ' . $manager['last_name']) . '</h5>';
-            $html .= '<span class="badge bg-light text-dark" style="font-size: 10px;">' . count($teamMembers) . ' membre(s)</span>';
-            $html .= '</div>';
-            $html .= '<div class="team-toggle" id="toggle-team-' . $managerId . '"><i class="fas fa-chevron-down"></i></div>';
-            $html .= '</div>';
-            
-            $html .= '<div class="team-content show" id="team-' . $managerId . '">';
-            
-            // Afficher le manager
-            $html .= '<div class="mb-3">';
-            $html .= '<h6 class="text-muted mb-2"><i class="fas fa-user-tie"></i> Manager</h6>';
-            $html .= '<div class="team-members">';
-            $html .= renderUserCard($manager, $roleModel, $agencyModel);
-            $html .= '</div>';
-            $html .= '</div>';
-            
-            // Afficher les membres de l'équipe
-            if (!empty($teamMembers)) {
-                $html .= '<div>';
-                $html .= '<h6 class="text-muted mb-2"><i class="fas fa-user-friends"></i> Membres de l\'équipe</h6>';
-                $html .= '<div class="team-members">';
-                foreach ($teamMembers as $member) {
-                    $html .= renderUserCard($member, $roleModel, $agencyModel);
-                }
-                $html .= '</div>';
-                $html .= '</div>';
-            }
-            
-            $html .= '</div>'; // team-content
-            $html .= '</div>'; // team-group
-        }
-        
-        // Afficher les utilisateurs sans manager
-        if (!empty($noManagerUsers)) {
-            $html .= '<div class="team-group">';
-            $html .= '<div class="team-header" onclick="toggleTeam(\'no-manager-' . $agency['id'] . '\')">';
-            $html .= '<div class="d-flex align-items-center gap-2">';
-            $html .= '<h5><i class="fas fa-user"></i> Sans équipe assignée</h5>';
-            $html .= '<span class="badge bg-warning text-dark" style="font-size: 10px;">' . count($noManagerUsers) . ' personne(s)</span>';
-            $html .= '</div>';
-            $html .= '<div class="team-toggle" id="toggle-team-no-manager-' . $agency['id'] . '"><i class="fas fa-chevron-down"></i></div>';
-            $html .= '</div>';
-            
-            $html .= '<div class="team-content show" id="team-no-manager-' . $agency['id'] . '">';
-            $html .= '<div class="team-members">';
-            foreach ($noManagerUsers as $user) {
-                $html .= renderUserCard($user, $roleModel, $agencyModel);
-            }
-            $html .= '</div>';
-            $html .= '</div>';
-            $html .= '</div>';
-        }
+        // Construire l'arbre hiérarchique pour cette agence
+        $html .= '<div class="agency-tree">';
+        $html .= buildAgencyTree($agencyUsers, $userModel, $roleModel, $agencyModel);
+        $html .= '</div>';
         
         $html .= '</div>'; // agency-content
         $html .= '</div>'; // agency-group
@@ -514,10 +440,8 @@ function renderOrgChartGrouped() {
         $html .= '</div>';
         
         $html .= '<div class="agency-content show" id="agency-no-agency">';
-        $html .= '<div class="team-members">';
-        foreach ($usersWithoutAgency as $user) {
-            $html .= renderUserCard($user, $roleModel, $agencyModel);
-        }
+        $html .= '<div class="agency-tree">';
+        $html .= buildAgencyTree($usersWithoutAgency, $userModel, $roleModel, $agencyModel);
         $html .= '</div>';
         $html .= '</div>';
         $html .= '</div>';
@@ -533,7 +457,44 @@ function renderOrgChartGrouped() {
     return $html;
 }
 
-function renderUserCard($user, $roleModel, $agencyModel) {
+/**
+ * Build hierarchical tree for an agency
+ */
+function buildAgencyTree($users, $userModel, $roleModel, $agencyModel) {
+    // Trouver les responsables (sans manager dans cette agence)
+    $roots = [];
+    $userIds = array_column($users, 'id');
+    
+    foreach ($users as $user) {
+        // Si pas de manager, ou si le manager n'est pas dans cette agence
+        if (!$user['manager_id'] || !in_array($user['manager_id'], $userIds)) {
+            $roots[] = $user;
+        }
+    }
+    
+    if (empty($roots)) {
+        // Si pas de racine trouvée, afficher tous les utilisateurs
+        $html = '<div class="org-node root">';
+        foreach ($users as $user) {
+            $html .= renderAgencyUserNode($user, $userModel, $roleModel, $agencyModel, $users);
+        }
+        $html .= '</div>';
+        return $html;
+    }
+    
+    $html = '<div class="org-node root">';
+    foreach ($roots as $root) {
+        $html .= renderAgencyUserNode($root, $userModel, $roleModel, $agencyModel, $users);
+    }
+    $html .= '</div>';
+    
+    return $html;
+}
+
+/**
+ * Render a user node with their subordinates in the agency
+ */
+function renderAgencyUserNode($user, $userModel, $roleModel, $agencyModel, $agencyUsers) {
     $initials = strtoupper(substr($user['first_name'], 0, 1) . substr($user['last_name'], 0, 1));
     
     $role = $roleModel->find($user['role_id']);
@@ -542,11 +503,18 @@ function renderUserCard($user, $roleModel, $agencyModel) {
     $roleLabel = $role ? ucfirst(str_replace('_', ' ', $role['name'])) : 'Non défini';
     $agencyLabel = $agency ? $agency['name'] : 'Non affecté';
     
-    // Déterminer la classe de style
-    $userModel = new \App\Models\UserModel();
-    $subordinateCount = $userModel->where('manager_id', $user['id'])->countAllResults();
+    // Trouver les subordonnés dans cette agence
+    $agencyUserIds = array_column($agencyUsers, 'id');
+    $subordinates = [];
+    foreach ($agencyUsers as $agencyUser) {
+        if ($agencyUser['manager_id'] == $user['id']) {
+            $subordinates[] = $agencyUser;
+        }
+    }
+    $subordinateCount = count($subordinates);
     
-    if (!$user['manager_id'] && $subordinateCount > 0) {
+    // Déterminer la classe de style
+    if (!$user['manager_id']) {
         $levelClass = 'ceo';
     } else if ($subordinateCount > 0) {
         $levelClass = 'manager';
@@ -571,7 +539,18 @@ function renderUserCard($user, $roleModel, $agencyModel) {
     
     $html .= '</div>';
     
+    // Afficher les subordonnés
+    if ($subordinateCount > 0) {
+        $html .= '<div class="org-children">';
+        foreach ($subordinates as $subordinate) {
+            $html .= '<div class="org-node">';
+            $html .= renderAgencyUserNode($subordinate, $userModel, $roleModel, $agencyModel, $agencyUsers);
+            $html .= '</div>';
+        }
+        $html .= '</div>';
+    }
+    
     return $html;
 }
 
-?>
+?>?>

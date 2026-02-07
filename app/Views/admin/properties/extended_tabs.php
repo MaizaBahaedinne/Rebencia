@@ -3,7 +3,14 @@
 
 <?php
 $extended = model(\App\Models\PropertyExtendedModel::class);
-$config = service(\App\Services\PropertyConfigService::class);
+
+// Essayer de charger le service PropertyConfigService
+try {
+    $config = service(\App\Services\PropertyConfigService::class);
+} catch (\Exception $e) {
+    $config = null;
+}
+
 $propertyType = $property['type'] ?? 'apartment';
 $propertyId = $property['id'] ?? 0;
 
@@ -16,10 +23,9 @@ $costs = $extended->getEstimatedCosts($propertyId);
 $orientation = $extended->getOrientation($propertyId);
 $mediaFiles = $extended->getMediaExtension($propertyId);
 
-// Vérifier features activées
+// Vérifier features activées - Si le service n'est pas disponible, afficher toutes les sections
 if ($config === null) {
-    echo '<div class="alert alert-danger">Erreur : le service PropertyConfigService n\'est pas disponible.</div>';
-    $enabledFeatures = [];
+    $enabledFeatures = ['rooms', 'options', 'location', 'financial', 'costs', 'orientation', 'media'];
 } else {
     $enabledFeatures = $config->getVisibleSections($propertyType);
 }

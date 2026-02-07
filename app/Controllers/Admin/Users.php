@@ -488,11 +488,25 @@ class Users extends BaseController
             return redirect()->to('/admin/users')->with('error', 'Utilisateur introuvable');
         }
 
+        // Récupérer le niveau du rôle de l'utilisateur connecté
+        $currentUserRoleLevel = session()->get('role_level');
+        
+        // Filtrer les rôles : afficher uniquement ceux en dessous du niveau de l'utilisateur connecté
+        // Admin (level 100) voit tous les rôles
+        if ($currentUserRoleLevel == 100) {
+            $availableRoles = $this->roleModel->orderBy('level', 'DESC')->findAll();
+        } else {
+            $availableRoles = $this->roleModel
+                ->where('level <', $currentUserRoleLevel)
+                ->orderBy('level', 'DESC')
+                ->findAll();
+        }
+
         $data = [
             'title' => 'Gestion des Rôles - ' . $user['first_name'] . ' ' . $user['last_name'],
             'page_title' => 'Gestion des Rôles',
             'user' => $user,
-            'allRoles' => $this->roleModel->orderBy('level', 'DESC')->findAll()
+            'allRoles' => $availableRoles
         ];
 
         return view('admin/users/manage_roles', $data);

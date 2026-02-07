@@ -307,19 +307,5 @@
 </form>
 
 <!-- Onglets des extensions -->
-<div class="row mt-5">
-    <div class="col-12">
-        <div class="card card-modern">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-puzzle-piece text-primary"></i> Extensions
-                </h5>
-            </div>
-            <div class="card-body">
-                <?= view('admin/properties/extended_tabs', ['property' => $property]) ?>
-            </div>
-        </div>
-    </div>
-</div>
 
 <?= $this->endSection() ?>

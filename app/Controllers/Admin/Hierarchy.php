@@ -46,7 +46,7 @@ class Hierarchy extends BaseController
     /**
      * Assign manager to user
      */
-    public function assignManager()
+    public function assignManager($userId = null)
     {
         if ($this->request->getMethod() === 'post') {
             $userId = $this->request->getPost('user_id');
@@ -55,24 +55,28 @@ class Hierarchy extends BaseController
             // Vérifier que le manager n'est pas un subordonné de l'utilisateur
             $subordinates = $this->hierarchyHelper->getAllSubordinates($userId);
             if (in_array($managerId, $subordinates)) {
-                return $this->response->setJSON([
-                    'success' => false,
-                    'message' => 'Le manager ne peut pas être un subordonné de l\'utilisateur'
-                ]);
+                return redirect()->back()->with('error', 'Le manager ne peut pas être un subordonné de l\'utilisateur');
             }
             
             // Mettre à jour
             $this->userModel->update($userId, ['manager_id' => $managerId]);
             
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => 'Manager assigné avec succès'
-            ]);
+            return redirect()->to('/admin/hierarchy/view-user/' . $userId)->with('success', 'Manager assigné avec succès');
+        }
+        
+        // Si userId fourni, récupérer l'utilisateur
+        $selectedUser = null;
+        if ($userId) {
+            $selectedUser = $this->userModel->find($userId);
+            if (!$selectedUser) {
+                return redirect()->to('/admin/hierarchy')->with('error', 'Utilisateur non trouvé');
+            }
         }
         
         $data = [
             'title' => 'Assigner un manager',
-            'users' => $this->userModel->where('role_id >', 1)->findAll(),
+            'selectedUser' => $selectedUser,
+            'users' => $this->userModel->findAll(),
             'managers' => $this->userModel->findAll()
         ];
         

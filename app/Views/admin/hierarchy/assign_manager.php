@@ -35,7 +35,7 @@
                         <select class="form-select" id="user_id" name="user_id" required>
                             <option value="">-- Sélectionner un utilisateur --</option>
                             <?php foreach ($users as $user): ?>
-                                <option value="<?= $user['id'] ?>" <?= isset($_GET['user']) && $_GET['user'] == $user['id'] ? 'selected' : '' ?>>
+                                <option value="<?= $user['id'] ?>" <?= isset($selectedUser) && $selectedUser['id'] == $user['id'] ? 'selected' : '' ?>>
                                     <?= esc($user['first_name'] . ' ' . $user['last_name']) ?> (<?= esc($user['email']) ?>)
                                 </option>
                             <?php endforeach ?>
@@ -91,34 +91,15 @@
 <?= $this->section('scripts') ?>
 <script>
 document.getElementById('assignManagerForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
     const formData = new FormData(this);
     const userId = formData.get('user_id');
     const managerId = formData.get('manager_id');
     
     if (userId === managerId) {
+        e.preventDefault();
         alert('Un utilisateur ne peut pas être son propre manager');
         return;
     }
-    
-    fetch('<?= base_url('admin/hierarchy/assign-manager') ?>', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert(data.message);
-            window.location.href = '<?= base_url('admin/hierarchy') ?>';
-        } else {
-            alert(data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Une erreur est survenue');
-    });
 });
 </script>
 <?= $this->endSection() ?>

@@ -3,6 +3,16 @@
 <?= $this->section('styles') ?>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
+    .datatable-filter {
+        position: relative;
+        z-index: 1;
+    }
+    .datatable-filter select,
+    .datatable-filter input {
+        font-size: 11px;
+        padding: 2px 5px;
+        height: 28px;
+    }
     .split-view-wrapper {
         position: relative;
         height: calc(100vh - 160px);
@@ -24,6 +34,8 @@
         width: 50%;
         overflow-y: auto;
         background: white;
+        position: relative;
+        z-index: 1;
     }
     .map-panel {
         width: 50%;
@@ -377,12 +389,28 @@ document.addEventListener('mouseup', () => {
 });
 
 $(document).ready(function() {
-    initDataTableWithFilters('propertiesTable', {
+    // Utiliser initSimpleDataTable au lieu de initDataTableWithFilters pour éviter les filtres intrusifs
+    $('#propertiesTable').DataTable({
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/fr-FR.json',
+            search: "Rechercher:",
+            lengthMenu: "Afficher _MENU_ entrées",
+            info: "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+            paginate: {
+                first: "Premier",
+                last: "Dernier",
+                next: "Suivant",
+                previous: "Précédent"
+            }
+        },
         order: [[0, 'desc']],
         columnDefs: [
             { orderable: false, targets: 6 }
         ],
-        pageLength: 25
+        pageLength: 25,
+        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tous"]],
+        responsive: true,
+        autoWidth: false
     });
     
     initMap();

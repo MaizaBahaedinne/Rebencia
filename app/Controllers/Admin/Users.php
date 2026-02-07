@@ -617,4 +617,107 @@ class Users extends BaseController
         
         return redirect()->to('/admin/dashboard')->with('success', 'Vous êtes de retour sur votre compte administrateur');
     }
+
+    /**
+     * Bulk management page
+     */
+    public function bulkManage()
+    {
+        $data = [
+            'title' => 'Gestion en masse des utilisateurs',
+            'users' => $this->userModel->select('users.*, roles.name as role_name, agencies.name as agency_name, 
+                                                 CONCAT(managers.first_name, " ", managers.last_name) as manager_name')
+                ->join('roles', 'roles.id = users.role_id', 'left')
+                ->join('agencies', 'agencies.id = users.agency_id', 'left')
+                ->join('users as managers', 'managers.id = users.manager_id', 'left')
+                ->orderBy('users.first_name', 'ASC')
+                ->findAll(),
+            'agencies' => $this->agencyModel->where('status', 'active')->findAll(),
+            'roles' => $this->roleModel->findAll(),
+            'managers' => $this->userModel->select('users.*, roles.name as role_name')
+                ->join('roles', 'roles.id = users.role_id', 'left')
+                ->orderBy('users.first_name', 'ASC')
+                ->findAll()
+        ];
+
+        return view('admin/users/bulk_manage', $data);
+    }
+
+    /**
+     * Execute bulk action
+     */
+    public function bulkAction()
+    {
+        if (!$this->request->isAJAX()) {
+            return redirect()->to('/admin/users/bulk-manage');
+        }
+
+        $json = $this->request->getJSON();
+        $userIds = $json->user_ids ?? [];
+        $action = $json->action ?? '';
+
+        if (empty($userIds)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Aucun utilisateur sélectionné'
+            ]);
+        }
+
+        try {
+            switch ($action) {
+                case 'agency':
+                    $agencyId = $json->agency_id ?? null;
+                    $this->userModel->whereIn('id', $userIds)->set(['agency_id' => $agencyId])->update();
+                    $message = 'Agence mise à jour pour ' . count($userIds) . ' utilisateur(s)';
+                    break;
+
+                case 'manager':
+                    $managerId = $json->manager_id ?? null;
+                    $this->userModel->whereIn('id', $userIds)->set(['manager_id' => $managerId])->update();
+                    $message = 'Manager mis à jour pour ' . count($userIds) . ' utilisateur(s)';
+                    break;
+
+                case 'role':
+                    $roleId = $json->role_id ?? null;
+                    if (!$roleId) {
+                        throw new \Exception('Rôle non spécifié');
+                    }
+                    $this->userModel->whereIn('id', $userIds)->set(['role_id' => $roleId])->update();
+                    $message = 'Rôle mis à jour pour ' . count($userIds) . ' utilisateur(s)';
+                    break;
+
+                case 'status':
+                    $status = $json->status ?? 'active';
+                    $this->userModel->whereIn('id', $userIds)->set(['status' => $status])->update();
+                    $message = 'Statut mis à jour pour ' . count($userIds) . ' utilisateur(s)';
+                    break;
+
+                case 'delete':
+                    // Vérifier qu'on ne supprime pas l'utilisateur actuel
+                    $currentUserId = session()->get('user_id');
+                    if (in_array($currentUserId, $userIds)) {
+                        return $this->response->setJSON([
+                            'success' => false,
+                            'message' => 'Vous ne pouvez pas supprimer votre propre compte'
+                        ]);
+                    }
+                    $this->userModel->whereIn('id', $userIds)->delete();
+                    $message = count($userIds) . ' utilisateur(s) supprimé(s)';
+                    break;
+
+                default:
+                    throw new \Exception('Action non reconnue');
+            }
+
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => $message
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Erreur : ' . $e->getMessage()
+            ]);
+        }
+    }
 }

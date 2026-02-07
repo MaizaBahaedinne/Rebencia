@@ -110,15 +110,116 @@ class Hierarchy extends BaseController
         $propertyModel = new \App\Models\PropertyModel();
         $properties = $propertyModel->where('agent_id', $userId)->findAll();
         
+        // Récupérer les listes pour les affectations
+        $roleModel = new \App\Models\RoleModel();
+        $agencyModel = new \App\Models\AgencyModel();
+        
         $data = [
             'title' => 'Hiérarchie de ' . $user['first_name'] . ' ' . $user['last_name'],
             'user' => $user,
             'manager' => $manager,
             'subordinates' => $subordinates,
             'totalSubordinatesCount' => count($allSubordinates),
-            'properties' => $properties
+            'properties' => $properties,
+            'roles' => $roleModel->findAll(),
+            'agencies' => $agencyModel->where('status', 'active')->findAll(),
+            'managers' => $this->userModel->findAll()
         ];
         
         return view('admin/hierarchy/view_user', $data);
+    }
+    
+    /**
+     * Update user role
+     */
+    public function updateRole($userId)
+    {
+        if (!$this->request->isAJAX()) {
+            return redirect()->to('/admin/hierarchy/view-user/' . $userId);
+        }
+        
+        $roleId = $this->request->getPost('role_id');
+        
+        if (!$roleId) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Rôle non spécifié'
+            ]);
+        }
+        
+        try {
+            $this->userModel->update($userId, ['role_id' => $roleId]);
+            
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Rôle mis à jour avec succès'
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Erreur : ' . $e->getMessage()
+            ]);
+        }
+    }
+    
+    /**
+     * Update user agency
+     */
+    public function updateAgency($userId)
+    {
+        if (!$this->request->isAJAX()) {
+            return redirect()->to('/admin/hierarchy/view-user/' . $userId);
+        }
+        
+        $agencyId = $this->request->getPost('agency_id');
+        
+        try {
+            $this->userModel->update($userId, ['agency_id' => $agencyId === 'null' ? null : $agencyId]);
+            
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Agence mise à jour avec succès'
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Erreur : ' . $e->getMessage()
+            ]);
+        }
+    }
+    
+    /**
+     * Update user manager
+     */
+    public function updateManager($userId)
+    {
+        if (!$this->request->isAJAX()) {
+            return redirect()->to('/admin/hierarchy/view-user/' . $userId);
+        }
+        
+        $managerId = $this->request->getPost('manager_id');
+        
+        // Vérifier que le manager n'est pas un subordonné de l'utilisateur
+        $subordinates = $this->hierarchyHelper->getAllSubordinates($userId);
+        if ($managerId && in_array($managerId, $subordinates)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Le manager ne peut pas être un subordonné de l\'utilisateur'
+            ]);
+        }
+        
+        try {
+            $this->userModel->update($userId, ['manager_id' => $managerId === 'null' ? null : $managerId]);
+            
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Manager mis à jour avec succès'
+            ]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Erreur : ' . $e->getMessage()
+            ]);
+        }
     }
 }

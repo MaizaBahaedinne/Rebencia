@@ -42,6 +42,8 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->post('set-default-role/(:num)', 'Users::setDefaultRole/$1');
         $routes->get('remove-role/(:num)/(:num)', 'Users::removeRole/$1/$2');
         $routes->get('login-as/(:num)', 'Users::loginAs/$1');
+        $routes->get('bulk-manage', 'Users::bulkManage');
+        $routes->post('bulk-action', 'Users::bulkAction');
     });
     
     // Stop impersonation
@@ -209,6 +211,9 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->post('assign-manager', 'Hierarchy::assignManager');
         $routes->post('assign-manager/(:num)', 'Hierarchy::assignManager/$1');
         $routes->get('view-user/(:num)', 'Hierarchy::viewUser/$1');
+        $routes->post('update-role/(:num)', 'Hierarchy::updateRole/$1');
+        $routes->post('update-agency/(:num)', 'Hierarchy::updateAgency/$1');
+        $routes->post('update-manager/(:num)', 'Hierarchy::updateManager/$1');
     });
     
     // Reports & Export

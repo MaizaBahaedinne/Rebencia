@@ -121,6 +121,30 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <hr class="my-4">
+                    
+                    <h5 class="mb-3"><i class="fas fa-user-tie text-info"></i> Informations du Propriétaire</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="owner_name" class="form-label">Nom du propriétaire</label>
+                            <input type="text" class="form-control" id="owner_name" name="owner_name" 
+                                   value="<?= old('owner_name') ?>" placeholder="Nom complet du propriétaire">
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="owner_phone" class="form-label">Téléphone du propriétaire</label>
+                            <input type="tel" class="form-control" id="owner_phone" name="owner_phone" 
+                                   value="<?= old('owner_phone') ?>" placeholder="Ex: +216 12 345 678">
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="owner_email" class="form-label">Email du propriétaire</label>
+                            <input type="email" class="form-control" id="owner_email" name="owner_email" 
+                                   value="<?= old('owner_email') ?>" placeholder="email@exemple.com">
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Étape 2: Localisation & Carte -->

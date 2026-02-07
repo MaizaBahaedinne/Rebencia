@@ -85,14 +85,30 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
-<script src="<?= base_url('assets/js/datatable-filters.js') ?>"></script>
 <script>
 $(document).ready(function() {
-    initDataTableWithFilters('clientsTable', {
+    $('#clientsTable').DataTable({
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/fr-FR.json',
+            search: "Rechercher:",
+            lengthMenu: "Afficher _MENU_ entrées",
+            info: "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+            infoEmpty: "Affichage de 0 à 0 sur 0 entrées",
+            paginate: {
+                first: "Premier",
+                last: "Dernier",
+                next: "Suivant",
+                previous: "Précédent"
+            }
+        },
+        pageLength: 25,
+        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tous"]],
         order: [[0, 'asc']],
         columnDefs: [
             { orderable: false, targets: 6 }
-        ]
+        ],
+        responsive: true,
+        autoWidth: false
     });
 });
 </script>

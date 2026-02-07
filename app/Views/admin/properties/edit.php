@@ -186,7 +186,7 @@
                         <div class="col-md-6">
                             <div class="form-check form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" id="is_active" name="is_active" 
-                                       value="1" <?= old('is_active', $property['is_active']) ? 'checked' : '' ?>>
+                                       value="1" <?= old('is_active', $property['status'] ?? 'available') == 'available' ? 'checked' : '' ?>>
                                 <label class="form-check-label" for="is_active">
                                     <i class="fas fa-eye text-success"></i> Bien actif (visible)
                                 </label>

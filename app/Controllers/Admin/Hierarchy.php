@@ -89,7 +89,13 @@ class Hierarchy extends BaseController
      */
     public function viewUser($userId)
     {
-        $user = $this->userModel->find($userId);
+        // Récupérer l'utilisateur avec le nom du rôle et de l'agence
+        $user = $this->userModel
+            ->select('users.*, roles.name as role_name, agencies.name as agency_name')
+            ->join('roles', 'roles.id = users.role_id', 'left')
+            ->join('agencies', 'agencies.id = users.agency_id', 'left')
+            ->find($userId);
+            
         if (!$user) {
             return redirect()->to('/admin/hierarchy')->with('error', 'Utilisateur non trouvé');
         }

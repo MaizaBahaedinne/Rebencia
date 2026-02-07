@@ -55,17 +55,38 @@
 
 <!-- Organization Chart -->
 <div class="card">
-    <div class="card-body p-4">
-        <div class="mb-3">
-            <button class="btn btn-sm btn-outline-primary me-2" onclick="expandAll()">
-                <i class="fas fa-expand"></i> Tout développer
-            </button>
-            <button class="btn btn-sm btn-outline-secondary" onclick="collapseAll()">
-                <i class="fas fa-compress"></i> Tout réduire
-            </button>
+    <div class="card-body p-0">
+        <!-- Controls Bar -->
+        <div class="controls-bar p-3 border-bottom bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <button class="btn btn-sm btn-outline-primary me-2" onclick="expandAll()">
+                        <i class="fas fa-expand"></i> Tout développer
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="collapseAll()">
+                        <i class="fas fa-compress"></i> Tout réduire
+                    </button>
+                </div>
+                <div class="zoom-controls">
+                    <button class="btn btn-sm btn-outline-dark me-1" onclick="zoomOut()" title="Zoom arrière">
+                        <i class="fas fa-search-minus"></i>
+                    </button>
+                    <span class="badge bg-dark mx-2" id="zoomLevel">100%</span>
+                    <button class="btn btn-sm btn-outline-dark" onclick="zoomIn()" title="Zoom avant">
+                        <i class="fas fa-search-plus"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary ms-3" onclick="resetZoom()" title="Réinitialiser">
+                        <i class="fas fa-redo"></i>
+                    </button>
+                </div>
+            </div>
         </div>
-        <div class="org-chart-container">
-            <?= renderOrgChartGrouped() ?>
+        
+        <!-- Zoomable Container -->
+        <div class="org-chart-wrapper">
+            <div class="org-chart-container" id="orgChart">
+                <?= renderOrgChartGrouped() ?>
+            </div>
         </div>
     </div>
 </div>
@@ -74,9 +95,33 @@
 
 <?= $this->section('styles') ?>
 <style>
+    /* Wrapper et zoom */
+    .org-chart-wrapper {
+        overflow: auto;
+        background: #f8f9fa;
+        height: calc(100vh - 350px);
+        min-height: 600px;
+        position: relative;
+    }
+    
     .org-chart-container {
-        overflow-x: auto;
-        padding: 20px;
+        padding: 40px;
+        min-width: 100%;
+        transform-origin: top center;
+        transition: transform 0.3s ease;
+    }
+    
+    .controls-bar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: white !important;
+    }
+    
+    .zoom-controls .badge {
+        min-width: 60px;
+        font-size: 13px;
+        padding: 6px 10px;
     }
     
     .org-tree {
@@ -252,86 +297,212 @@
         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
     
-    /* Groupes d'agences */
-    .agency-group {
-        margin-bottom: 30px;
-        border: 2px solid #dee2e6;
-        border-radius: 12px;
-        overflow: hidden;
-        background: white;
+    /* Structure hiérarchique organisationnelle */
+    .organizational-tree {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
     }
     
-    .agency-header {
+    .headquarters-section {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .hierarchy-connector {
+        width: 3px;
+        height: 60px;
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        margin: 0 auto 40px;
+        position: relative;
+    }
+    
+    .hierarchy-connector::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-top: 10px solid #764ba2;
+    }
+    
+    .agencies-section {
+        display: flex;
+        gap: 40px;
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 100%;
+    }
+    
+    .agency-branch {
+        flex: 0 1 auto;
+        min-width: 300px;
+    }
+    
+    /* Cartes d'entité (siège et agences) */
+    .entity-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        transition: all 0.3s;
+        cursor: pointer;
+        position: relative;
+        border: 3px solid #e0e0e0;
+    }
+    
+    .entity-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+    }
+    
+    .headquarters-card {
+        border-color: #ffd700;
+        background: linear-gradient(135deg, #fff9e6 0%, #ffffff 100%);
+    }
+    
+    .headquarters-card .entity-icon {
+        background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    }
+    
+    .agency-card {
+        border-color: #667eea;
+    }
+    
+    .entity-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
-        padding: 15px 20px;
-        cursor: pointer;
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: center;
+        font-size: 32px;
+        margin: 0 auto 16px;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .entity-name {
+        font-size: 20px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 8px;
+        letter-spacing: 1px;
+    }
+    
+    .entity-count {
+        font-size: 14px;
+        color: #7f8c8d;
+        font-weight: 500;
+    }
+    
+    .toggle-icon {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(102, 126, 234, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
         transition: all 0.3s;
     }
     
-    .agency-header:hover {
-        background: linear-gradient(135deg, #5568d3 0%, #653a8b 100%);
-    }
-    
-    .agency-header h4 {
-        margin: 0;
-        font-size: 18px;
-        font-weight: 600;
-    }
-    
-    .agency-header .badge {
-        font-size: 12px;
-        padding: 6px 12px;
-    }
-    
-    .agency-toggle {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    .toggle-icon i {
         transition: transform 0.3s;
+        color: #667eea;
     }
     
-    .agency-toggle.collapsed {
-        transform: rotate(-90deg);
+    .toggle-icon.collapsed i {
+        transform: rotate(-180deg);
     }
     
-    .agency-content {
-        padding: 20px;
+    /* Organigramme de l'entité */
+    .entity-orgchart {
+        margin-top: 30px;
+        padding-top: 30px;
+        border-top: 2px dashed #dee2e6;
+        transition: all 0.3s;
+    }
+    
+    .entity-orgchart.collapsed {
         display: none;
-        background: #f8f9fa;
     }
     
-    .agency-content.show {
-        display: block;
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+        .agencies-section {
+            gap: 30px;
+        }
+        
+        .agency-branch {
+            min-width: 250px;
+        }
     }
     
-    .agency-tree {
-        display: flex;
-        justify-content: center;
-        padding: 20px 0;
-        min-height: 200px;
+    @media (max-width: 768px) {
+        .org-chart-wrapper {
+            height: calc(100vh - 400px);
+        }
+        
+        .organizational-tree {
+            padding: 10px;
+        }
+        
+        .agencies-section {
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .agency-branch {
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .entity-card {
+            padding: 16px;
+        }
+        
+        .entity-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+        }
+        
+        .entity-name {
+            font-size: 16px;
+        }
     }
     
-    .no-agency-group {
-        background: #fff3cd;
-        border: 2px solid #ffc107;
+    /* Animations */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     
-    .no-agency-group .agency-header {
-        background: linear-gradient(135deg, #ffc107 0%, #ff8c00 100%);
+    .agency-branch {
+        animation: fadeIn 0.5s ease-out;
     }
     
-    .no-agency-group .agency-content {
-        background: #fffef8;
-    }
-
+    .agency-branch:nth-child(1) { animation-delay: 0.1s; }
+    .agency-branch:nth-child(2) { animation-delay: 0.2s; }
+    .agency-branch:nth-child(3) { animation-delay: 0.3s; }
+    .agency-branch:nth-child(4) { animation-delay: 0.4s; }
 </style>
 <?= $this->endSection() ?>
 
@@ -392,62 +563,78 @@ function renderOrgChartGrouped() {
     $agencyModel = new \App\Models\AgencyModel();
     $roleModel = new \App\Models\RoleModel();
     
-    // Récupérer toutes les agences
-    $agencies = $agencyModel->findAll();
+    // Récupérer toutes les agences actives
+    $agencies = $agencyModel->where('status', 'active')->findAll();
     
-    // Récupérer les utilisateurs sans agence
-    $usersWithoutAgency = $userModel->where('agency_id IS NULL')->findAll();
+    // Récupérer les utilisateurs sans agence (siège)
+    $headquartersUsers = $userModel->where('agency_id IS NULL')->orWhere('agency_id', 0)->findAll();
     
-    $html = '';
+    $html = '<div class="organizational-tree">';
     
-    // Afficher chaque agence
-    foreach ($agencies as $agency) {
-        $agencyUsers = $userModel->where('agency_id', $agency['id'])->findAll();
+    // 1. SIÈGE (en haut de la hiérarchie)
+    if (!empty($headquartersUsers)) {
+        $html .= '<div class="headquarters-section">';
+        $html .= '<div class="entity-card headquarters-card">';
+        $html .= '<div class="entity-icon"><i class="fas fa-landmark"></i></div>';
+        $html .= '<div class="entity-name">SIÈGE SOCIAL</div>';
+        $html .= '<div class="entity-count">' . count($headquartersUsers) . ' personne(s)</div>';
+        $html .= '</div>';
         
-        if (empty($agencyUsers)) {
-            continue;
+        // Organigramme du siège
+        $html .= '<div class="entity-orgchart">';
+        $html .= '<div class="org-tree">';
+        $html .= buildAgencyTree($headquartersUsers, $userModel, $roleModel, $agencyModel);
+        $html .= '</div>';
+        $html .= '</div>';
+        $html .= '</div>';
+        
+        // Ligne de connexion vers les agences
+        if (!empty($agencies)) {
+            $html .= '<div class="hierarchy-connector"></div>';
+        }
+    }
+    
+    // 2. AGENCES (branches sous le siège)
+    if (!empty($agencies)) {
+        $html .= '<div class="agencies-section">';
+        
+        foreach ($agencies as $agency) {
+            $agencyUsers = $userModel->where('agency_id', $agency['id'])->findAll();
+            
+            if (empty($agencyUsers)) {
+                continue;
+            }
+            
+            $html .= '<div class="agency-branch" id="agency-branch-' . $agency['id'] . '">';
+            
+            // Carte de l'agence
+            $html .= '<div class="entity-card agency-card" onclick="toggleAgency(' . $agency['id'] . ')">';
+            $html .= '<div class="entity-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">';
+            $html .= '<i class="fas fa-building"></i>';
+            $html .= '</div>';
+            $html .= '<div class="entity-name">' . esc(strtoupper($agency['name'])) . '</div>';
+            $html .= '<div class="entity-count">' . count($agencyUsers) . ' personne(s)</div>';
+            $html .= '<div class="toggle-icon" id="agency-toggle-' . $agency['id'] . '">';
+            $html .= '<i class="fas fa-chevron-down"></i>';
+            $html .= '</div>';
+            $html .= '</div>';
+            
+            // Organigramme de l'agence (collapsible)
+            $html .= '<div class="entity-orgchart" id="agency-content-' . $agency['id'] . '" style="display: block;">';
+            $html .= '<div class="org-tree">';
+            $html .= buildAgencyTree($agencyUsers, $userModel, $roleModel, $agencyModel);
+            $html .= '</div>';
+            $html .= '</div>';
+            
+            $html .= '</div>'; // agency-branch
         }
         
-        $html .= '<div class="agency-group">';
-        $html .= '<div class="agency-header" onclick="toggleAgency(' . $agency['id'] . ')">';
-        $html .= '<div class="d-flex align-items-center gap-3">';
-        $html .= '<h4><i class="fas fa-building"></i> ' . esc($agency['name']) . '</h4>';
-        $html .= '<span class="badge bg-light text-dark">' . count($agencyUsers) . ' personne(s)</span>';
-        $html .= '</div>';
-        $html .= '<div class="agency-toggle" id="toggle-agency-' . $agency['id'] . '"><i class="fas fa-chevron-down"></i></div>';
-        $html .= '</div>';
-        
-        $html .= '<div class="agency-content show" id="agency-' . $agency['id'] . '">';
-        
-        // Construire l'arbre hiérarchique pour cette agence
-        $html .= '<div class="agency-tree">';
-        $html .= buildAgencyTree($agencyUsers, $userModel, $roleModel, $agencyModel);
-        $html .= '</div>';
-        
-        $html .= '</div>'; // agency-content
-        $html .= '</div>'; // agency-group
+        $html .= '</div>'; // agencies-section
     }
     
-    // Afficher les utilisateurs sans agence
-    if (!empty($usersWithoutAgency)) {
-        $html .= '<div class="agency-group no-agency-group">';
-        $html .= '<div class="agency-header" onclick="toggleAgency(\'no-agency\')">';
-        $html .= '<div class="d-flex align-items-center gap-3">';
-        $html .= '<h4><i class="fas fa-exclamation-triangle"></i> Sans agence</h4>';
-        $html .= '<span class="badge bg-danger">' . count($usersWithoutAgency) . ' personne(s)</span>';
-        $html .= '</div>';
-        $html .= '<div class="agency-toggle" id="toggle-agency-no-agency"><i class="fas fa-chevron-down"></i></div>';
-        $html .= '</div>';
-        
-        $html .= '<div class="agency-content show" id="agency-no-agency">';
-        $html .= '<div class="agency-tree">';
-        $html .= buildAgencyTree($usersWithoutAgency, $userModel, $roleModel, $agencyModel);
-        $html .= '</div>';
-        $html .= '</div>';
-        $html .= '</div>';
-    }
+    $html .= '</div>'; // organizational-tree
     
-    if (empty($agencies) && empty($usersWithoutAgency)) {
+    if (empty($headquartersUsers) && empty($agencies)) {
         return '<div class="text-center text-muted py-5">
             <i class="fas fa-sitemap fa-3x mb-3"></i>
             <p>Aucun utilisateur trouvé.</p>
@@ -553,4 +740,99 @@ function renderAgencyUserNode($user, $userModel, $roleModel, $agencyModel, $agen
     return $html;
 }
 
-?>?>
+?>
+
+<?= $this->section('scripts') ?>
+<script>
+let currentZoom = 1;
+const zoomStep = 0.1;
+const minZoom = 0.5;
+const maxZoom = 2;
+
+function zoomIn() {
+    if (currentZoom < maxZoom) {
+        currentZoom += zoomStep;
+        applyZoom();
+    }
+}
+
+function zoomOut() {
+    if (currentZoom > minZoom) {
+        currentZoom -= zoomStep;
+        applyZoom();
+    }
+}
+
+function resetZoom() {
+    currentZoom = 1;
+    applyZoom();
+}
+
+function applyZoom() {
+    const chart = document.getElementById('orgChart');
+    chart.style.transform = `scale(${currentZoom})`;
+    document.getElementById('zoomLevel').textContent = Math.round(currentZoom * 100) + '%';
+}
+
+function expandAll() {
+    document.querySelectorAll('.entity-orgchart').forEach(content => {
+        content.style.display = 'block';
+    });
+    document.querySelectorAll('.toggle-icon').forEach(toggle => {
+        toggle.classList.remove('collapsed');
+    });
+}
+
+function collapseAll() {
+    document.querySelectorAll('.entity-orgchart').forEach(content => {
+        if (!content.closest('.headquarters-section')) {
+            content.style.display = 'none';
+        }
+    });
+    document.querySelectorAll('.toggle-icon').forEach(toggle => {
+        toggle.classList.add('collapsed');
+    });
+}
+
+function toggleAgency(agencyId) {
+    const content = document.getElementById('agency-content-' + agencyId);
+    const toggle = document.getElementById('agency-toggle-' + agencyId);
+    
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        toggle.classList.remove('collapsed');
+    } else {
+        content.style.display = 'none';
+        toggle.classList.add('collapsed');
+    }
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey || e.metaKey) {
+        if (e.key === '+' || e.key === '=') {
+            e.preventDefault();
+            zoomIn();
+        } else if (e.key === '-') {
+            e.preventDefault();
+            zoomOut();
+        } else if (e.key === '0') {
+            e.preventDefault();
+            resetZoom();
+        }
+    }
+});
+
+// Mouse wheel zoom
+document.getElementById('orgChart').addEventListener('wheel', function(e) {
+    if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        if (e.deltaY < 0) {
+            zoomIn();
+        } else {
+            zoomOut();
+        }
+    }
+}, { passive: false });
+</script>
+<?= $this->endSection() ?>

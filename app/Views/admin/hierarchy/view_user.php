@@ -61,10 +61,35 @@
                     </div>
                     <?php endif; ?>
 
-                    <?php if (isset($user['agency_id']) && $user['agency_id']): ?>
+                    <div class="info-group mb-3">
+                        <label class="text-muted small mb-1">Rôle</label>
+                        <div>
+                            <span class="badge bg-secondary"><?= esc($user['role_name']) ?></span>
+                            <button class="btn btn-sm btn-outline-secondary ms-2" onclick="showEditModal('role')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <?php if (!empty($user['agency_name'])): ?>
                     <div class="info-group">
                         <label class="text-muted small mb-1">Agence</label>
-                        <div><?= esc($user['agency_id']) ?></div>
+                        <div>
+                            <span class="badge bg-primary"><?= esc($user['agency_name']) ?></span>
+                            <button class="btn btn-sm btn-outline-primary ms-2" onclick="showEditModal('agency')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <?php else: ?>
+                    <div class="info-group">
+                        <label class="text-muted small mb-1">Agence</label>
+                        <div>
+                            <span class="badge bg-warning text-dark">Non affecté</span>
+                            <button class="btn btn-sm btn-outline-primary ms-2" onclick="showEditModal('agency')">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
                     </div>
                     <?php endif; ?>
                 </div>
@@ -118,11 +143,9 @@
                     <h5 class="mb-0">
                         <i class="fas fa-user-tie text-primary"></i> Manager
                     </h5>
-                    <?php if ($manager): ?>
-                        <a href="<?= base_url('admin/hierarchy/assign-manager/' . $user['id']) ?>" class="btn btn-sm btn-outline-primary">
-                            <i class="fas fa-edit"></i> Changer
-                        </a>
-                    <?php endif; ?>
+                    <button class="btn btn-sm btn-outline-primary" onclick="showEditModal('manager')">
+                        <i class="fas fa-edit"></i> Changer
+                    </button>
                 </div>
                 <div class="card-body">
                     <?php if ($manager): ?>
@@ -142,9 +165,6 @@
                         <div class="alert alert-warning mb-0">
                             <i class="fas fa-exclamation-triangle"></i>
                             Aucun manager assigné. Cet utilisateur est au sommet de la hiérarchie.
-                            <a href="<?= base_url('admin/hierarchy/assign-manager/' . $user['id']) ?>" class="alert-link">
-                                Assigner un manager
-                            </a>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -397,4 +417,122 @@
         letter-spacing: 0.5px;
     }
 </style>
+<?= $this->endSection() ?>
+
+
+<!-- Modals pour l'édition -->
+<!-- Modal Changer le rôle -->
+<div class="modal fade" id="editRoleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-secondary text-white">
+                <h5 class="modal-title"><i class="fas fa-user-tag"></i> Modifier le rôle</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Sélectionner le nouveau rôle :</p>
+                <select class="form-select" id="roleSelect"></select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" onclick="updateRole()"><i class="fas fa-check"></i> Confirmer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Changer l'agence -->
+<div class="modal fade" id="editAgencyModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-building"></i> Modifier l'agence</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Sélectionner la nouvelle agence :</p>
+                <select class="form-select" id="agencySelect"></select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" onclick="updateAgency()"><i class="fas fa-check"></i> Confirmer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Changer le manager -->
+<div class="modal fade" id="editManagerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title"><i class="fas fa-user-tie"></i> Modifier le manager</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Sélectionner le nouveau manager :</p>
+                <select class="form-select" id="managerSelect"></select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-info" onclick="updateManager()"><i class="fas fa-check"></i> Confirmer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?= $this->section('scripts') ?>
+<script>
+// Données pour les select
+const roles = <?= json_encode($roles) ?>;
+const agencies = <?= json_encode($agencies) ?>;
+const managers = <?= json_encode($managers) ?>;
+const currentUser = <?= json_encode($user) ?>;
+
+function showEditModal(type) {
+    if (type === 'role') {
+        const select = document.getElementById('roleSelect');
+        select.innerHTML = '<option value="">-- Sélectionner --</option>' + 
+            roles.map(r => `<option value="${r.id}" ${r.id == currentUser.role_id ? 'selected' : ''}>${r.name}</option>`).join('');
+        new bootstrap.Modal(document.getElementById('editRoleModal')).show();
+    } else if (type === 'agency') {
+        const select = document.getElementById('agencySelect');
+        select.innerHTML = '<option value="">-- Aucune agence --</option>' + 
+            agencies.map(a => `<option value="${a.id}" ${a.id == currentUser.agency_id ? 'selected' : ''}>${a.name}</option>`).join('');
+        new bootstrap.Modal(document.getElementById('editAgencyModal')).show();
+    } else if (type === 'manager') {
+        const select = document.getElementById('managerSelect');
+        select.innerHTML = '<option value="">-- Aucun manager --</option>' + 
+            managers.map(m => `<option value="${m.id}" ${m.id == currentUser.manager_id ? 'selected' : ''}>${m.first_name} ${m.last_name}</option>`).join('');
+        new bootstrap.Modal(document.getElementById('editManagerModal')).show();
+    }
+}
+function updateRole() {
+    const roleId = document.getElementById('roleSelect').value;
+    if (!roleId) return alert('Veuillez sélectionner un rôle');
+    fetch('<?= base_url("admin/hierarchy/update-role/" . $user["id"]) ?>', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest'},
+        body: `role_id=${roleId}`
+    }).then(r => r.json()).then(d => { if(d.success) { alert(d.message); location.reload(); } else alert(d.message); });
+}
+function updateAgency() {
+    const agencyId = document.getElementById('agencySelect').value;
+    if (!agencyId) return alert('Veuillez sélectionner une agence');
+    fetch('<?= base_url("admin/hierarchy/update-agency/" . $user["id"]) ?>', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest'},
+        body: `agency_id=${agencyId}`
+    }).then(r => r.json()).then(d => { if(d.success) { alert(d.message); location.reload(); } else alert(d.message); });
+}
+function updateManager() {
+    const managerId = document.getElementById('managerSelect').value;
+    if (!managerId) return alert('Veuillez sélectionner un manager');
+    fetch('<?= base_url("admin/hierarchy/update-manager/" . $user["id"]) ?>', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-Requested-With': 'XMLHttpRequest'},
+        body: `manager_id=${managerId}`
+    }).then(r => r.json()).then(d => { if(d.success) { alert(d.message); location.reload(); } else alert(d.message); });
+}
+</script>
 <?= $this->endSection() ?>

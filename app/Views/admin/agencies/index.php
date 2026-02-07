@@ -1,330 +1,10 @@
 <?= $this->extend('layouts/admin_modern') ?>
 
-<?= $this->section('styles') ?>
-<style>
-    .filters-section {
-        background: white;
-        border-radius: 10px;
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .filters-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 0.75rem;
-    }
-    .agency-tree {
-        list-style: none;
-        padding-left: 0;
-        margin: 0;
-    }
-    .agency-tree > li {
-        margin-bottom: 1rem;
-        position: relative;
-    }
-    .agency-item {
-        background: white;
-        border: 2px solid #e1e1e1;
-        border-radius: 8px;
-        padding: 0.65rem 1rem;
-        margin-bottom: 0;
-        transition: all 0.2s;
-        position: relative;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.75rem;
-        min-width: 240px;
-        max-width: 280px;
-    }
-    .agency-item:hover {
-        border-color: #6264a7;
-        box-shadow: 0 2px 8px rgba(98, 100, 167, 0.2);
-        background: #fafafa;
-    }
-    .agency-item.siege {
-        border-color: #6264a7;
-        background: #f5f5ff;
-    }
-    .agency-item.agence {
-        border-color: #b4b4b4;
-    }
-    .agency-item.hidden {
-        display: none;
-    }
-    .agency-logo {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 2px solid #e1e1e1;
-    }
-    .agency-logo-placeholder {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: #6264a7;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        color: white;
-        border: 2px solid #6264a7;
-    }
-    .agency-item.agence .agency-logo-placeholder {
-        background: #8b8b8b;
-        border-color: #8b8b8b;
-    }
-    .agency-title {
-        flex: 1;
-        min-width: 0;
-    }
-    .agency-title h5 {
-        margin: 0;
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: #242424;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .agency-code {
-        font-size: 0.7rem;
-        color: #8a8886;
-        font-weight: 400;
-        margin-top: 2px;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .children-agencies {
-        list-style: none;
-        padding-left: 40px;
-        margin-top: 0.75rem;
-        margin-bottom: 0;
-        position: relative;
-    }
-    .children-agencies::before {
-        content: '';
-        position: absolute;
-        left: 20px;
-        top: -10px;
-        bottom: 20px;
-        width: 2px;
-        background: #c8c6c4;
-    }
-    .children-agencies > li {
-        position: relative;
-        margin-bottom: 0.75rem;
-        padding-left: 0;
-    }
-    .children-agencies > li::before {
-        content: '';
-        position: absolute;
-        left: -20px;
-        top: 20px;
-        width: 20px;
-        height: 2px;
-        background: #c8c6c4;
-    }
-    .children-agencies > li:last-child::after {
-        content: '';
-        position: absolute;
-        left: -20px;
-        top: 20px;
-        width: 2px;
-        height: 100%;
-        background: white;
-    }
-    .agency-stats {
-        display: flex;
-        gap: 0.5rem;
-        margin: 0.5rem 0;
-        flex-wrap: wrap;
-    }
-    .stat-card {
-        background: #f9fafb;
-        padding: 0.5rem 0.75rem;
-        border-radius: 6px;
-        border-left: 2px solid #d1d5db;
-        flex: 1;
-        min-width: 80px;
-    }
-    .stat-card.users { border-left-color: #3b82f6; }
-    .stat-card.properties { border-left-color: #10b981; }
-    .stat-card.transactions { border-left-color: #f59e0b; }
-    .stat-card .stat-value {
-        font-size: 1.1rem;
-        font-weight: 700;
-        margin: 0;
-        line-height: 1.2;
-    }
-    .stat-card .stat-label {
-        font-size: 0.7rem;
-        color: #6b7280;
-        margin: 0;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    .agency-contact {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        margin: 0.5rem 0;
-        font-size: 0.875rem;
-    }
-    .contact-item {
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-        color: #4b5563;
-    }
-    .contact-item i {
-        color: #9ca3af;
-        font-size: 0.75rem;
-    }
-    .agency-actions {
-        display: flex;
-        gap: 0.4rem;
-        justify-content: flex-end;
-        margin-top: 0.5rem;
-    }
-    .agency-actions .btn {
-        padding: 0.35rem 0.75rem;
-        font-size: 0.8rem;
-    }
-    .children-agencies {
-        list-style: none;
-        padding-left: 2.5rem;
-        margin-top: 0.5rem;
-        position: relative;
-    .toggle-children {
-        position: absolute;
-        top: 50%;
-        left: -30px;
-        transform: translateY(-50%);
-        background: white;
-        border: 2px solid #c8c6c4;
-        border-radius: 2px;
-        width: 20px;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s;
-        z-index: 10;
-        font-size: 10px;
-        color: #605e5c;
-    }
-    .toggle-children:hover {
-        border-color: #6264a7;
-        background: #f5f5ff;
-        color: #6264a7;
-    }
-    .toggle-children i {
-        transition: transform 0.3s;
-    }
-    .toggle-children.active i {
-        transform: rotate(90deg);
-    }
-    .children-agencies.collapsed {
-        display: none;
-    }
-    .no-results {
-        text-align: center;
-        padding: 3rem;
-        color: #6b7280;
-    }
-    
-    /* Modal Styles */
-    .agency-modal .modal-dialog {
-        max-width: 700px;
-    }
-    .agency-modal .modal-header {
-        background: #6264a7;
-        color: white;
-        border-bottom: none;
-        padding: 1.25rem 1.5rem;
-    }
-    .agency-modal .modal-header .btn-close {
-        filter: invert(1);
-    }
-    .modal-agency-logo {
-        width: 70px;
-        height: 70px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 3px solid white;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-    .modal-agency-logo-placeholder {
-        width: 70px;
-        height: 70px;
-        border-radius: 50%;
-        background: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 28px;
-        color: #6264a7;
-        border: 3px solid white;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-    .modal-stat-card {
-        background: #faf9f8;
-        padding: 1rem;
-        border-radius: 4px;
-        border: 1px solid #edebe9;
-        text-align: center;
-    }
-    .modal-stat-card.users { border-left: 3px solid #6264a7; }
-    .modal-stat-card.properties { border-left: 3px solid #0078d4; }
-    .modal-stat-card.transactions { border-left: 3px solid #498205; }
-    .modal-stat-card .stat-value {
-        font-size: 2rem;
-        font-weight: 600;
-        margin: 0;
-        line-height: 1;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .modal-stat-card .stat-label {
-        font-size: 0.8rem;
-        color: #605e5c;
-        margin: 0.5rem 0 0 0;
-        font-weight: 400;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .info-row {
-        display: flex;
-        padding: 0.65rem 0;
-        border-bottom: 1px solid #edebe9;
-    }
-    .info-row:last-child {
-        border-bottom: none;
-    }
-    .info-label {
-        font-weight: 600;
-        color: #605e5c;
-        width: 140px;
-        flex-shrink: 0;
-        font-size: 0.85rem;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    .info-value {
-        color: #323130;
-        flex: 1;
-        font-size: 0.85rem;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-</style>
-<?= $this->endSection() ?>
-
 <?= $this->section('content') ?>
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0 text-gray-800">
-            <i class="fas fa-sitemap me-2"></i>Hiérarchie des Agences
+            <i class="fas fa-sitemap me-2"></i>Organigramme des Agences
         </h1>
         <div>
             <button class="btn btn-outline-secondary me-2" onclick="expandAll()">
@@ -355,362 +35,523 @@
         </div>
     <?php endif ?>
 
-    <!-- Filtres de recherche -->
-    <div class="filters-section">
-        <div class="filters-row">
-            <div>
-                <label class="form-label small mb-1">Recherche</label>
-                <input type="text" id="searchName" class="form-control form-control-sm" 
-                       placeholder="Nom ou code agence..." onkeyup="applyFilters()">
+    <!-- Organization Chart -->
+    <div class="card">
+        <div class="card-body p-0">
+            <!-- Controls Bar -->
+            <div class="controls-bar p-3 border-bottom bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary me-2" onclick="expandAll()">
+                            <i class="fas fa-expand-alt"></i> Tout développer
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="collapseAll()">
+                            <i class="fas fa-compress-alt"></i> Tout réduire
+                        </button>
+                    </div>
+                    <div class="zoom-controls">
+                        <button class="btn btn-sm btn-outline-dark me-1" onclick="zoomOut()" title="Zoom arrière">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <span class="badge bg-dark mx-2" id="zoomLevel">100%</span>
+                        <button class="btn btn-sm btn-outline-dark" onclick="zoomIn()" title="Zoom avant">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary ms-3" onclick="resetZoom()" title="Réinitialiser">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div>
-                <label class="form-label small mb-1">Type</label>
-                <select id="filterType" class="form-select form-select-sm" onchange="applyFilters()">
-                    <option value="">Tous les types</option>
-                    <option value="siege">Siège</option>
-                    <option value="agence">Agence</option>
-                </select>
-            </div>
-            <div>
-                <label class="form-label small mb-1">Ville</label>
-                <input type="text" id="filterCity" class="form-control form-control-sm" 
-                       placeholder="Filtrer par ville..." onkeyup="applyFilters()">
-            </div>
-            <div>
-                <label class="form-label small mb-1">Statut</label>
-                <select id="filterStatus" class="form-select form-select-sm" onchange="applyFilters()">
-                    <option value="">Tous les statuts</option>
-                    <option value="active">Actif</option>
-                    <option value="inactive">Inactif</option>
-                </select>
-            </div>
-            <div class="d-flex align-items-end">
-                <button class="btn btn-outline-secondary btn-sm w-100" onclick="resetFilters()">
-                    <i class="fas fa-redo me-1"></i>Réinitialiser
-                </button>
+            
+            <!-- Pyramid Container -->
+            <div class="pyramid-wrapper">
+                <div class="pyramid-container" id="orgChart">
+                    <?= renderAgenciesPyramid() ?>
+                </div>
             </div>
         </div>
     </div>
+</div>
+<?= $this->endSection() ?>
 
-    <div id="agencyTreeContainer">
-    <?php
-    // Function to render agency tree recursively
-    function renderAgencyTree($agencies, $level = 0) {
-        if (empty($agencies)) return;
-        
-        echo '<ul class="agency-tree' . ($level > 0 ? ' children-agencies' : '') . '">';
-        
-        foreach ($agencies as $agency) {
-            $hasChildren = !empty($agency['children']);
-            ?>
-            <li>
-                <div class="agency-item <?= esc($agency['type']) ?>" 
-                     data-agency-id="<?= $agency['id'] ?>"
-                     data-agency-name="<?= esc($agency['name']) ?>"
-                     data-agency-code="<?= esc($agency['code']) ?>"
-                     data-agency-type="<?= esc($agency['type']) ?>"
-                     data-agency-status="<?= esc($agency['status']) ?>"
-                     data-agency-city="<?= esc($agency['city']) ?>"
-                     data-agency-governorate="<?= esc($agency['governorate']) ?>"
-                     data-agency-address="<?= esc($agency['address'] ?? '') ?>"
-                     data-agency-phone="<?= esc($agency['phone'] ?? '') ?>"
-                     data-agency-email="<?= esc($agency['email'] ?? '') ?>"
-                     data-agency-users="<?= $agency['users_count'] ?? 0 ?>"
-                     data-agency-properties="<?= $agency['properties_count'] ?? 0 ?>"
-                     data-agency-transactions="<?= $agency['transactions_count'] ?? 0 ?>"
-                     data-agency-logo="<?= !empty($agency['logo']) ? base_url('uploads/agencies/' . $agency['logo']) : '' ?>"
-                     onclick="showAgencyModal(this)">
-                    <?php if ($hasChildren): ?>
-                        <div class="toggle-children" onclick="event.stopPropagation(); toggleChildren(this)">
-                            <i class="fas fa-chevron-right"></i>
-                        </div>
-                    <?php endif; ?>
-                    
-                    <?php if (!empty($agency['logo'])): ?>
-                        <img src="<?= base_url('uploads/agencies/' . $agency['logo']) ?>" 
-                             alt="Logo" class="agency-logo">
-                    <?php else: ?>
-                        <div class="agency-logo-placeholder">
-                            <i class="fas fa-building"></i>
-                        </div>
-                    <?php endif; ?>
-                    
-                    <div class="agency-title">
-                        <h5><?= esc($agency['name']) ?></h5>
-                        <div class="agency-code"><?= esc($agency['code']) ?></div>
-                    </div>
-                </div>
-                
-                <?php if ($hasChildren): ?>
-                    <?php renderAgencyTree($agency['children'], $level + 1); ?>
-                <?php endif; ?>
-            </li>
-            <?php
-        }
-        
-        echo '</ul>';
+<?= $this->section('styles') ?>
+<style>
+    /* Pyramid Wrapper */
+    .pyramid-wrapper {
+        overflow: auto;
+        padding: 2rem;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 500px;
     }
     
-    // Render the tree
-    renderAgencyTree($agencies);
-    ?>
-</div>
-
-    <div id="noResults" class="no-results" style="display: none;">
-        <i class="fas fa-search fa-3x mb-3"></i>
-        <h5>Aucune agence trouvée</h5>
-        <p>Essayez de modifier vos critères de recherche</p>
-    </div>
-</div>
-
-<!-- Modal pour afficher les détails de l'agence -->
-<div class="modal fade agency-modal" id="agencyModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="d-flex align-items-center gap-3">
-                    <div id="modalLogo"></div>
-                    <div>
-                        <h5 class="modal-title mb-1" id="modalName"></h5>
-                        <small id="modalCode"></small>
-                    </div>
-                </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Statistiques -->
-                <div class="row mb-4">
-                    <div class="col-4">
-                        <div class="modal-stat-card users">
-                            <p class="stat-value text-primary" id="modalUsers">0</p>
-                            <p class="stat-label">Utilisateurs</p>
-                        </div>
-                    </div>
-                    <div class="col-4">
-                        <div class="modal-stat-card properties">
-                            <p class="stat-value text-success" id="modalProperties">0</p>
-                            <p class="stat-label">Biens</p>
-                        </div>
-                    </div>
-                    <div class="col-4">
-                        <div class="modal-stat-card transactions">
-                            <p class="stat-value text-warning" id="modalTransactions">0</p>
-                            <p class="stat-label">Transactions</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Informations -->
-                <h6 class="mb-3 fw-bold">Informations</h6>
-                <div class="info-row">
-                    <div class="info-label"><i class="fas fa-tag me-2"></i>Type</div>
-                    <div class="info-value" id="modalType"></div>
-                </div>
-                <div class="info-row">
-                    <div class="info-label"><i class="fas fa-circle me-2"></i>Statut</div>
-                    <div class="info-value" id="modalStatus"></div>
-                </div>
-                <div class="info-row">
-                    <div class="info-label"><i class="fas fa-map-marker-alt me-2"></i>Localisation</div>
-                    <div class="info-value" id="modalLocation"></div>
-                </div>
-                <div class="info-row" id="modalAddressRow" style="display: none;">
-                    <div class="info-label"><i class="fas fa-home me-2"></i>Adresse</div>
-                    <div class="info-value" id="modalAddress"></div>
-                </div>
-                <div class="info-row" id="modalPhoneRow" style="display: none;">
-                    <div class="info-label"><i class="fas fa-phone me-2"></i>Téléphone</div>
-                    <div class="info-value" id="modalPhone"></div>
-                </div>
-                <div class="info-row" id="modalEmailRow" style="display: none;">
-                    <div class="info-label"><i class="fas fa-envelope me-2"></i>Email</div>
-                    <div class="info-value" id="modalEmail"></div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-2"></i>Fermer
-                </button>
-                <a href="#" id="modalViewLink" class="btn btn-info">
-                    <i class="fas fa-eye me-2"></i>Plus d'infos
-                </a>
-                <a href="#" id="modalEditLink" class="btn btn-warning">
-                    <i class="fas fa-edit me-2"></i>Modifier
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
+    .pyramid-container {
+        transform-origin: top center;
+        transition: transform 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3rem;
+        padding: 2rem;
+    }
+    
+    /* Org Levels */
+    .org-level {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        width: 100%;
+    }
+    
+    .agencies-row {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 2rem;
+        position: relative;
+        padding: 1rem 0;
+    }
+    
+    /* Connection Lines */
+    .agencies-row::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 10%;
+        right: 10%;
+        height: 2px;
+        background: linear-gradient(to right, transparent, #6264a7 20%, #6264a7 80%, transparent);
+        z-index: 0;
+    }
+    
+    .org-level::before {
+        content: '';
+        position: absolute;
+        top: -1.5rem;
+        left: 50%;
+        width: 2px;
+        height: 1.5rem;
+        background: #6264a7;
+        transform: translateX(-50%);
+    }
+    
+    .org-level:first-child::before {
+        display: none;
+    }
+    
+    /* Agency Box */
+    .agency-box {
+        background: white;
+        border: 3px solid #e1e8ed;
+        border-radius: 12px;
+        padding: 1.5rem;
+        width: 280px;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        z-index: 1;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .agency-box:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        border-color: #6264a7;
+    }
+    
+    .agency-box.siege {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-color: #667eea;
+    }
+    
+    .agency-box.agence {
+        border-color: #10b981;
+    }
+    
+    /* Agency Logo */
+    .agency-logo-wrapper {
+        margin-bottom: 1rem;
+    }
+    
+    .agency-logo {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #e1e8ed;
+        margin: 0 auto;
+    }
+    
+    .agency-logo-placeholder {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: #6264a7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        color: white;
+        border: 3px solid #6264a7;
+        margin: 0 auto;
+    }
+    
+    .agency-box.siege .agency-logo-placeholder {
+        background: white;
+        color: #667eea;
+        border-color: white;
+    }
+    
+    .agency-box.agence .agency-logo-placeholder {
+        background: #10b981;
+        border-color: #10b981;
+    }
+    
+    /* Agency Info */
+    .agency-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin: 0.5rem 0;
+        color: #1e293b;
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+    }
+    
+    .agency-box.siege .agency-name {
+        color: white;
+    }
+    
+    .agency-code {
+        font-size: 0.85rem;
+        color: #64748b;
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+    
+    .agency-box.siege .agency-code {
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .agency-location {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+    }
+    
+    .agency-box.siege .agency-location {
+        color: rgba(255, 255, 255, 0.85);
+    }
+    
+    /* Agency Stats */
+    .agency-stats {
+        display: flex;
+        justify-content: space-around;
+        gap: 0.5rem;
+        padding-top: 1rem;
+        border-top: 2px solid #e1e8ed;
+        margin-top: 1rem;
+    }
+    
+    .agency-box.siege .agency-stats {
+        border-top-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    .stat-item {
+        text-align: center;
+    }
+    
+    .stat-value {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #6264a7;
+        display: block;
+    }
+    
+    .agency-box.siege .stat-value {
+        color: white;
+    }
+    
+    .agency-box.agence .stat-value {
+        color: #10b981;
+    }
+    
+    .stat-label {
+        font-size: 0.7rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 0.2rem;
+    }
+    
+    .agency-box.siege .stat-label {
+        color: rgba(255, 255, 255, 0.8);
+    }
+    
+    /* Toggle Button */
+    .toggle-btn {
+        position: absolute;
+        bottom: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        border: 2px solid #6264a7;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #6264a7;
+        font-size: 10px;
+        z-index: 10;
+        transition: all 0.3s ease;
+    }
+    
+    .toggle-btn:hover {
+        background: #6264a7;
+        color: white;
+        transform: translateX(-50%) scale(1.2);
+    }
+    
+    .toggle-btn.collapsed i {
+        transform: rotate(180deg);
+    }
+    
+    /* Collapsible Section */
+    .collapsible-section {
+        max-height: 10000px;
+        opacity: 1;
+        transition: max-height 0.5s ease, opacity 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .collapsible-section.collapsed {
+        max-height: 0;
+        opacity: 0;
+    }
+    
+    /* Empty State */
+    .empty-message {
+        text-align: center;
+        padding: 3rem;
+        color: #64748b;
+        font-size: 1rem;
+    }
+    
+    .empty-message i {
+        color: #94a3b8;
+        margin-bottom: 1rem;
+    }
+    
+    /* Status Badge */
+    .status-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-badge.active {
+        background: #10b981;
+        color: white;
+    }
+    
+    .status-badge.inactive {
+        background: #ef4444;
+        color: white;
+    }
+    
+    .agency-box.siege .status-badge {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .agency-box {
+            width: 240px;
+            padding: 1.2rem;
+        }
+        
+        .agencies-row {
+            gap: 1.5rem;
+        }
+        
+        .pyramid-wrapper {
+            padding: 1rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .agency-box {
+            width: 200px;
+            padding: 1rem;
+        }
+        
+        .agency-logo, .agency-logo-placeholder {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+        }
+        
+        .agency-name {
+            font-size: 0.95rem;
+        }
+        
+        .agencies-row {
+            gap: 1rem;
+        }
+    }
+</style>
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
 <script>
-function showAgencyModal(element) {
-    const id = element.dataset.agencyId;
-    const name = element.dataset.agencyName;
-    const code = element.dataset.agencyCode;
-    const type = element.dataset.agencyType;
-    const status = element.dataset.agencyStatus;
-    const city = element.dataset.agencyCity;
-    const governorate = element.dataset.agencyGovernorate;
-    const address = element.dataset.agencyAddress;
-    const phone = element.dataset.agencyPhone;
-    const email = element.dataset.agencyEmail;
-    const users = element.dataset.agencyUsers;
-    const properties = element.dataset.agencyProperties;
-    const transactions = element.dataset.agencyTransactions;
-    const logo = element.dataset.agencyLogo;
+let currentZoom = 1;
 
-    // Logo
-    if (logo) {
-        document.getElementById('modalLogo').innerHTML = 
-            `<img src="${logo}" alt="Logo" class="modal-agency-logo">`;
-    } else {
-        document.getElementById('modalLogo').innerHTML = 
-            `<div class="modal-agency-logo-placeholder"><i class="fas fa-building"></i></div>`;
+function zoomIn() {
+    if (currentZoom < 2) {
+        currentZoom += 0.1;
+        document.getElementById('orgChart').style.transform = `scale(${currentZoom})`;
+        document.getElementById('zoomLevel').textContent = Math.round(currentZoom * 100) + '%';
     }
-
-    // Informations de base
-    document.getElementById('modalName').textContent = name;
-    document.getElementById('modalCode').textContent = 'Code: ' + code;
-    
-    // Statistiques
-    document.getElementById('modalUsers').textContent = users;
-    document.getElementById('modalProperties').textContent = properties;
-    document.getElementById('modalTransactions').textContent = transactions;
-
-    // Type
-    document.getElementById('modalType').innerHTML = 
-        type === 'siege' 
-        ? '<span class="badge" style="background: #6264a7;">Siège</span>' 
-        : '<span class="badge" style="background: #8b8b8b;">Agence</span>';
-
-    // Statut
-    document.getElementById('modalStatus').innerHTML = 
-        status === 'active' 
-        ? '<span class="badge" style="background: #498205;">Actif</span>' 
-        : '<span class="badge" style="background: #a4262c;">Inactif</span>';
-
-    // Localisation
-    document.getElementById('modalLocation').textContent = `${city}, ${governorate}`;
-
-    // Adresse
-    if (address) {
-        document.getElementById('modalAddress').textContent = address;
-        document.getElementById('modalAddressRow').style.display = 'flex';
-    } else {
-        document.getElementById('modalAddressRow').style.display = 'none';
-    }
-
-    // Téléphone
-    if (phone) {
-        document.getElementById('modalPhone').textContent = phone;
-        document.getElementById('modalPhoneRow').style.display = 'flex';
-    } else {
-        document.getElementById('modalPhoneRow').style.display = 'none';
-    }
-
-    // Email
-    if (email) {
-        document.getElementById('modalEmail').textContent = email;
-        document.getElementById('modalEmailRow').style.display = 'flex';
-    } else {
-        document.getElementById('modalEmailRow').style.display = 'none';
-    }
-
-    // Liens d'action
-    document.getElementById('modalViewLink').href = '<?= base_url('admin/agencies/view/') ?>' + id;
-    document.getElementById('modalEditLink').href = '<?= base_url('admin/agencies/edit/') ?>' + id;
-
-    // Ouvrir le modal
-    const modal = new bootstrap.Modal(document.getElementById('agencyModal'));
-    modal.show();
 }
 
-function toggleChildren(btn) {
-    const agencyItem = btn.closest('.agency-item');
-    const childrenList = agencyItem.nextElementSibling;
-    
-    if (childrenList && childrenList.classList.contains('children-agencies')) {
-        childrenList.classList.toggle('collapsed');
-        btn.classList.toggle('active');
+function zoomOut() {
+    if (currentZoom > 0.5) {
+        currentZoom -= 0.1;
+        document.getElementById('orgChart').style.transform = `scale(${currentZoom})`;
+        document.getElementById('zoomLevel').textContent = Math.round(currentZoom * 100) + '%';
+    }
+}
+
+function resetZoom() {
+    currentZoom = 1;
+    document.getElementById('orgChart').style.transform = 'scale(1)';
+    document.getElementById('zoomLevel').textContent = '100%';
+}
+
+function toggleSection(id) {
+    const section = document.getElementById('section-' + id);
+    const btn = document.getElementById('btn-' + id);
+    if (section && btn) {
+        section.classList.toggle('collapsed');
+        btn.classList.toggle('collapsed');
     }
 }
 
 function expandAll() {
-    document.querySelectorAll('.children-agencies').forEach(ul => {
-        ul.classList.remove('collapsed');
-    });
-    document.querySelectorAll('.toggle-children').forEach(btn => {
-        btn.classList.add('active');
-    });
+    document.querySelectorAll('.collapsible-section').forEach(el => el.classList.remove('collapsed'));
+    document.querySelectorAll('.toggle-btn').forEach(el => el.classList.remove('collapsed'));
 }
 
 function collapseAll() {
-    document.querySelectorAll('.children-agencies').forEach(ul => {
-        ul.classList.add('collapsed');
-    });
-    document.querySelectorAll('.toggle-children').forEach(btn => {
-        btn.classList.remove('active');
-    });
+    document.querySelectorAll('.collapsible-section').forEach(el => el.classList.add('collapsed'));
+    document.querySelectorAll('.toggle-btn').forEach(el => el.classList.add('collapsed'));
 }
 
-function applyFilters() {
-    const searchName = document.getElementById('searchName').value.toLowerCase();
-    const filterType = document.getElementById('filterType').value.toLowerCase();
-    const filterCity = document.getElementById('filterCity').value.toLowerCase();
-    const filterStatus = document.getElementById('filterStatus').value.toLowerCase();
-    
-    let visibleCount = 0;
-    
-    // Parcourir toutes les agences
-    document.querySelectorAll('.agency-item').forEach(item => {
-        const name = item.dataset.agencyName.toLowerCase();
-        const code = item.dataset.agencyCode.toLowerCase();
-        const type = item.dataset.agencyType;
-        const city = item.dataset.agencyCity.toLowerCase();
-        const status = item.dataset.agencyStatus;
-        
-        // Appliquer les filtres
-        const matchName = !searchName || name.includes(searchName) || code.includes(searchName);
-        const matchType = !filterType || type === filterType;
-        const matchCity = !filterCity || city.includes(filterCity);
-        const matchStatus = !filterStatus || status === filterStatus;
-        
-        if (matchName && matchType && matchCity && matchStatus) {
-            item.closest('li').style.display = '';
-            visibleCount++;
-        } else {
-            item.closest('li').style.display = 'none';
-        }
-    });
-    
-    // Afficher le message si aucun résultat
-    const noResults = document.getElementById('noResults');
-    const treeContainer = document.getElementById('agencyTreeContainer');
-    
-    if (visibleCount === 0) {
-        treeContainer.style.display = 'none';
-        noResults.style.display = 'block';
-    } else {
-        treeContainer.style.display = 'block';
-        noResults.style.display = 'none';
-    }
-}
-
-function resetFilters() {
-    document.getElementById('searchName').value = '';
-    document.getElementById('filterType').value = '';
-    document.getElementById('filterCity').value = '';
-    document.getElementById('filterStatus').value = '';
-    applyFilters();
-}
-
-function confirmDelete(id) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette agence ?')) {
-        window.location.href = '<?= base_url('admin/agencies/delete/') ?>' + id;
-    }
+function goToAgency(agencyId) {
+    window.location.href = '<?= base_url("admin/agencies/view/") ?>' + agencyId;
 }
 </script>
 <?= $this->endSection() ?>
+
+<?php
+function renderAgenciesPyramid() {
+    $agencyModel = new \App\Models\AgencyModel();
+    $allAgencies = $agencyModel->getAgenciesWithStats();
+    
+    // Récupérer les sièges (agences sans parent_id)
+    $sieges = array_filter($allAgencies, function($a) { return !$a['parent_id'] && $a['type'] === 'siege'; });
+    
+    $html = '';
+    if (!empty($sieges)) {
+        $html .= '<div class="org-level"><div class="agencies-row">';
+        foreach ($sieges as $siege) {
+            $html .= renderAgencyCard($siege, 'siege');
+            $children = array_filter($allAgencies, function($a) use ($siege) { return $a['parent_id'] == $siege['id']; });
+            if (!empty($children)) {
+                $html .= '<div class="toggle-btn" id="btn-siege-' . $siege['id'] . '" onclick="toggleSection(\'siege-' . $siege['id'] . '\')"><i class="fas fa-minus"></i></div>';
+            }
+        }
+        $html .= '</div></div>';
+        foreach ($sieges as $siege) {
+            $html .= renderChildAgencies($siege['id'], $allAgencies, 'siege-' . $siege['id']);
+        }
+    } else {
+        $html = '<div class="empty-message"><i class="fas fa-sitemap fa-3x mb-3"></i><p>Aucune structure d\'agence trouvée</p></div>';
+    }
+    return $html;
+}
+
+function renderChildAgencies($parentId, $allAgencies, $sectionId) {
+    $children = array_filter($allAgencies, function($a) use ($parentId) { return $a['parent_id'] == $parentId; });
+    if (empty($children)) return '';
+    
+    $html = '<div class="collapsible-section" id="section-' . $sectionId . '"><div class="org-level"><div class="agencies-row">';
+    foreach ($children as $child) {
+        $html .= renderAgencyCard($child, 'agence');
+        $subChildren = array_filter($allAgencies, function($a) use ($child) { return $a['parent_id'] == $child['id']; });
+        if (!empty($subChildren)) {
+            $html .= '<div class="toggle-btn" id="btn-agency-' . $child['id'] . '" onclick="toggleSection(\'agency-' . $child['id'] . '\')"><i class="fas fa-minus"></i></div>';
+        }
+    }
+    $html .= '</div></div>';
+    foreach ($children as $child) {
+        $html .= renderChildAgencies($child['id'], $allAgencies, 'agency-' . $child['id']);
+    }
+    $html .= '</div>';
+    return $html;
+}
+
+function renderAgencyCard($agency, $class = '') {
+    $initials = strtoupper(substr($agency['name'], 0, 2));
+    $statusClass = $agency['status'] === 'active' ? 'active' : 'inactive';
+    $statusText = $agency['status'] === 'active' ? 'Actif' : 'Inactif';
+    
+    $html = '<div class="agency-box ' . $class . '" onclick="goToAgency(' . $agency['id'] . ')">';
+    $html .= '<span class="status-badge ' . $statusClass . '">' . $statusText . '</span>';
+    
+    $html .= '<div class="agency-logo-wrapper">';
+    if (!empty($agency['logo']) && file_exists(FCPATH . 'uploads/agencies/' . $agency['logo'])) {
+        $html .= '<img src="' . base_url('uploads/agencies/' . $agency['logo']) . '" alt="Logo" class="agency-logo">';
+    } else {
+        $html .= '<div class="agency-logo-placeholder">' . $initials . '</div>';
+    }
+    $html .= '</div>';
+    
+    $html .= '<div class="agency-name">' . esc($agency['name']) . '</div>';
+    $html .= '<div class="agency-code">' . esc($agency['code']) . '</div>';
+    $html .= '<div class="agency-location"><i class="fas fa-map-marker-alt"></i> ' . esc($agency['city']) . ', ' . esc($agency['governorate']) . '</div>';
+    
+    $html .= '<div class="agency-stats">';
+    $html .= '<div class="stat-item">';
+    $html .= '<span class="stat-value">' . ($agency['users_count'] ?? 0) . '</span>';
+    $html .= '<span class="stat-label">Utilisateurs</span>';
+    $html .= '</div>';
+    $html .= '<div class="stat-item">';
+    $html .= '<span class="stat-value">' . ($agency['properties_count'] ?? 0) . '</span>';
+    $html .= '<span class="stat-label">Biens</span>';
+    $html .= '</div>';
+    $html .= '<div class="stat-item">';
+    $html .= '<span class="stat-value">' . ($agency['transactions_count'] ?? 0) . '</span>';
+    $html .= '<span class="stat-label">Transactions</span>';
+    $html .= '</div>';
+    $html .= '</div>';
+    
+    $html .= '</div>';
+    return $html;
+}
+?>

@@ -56,8 +56,16 @@
 <!-- Organization Chart -->
 <div class="card">
     <div class="card-body p-4">
+        <div class="mb-3">
+            <button class="btn btn-sm btn-outline-primary me-2" onclick="expandAll()">
+                <i class="fas fa-expand"></i> Tout développer
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="collapseAll()">
+                <i class="fas fa-compress"></i> Tout réduire
+            </button>
+        </div>
         <div class="org-chart-container">
-            <?= renderOrgChart() ?>
+            <?= renderOrgChartGrouped() ?>
         </div>
     </div>
 </div>
@@ -243,11 +251,188 @@
         font-size: 12px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
+    
+    /* Groupes d'agences et équipes */
+    .agency-group {
+        margin-bottom: 30px;
+        border: 2px solid #dee2e6;
+        border-radius: 12px;
+        overflow: hidden;
+        background: white;
+    }
+    
+    .agency-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.3s;
+    }
+    
+    .agency-header:hover {
+        background: linear-gradient(135deg, #5568d3 0%, #653a8b 100%);
+    }
+    
+    .agency-header h4 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+    }
+    
+    .agency-header .badge {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+    
+    .agency-toggle {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.3s;
+    }
+    
+    .agency-toggle.collapsed {
+        transform: rotate(-90deg);
+    }
+    
+    .agency-content {
+        padding: 20px;
+        display: none;
+    }
+    
+    .agency-content.show {
+        display: block;
+    }
+    
+    .team-group {
+        margin-bottom: 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        background: #f8f9fa;
+    }
+    
+    .team-header {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        padding: 12px 15px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-radius: 9px 9px 0 0;
+        transition: all 0.3s;
+    }
+    
+    .team-header:hover {
+        background: linear-gradient(135deg, #3d9ce8 0%, #00d8e2 100%);
+    }
+    
+    .team-header h5 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+    }
+    
+    .team-toggle {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.3s;
+        font-size: 12px;
+    }
+    
+    .team-toggle.collapsed {
+        transform: rotate(-90deg);
+    }
+    
+    .team-content {
+        padding: 15px;
+        display: none;
+    }
+    
+    .team-content.show {
+        display: block;
+    }
+    
+    .team-members {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .no-agency-group {
+        background: #fff3cd;
+        border: 2px solid #ffc107;
+    }
+    
+    .no-agency-group .agency-header {
+        background: linear-gradient(135deg, #ffc107 0%, #ff8c00 100%);
+    }
+
 </style>
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
 <script>
+// Toggle agency
+function toggleAgency(agencyId) {
+    const content = document.getElementById('agency-' + agencyId);
+    const toggle = document.getElementById('toggle-agency-' + agencyId);
+    
+    if (content.classList.contains('show')) {
+        content.classList.remove('show');
+        toggle.classList.add('collapsed');
+    } else {
+        content.classList.add('show');
+        toggle.classList.remove('collapsed');
+    }
+}
+
+// Toggle team
+function toggleTeam(teamId) {
+    const content = document.getElementById('team-' + teamId);
+    const toggle = document.getElementById('toggle-team-' + teamId);
+    
+    if (content.classList.contains('show')) {
+        content.classList.remove('show');
+        toggle.classList.add('collapsed');
+    } else {
+        content.classList.add('show');
+        toggle.classList.remove('collapsed');
+    }
+}
+
+// Expand all
+function expandAll() {
+    document.querySelectorAll('.agency-content, .team-content').forEach(el => {
+        el.classList.add('show');
+    });
+    document.querySelectorAll('.agency-toggle, .team-toggle').forEach(el => {
+        el.classList.remove('collapsed');
+    });
+}
+
+// Collapse all
+function collapseAll() {
+    document.querySelectorAll('.agency-content, .team-content').forEach(el => {
+        el.classList.remove('show');
+    });
+    document.querySelectorAll('.agency-toggle, .team-toggle').forEach(el => {
+        el.classList.add('collapsed');
+    });
+}
+
 document.querySelectorAll('.org-card').forEach(card => {
     card.addEventListener('click', function(e) {
         e.stopPropagation();

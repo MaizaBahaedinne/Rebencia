@@ -19,16 +19,28 @@ class PropertyRoomModel extends Model
     
     protected $allowedFields = [
         'property_id',
-        'room_name',
+        'name_fr',
+        'name_ar',
         'room_type',
-        'area_m2'
+        'surface',
+        'width',
+        'length',
+        'height',
+        'has_window',
+        'window_type',
+        'orientation',
+        'sort_order'
     ];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
 
     protected array $casts = [
-        'area_m2' => 'float'
+        'surface' => 'float',
+        'width' => 'float',
+        'length' => 'float',
+        'height' => 'float',
+        'has_window' => 'boolean'
     ];
 
     // Dates
@@ -40,9 +52,9 @@ class PropertyRoomModel extends Model
     // Validation
     protected $validationRules = [
         'property_id' => 'required|is_natural_no_zero',
-        'room_name' => 'required|min_length[2]|max_length[100]',
-        'room_type' => 'required|in_list[salon,chambre,cuisine,salle_bain,wc,bureau,dressing,cave,garage,terrasse,balcon,autre]',
-        'area_m2' => 'required|decimal|greater_than[0]'
+        'name_fr' => 'required|min_length[2]|max_length[100]',
+        'room_type' => 'required|in_list[bedroom,bathroom,kitchen,living,dining,office,storage,utility,other]',
+        'surface' => 'permit_empty|decimal|greater_than[0]'
     ];
 
     protected $validationMessages = [
@@ -50,7 +62,7 @@ class PropertyRoomModel extends Model
             'required' => 'L\'ID du bien est requis',
             'is_natural_no_zero' => 'L\'ID du bien doit être un nombre valide'
         ],
-        'room_name' => [
+        'name_fr' => [
             'required' => 'Le nom de la pièce est requis',
             'min_length' => 'Le nom doit contenir au moins 2 caractères',
             'max_length' => 'Le nom ne peut pas dépasser 100 caractères'
@@ -59,8 +71,7 @@ class PropertyRoomModel extends Model
             'required' => 'Le type de pièce est requis',
             'in_list' => 'Le type de pièce n\'est pas valide'
         ],
-        'area_m2' => [
-            'required' => 'La surface est requise',
+        'surface' => [
             'decimal' => 'La surface doit être un nombre',
             'greater_than' => 'La surface doit être supérieure à 0'
         ]
@@ -72,8 +83,8 @@ class PropertyRoomModel extends Model
     public function getRoomsByProperty(int $propertyId): array
     {
         return $this->where('property_id', $propertyId)
+                    ->orderBy('sort_order', 'ASC')
                     ->orderBy('room_type', 'ASC')
-                    ->orderBy('room_name', 'ASC')
                     ->findAll();
     }
 
@@ -82,7 +93,7 @@ class PropertyRoomModel extends Model
      */
     public function getTotalAreaByProperty(int $propertyId): float
     {
-        $result = $this->selectSum('area_m2', 'total')
+        $result = $this->selectSum('surface', 'total')
                        ->where('property_id', $propertyId)
                        ->first();
         
@@ -111,13 +122,16 @@ class PropertyRoomModel extends Model
         }
 
         $data = [];
+        $sortOrder = 1;
         foreach ($rooms as $room) {
-            if (!empty($room['room_name']) && !empty($room['area_m2'])) {
+            if (!empty($room['room_name']) || !empty($room['surface'])) {
                 $data[] = [
                     'property_id' => $propertyId,
-                    'room_name' => $room['room_name'],
-                    'room_type' => $room['room_type'] ?? 'autre',
-                    'area_m2' => $room['area_m2']
+                    'name_fr' => $room['room_name'] ?? '',
+                    'name_ar' => $room['name_ar'] ?? null,
+                    'room_type' => $room['room_type'] ?? 'other',
+                    'surface' => $room['area_m2'] ?? $room['surface'] ?? null,
+                    'sort_order' => $sortOrder++
                 ];
             }
         }

@@ -26,30 +26,27 @@
                                     <input type="text" 
                                            class="form-control form-control-sm" 
                                            name="rooms[<?= $index ?>][room_name]" 
-                                           value="<?= esc($room['room_name']) ?>"
+                                           value="<?= esc($room['name_fr'] ?? $room['room_name'] ?? '') ?>"
                                            placeholder="Ex: Chambre principale">
                                 </td>
                                 <td>
                                     <select class="form-select form-select-sm" name="rooms[<?= $index ?>][room_type]">
-                                        <option value="bedroom" <?= $room['room_type'] == 'bedroom' ? 'selected' : '' ?>>Chambre</option>
-                                        <option value="living_room" <?= $room['room_type'] == 'living_room' ? 'selected' : '' ?>>Salon</option>
-                                        <option value="dining_room" <?= $room['room_type'] == 'dining_room' ? 'selected' : '' ?>>Salle à manger</option>
-                                        <option value="kitchen" <?= $room['room_type'] == 'kitchen' ? 'selected' : '' ?>>Cuisine</option>
-                                        <option value="bathroom" <?= $room['room_type'] == 'bathroom' ? 'selected' : '' ?>>Salle de bain</option>
-                                        <option value="toilet" <?= $room['room_type'] == 'toilet' ? 'selected' : '' ?>>Toilette</option>
-                                        <option value="office" <?= $room['room_type'] == 'office' ? 'selected' : '' ?>>Bureau</option>
-                                        <option value="balcony" <?= $room['room_type'] == 'balcony' ? 'selected' : '' ?>>Balcon</option>
-                                        <option value="terrace" <?= $room['room_type'] == 'terrace' ? 'selected' : '' ?>>Terrasse</option>
-                                        <option value="garage" <?= $room['room_type'] == 'garage' ? 'selected' : '' ?>>Garage</option>
-                                        <option value="storage" <?= $room['room_type'] == 'storage' ? 'selected' : '' ?>>Rangement</option>
-                                        <option value="other" <?= $room['room_type'] == 'other' ? 'selected' : '' ?>>Autre</option>
+                                        <option value="bedroom" <?= ($room['room_type'] ?? '') == 'bedroom' ? 'selected' : '' ?>>Chambre</option>
+                                        <option value="living" <?= ($room['room_type'] ?? '') == 'living' ? 'selected' : '' ?>>Salon</option>
+                                        <option value="dining" <?= ($room['room_type'] ?? '') == 'dining' ? 'selected' : '' ?>>Salle à manger</option>
+                                        <option value="kitchen" <?= ($room['room_type'] ?? '') == 'kitchen' ? 'selected' : '' ?>>Cuisine</option>
+                                        <option value="bathroom" <?= ($room['room_type'] ?? '') == 'bathroom' ? 'selected' : '' ?>>Salle de bain</option>
+                                        <option value="utility" <?= ($room['room_type'] ?? '') == 'utility' ? 'selected' : '' ?>>Toilette</option>
+                                        <option value="office" <?= ($room['room_type'] ?? '') == 'office' ? 'selected' : '' ?>>Bureau</option>
+                                        <option value="storage" <?= ($room['room_type'] ?? '') == 'storage' ? 'selected' : '' ?>>Rangement</option>
+                                        <option value="other" <?= ($room['room_type'] ?? '') == 'other' ? 'selected' : '' ?>>Autre</option>
                                     </select>
                                 </td>
                                 <td>
                                     <input type="number" 
                                            class="form-control form-control-sm room-area" 
                                            name="rooms[<?= $index ?>][area_m2]" 
-                                           value="<?= esc($room['area_m2']) ?>"
+                                           value="<?= esc($room['surface'] ?? $room['area_m2'] ?? '') ?>"
                                            step="0.01"
                                            min="0">
                                 </td>
@@ -173,15 +170,12 @@ document.addEventListener('DOMContentLoaded', function() {
             <td>
                 <select class="form-select form-select-sm" name="rooms[${roomIndex}][room_type]">
                     <option value="bedroom">Chambre</option>
-                    <option value="living_room">Salon</option>
-                    <option value="dining_room">Salle à manger</option>
+                    <option value="living">Salon</option>
+                    <option value="dining">Salle à manger</option>
                     <option value="kitchen">Cuisine</option>
                     <option value="bathroom">Salle de bain</option>
-                    <option value="toilet">Toilette</option>
+                    <option value="utility">Toilette</option>
                     <option value="office">Bureau</option>
-                    <option value="balcony">Balcon</option>
-                    <option value="terrace">Terrasse</option>
-                    <option value="garage">Garage</option>
                     <option value="storage">Rangement</option>
                     <option value="other">Autre</option>
                 </select>

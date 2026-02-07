@@ -49,7 +49,7 @@
                class="form-control" 
                id="rooms" 
                name="rooms" 
-               value="<?= old('rooms', $property['rooms'] ?? '') ?>"
+               value="<?= old('rooms', isset($property['rooms']) && !is_array($property['rooms']) ? $property['rooms'] : '') ?>"
                min="0">
     </div>
 
@@ -59,7 +59,7 @@
                class="form-control" 
                id="bedrooms" 
                name="bedrooms" 
-               value="<?= old('bedrooms', $property['bedrooms'] ?? '') ?>"
+               value="<?= old('bedrooms', isset($property['bedrooms']) && !is_array($property['bedrooms']) ? $property['bedrooms'] : '') ?>"
                min="0">
     </div>
 
@@ -69,7 +69,7 @@
                class="form-control" 
                id="bathrooms" 
                name="bathrooms" 
-               value="<?= old('bathrooms', $property['bathrooms'] ?? '') ?>"
+               value="<?= old('bathrooms', isset($property['bathrooms']) && !is_array($property['bathrooms']) ? $property['bathrooms'] : '') ?>"
                min="0">
     </div>
 
@@ -79,7 +79,7 @@
                class="form-control" 
                id="parking_spaces" 
                name="parking_spaces" 
-               value="<?= old('parking_spaces', $property['parking_spaces'] ?? 0) ?>"
+               value="<?= old('parking_spaces', isset($property['parking_spaces']) && !is_array($property['parking_spaces']) ? $property['parking_spaces'] : 0) ?>"
                min="0">
     </div>
 

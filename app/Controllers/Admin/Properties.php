@@ -573,7 +573,7 @@ class Properties extends BaseController
         // Filtres
         $currentAgency = $this->request->getGet('agency_id');
         $currentAgent = $this->request->getGet('agent_id');
-        $status = $this->request->getGet('status');
+        $currentStatus = $this->request->getGet('status');
 
         $builder = $this->propertyModel
             ->select('properties.*, zones.name as zone_name, 
@@ -589,8 +589,8 @@ class Properties extends BaseController
         if ($currentAgent) {
             $builder->where('properties.agent_id', $currentAgent);
         }
-        if ($status) {
-            $builder->where('properties.status', $status);
+        if ($currentStatus) {
+            $builder->where('properties.status', $currentStatus);
         }
 
         $data = [
@@ -600,7 +600,7 @@ class Properties extends BaseController
             'agents' => $userModel->where('role_id >=', 6)->where('status', 'active')->findAll(),
             'currentAgency' => $currentAgency,
             'currentAgent' => $currentAgent,
-            'currentStatus' => $status
+            'currentStatus' => $currentStatus
         ];
 
         return view('admin/properties/assignments', $data);

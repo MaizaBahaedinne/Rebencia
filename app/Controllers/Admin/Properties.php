@@ -603,7 +603,8 @@ class Properties extends BaseController
         $properties = $this->propertyModel
             ->select('properties.*, zones.name as zone_name, 
                      agencies.name as agency_name, 
-                     CONCAT(users.first_name, " ", users.last_name) as agent_name')
+                     CONCAT(users.first_name, " ", users.last_name) as agent_name,
+                     users.id as user_id')
             ->join('zones', 'zones.id = properties.zone_id', 'left')
             ->join('agencies', 'agencies.id = properties.agency_id', 'left')
             ->join('users', 'users.id = properties.agent_id', 'left')

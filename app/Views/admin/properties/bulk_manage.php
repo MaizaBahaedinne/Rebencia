@@ -120,6 +120,10 @@
         </div>
 
         <!-- Liste des biens -->
+        <div class="alert alert-info mb-3">
+            <i class="fas fa-info-circle"></i> 
+            <strong>Debug:</strong> <?= count($properties) ?> bien(s) chargé(s) depuis la base de données
+        </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm" id="propertiesTable">
                 <thead class="table-light">

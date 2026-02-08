@@ -106,49 +106,43 @@
                                 <i class="fas fa-ruler-combined text-primary me-2"></i>
                                 <div>
                                     <small class="text-muted">Surface totale</small>
-                                    <div><strong><?= number_format($property['area_total'] ?? 0) ?> m²</strong></div>
+                                    <div><strong><?= $property['area_total'] ? number_format($property['area_total']) . ' m²' : '-' ?></strong></div>
                                 </div>
                             </div>
                         </div>
-                        <?php if (!empty($property['area_living'])): ?>
-                            <div class="col-md-4">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-home text-primary me-2"></i>
-                                    <div>
-                                        <small class="text-muted">Surface habitable</small>
-                                        <div><strong><?= number_format($property['area_living']) ?> m²</strong></div>
-                                    </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-home text-primary me-2"></i>
+                                <div>
+                                    <small class="text-muted">Surface habitable</small>
+                                    <div><strong><?= $property['area_living'] ? number_format($property['area_living']) . ' m²' : '-' ?></strong></div>
                                 </div>
                             </div>
-                        <?php endif ?>
-                        <?php if (!empty($property['area_land'])): ?>
-                            <div class="col-md-4">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-map text-primary me-2"></i>
-                                    <div>
-                                        <small class="text-muted">Surface terrain</small>
-                                        <div><strong><?= number_format($property['area_land']) ?> m²</strong></div>
-                                    </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-map text-primary me-2"></i>
+                                <div>
+                                    <small class="text-muted">Surface terrain</small>
+                                    <div><strong><?= $property['area_land'] ? number_format($property['area_land']) . ' m²' : '-' ?></strong></div>
                                 </div>
                             </div>
-                        <?php endif ?>
-                        <?php if (!empty($property['rooms'])): ?>
-                            <div class="col-md-4">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-door-open text-primary me-2"></i>
-                                    <div>
-                                        <small class="text-muted">Nombre de pièces</small>
-                                        <div><strong><?= $property['rooms'] ?></strong></div>
-                                    </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-door-open text-primary me-2"></i>
+                                <div>
+                                    <small class="text-muted">Nombre de pièces</small>
+                                    <div><strong><?= $property['rooms'] ?? '-' ?></strong></div>
                                 </div>
                             </div>
-                        <?php endif ?>
+                        </div>
                         <div class="col-md-4">
                             <div class="d-flex align-items-center">
                                 <i class="fas fa-bed text-primary me-2"></i>
                                 <div>
                                     <small class="text-muted">Chambres</small>
-                                    <div><strong><?= $property['bedrooms'] ?? 0 ?></strong></div>
+                                    <div><strong><?= $property['bedrooms'] ?? '-' ?></strong></div>
                                 </div>
                             </div>
                         </div>
@@ -157,92 +151,150 @@
                                 <i class="fas fa-bath text-primary me-2"></i>
                                 <div>
                                     <small class="text-muted">Salles de bain</small>
-                                    <div><strong><?= $property['bathrooms'] ?? 0 ?></strong></div>
+                                    <div><strong><?= $property['bathrooms'] ?? '-' ?></strong></div>
                                 </div>
                             </div>
                         </div>
-                        <?php if (!empty($property['floor'])): ?>
-                            <div class="col-md-4">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-building text-primary me-2"></i>
-                                    <div>
-                                        <small class="text-muted">Étage</small>
-                                        <div><strong><?= esc($property['floor']) ?></strong></div>
-                                    </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-building text-primary me-2"></i>
+                                <div>
+                                    <small class="text-muted">Étage</small>
+                                    <div><strong><?= $property['floor'] ?? '-' ?></strong></div>
                                 </div>
                             </div>
-                        <?php endif ?>
-                        <?php if (!empty($property['parking_spaces']) && $property['parking_spaces'] > 0): ?>
-                            <div class="col-md-4">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-car text-primary me-2"></i>
-                                    <div>
-                                        <small class="text-muted">Parking</small>
-                                        <div><strong><?= esc($property['parking_spaces']) ?> place(s)</strong></div>
-                                    </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-layer-group text-primary me-2"></i>
+                                <div>
+                                    <small class="text-muted">Nombre d'étages</small>
+                                    <div><strong><?= $property['total_floors'] ?? '-' ?></strong></div>
                                 </div>
                             </div>
-                        <?php endif ?>
-                        <?php if (!empty($property['construction_year'])): ?>
-                            <div class="col-md-4">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-calendar text-primary me-2"></i>
-                                    <div>
-                                        <small class="text-muted">Année construction</small>
-                                        <div><strong><?= esc($property['construction_year']) ?></strong></div>
-                                    </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-car text-primary me-2"></i>
+                                <div>
+                                    <small class="text-muted">Parking</small>
+                                    <div><strong><?= $property['parking_spaces'] ? $property['parking_spaces'] . ' place(s)' : '-' ?></strong></div>
                                 </div>
                             </div>
-                        <?php endif ?>
-                        <?php if (!empty($property['total_floors'])): ?>
-                            <div class="col-md-4">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-layer-group text-primary me-2"></i>
-                                    <div>
-                                        <small class="text-muted">Nombre d'étages</small>
-                                        <div><strong><?= esc($property['total_floors']) ?></strong></div>
-                                    </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-calendar text-primary me-2"></i>
+                                <div>
+                                    <small class="text-muted">Année construction</small>
+                                    <div><strong><?= $property['construction_year'] ?? '-' ?></strong></div>
                                 </div>
                             </div>
-                        <?php endif ?>
-                        <?php if (!empty($property['standing'])): ?>
-                            <div class="col-md-4">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-star text-warning me-2"></i>
-                                    <div>
-                                        <small class="text-muted">Standing</small>
-                                        <div><strong><?= ucfirst(esc($property['standing'])) ?></strong></div>
-                                    </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-star text-warning me-2"></i>
+                                <div>
+                                    <small class="text-muted">Standing</small>
+                                    <div><strong><?= $property['standing'] ? ucfirst($property['standing']) : '-' ?></strong></div>
                                 </div>
                             </div>
-                        <?php endif ?>
-                        <?php if (!empty($property['condition_state'])): ?>
-                            <div class="col-md-4">
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-tools text-info me-2"></i>
-                                    <div>
-                                        <small class="text-muted">État</small>
-                                        <div><strong><?= ucfirst(esc($property['condition_state'])) ?></strong></div>
-                                    </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-tools text-info me-2"></i>
+                                <div>
+                                    <small class="text-muted">État</small>
+                                    <div><strong><?= $property['condition_state'] ? ucfirst($property['condition_state']) : '-' ?></strong></div>
                                 </div>
                             </div>
-                        <?php endif ?>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-gavel text-secondary me-2"></i>
+                                <div>
+                                    <small class="text-muted">Statut légal</small>
+                                    <div><strong><?= $property['legal_status'] ? ucfirst($property['legal_status']) : '-' ?></strong></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-envelope text-primary me-2"></i>
+                                <div>
+                                    <small class="text-muted">Code postal</small>
+                                    <div><strong><?= $property['postal_code'] ?? '-' ?></strong></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-money-bill text-success me-2"></i>
+                                <div>
+                                    <small class="text-muted">Estimation interne</small>
+                                    <div><strong><?= $property['internal_estimation'] ? number_format($property['internal_estimation'], 0, ',', ' ') . ' TND' : '-' ?></strong></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <?php if (!empty($property['has_elevator']) || !empty($property['has_garden']) || !empty($property['has_pool'])): ?>
-                        <hr class="my-3">
-                        <div class="d-flex flex-wrap gap-2">
-                            <?php if (!empty($property['has_elevator'])): ?>
-                                <span class="badge bg-success"><i class="fas fa-check me-1"></i>Ascenseur</span>
-                            <?php endif ?>
-                            <?php if (!empty($property['has_garden'])): ?>
-                                <span class="badge bg-success"><i class="fas fa-check me-1"></i>Jardin</span>
-                            <?php endif ?>
-                            <?php if (!empty($property['has_pool'])): ?>
-                                <span class="badge bg-success"><i class="fas fa-check me-1"></i>Piscine</span>
-                            <?php endif ?>
+                    <hr class="my-3">
+                    <h6 class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Équipements</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <?php if ($property['has_elevator']): ?>
+                            <span class="badge bg-success"><i class="fas fa-check me-1"></i>Ascenseur</span>
+                        <?php else: ?>
+                            <span class="badge bg-secondary"><i class="fas fa-times me-1"></i>Ascenseur</span>
+                        <?php endif ?>
+                        <?php if ($property['has_garden']): ?>
+                            <span class="badge bg-success"><i class="fas fa-check me-1"></i>Jardin</span>
+                        <?php else: ?>
+                            <span class="badge bg-secondary"><i class="fas fa-times me-1"></i>Jardin</span>
+                        <?php endif ?>
+                        <?php if ($property['has_pool']): ?>
+                            <span class="badge bg-success"><i class="fas fa-check me-1"></i>Piscine</span>
+                        <?php else: ?>
+                            <span class="badge bg-secondary"><i class="fas fa-times me-1"></i>Piscine</span>
+                        <?php endif ?>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Informations Propriétaire -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-user-tie me-2"></i>Informations du Propriétaire</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-user text-primary me-2"></i>
+                                <div>
+                                    <small class="text-muted">Nom</small>
+                                    <div><strong><?= $property['owner_name'] ? esc($property['owner_name']) : '-' ?></strong></div>
+                                </div>
+                            </div>
                         </div>
-                    <?php endif ?>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-phone text-primary me-2"></i>
+                                <div>
+                                    <small class="text-muted">Téléphone</small>
+                                    <div><strong><?= $property['owner_phone'] ? esc($property['owner_phone']) : '-' ?></strong></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-envelope text-primary me-2"></i>
+                                <div>
+                                    <small class="text-muted">Email</small>
+                                    <div><strong><?= $property['owner_email'] ? esc($property['owner_email']) : '-' ?></strong></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

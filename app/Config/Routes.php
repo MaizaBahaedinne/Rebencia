@@ -110,6 +110,10 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->get('bulk-manage', 'Properties::bulkManage');
         $routes->post('bulk-action', 'Properties::bulkAction');
         
+        // Owner management
+        $routes->get('search-owners', 'Properties::searchOwners');
+        $routes->post('update-owner/(:num)', 'Properties::updateOwner/$1');
+        
         // Property Extended Data Routes
         $routes->post('(:num)/rooms/save', 'PropertyExtendedController::saveRooms/$1');
         $routes->post('(:num)/options/save', 'PropertyExtendedController::saveOptions/$1');

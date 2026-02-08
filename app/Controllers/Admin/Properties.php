@@ -742,4 +742,106 @@ class Properties extends BaseController
             ]);
         }
     }
+
+    /**
+     * Recherche de propriétaires
+     */
+    public function searchOwners()
+    {
+        $query = $this->request->getGet('q');
+        
+        if (!$query || strlen($query) < 3) {
+            return $this->response->setJSON([
+                'success' => false,
+                'owners' => []
+            ]);
+        }
+
+        // Rechercher dans les champs owner_name, owner_phone, owner_email
+        $owners = $this->propertyModel
+            ->select('owner_name as name, owner_phone as phone, owner_email as email')
+            ->groupStart()
+                ->like('owner_name', $query)
+                ->orLike('owner_phone', $query)
+                ->orLike('owner_email', $query)
+            ->groupEnd()
+            ->where('owner_name IS NOT NULL')
+            ->where('owner_name !=', '')
+            ->groupBy('owner_name, owner_phone, owner_email')
+            ->limit(10)
+            ->findAll();
+
+        return $this->response->setJSON([
+            'success' => true,
+            'owners' => $owners
+        ]);
+    }
+
+    /**
+     * Mise à jour des informations propriétaire
+     */
+    public function updateOwner($id = null)
+    {
+        if (!$id) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'ID du bien manquant'
+            ]);
+        }
+
+        // Vérifier les permissions
+        $currentUserId = session()->get('user_id');
+        $currentRoleLevel = session()->get('role_level');
+        
+        $property = $this->propertyModel->find($id);
+        if (!$property) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Bien non trouvé'
+            ]);
+        }
+
+        // Vérifier les droits d'édition
+        if ($currentRoleLevel != 100) {
+            $editableUserIds = $this->hierarchyHelper->getAccessibleUserIds($currentUserId);
+            if (!in_array($property['agent_id'], $editableUserIds)) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Vous n\'avez pas l\'autorisation de modifier ce bien'
+                ]);
+            }
+        }
+
+        // Récupérer les données
+        $ownerName = $this->request->getPost('owner_name');
+        $ownerPhone = $this->request->getPost('owner_phone');
+        $ownerEmail = $this->request->getPost('owner_email');
+
+        if (!$ownerName || !$ownerPhone) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Le nom et le téléphone du propriétaire sont obligatoires'
+            ]);
+        }
+
+        // Mettre à jour
+        $updated = $this->propertyModel->update($id, [
+            'owner_name' => $ownerName,
+            'owner_phone' => $ownerPhone,
+            'owner_email' => $ownerEmail
+        ]);
+
+        if ($updated) {
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Propriétaire mis à jour avec succès'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Erreur lors de la mise à jour'
+            ]);
+        }
+    }
 }
+

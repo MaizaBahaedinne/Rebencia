@@ -402,13 +402,7 @@ $(document).ready(function() {
         pageLength: 25,
         lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tous"]],
         colReorder: true,
-        stateSave: true,
-        stateSaveCallback: function(settings, data) {
-            localStorage.setItem('DataTables_properties_' + settings.sInstance, JSON.stringify(data));
-        },
-        stateLoadCallback: function(settings) {
-            return JSON.parse(localStorage.getItem('DataTables_properties_' + settings.sInstance));
-        },
+        stateSave: false,
         columnDefs: [
             {
                 targets: [15, 16, 17, 18],

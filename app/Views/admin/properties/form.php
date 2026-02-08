@@ -352,8 +352,19 @@ document.querySelectorAll('.wizard-step').forEach(step => {
 
 // Sauvegarder les données d'une étape via AJAX
 function saveStepData(step, callback) {
+    console.log('saveStepData called for step:', step);
+    
     const formData = new FormData(document.getElementById('propertyForm'));
     const saveBtn = step === totalSteps ? document.getElementById('submitBtn') : document.getElementById('nextBtn');
+    
+    // Déboguer les fichiers photos
+    const photoInput = document.getElementById('photos');
+    if (photoInput && photoInput.files) {
+        console.log('Photos in input:', photoInput.files.length);
+        for (let i = 0; i < photoInput.files.length; i++) {
+            console.log('Photo', i, ':', photoInput.files[i].name, photoInput.files[i].size);
+        }
+    }
     
     // Afficher un loader
     const originalText = saveBtn.innerHTML;
@@ -364,6 +375,9 @@ function saveStepData(step, callback) {
     let url = '<?= base_url("admin/properties/save-step") ?>';
     formData.append('step', step);
     formData.append('property_id', propertyId || '');
+    
+    console.log('Sending request to:', url);
+    console.log('Property ID:', propertyId);
     
     fetch(url, {
         method: 'POST',

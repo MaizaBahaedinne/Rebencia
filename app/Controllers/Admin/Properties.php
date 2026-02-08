@@ -24,28 +24,60 @@ class Properties extends BaseController
     {
         // Récupérer l'utilisateur connecté
         $currentUserId = session()->get('user_id');
+        $currentRoleLevel = session()->get('role_level');
         
         if (!$currentUserId) {
             return redirect()->to('/login')->with('error', 'Session expirée');
         }
         
-        // Récupérer les IDs des utilisateurs accessibles (self + subordonnés récursifs)
-        $accessibleUserIds = $this->hierarchyHelper->getAccessibleUserIds($currentUserId);
-        
-        // Filtrer les propriétés selon la hiérarchie
-        if (empty($accessibleUserIds)) {
-            $accessibleUserIds = [$currentUserId]; // Au minimum, l'utilisateur voit ses propres biens
+        // Admin voit tout, les autres voient leur agence et sous-agences
+        if ($currentRoleLevel == 100) {
+            // Admin voit tous les biens
+            $properties = $this->propertyModel
+                ->select('properties.*, zones.name as zone_name, agencies.name as agency_name, 
+                         CONCAT(users.first_name, " ", users.last_name) as agent_name')
+                ->join('zones', 'zones.id = properties.zone_id', 'left')
+                ->join('agencies', 'agencies.id = properties.agency_id', 'left')
+                ->join('users', 'users.id = properties.agent_id', 'left')
+                ->orderBy('properties.created_at', 'DESC')
+                ->paginate(20);
+        } else {
+            // Récupérer les IDs des utilisateurs accessibles (self + subordonnés récursifs)
+            $accessibleUserIds = $this->hierarchyHelper->getAccessibleUserIds($currentUserId);
+            
+            if (empty($accessibleUserIds)) {
+                $accessibleUserIds = [$currentUserId];
+            }
+            
+            // Filtrer les propriétés par agence et sous-agences
+            $userModel = model('UserModel');
+            $currentUser = $userModel->find($currentUserId);
+            $currentAgencyId = $currentUser['agency_id'] ?? null;
+            
+            $properties = $this->propertyModel
+                ->select('properties.*, zones.name as zone_name, agencies.name as agency_name, 
+                         CONCAT(users.first_name, " ", users.last_name) as agent_name')
+                ->join('zones', 'zones.id = properties.zone_id', 'left')
+                ->join('agencies', 'agencies.id = properties.agency_id', 'left')
+                ->join('users', 'users.id = properties.agent_id', 'left')
+                ->where('properties.agency_id', $currentAgencyId)
+                ->orderBy('properties.created_at', 'DESC')
+                ->paginate(20);
         }
         
-        $properties = $this->propertyModel
-            ->whereIn('agent_id', $accessibleUserIds)
-            ->orderBy('created_at', 'DESC')
-            ->paginate(20);
+        // Récupérer les IDs des utilisateurs modifiables (pour les boutons edit/delete)
+        $editableUserIds = $this->hierarchyHelper->getAccessibleUserIds($currentUserId);
+        if (empty($editableUserIds)) {
+            $editableUserIds = [$currentUserId];
+        }
         
         $data = [
             'title' => 'Gestion des Propriétés',
             'properties' => $properties,
-            'pager' => $this->propertyModel->pager
+            'pager' => $this->propertyModel->pager,
+            'currentUserId' => $currentUserId,
+            'currentRoleLevel' => $currentRoleLevel,
+            'editableUserIds' => $editableUserIds
         ];
 
         return view('admin/properties/index', $data);
@@ -286,6 +318,15 @@ class Properties extends BaseController
         if (!$property) {
             return redirect()->to('/admin/properties')->with('error', 'Bien non trouvé');
         }
+        
+        // Vérifier les permissions : admin ou propriétaire du bien ou manager du propriétaire
+        $currentUserId = session()->get('user_id');
+        $currentRoleLevel = session()->get('role_level');
+        $editableUserIds = $this->hierarchyHelper->getAccessibleUserIds($currentUserId);
+        
+        if ($currentRoleLevel != 100 && !in_array($property['agent_id'], $editableUserIds)) {
+            return redirect()->to('/admin/properties')->with('error', 'Vous n\'avez pas la permission de modifier ce bien.');
+        }
 
         $userModel = model('UserModel');
         $propertyRoomModel = model('PropertyRoomModel');
@@ -314,6 +355,15 @@ class Properties extends BaseController
         
         if (!$property) {
             return redirect()->to('/admin/properties')->with('error', 'Bien non trouvé');
+        }
+        
+        // Vérifier les permissions : admin ou propriétaire du bien ou manager du propriétaire
+        $currentUserId = session()->get('user_id');
+        $currentRoleLevel = session()->get('role_level');
+        $editableUserIds = $this->hierarchyHelper->getAccessibleUserIds($currentUserId);
+        
+        if ($currentRoleLevel != 100 && !in_array($property['agent_id'], $editableUserIds)) {
+            return redirect()->to('/admin/properties')->with('error', 'Vous n\'avez pas la permission de modifier ce bien.');
         }
 
         $validation = \Config\Services::validation();
@@ -460,6 +510,15 @@ class Properties extends BaseController
         
         if (!$property) {
             return redirect()->to('/admin/properties')->with('error', 'Bien non trouvé');
+        }
+        
+        // Vérifier les permissions : admin ou propriétaire du bien ou manager du propriétaire
+        $currentUserId = session()->get('user_id');
+        $currentRoleLevel = session()->get('role_level');
+        $editableUserIds = $this->hierarchyHelper->getAccessibleUserIds($currentUserId);
+        
+        if ($currentRoleLevel != 100 && !in_array($property['agent_id'], $editableUserIds)) {
+            return redirect()->to('/admin/properties')->with('error', 'Vous n\'avez pas la permission de supprimer ce bien.');
         }
 
         // Supprimer les images associées

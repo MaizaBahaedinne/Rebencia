@@ -205,9 +205,11 @@
                                             <a href="<?= base_url('admin/properties/view/' . $property['id']) ?>" class="btn btn-sm btn-info" onclick="event.stopPropagation()">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="<?= base_url('admin/properties/edit/' . $property['id']) ?>" class="btn btn-sm btn-warning" onclick="event.stopPropagation()">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
+                                            <?php if ($currentRoleLevel == 100 || in_array($property['agent_id'], $editableUserIds)): ?>
+                                                <a href="<?= base_url('admin/properties/edit/' . $property['id']) ?>" class="btn btn-sm btn-warning" onclick="event.stopPropagation()">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -240,6 +242,8 @@
 let map;
 let markers = {};
 const propertiesData = <?= json_encode($properties) ?>;
+const currentRoleLevel = <?= $currentRoleLevel ?>;
+const editableUserIds = <?= json_encode($editableUserIds) ?>;
 
 // Initialize map
 function initMap() {
@@ -280,9 +284,10 @@ function initMap() {
                         <a href="/admin/properties/view/${property.id}" class="btn btn-sm btn-primary w-100 mb-1">
                             <i class="fas fa-eye"></i> Voir
                         </a>
-                        <a href="/admin/properties/edit/${property.id}" class="btn btn-sm btn-warning w-100">
-                            <i class="fas fa-edit"></i> Modifier
-                        </a>
+                        ${(currentRoleLevel == 100 || editableUserIds.includes(property.agent_id)) ? 
+                            `<a href="/admin/properties/edit/${property.id}" class="btn btn-sm btn-warning w-100">
+                                <i class="fas fa-edit"></i> Modifier
+                            </a>` : ''}
                     </div>
                 </div>
             `);

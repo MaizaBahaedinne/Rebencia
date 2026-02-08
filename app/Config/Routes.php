@@ -103,6 +103,7 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->post('store', 'Properties::store');
         $routes->get('edit/(:num)', 'Properties::edit/$1');
         $routes->post('update/(:num)', 'Properties::update/$1');
+        $routes->put('update/(:num)', 'Properties::update/$1');
         $routes->delete('delete/(:num)', 'Properties::delete/$1');
         $routes->get('view/(:num)', 'Properties::view/$1');
         $routes->post('deleteImage/(:num)', 'Properties::deleteImage/$1');

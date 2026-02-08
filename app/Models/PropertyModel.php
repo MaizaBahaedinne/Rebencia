@@ -60,8 +60,8 @@ class PropertyModel extends Model
             ->join('users', 'users.id = properties.agent_id', 'left')
             ->where('properties.id', $id);
         
-        // Appliquer le filtre d'agence
-        applyAgencyFilter($builder, 'properties.agency_id');
+        // Ne pas appliquer le filtre d'agence pour la vue - tout le monde peut voir tous les biens
+        // applyAgencyFilter($builder, 'properties.agency_id');
         
         $property = $builder->first();
 

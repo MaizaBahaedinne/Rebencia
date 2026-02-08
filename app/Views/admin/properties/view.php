@@ -341,12 +341,107 @@
                             <i class="fas fa-globe text-primary me-2"></i>
                             Coordonnées GPS: <code><?= number_format($property['latitude'], 6) ?>, <?= number_format($property['longitude'], 6) ?></code>
                         </p>
+                        
+                        <!-- Carte Leaflet -->
+                        <div id="propertyMap" style="height: 300px; border-radius: 0.5rem; margin-top: 1rem;"></div>
                     <?php endif ?>
                     <?php if (!empty($property['legal_status'])): ?>
                         <p class="mb-0">
                             <i class="fas fa-gavel text-primary me-2"></i>
                             Statut légal: <strong><?= ucfirst(esc($property['legal_status'])) ?></strong>
                         </p>
+                    <?php endif ?>
+                </div>
+            </div>
+            
+            <!-- Documents -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-file-pdf me-2"></i>Documents</h5>
+                </div>
+                <div class="card-body">
+                    <?php 
+                    $documentTypes = [
+                        'contrat' => ['icon' => 'file-contract', 'label' => 'Contrat', 'color' => 'primary'],
+                        'titre_foncier' => ['icon' => 'certificate', 'label' => 'Titre foncier', 'color' => 'success'],
+                        'plan' => ['icon' => 'drafting-compass', 'label' => 'Plan', 'color' => 'info'],
+                        'diagnostic_performance_energetique' => ['icon' => 'leaf', 'label' => 'Diagnostic Performance Énergétique (DPE)', 'color' => 'success'],
+                        'diagnostic_technique' => ['icon' => 'clipboard-check', 'label' => 'Diagnostic technique', 'color' => 'warning'],
+                        'certificat_conformite' => ['icon' => 'check-circle', 'label' => 'Certificat de conformité', 'color' => 'success'],
+                        'autorisation_construction' => ['icon' => 'hard-hat', 'label' => 'Autorisation de construction', 'color' => 'danger'],
+                        'photo' => ['icon' => 'image', 'label' => 'Photos supplémentaires', 'color' => 'info'],
+                        'autre' => ['icon' => 'file', 'label' => 'Autres documents', 'color' => 'secondary']
+                    ];
+                    
+                    // Indexer les documents par type
+                    $documentsByType = [];
+                    foreach ($documents as $doc) {
+                        if (!isset($documentsByType[$doc['document_type']])) {
+                            $documentsByType[$doc['document_type']] = [];
+                        }
+                        $documentsByType[$doc['document_type']][] = $doc;
+                    }
+                    ?>
+                    
+                    <div class="row g-3">
+                        <?php foreach ($documentTypes as $type => $info): ?>
+                            <?php 
+                            $hasDocument = isset($documentsByType[$type]);
+                            $docs = $documentsByType[$type] ?? [];
+                            ?>
+                            <div class="col-md-6">
+                                <div class="card h-100 <?= $hasDocument ? 'border-' . $info['color'] : 'border-secondary' ?>" style="border-width: 2px;">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div>
+                                                <i class="fas fa-<?= $info['icon'] ?> text-<?= $hasDocument ? $info['color'] : 'muted' ?> me-2"></i>
+                                                <strong><?= $info['label'] ?></strong>
+                                            </div>
+                                            <?php if ($hasDocument): ?>
+                                                <span class="badge bg-<?= $info['color'] ?>">
+                                                    <i class="fas fa-check me-1"></i>Disponible
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="badge bg-secondary">
+                                                    <i class="fas fa-times me-1"></i>Non disponible
+                                                </span>
+                                            <?php endif ?>
+                                        </div>
+                                        
+                                        <?php if ($hasDocument): ?>
+                                            <div class="mt-2">
+                                                <?php foreach ($docs as $doc): ?>
+                                                    <div class="mb-2">
+                                                        <a href="<?= base_url('uploads/documents/' . $doc['file_path']) ?>" 
+                                                           target="_blank" 
+                                                           class="text-decoration-none">
+                                                            <i class="fas fa-download me-1"></i>
+                                                            <?= esc($doc['file_name']) ?>
+                                                        </a>
+                                                        <br>
+                                                        <small class="text-muted">
+                                                            <?= $doc['file_size'] ? number_format($doc['file_size'] / 1024, 0) . ' KB' : '-' ?> · 
+                                                            <?= date('d/m/Y', strtotime($doc['created_at'])) ?>
+                                                        </small>
+                                                        <?php if (!empty($doc['description'])): ?>
+                                                            <br><small class="text-muted"><?= esc($doc['description']) ?></small>
+                                                        <?php endif ?>
+                                                    </div>
+                                                <?php endforeach ?>
+                                            </div>
+                                        <?php else: ?>
+                                            <small class="text-muted">Aucun document de ce type n'est disponible</small>
+                                        <?php endif ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach ?>
+                    </div>
+                    
+                    <?php if (empty($documents)): ?>
+                        <div class="alert alert-info mb-0 mt-3">
+                            <i class="fas fa-info-circle me-2"></i>Aucun document n'a été ajouté pour ce bien.
+                        </div>
                     <?php endif ?>
                 </div>
             </div>
@@ -677,4 +772,32 @@ function saveOwnerInfo(clientId, name, phone, email, clientType) {
 }
 </script>
 <?php endif; ?>
+
+<?php if (!empty($property['latitude']) && !empty($property['longitude'])): ?>
+<!-- Leaflet Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialiser la carte
+    const map = L.map('propertyMap').setView([<?= $property['latitude'] ?>, <?= $property['longitude'] ?>], 15);
+    
+    // Ajouter le layer de tuiles OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19
+    }).addTo(map);
+    
+    // Ajouter un marqueur pour la propriété
+    const marker = L.marker([<?= $property['latitude'] ?>, <?= $property['longitude'] ?>]).addTo(map);
+    marker.bindPopup(`
+        <div style="text-align: center;">
+            <strong><?= esc($property['title']) ?></strong><br>
+            <small><?= esc($property['address']) ?></small>
+        </div>
+    `).openPopup();
+});
+</script>
+<?php endif; ?>
+
 <?= $this->endSection() ?>

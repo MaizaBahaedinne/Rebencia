@@ -568,9 +568,14 @@ class Properties extends BaseController
         // L'utilisateur peut modifier si admin ou si c'est son bien ou le bien d'un subordonné
         $canEdit = ($currentRoleLevel == 100 || in_array($property['agent_id'], $editableUserIds));
 
+        // Récupérer les documents
+        $documentModel = model('PropertyDocumentModel');
+        $documents = $documentModel->where('property_id', $id)->findAll();
+
         $data = [
             'title' => 'Détails Propriété - ' . $property['reference'],
             'property' => $property,
+            'documents' => $documents,
             'canEdit' => $canEdit,
             'currentRoleLevel' => $currentRoleLevel
         ];

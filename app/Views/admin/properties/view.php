@@ -16,14 +16,27 @@
             </nav>
         </div>
         <div>
-            <a href="<?= base_url('admin/properties/edit/' . $property['id']) ?>" class="btn btn-primary">
-                <i class="fas fa-edit me-2"></i>Modifier
-            </a>
+            <?php if ($canEdit): ?>
+                <a href="<?= base_url('admin/properties/edit/' . $property['id']) ?>" class="btn btn-primary">
+                    <i class="fas fa-edit me-2"></i>Modifier
+                </a>
+            <?php endif; ?>
             <a href="<?= base_url('admin/properties') ?>" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-2"></i>Retour
             </a>
         </div>
     </div>
+
+    <?php if ($canEdit && empty($property['owner_name']) && empty($property['owner_phone']) && empty($property['owner_email'])): ?>
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <h5 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Informations du propriétaire manquantes</h5>
+            <p class="mb-3">Les informations du propriétaire de ce bien ne sont pas renseignées. Vous pouvez les ajouter en cliquant sur le bouton ci-dessous.</p>
+            <a href="<?= base_url('admin/properties/edit/' . $property['id']) ?>" class="btn btn-warning btn-sm">
+                <i class="fas fa-user-plus me-1"></i>Ajouter les informations du propriétaire
+            </a>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <?php endif; ?>
 
     <div class="row">
         <!-- Informations Principales -->

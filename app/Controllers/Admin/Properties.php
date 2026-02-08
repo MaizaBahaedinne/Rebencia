@@ -555,9 +555,24 @@ class Properties extends BaseController
             return redirect()->to(base_url('admin/properties'))->with('error', 'Propriété non trouvée');
         }
 
+        // Vérifier les permissions d'édition
+        $currentUserId = session()->get('user_id');
+        $currentRoleLevel = session()->get('role_level');
+        
+        // Récupérer les IDs des utilisateurs modifiables (pour vérifier les permissions)
+        $editableUserIds = $this->hierarchyHelper->getAccessibleUserIds($currentUserId);
+        if (empty($editableUserIds)) {
+            $editableUserIds = [$currentUserId];
+        }
+        
+        // L'utilisateur peut modifier si admin ou si c'est son bien ou le bien d'un subordonné
+        $canEdit = ($currentRoleLevel == 100 || in_array($property['agent_id'], $editableUserIds));
+
         $data = [
             'title' => 'Détails Propriété - ' . $property['reference'],
-            'property' => $property
+            'property' => $property,
+            'canEdit' => $canEdit,
+            'currentRoleLevel' => $currentRoleLevel
         ];
 
         return view('admin/properties/view', $data);

@@ -48,75 +48,7 @@
     </div>
 <?php endif; ?>
 
-<div class="card shadow-sm mb-4 filters-card">
-    <div class="card-header">
-        <h5 class="mb-0">
-            <i class="fas fa-filter me-2"></i>Filtres de Recherche
-            <small class="ms-2">(Utilisez ces filtres pour affiner la liste des biens)</small>
-        </h5>
-    </div>
-    <div class="card-body bg-light">
-        <div class="row g-3">
-            <div class="col-md-3">
-                <label class="form-label fw-bold">
-                    <i class="fas fa-building text-primary me-1"></i>Agence
-                </label>
-                <select class="form-select form-select-lg" id="filterAgency">
-                    <option value="">Toutes les agences</option>
-                    <?php foreach ($agencies as $agency): ?>
-                        <option value="<?= $agency['id'] ?>"><?= esc($agency['name']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-bold">
-                    <i class="fas fa-user text-primary me-1"></i>Agent
-                </label>
-                <select class="form-select form-select-lg" id="filterAgent">
-                    <option value="">Tous les agents</option>
-                    <?php foreach ($agents as $agent): ?>
-                        <option value="<?= $agent['id'] ?>"><?= esc($agent['first_name'] . ' ' . $agent['last_name']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-bold">
-                    <i class="fas fa-info-circle text-primary me-1"></i>Statut
-                </label>
-                <select class="form-select form-select-lg" id="filterStatus">
-                    <option value="">Tous les statuts</option>
-                    <option value="draft">Brouillon</option>
-                    <option value="published">Publié</option>
-                    <option value="reserved">Réservé</option>
-                    <option value="sold">Vendu</option>
-                    <option value="rented">Loué</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-bold">
-                    <i class="fas fa-home text-primary me-1"></i>Type
-                </label>
-                <select class="form-select form-select-lg" id="filterType">
-                    <option value="">Tous les types</option>
-                    <option value="apartment">Appartement</option>
-                    <option value="villa">Villa</option>
-                    <option value="house">Maison</option>
-                    <option value="land">Terrain</option>
-                    <option value="commercial">Commercial</option>
-                    <option value="office">Bureau</option>
-                </select>
-            </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col-12">
-                <div class="alert alert-info mb-0">
-                    <i class="fas fa-info-circle me-2"></i>
-                    <strong>Total :</strong> <?= count($properties) ?> bien(s) disponible(s) pour la gestion en masse
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <div class="card shadow-sm">
     <div class="card-header bg-primary text-white">
@@ -210,10 +142,10 @@
                         <th>Agence</th>
                         <th>Agent</th>
                         <th>Statut</th>
-                        <th>En vedette</th>
-                        <th>Vues</th>
-                        <th>Date création</th>
-                        <th>Date publication</th>
+                        <th class="no-filter">En vedette</th>
+                        <th class="no-filter">Vues</th>
+                        <th class="no-filter">Date création</th>
+                        <th class="no-filter">Date publication</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -313,8 +245,7 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
-<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script src="<?= base_url('assets/js/datatable-filters.js') ?>"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
@@ -327,12 +258,9 @@
 let dataTable;
 let selectedPropertyIds = [];
 
-// Initialiser DataTables
+// Initialiser DataTables avec filtres
 document.addEventListener('DOMContentLoaded', function() {
-    dataTable = $('#propertiesTable').DataTable({
-        language: {
-            url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/fr-FR.json'
-        },
+    dataTable = initDataTableWithFilters('propertiesTable', {
         dom: '<"row mb-3"<"col-sm-12 col-md-6"B><"col-sm-12 col-md-6"f>>' +
              '<"row"<"col-sm-12"tr>>' +
              '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
@@ -386,10 +314,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 targets: 0,
                 orderable: false,
                 searchable: false
+            },
+            {
+                targets: [15, 16, 17, 18],
+                orderable: true,
+                searchable: false
             }
         ],
         drawCallback: function() {
-            // Re-appliquer les sélections après redraw
             selectedPropertyIds.forEach(id => {
                 $(`.property-checkbox[value="${id}"]`).prop('checked', true);
             });
@@ -397,7 +329,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Événement pour les checkbox de propriétés
     $('#propertiesTable').on('change', '.property-checkbox', function() {
         const id = parseInt($(this).val());
         if ($(this).is(':checked')) {
@@ -467,36 +398,6 @@ document.getElementById('bulkAction').addEventListener('change', function() {
         document.getElementById('agentField').style.display = 'block';
     }
 });
-
-// Filtres
-['filterAgency', 'filterAgent', 'filterStatus', 'filterType'].forEach(filterId => {
-    document.getElementById(filterId).addEventListener('change', applyFilters);
-});
-
-function applyFilters() {
-    const agencyFilter = document.getElementById('filterAgency').value;
-    const agentFilter = document.getElementById('filterAgent').value;
-    const statusFilter = document.getElementById('filterStatus').value;
-    const typeFilter = document.getElementById('filterType').value;
-    
-    $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
-        const row = dataTable.row(dataIndex).node();
-        const agency = $(row).data('agency');
-        const agent = $(row).data('agent');
-        const status = $(row).data('status');
-        const type = $(row).data('type');
-        
-        const showAgency = !agencyFilter || agency == agencyFilter;
-        const showAgent = !agentFilter || agent == agentFilter;
-        const showStatus = !statusFilter || status === statusFilter;
-        const showType = !typeFilter || type === typeFilter;
-        
-        return showAgency && showAgent && showStatus && showType;
-    });
-    
-    dataTable.draw();
-    $.fn.dataTable.ext.search.pop();
-}
 
 // Exécution de l'action
 function executeBulkAction() {

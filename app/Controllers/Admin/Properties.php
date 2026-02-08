@@ -637,4 +637,143 @@ class Properties extends BaseController
         return redirect()->to(base_url('admin/properties/assignments'))
             ->with('success', "$updated bien(s) réaffecté(s) avec succès");
     }
+
+    /**
+     * Page de gestion en masse des biens
+     */
+    public function bulkManage()
+    {
+        // Seulement l'admin peut accéder
+        if (session()->get('role_level') != 100) {
+            return redirect()->to('/admin/properties')->with('error', 'Accès non autorisé.');
+        }
+
+        $userModel = model('UserModel');
+        
+        $properties = $this->propertyModel
+            ->select('properties.*, zones.name as zone_name, 
+                     agencies.name as agency_name, 
+                     CONCAT(users.first_name, " ", users.last_name) as agent_name')
+            ->join('zones', 'zones.id = properties.zone_id', 'left')
+            ->join('agencies', 'agencies.id = properties.agency_id', 'left')
+            ->join('users', 'users.id = properties.agent_id', 'left')
+            ->orderBy('properties.created_at', 'DESC')
+            ->findAll();
+
+        $data = [
+            'title' => 'Gestion en masse des biens',
+            'properties' => $properties,
+            'agencies' => $this->agencyModel->where('status', 'active')->findAll(),
+            'agents' => $userModel->where('role_id >=', 6)->where('status', 'active')->findAll()
+        ];
+
+        return view('admin/properties/bulk_manage', $data);
+    }
+
+    /**
+     * Exécuter une action en masse
+     */
+    public function bulkAction()
+    {
+        // Seulement l'admin peut exécuter
+        if (session()->get('role_level') != 100) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Accès non autorisé.'
+            ]);
+        }
+
+        if (!$this->request->isAJAX()) {
+            return redirect()->to('/admin/properties/bulk-manage');
+        }
+
+        $json = $this->request->getJSON();
+        $propertyIds = $json->property_ids ?? [];
+        $action = $json->action ?? '';
+        $value = $json->value ?? null;
+
+        if (empty($propertyIds)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Aucun bien sélectionné'
+            ]);
+        }
+
+        try {
+            $affected = 0;
+            
+            switch ($action) {
+                case 'change_status':
+                    foreach ($propertyIds as $id) {
+                        if ($this->propertyModel->update($id, ['status' => $value])) {
+                            $affected++;
+                        }
+                    }
+                    $message = "$affected bien(s) - Statut changé en '$value'";
+                    break;
+
+                case 'change_agency':
+                    foreach ($propertyIds as $id) {
+                        if ($this->propertyModel->update($id, ['agency_id' => $value])) {
+                            $affected++;
+                        }
+                    }
+                    $message = "$affected bien(s) réaffecté(s) à la nouvelle agence";
+                    break;
+
+                case 'change_agent':
+                    foreach ($propertyIds as $id) {
+                        if ($this->propertyModel->update($id, ['agent_id' => $value])) {
+                            $affected++;
+                        }
+                    }
+                    $message = "$affected bien(s) réaffecté(s) au nouvel agent";
+                    break;
+
+                case 'set_featured':
+                    foreach ($propertyIds as $id) {
+                        if ($this->propertyModel->update($id, ['featured' => 1])) {
+                            $affected++;
+                        }
+                    }
+                    $message = "$affected bien(s) mis en vedette";
+                    break;
+
+                case 'unset_featured':
+                    foreach ($propertyIds as $id) {
+                        if ($this->propertyModel->update($id, ['featured' => 0])) {
+                            $affected++;
+                        }
+                    }
+                    $message = "$affected bien(s) retirés de la vedette";
+                    break;
+
+                case 'delete':
+                    foreach ($propertyIds as $id) {
+                        if ($this->propertyModel->delete($id)) {
+                            $affected++;
+                        }
+                    }
+                    $message = "$affected bien(s) supprimé(s)";
+                    break;
+
+                default:
+                    return $this->response->setJSON([
+                        'success' => false,
+                        'message' => 'Action non reconnue'
+                    ]);
+            }
+
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => $message
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Erreur: ' . $e->getMessage()
+            ]);
+        }
+    }
 }

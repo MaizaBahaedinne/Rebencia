@@ -133,11 +133,18 @@
     <h1 class="page-title">
         <i class="fas fa-building"></i> Gestion des Biens Immobiliers
     </h1>
-    <?php if (canCreate('properties')): ?>
-    <a href="<?= base_url('admin/properties/create') ?>" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Nouveau Bien
-    </a>
-    <?php endif; ?>
+    <div class="d-flex gap-2">
+        <?php if ($currentRoleLevel == 100): ?>
+            <a href="<?= base_url('admin/properties/bulk-manage') ?>" class="btn btn-outline-primary">
+                <i class="fas fa-tasks"></i> Gestion en masse
+            </a>
+        <?php endif; ?>
+        <?php if (canCreate('properties')): ?>
+        <a href="<?= base_url('admin/properties/create') ?>" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nouveau Bien
+        </a>
+        <?php endif; ?>
+    </div>
 </div>
 
 <?php if (session()->getFlashdata('success')): ?>

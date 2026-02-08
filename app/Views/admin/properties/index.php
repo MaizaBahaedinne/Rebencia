@@ -2,6 +2,9 @@
 
 <?= $this->section('styles') ?>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/colreorder/1.7.0/css/colReorder.bootstrap5.min.css">
 <style>
     .datatable-filter {
         position: relative;
@@ -139,6 +142,12 @@
         border-radius: 8px;
         margin-bottom: 10px;
     }
+    .dt-button {
+        margin: 0 2px !important;
+    }
+    #resetFiltersBtn {
+        margin-left: 10px;
+    }
 </style>
 <?= $this->endSection() ?>
 
@@ -186,15 +195,27 @@
     <div class="split-view-container">
         <div class="list-panel">
             <div class="table-responsive">
-                <table class="table table-hover mb-0" id="propertiesTable">
+                <table class="table table-hover mb-0 table-sm" id="propertiesTable">
                         <thead class="table-light">
                             <tr>
-                                <th>Réf</th>
+                                <th>Référence</th>
                                 <th>Titre</th>
                                 <th>Type</th>
+                                <th>Transaction</th>
+                                <th>Prix Vente</th>
+                                <th>Prix Location</th>
+                                <th>Surface (m²)</th>
+                                <th>Chambres</th>
+                                <th>Salles de bain</th>
+                                <th>Zone</th>
                                 <th>Ville</th>
-                                <th>Prix</th>
+                                <th>Adresse</th>
+                                <th>Agence</th>
+                                <th>Agent</th>
                                 <th>Statut</th>
+                                <th class="no-filter">En vedette</th>
+                                <th class="no-filter">Vues</th>
+                                <th class="no-filter">Date création</th>
                                 <th class="no-filter">Actions</th>
                             </tr>
                         </thead>
@@ -209,21 +230,73 @@
                                         <td><strong><?= esc($property['reference']) ?></strong></td>
                                         <td><?= esc($property['title']) ?></td>
                                         <td>
-                                            <span class="badge bg-info"><?= ucfirst($property['type']) ?></span>
+                                            <?php
+                                            $types = [
+                                                'apartment' => 'Appartement',
+                                                'villa' => 'Villa',
+                                                'house' => 'Maison',
+                                                'land' => 'Terrain',
+                                                'commercial' => 'Commercial',
+                                                'office' => 'Bureau'
+                                            ];
+                                            ?>
+                                            <span class="badge bg-info"><?= $types[$property['type']] ?? $property['type'] ?></span>
                                         </td>
-                                        <td><?= esc($property['city'] ?? '-') ?></td>
-                                        <td><strong><?= number_format($property['price'], 0, ',', ' ') ?> TND</strong></td>
                                         <td>
                                             <?php
-                                            $badgeClass = match($property['status']) {
+                                            $transactions = [
+                                                'sale' => 'Vente',
+                                                'rent' => 'Location',
+                                                'both' => 'Vente/Location'
+                                            ];
+                                            ?>
+                                            <?= $transactions[$property['transaction_type']] ?? $property['transaction_type'] ?>
+                                        </td>
+                                        <td><?= $property['price'] ? number_format($property['price'], 0, ',', ' ') . ' TND' : '-' ?></td>
+                                        <td><?= $property['rental_price'] ? number_format($property['rental_price'], 0, ',', ' ') . ' TND' : '-' ?></td>
+                                        <td><?= $property['area_total'] ?? '-' ?></td>
+                                        <td><?= $property['bedrooms'] ?? '-' ?></td>
+                                        <td><?= $property['bathrooms'] ?? '-' ?></td>
+                                        <td><?= esc($property['zone_name'] ?? '-') ?></td>
+                                        <td><?= esc($property['city'] ?? '-') ?></td>
+                                        <td><?= esc($property['address'] ?? '-') ?></td>
+                                        <td>
+                                            <?php if (!empty($property['agency_name'])): ?>
+                                                <span class="badge bg-primary"><?= esc($property['agency_name']) ?></span>
+                                            <?php else: ?>
+                                                <span class="text-muted">-</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <?php if (!empty($property['agent_name'])): ?>
+                                                <?= esc($property['agent_name']) ?>
+                                            <?php else: ?>
+                                                <span class="text-muted">-</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <?php
+                                            $statusBadges = [
+                                                'draft' => 'secondary',
                                                 'published' => 'success',
                                                 'reserved' => 'warning',
                                                 'sold' => 'danger',
-                                                default => 'secondary'
-                                            };
+                                                'rented' => 'info'
+                                            ];
                                             ?>
-                                            <span class="badge bg-<?= $badgeClass ?>"><?= ucfirst($property['status']) ?></span>
+                                            <span class="badge bg-<?= $statusBadges[$property['status']] ?? 'secondary' ?>">
+                                                <?= ucfirst($property['status']) ?>
+                                            </span>
                                         </td>
+                                        <td>
+                                            <?php if ($property['featured']): ?>
+                                                <i class="fas fa-star text-warning"></i>
+                                            <?php else: ?>
+                                                <i class="far fa-star text-muted"></i>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?= number_format($property['views_count'] ?? 0) ?></td>
+                                        <td><?= date('d/m/Y', strtotime($property['created_at'])) ?></td>
                                         <td>
                                             <a href="<?= base_url('admin/properties/view/' . $property['id']) ?>" class="btn btn-sm btn-info" onclick="event.stopPropagation()">
                                                 <i class="fas fa-eye"></i>
@@ -238,7 +311,7 @@
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="7" class="text-center py-4 text-muted">
+                                    <td colspan="19" class="text-center py-4 text-muted">
                                         Aucune propriété trouvée
                                     </td>
                                 </tr>
@@ -261,12 +334,99 @@
 <?= $this->section('scripts') ?>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="<?= base_url('assets/js/datatable-filters.js') ?>"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/colreorder/1.7.0/js/dataTables.colReorder.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 let map;
 let markers = {};
+let dataTable;
 const propertiesData = <?= json_encode($properties) ?>;
 const currentRoleLevel = <?= $currentRoleLevel ?>;
 const editableUserIds = <?= json_encode($editableUserIds) ?>;
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialiser DataTables avec filtres
+    dataTable = initDataTableWithFilters('propertiesTable', {
+        dom: '<"row mb-3"<"col-sm-12 col-md-auto"B><"col-sm-12 col-md-auto"<"btn btn-secondary btn-sm" id="resetFiltersBtn">><"col-sm-12 col-md"f>>' +
+             '<"row"<"col-sm-12"tr>>' +
+             '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+        buttons: [
+            {
+                extend: 'colvis',
+                text: '<i class="fas fa-columns"></i> Colonnes',
+                className: 'btn btn-sm btn-outline-secondary me-1'
+            },
+            {
+                extend: 'csv',
+                text: '<i class="fas fa-file-csv"></i> CSV',
+                className: 'btn btn-sm btn-outline-primary me-1',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            {
+                extend: 'excel',
+                text: '<i class="fas fa-file-excel"></i> Excel',
+                className: 'btn btn-sm btn-outline-success me-1',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            {
+                extend: 'print',
+                text: '<i class="fas fa-print"></i> Imprimer',
+                className: 'btn btn-sm btn-outline-info',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            }
+        ],
+        order: [[0, 'desc']],
+        pageLength: 25,
+        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tous"]],
+        colReorder: true,
+        stateSave: true,
+        stateSaveCallback: function(settings, data) {
+            localStorage.setItem('DataTables_properties_' + settings.sInstance, JSON.stringify(data));
+        },
+        stateLoadCallback: function(settings) {
+            return JSON.parse(localStorage.getItem('DataTables_properties_' + settings.sInstance));
+        },
+        columnDefs: [
+            {
+                targets: [15, 16, 17, 18],
+                orderable: true,
+                searchable: false
+            }
+        ]
+    });
+    
+    // Bouton Reset Filtres
+    $('#resetFiltersBtn').html('<i class="fas fa-redo"></i> Reset Filtres').on('click', function() {
+        // Réinitialiser tous les filtres de colonnes
+        dataTable.columns().every(function() {
+            const column = this;
+            $('input', column.footer()).val('');
+            $('select', column.footer()).val('');
+        });
+        // Effacer la recherche globale
+        dataTable.search('').columns().search('').draw();
+        // Message de confirmation
+        const btn = $(this);
+        btn.html('<i class="fas fa-check"></i> Réinitialisé!');
+        setTimeout(() => {
+            btn.html('<i class="fas fa-redo"></i> Reset Filtres');
+        }, 1500);
+    });
+    
+    initMap();
+});
 
 // Initialize map
 function initMap() {

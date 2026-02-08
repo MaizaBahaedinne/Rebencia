@@ -253,8 +253,8 @@ class Properties extends BaseController
     
     private function handlePhotoUpload($propertyId, $files)
     {
-        $propertyDocumentModel = model('PropertyDocumentModel');
-        $uploadPath = FCPATH . 'uploads/properties/' . $propertyId . '/photos';
+        $propertyMediaModel = model('PropertyMediaModel');
+        $uploadPath = FCPATH . 'uploads/properties';
         
         if (!is_dir($uploadPath)) {
             mkdir($uploadPath, 0755, true);
@@ -265,14 +265,13 @@ class Properties extends BaseController
                 $newName = $file->getRandomName();
                 $file->move($uploadPath, $newName);
                 
-                $propertyDocumentModel->insert([
+                $propertyMediaModel->insert([
                     'property_id' => $propertyId,
-                    'document_type' => 'photo',
+                    'type' => 'image',
                     'file_name' => $file->getClientName(),
-                    'file_path' => 'uploads/properties/' . $propertyId . '/photos/' . $newName,
+                    'file_path' => $newName,
                     'file_size' => $file->getSize(),
                     'mime_type' => $file->getMimeType(),
-                    'uploaded_by' => session()->get('user_id')
                 ]);
             }
         }
@@ -281,7 +280,7 @@ class Properties extends BaseController
     private function handleDocumentUpload($propertyId, $documentsByType)
     {
         $propertyDocumentModel = model('PropertyDocumentModel');
-        $uploadPath = FCPATH . 'uploads/properties/' . $propertyId . '/documents';
+        $uploadPath = FCPATH . 'uploads/documents';
         
         if (!is_dir($uploadPath)) {
             mkdir($uploadPath, 0755, true);
@@ -301,7 +300,7 @@ class Properties extends BaseController
                         'property_id' => $propertyId,
                         'document_type' => $type,
                         'file_name' => $file->getClientName(),
-                        'file_path' => 'uploads/properties/' . $propertyId . '/documents/' . $newName,
+                        'file_path' => $newName,
                         'file_size' => $file->getSize(),
                         'mime_type' => $file->getMimeType(),
                         'uploaded_by' => session()->get('user_id')
@@ -332,6 +331,7 @@ class Properties extends BaseController
         $propertyRoomModel = model('PropertyRoomModel');
         $propertyProximityModel = model('PropertyProximityModel');
         $propertyDocumentModel = model('PropertyDocumentModel');
+        $propertyMediaModel = model('PropertyMediaModel');
 
         $data = [
             'title' => 'Modifier le Bien - ' . $property['reference'],
@@ -339,7 +339,7 @@ class Properties extends BaseController
             'rooms' => $propertyRoomModel->getRoomsByProperty($id),
             'proximities' => $propertyProximityModel->getProximitiesByProperty($id),
             'documents' => $propertyDocumentModel->getDocumentsByProperty($id),
-            'photos' => $propertyDocumentModel->getPhotosByProperty($id),
+            'photos' => $propertyMediaModel->getPropertyImages($id),
             'zones' => $this->zoneModel->findAll(),
             'agencies' => $this->agencyModel->where('status', 'active')->findAll(),
             'agents' => $userModel->where('role_id >=', 6)->findAll(),
@@ -541,6 +541,33 @@ class Properties extends BaseController
         $propertyMediaModel = model('PropertyMediaModel');
         
         if ($propertyMediaModel->deleteMediaFile($imageId)) {
+            return $this->response->setJSON(['success' => true]);
+        }
+
+        return $this->response->setJSON(['success' => false, 'message' => 'Erreur lors de la suppression']);
+    }
+
+    public function deleteDocument($documentId)
+    {
+        if (!$this->request->isAJAX()) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Requête invalide']);
+        }
+
+        $propertyDocumentModel = model('PropertyDocumentModel');
+        $document = $propertyDocumentModel->find($documentId);
+        
+        if (!$document) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Document non trouvé']);
+        }
+        
+        // Supprimer le fichier physique
+        $filePath = FCPATH . 'uploads/documents/' . $document['file_path'];
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+        
+        // Supprimer de la base de données
+        if ($propertyDocumentModel->delete($documentId)) {
             return $this->response->setJSON(['success' => true]);
         }
 

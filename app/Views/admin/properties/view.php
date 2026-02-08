@@ -44,20 +44,43 @@
             <!-- Images -->
             <?php if (!empty($property['images'])): ?>
                 <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="fas fa-images me-2"></i>Photos</h5>
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-images me-2"></i>Galerie photos (<?= count($property['images']) ?>)</h5>
                     </div>
                     <div class="card-body">
-                        <div class="row g-3">
-                            <?php foreach ($property['images'] as $image): ?>
-                                <div class="col-md-4">
-                                    <img src="<?= base_url('uploads/properties/' . $image['file_path']) ?>" 
-                                         class="img-fluid rounded" 
-                                         alt="<?= esc($property['title']) ?>">
-                                </div>
-                            <?php endforeach ?>
+                        <!-- Image principale -->
+                        <?php $mainImage = $property['images'][0]; ?>
+                        <div class="mb-3">
+                            <img id="mainImage" 
+                                 src="<?= base_url('uploads/properties/' . $mainImage['file_path']) ?>" 
+                                 class="img-fluid rounded w-100" 
+                                 style="max-height: 500px; object-fit: cover; cursor: pointer;"
+                                 alt="<?= esc($property['title']) ?>"
+                                 onclick="openImageModal(0)">
                         </div>
+                        
+                        <!-- Miniatures -->
+                        <?php if (count($property['images']) > 1): ?>
+                            <div class="row g-2">
+                                <?php foreach ($property['images'] as $index => $image): ?>
+                                    <div class="col-2">
+                                        <img src="<?= base_url('uploads/properties/' . $image['file_path']) ?>" 
+                                             class="img-fluid rounded thumbnail-img <?= $index === 0 ? 'active' : '' ?>" 
+                                             style="height: 80px; width: 100%; object-fit: cover; cursor: pointer; border: 3px solid <?= $index === 0 ? '#0d6efd' : 'transparent' ?>; transition: all 0.3s;"
+                                             alt="<?= esc($property['title']) ?>"
+                                             data-index="<?= $index ?>"
+                                             onmouseover="this.style.opacity='0.8'"
+                                             onmouseout="this.style.opacity='1'"
+                                             onclick="changeMainImage(<?= $index ?>)">
+                                    </div>
+                                <?php endforeach ?>
+                            </div>
+                        <?php endif ?>
                     </div>
+                </div>
+            <?php else: ?>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>Aucune photo n'a été ajoutée pour ce bien.
                 </div>
             <?php endif ?>
 
@@ -275,8 +298,13 @@
             
             <!-- Informations Propriétaire -->
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="fas fa-user-tie me-2"></i>Informations du Propriétaire</h5>
+                    <?php if ($canEdit): ?>
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#ownerModal">
+                            <i class="fas fa-edit me-1"></i>Modifier
+                        </button>
+                    <?php endif; ?>
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
@@ -564,7 +592,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="ownerModalLabel">
-                    <i class="fas fa-user-plus me-2"></i>Ajouter un propriétaire
+                    <i class="fas fa-user-plus me-2"></i>Gérer le propriétaire
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -637,9 +665,105 @@
 </div>
 <?php endif; ?>
 
+<!-- Modal Galerie Images -->
+<?php if (!empty($property['images'])): ?>
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-0">
+                <h5 class="modal-title text-white" id="imageModalLabel">
+                    <span id="imageCounter">1 / <?= count($property['images']) ?></span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0 position-relative">
+                <img id="modalImage" src="" class="img-fluid w-100" style="max-height: 80vh; object-fit: contain;" alt="">
+                
+                <!-- Navigation arrows -->
+                <?php if (count($property['images']) > 1): ?>
+                <button class="btn btn-light position-absolute top-50 start-0 translate-middle-y ms-3" 
+                        onclick="navigateImage(-1)" 
+                        style="opacity: 0.8; z-index: 10;">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="btn btn-light position-absolute top-50 end-0 translate-middle-y me-3" 
+                        onclick="navigateImage(1)" 
+                        style="opacity: 0.8; z-index: 10;">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                <?php endif ?>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif ?>
+
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
+
+<?php if (!empty($property['images'])): ?>
+<script>
+// Galerie d'images
+const images = <?= json_encode(array_map(function($img) {
+    return base_url('uploads/properties/' . $img['file_path']);
+}, $property['images'])) ?>;
+let currentImageIndex = 0;
+
+// Changer l'image principale
+function changeMainImage(index) {
+    currentImageIndex = index;
+    document.getElementById('mainImage').src = images[index];
+    
+    // Mettre à jour les miniatures actives
+    document.querySelectorAll('.thumbnail-img').forEach((thumb, i) => {
+        if (i === index) {
+            thumb.style.borderColor = '#0d6efd';
+            thumb.classList.add('active');
+        } else {
+            thumb.style.borderColor = 'transparent';
+            thumb.classList.remove('active');
+        }
+    });
+}
+
+// Ouvrir le modal avec l'image sélectionnée
+function openImageModal(index) {
+    currentImageIndex = index;
+    document.getElementById('modalImage').src = images[index];
+    document.getElementById('imageCounter').textContent = `${index + 1} / ${images.length}`;
+    new bootstrap.Modal(document.getElementById('imageModal')).show();
+}
+
+// Naviguer entre les images dans le modal
+function navigateImage(direction) {
+    currentImageIndex += direction;
+    
+    // Boucler sur les images
+    if (currentImageIndex < 0) {
+        currentImageIndex = images.length - 1;
+    } else if (currentImageIndex >= images.length) {
+        currentImageIndex = 0;
+    }
+    
+    document.getElementById('modalImage').src = images[currentImageIndex];
+    document.getElementById('imageCounter').textContent = `${currentImageIndex + 1} / ${images.length}`;
+}
+
+// Navigation au clavier
+document.addEventListener('keydown', function(e) {
+    const modal = document.getElementById('imageModal');
+    if (modal.classList.contains('show')) {
+        if (e.key === 'ArrowLeft') {
+            navigateImage(-1);
+        } else if (e.key === 'ArrowRight') {
+            navigateImage(1);
+        }
+    }
+});
+</script>
+<?php endif; ?>
+
 <?php if ($canEdit): ?>
 <script>
 let searchTimeout;

@@ -165,6 +165,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const photoZone = document.getElementById('photo-upload-zone');
     const photoPreview = document.getElementById('photo-preview');
     
+    // Stockage des fichiers sélectionnés
+    let photoFiles = [];
+    
     // Click sur la zone de drag & drop
     photoZone.addEventListener('click', function(e) {
         if (e.target !== photoInput && !e.target.closest('button')) {
@@ -187,18 +190,19 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         this.classList.remove('dragover');
         
-        const files = e.dataTransfer.files;
-        handlePhotoFiles(files);
+        const files = Array.from(e.dataTransfer.files);
+        addPhotoFiles(files);
     });
     
     // Changement d'input fichier pour photos
     photoInput.addEventListener('change', function(e) {
-        handlePhotoFiles(this.files);
+        const files = Array.from(this.files);
+        addPhotoFiles(files);
     });
     
-    // Traiter les fichiers photos
-    function handlePhotoFiles(files) {
-        Array.from(files).forEach(file => {
+    // Ajouter des fichiers photos
+    function addPhotoFiles(files) {
+        files.forEach(file => {
             // Vérifier le type
             if (!file.type.match('image.*')) {
                 alert('Seules les images sont acceptées pour les photos');
@@ -211,6 +215,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
+            photoFiles.push(file);
+            
             // Prévisualisation
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -222,13 +228,35 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="card-body p-2">
                             <small class="text-muted d-block text-truncate">${file.name}</small>
                             <small class="text-muted d-block">${(file.size / 1024).toFixed(2)} Ko</small>
+                            <button type="button" class="btn btn-sm btn-danger w-100 mt-1 remove-new-photo-btn" data-filename="${file.name}">
+                                <i class="fas fa-times"></i> Retirer
+                            </button>
                         </div>
                     </div>
                 `;
                 photoPreview.appendChild(col);
+                
+                // Ajouter l'événement de suppression
+                col.querySelector('.remove-new-photo-btn').addEventListener('click', function() {
+                    const filename = this.getAttribute('data-filename');
+                    photoFiles = photoFiles.filter(f => f.name !== filename);
+                    col.remove();
+                    updatePhotoInput();
+                });
             };
             reader.readAsDataURL(file);
         });
+        
+        updatePhotoInput();
+    }
+    
+    // Mettre à jour l'input avec les fichiers
+    function updatePhotoInput() {
+        const dataTransfer = new DataTransfer();
+        photoFiles.forEach(file => {
+            dataTransfer.items.add(file);
+        });
+        photoInput.files = dataTransfer.files;
     }
     
     // Gérer les documents par type
@@ -265,8 +293,28 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function() {
             if (confirm('Êtes-vous sûr de vouloir supprimer cette photo ?')) {
                 const photoId = this.getAttribute('data-id');
-                // TODO: Appel AJAX pour supprimer la photo
-                this.closest('.col-md-3').remove();
+                const card = this.closest('.col-md-3');
+                
+                // Appel AJAX pour supprimer la photo
+                fetch('<?= base_url("admin/properties/deleteImage") ?>/' + photoId, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        card.remove();
+                    } else {
+                        alert('Erreur lors de la suppression');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Erreur lors de la suppression');
+                });
             }
         });
     });
@@ -276,8 +324,28 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function() {
             if (confirm('Êtes-vous sûr de vouloir supprimer ce document ?')) {
                 const docId = this.getAttribute('data-id');
-                // TODO: Appel AJAX pour supprimer le document
-                this.closest('.d-flex').remove();
+                const docDiv = this.closest('.d-flex');
+                
+                // Appel AJAX pour supprimer le document
+                fetch('<?= base_url("admin/properties/deleteDocument") ?>/' + docId, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        docDiv.remove();
+                    } else {
+                        alert('Erreur lors de la suppression');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Erreur lors de la suppression');
+                });
             }
         });
     });

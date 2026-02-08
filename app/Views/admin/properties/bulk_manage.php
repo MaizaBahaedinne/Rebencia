@@ -413,7 +413,7 @@ function executeBulkAction() {
     }
     
     let value = null;
-    let confirmMsg = `Voulez-vous vraiment appliquer cette action à ${selectedIds.length} bien(s) ?`;
+    let confirmMsg = `Voulez-vous vraiment appliquer cette action à ${selectedPropertyIds.length} bien(s) ?`;
     
     if (action === 'change_status') {
         value = document.getElementById('newStatus').value;
@@ -430,7 +430,7 @@ function executeBulkAction() {
             return;
         }
     } else if (action === 'delete') {
-        confirmMsg = `⚠️ ATTENTION : Voulez-vous vraiment SUPPRIMER ${selectedIds.length} bien(s) ?\nCette action est IRRÉVERSIBLE !`;
+        confirmMsg = `⚠️ ATTENTION : Voulez-vous vraiment SUPPRIMER ${selectedPropertyIds.length} bien(s) ?\nCette action est IRRÉVERSIBLE !`;
     }
     
     if (!confirm(confirmMsg)) {

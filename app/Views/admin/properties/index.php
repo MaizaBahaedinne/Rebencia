@@ -195,7 +195,7 @@
         <button class="view-toggle-btn" onclick="toggleView('split')" title="Vue partagée">
             <i class="fas fa-columns"></i>
         </button>
-        <button class="view-toggle-btn" onclick="toggleView('table')" title="Tableau plein écran">
+        <button class="view-toggle-btn active" onclick="toggleView('table')" title="Tableau plein écran">
             <i class="fas fa-table"></i>
         </button>
         <button class="view-toggle-btn" onclick="toggleView('map')" title="Carte plein écran">
@@ -204,7 +204,7 @@
     </div>
 
     <div class="split-view-container">
-        <div class="list-panel">
+        <div class="list-panel fullscreen">
             <div class="table-responsive">
                 <table class="table table-hover mb-0 table-sm" id="propertiesTable">
                         <thead class="table-light">
@@ -332,9 +332,9 @@
             </div>
         </div>
         
-        <div class="resize-handle" id="resizeHandle"></div>
+        <div class="resize-handle hidden" id="resizeHandle"></div>
         
-        <div class="map-panel">
+        <div class="map-panel hidden">
             <div id="propertiesMap"></div>
         </div>
     </div>
@@ -434,13 +434,6 @@ $(document).ready(function() {
     });
     
     initMap();
-    
-    // Définir la vue table comme vue par défaut
-    setTimeout(() => {
-        toggleView('table');
-        // Activer le bouton table
-        document.querySelectorAll('.view-toggle-btn')[1].classList.add('active');
-    }, 100);
 });
 
 // Initialize map

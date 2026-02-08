@@ -744,7 +744,7 @@ class Properties extends BaseController
     }
 
     /**
-     * Recherche de propriétaires
+     * Recherche de propriétaires (clients)
      */
     public function searchOwners()
     {
@@ -757,19 +757,37 @@ class Properties extends BaseController
             ]);
         }
 
-        // Rechercher dans les champs owner_name, owner_phone, owner_email
-        $owners = $this->propertyModel
-            ->select('owner_name as name, owner_phone as phone, owner_email as email')
+        // Rechercher dans la table clients
+        $clientModel = model('ClientModel');
+        $clients = $clientModel
+            ->select('id, type, first_name, last_name, company_name, email, phone, phone_secondary')
             ->groupStart()
-                ->like('owner_name', $query)
-                ->orLike('owner_phone', $query)
-                ->orLike('owner_email', $query)
+                ->like('first_name', $query)
+                ->orLike('last_name', $query)
+                ->orLike('company_name', $query)
+                ->orLike('email', $query)
+                ->orLike('phone', $query)
+                ->orLike('phone_secondary', $query)
             ->groupEnd()
-            ->where('owner_name IS NOT NULL')
-            ->where('owner_name !=', '')
-            ->groupBy('owner_name, owner_phone, owner_email')
             ->limit(10)
             ->findAll();
+
+        // Formater les résultats
+        $owners = [];
+        foreach ($clients as $client) {
+            $name = $client['type'] === 'company' 
+                ? $client['company_name'] 
+                : trim($client['first_name'] . ' ' . $client['last_name']);
+            
+            $owners[] = [
+                'id' => $client['id'],
+                'type' => $client['type'],
+                'name' => $name,
+                'phone' => $client['phone'],
+                'phone_secondary' => $client['phone_secondary'],
+                'email' => $client['email'] ?: ''
+            ];
+        }
 
         return $this->response->setJSON([
             'success' => true,
@@ -812,19 +830,72 @@ class Properties extends BaseController
             }
         }
 
-        // Récupérer les données
-        $ownerName = $this->request->getPost('owner_name');
-        $ownerPhone = $this->request->getPost('owner_phone');
-        $ownerEmail = $this->request->getPost('owner_email');
+        $clientId = $this->request->getPost('client_id');
+        
+        // Si un client existant est sélectionné
+        if ($clientId) {
+            $clientModel = model('ClientModel');
+            $client = $clientModel->find($clientId);
+            
+            if (!$client) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Client non trouvé'
+                ]);
+            }
+            
+            // Utiliser les infos du client
+            $ownerName = $client['type'] === 'company' 
+                ? $client['company_name'] 
+                : trim($client['first_name'] . ' ' . $client['last_name']);
+            $ownerPhone = $client['phone'];
+            $ownerEmail = $client['email'];
+            
+        } else {
+            // Nouveau client à créer
+            $ownerName = $this->request->getPost('owner_name');
+            $ownerPhone = $this->request->getPost('owner_phone');
+            $ownerEmail = $this->request->getPost('owner_email');
+            $clientType = $this->request->getPost('client_type') ?: 'individual';
 
-        if (!$ownerName || !$ownerPhone) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Le nom et le téléphone du propriétaire sont obligatoires'
-            ]);
+            if (!$ownerName || !$ownerPhone) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Le nom et le téléphone du propriétaire sont obligatoires'
+                ]);
+            }
+            
+            // Créer le client
+            $clientModel = model('ClientModel');
+            $clientData = [
+                'type' => $clientType,
+                'phone' => $ownerPhone,
+                'email' => $ownerEmail,
+                'status' => 'owner',
+                'assigned_to' => $property['agent_id'],
+                'agency_id' => $property['agency_id']
+            ];
+            
+            if ($clientType === 'company') {
+                $clientData['company_name'] = $ownerName;
+            } else {
+                // Séparer prénom et nom
+                $nameParts = explode(' ', $ownerName, 2);
+                $clientData['first_name'] = $nameParts[0];
+                $clientData['last_name'] = $nameParts[1] ?? '';
+            }
+            
+            $clientId = $clientModel->insert($clientData);
+            
+            if (!$clientId) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Erreur lors de la création du client'
+                ]);
+            }
         }
 
-        // Mettre à jour
+        // Mettre à jour le bien avec les infos du propriétaire
         $updated = $this->propertyModel->update($id, [
             'owner_name' => $ownerName,
             'owner_phone' => $ownerPhone,

@@ -502,9 +502,20 @@
                     <!-- Onglet Ajout -->
                     <div class="tab-pane fade" id="add" role="tabpanel">
                         <form id="ownerForm">
+                            <div class="mb-3">
+                                <label class="form-label">Type de client <span class="text-danger">*</span></label>
+                                <select class="form-select" id="client_type" name="client_type">
+                                    <option value="individual">Particulier</option>
+                                    <option value="company">Entreprise</option>
+                                </select>
+                            </div>
                             <div class="row">
                                 <div class="col-md-12 mb-3">
-                                    <label for="owner_name" class="form-label">Nom complet <span class="text-danger">*</span></label>
+                                    <label for="owner_name" class="form-label">
+                                        <span class="individual-label">Nom complet</span>
+                                        <span class="company-label" style="display:none;">Nom de l'entreprise</span>
+                                        <span class="text-danger">*</span>
+                                    </label>
                                     <input type="text" class="form-control" id="owner_name" name="owner_name" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
@@ -559,13 +570,18 @@ $('#searchOwnerInput').on('keyup', function() {
                     response.owners.forEach(owner => {
                         html += `
                             <a href="#" class="list-group-item list-group-item-action owner-item" 
+                               data-id="${owner.id}"
                                data-name="${owner.name}" 
                                data-phone="${owner.phone}" 
                                data-email="${owner.email || ''}">
                                 <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-1">${owner.name}</h6>
+                                    <h6 class="mb-1">
+                                        ${owner.name}
+                                        ${owner.type === 'company' ? '<span class="badge bg-info ms-2">Entreprise</span>' : '<span class="badge bg-secondary ms-2">Particulier</span>'}
+                                    </h6>
                                 </div>
                                 <small><i class="fas fa-phone me-1"></i>${owner.phone}</small>
+                                ${owner.phone_secondary ? `<small class="ms-2"><i class="fas fa-mobile-alt me-1"></i>${owner.phone_secondary}</small>` : ''}
                                 ${owner.email ? `<br><small><i class="fas fa-envelope me-1"></i>${owner.email}</small>` : ''}
                             </a>
                         `;
@@ -583,12 +599,24 @@ $('#searchOwnerInput').on('keyup', function() {
 // Sélection d'un propriétaire depuis les résultats
 $(document).on('click', '.owner-item', function(e) {
     e.preventDefault();
+    const clientId = $(this).data('id');
     const name = $(this).data('name');
     const phone = $(this).data('phone');
     const email = $(this).data('email');
     
-    if (confirm(`Associer ${name} à ce bien ?`)) {
-        saveOwnerInfo(name, phone, email);
+    if (confirm(`Associer le client "${name}" à ce bien ?`)) {
+        saveOwnerInfo(clientId, name, phone, email);
+    }
+});
+
+// Toggle label selon le type de client
+$('#client_type').on('change', function() {
+    if ($(this).val() === 'company') {
+        $('.individual-label').hide();
+        $('.company-label').show();
+    } else {
+        $('.individual-label').show();
+        $('.company-label').hide();
     }
 });
 
@@ -601,29 +629,40 @@ $('#saveOwnerBtn').on('click', function() {
         const name = $('#owner_name').val().trim();
         const phone = $('#owner_phone').val().trim();
         const email = $('#owner_email').val().trim();
+        const clientType = $('#client_type').val();
         
         if (!name || !phone) {
             alert('Le nom et le téléphone sont obligatoires');
             return;
         }
         
-        saveOwnerInfo(name, phone, email);
+        saveOwnerInfo(null, name, phone, email, clientType);
     } else {
-        alert('Veuillez sélectionner un propriétaire dans les résultats de recherche');
+        alert('Veuillez sélectionner un client dans les résultats de recherche');
     }
 });
 
 // Fonction pour sauvegarder les infos propriétaire
-function saveOwnerInfo(name, phone, email) {
+function saveOwnerInfo(clientId, name, phone, email, clientType) {
+    const postData = {
+        <?= csrf_token() ?>: '<?= csrf_hash() ?>'
+    };
+    
+    if (clientId) {
+        // Client existant
+        postData.client_id = clientId;
+    } else {
+        // Nouveau client
+        postData.owner_name = name;
+        postData.owner_phone = phone;
+        postData.owner_email = email;
+        postData.client_type = clientType;
+    }
+    
     $.ajax({
         url: '<?= base_url('admin/properties/update-owner/' . $property['id']) ?>',
         method: 'POST',
-        data: {
-            owner_name: name,
-            owner_phone: phone,
-            owner_email: email,
-            <?= csrf_token() ?>: '<?= csrf_hash() ?>'
-        },
+        data: postData,
         success: function(response) {
             if (response.success) {
                 location.reload();

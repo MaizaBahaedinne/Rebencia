@@ -11,6 +11,15 @@
     .dataTables_wrapper .dataTables_filter input {
         margin-left: 0.5em;
     }
+    .filters-card {
+        border: 2px solid #0d6efd;
+        box-shadow: 0 4px 6px rgba(13, 110, 253, 0.1);
+    }
+    .filters-card .card-header {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        color: white;
+        font-weight: 600;
+    }
 </style>
 <?= $this->endSection() ?>
 
@@ -39,15 +48,20 @@
     </div>
 <?php endif; ?>
 
-<div class="card shadow-sm mb-4">
-    <div class="card-header bg-light">
-        <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filtres</h5>
+<div class="card shadow-sm mb-4 filters-card">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-filter me-2"></i>Filtres de Recherche
+            <small class="ms-2">(Utilisez ces filtres pour affiner la liste des biens)</small>
+        </h5>
     </div>
-    <div class="card-body">
+    <div class="card-body bg-light">
         <div class="row g-3">
             <div class="col-md-3">
-                <label class="form-label">Agence</label>
-                <select class="form-select" id="filterAgency">
+                <label class="form-label fw-bold">
+                    <i class="fas fa-building text-primary me-1"></i>Agence
+                </label>
+                <select class="form-select form-select-lg" id="filterAgency">
                     <option value="">Toutes les agences</option>
                     <?php foreach ($agencies as $agency): ?>
                         <option value="<?= $agency['id'] ?>"><?= esc($agency['name']) ?></option>
@@ -55,8 +69,10 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <label class="form-label">Agent</label>
-                <select class="form-select" id="filterAgent">
+                <label class="form-label fw-bold">
+                    <i class="fas fa-user text-primary me-1"></i>Agent
+                </label>
+                <select class="form-select form-select-lg" id="filterAgent">
                     <option value="">Tous les agents</option>
                     <?php foreach ($agents as $agent): ?>
                         <option value="<?= $agent['id'] ?>"><?= esc($agent['first_name'] . ' ' . $agent['last_name']) ?></option>
@@ -64,8 +80,10 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <label class="form-label">Statut</label>
-                <select class="form-select" id="filterStatus">
+                <label class="form-label fw-bold">
+                    <i class="fas fa-info-circle text-primary me-1"></i>Statut
+                </label>
+                <select class="form-select form-select-lg" id="filterStatus">
                     <option value="">Tous les statuts</option>
                     <option value="draft">Brouillon</option>
                     <option value="published">Publié</option>
@@ -75,8 +93,10 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <label class="form-label">Type</label>
-                <select class="form-select" id="filterType">
+                <label class="form-label fw-bold">
+                    <i class="fas fa-home text-primary me-1"></i>Type
+                </label>
+                <select class="form-select form-select-lg" id="filterType">
                     <option value="">Tous les types</option>
                     <option value="apartment">Appartement</option>
                     <option value="villa">Villa</option>
@@ -85,6 +105,14 @@
                     <option value="commercial">Commercial</option>
                     <option value="office">Bureau</option>
                 </select>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Total :</strong> <?= count($properties) ?> bien(s) disponible(s) pour la gestion en masse
+                </div>
             </div>
         </div>
     </div>

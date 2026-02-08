@@ -149,7 +149,8 @@
         <i class="fas fa-building"></i> Gestion des Biens Immobiliers
     </h1>
     <div class="d-flex gap-2">
-        <?php if ($currentRoleLevel == 100): ?>
+        <!-- Debug: Role Level = <?= $currentRoleLevel ?? 'non défini' ?> -->
+        <?php if (isset($currentRoleLevel) && $currentRoleLevel == 100): ?>
             <a href="<?= base_url('admin/properties/bulk-manage') ?>" class="btn btn-outline-primary">
                 <i class="fas fa-tasks"></i> Gestion en masse
             </a>

@@ -410,18 +410,30 @@ class Properties extends BaseController
                 
                 // Sauvegarder les pièces
                 $rooms = $this->request->getPost('rooms');
-                if (!empty($rooms)) {
+                log_message('debug', 'Rooms data type: ' . gettype($rooms) . ', value: ' . json_encode($rooms));
+                
+                if ($rooms && is_array($rooms) && count($rooms) > 0) {
                     $propertyRoomModel = model('PropertyRoomModel');
                     $propertyRoomModel->where('property_id', $propertyId)->delete();
                     $propertyRoomModel->saveRooms($propertyId, $rooms);
+                } else {
+                    // Pas de pièces ou tableau vide, supprimer les anciennes
+                    $propertyRoomModel = model('PropertyRoomModel');
+                    $propertyRoomModel->where('property_id', $propertyId)->delete();
                 }
                 
                 // Sauvegarder les proximités
                 $proximities = $this->request->getPost('proximities');
-                if (!empty($proximities)) {
+                log_message('debug', 'Proximities data type: ' . gettype($proximities) . ', value: ' . json_encode($proximities));
+                
+                if ($proximities && is_array($proximities) && count($proximities) > 0) {
                     $propertyProximityModel = model('PropertyProximityModel');
                     $propertyProximityModel->where('property_id', $propertyId)->delete();
                     $propertyProximityModel->saveProximities($propertyId, $proximities);
+                } else {
+                    // Pas de proximités ou tableau vide
+                    $propertyProximityModel = model('PropertyProximityModel');
+                    $propertyProximityModel->where('property_id', $propertyId)->delete();
                 }
                 
                 return $this->response->setJSON([

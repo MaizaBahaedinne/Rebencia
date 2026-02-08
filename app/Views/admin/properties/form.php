@@ -85,6 +85,10 @@
     <!-- Wizard Form -->
     <form id="propertyForm" method="POST" action="<?= base_url('admin/properties/' . ($isEdit ? 'update/' . $property['id'] : 'store')) ?>" enctype="multipart/form-data">
         <?= csrf_field() ?>
+        
+        <!-- Stocker l'ID de la propriété pour les sauvegardes AJAX -->
+        <input type="hidden" id="propertyId" name="property_id" value="<?= $property['id'] ?? '' ?>">
+        <input type="hidden" id="isEdit" value="<?= $isEdit ? '1' : '0' ?>">
 
         <!-- Step 1: Informations générales -->
         <div class="wizard-content active" data-step="1">
@@ -306,14 +310,18 @@
 <script>
 let currentStep = 1;
 const totalSteps = 6;
+let propertyId = document.getElementById('propertyId').value || null;
+const isEdit = document.getElementById('isEdit').value === '1';
 
 // Navigation entre les étapes
 document.getElementById('nextBtn').addEventListener('click', () => {
     if (validateStep(currentStep)) {
-        if (currentStep < totalSteps) {
-            currentStep++;
-            showStep(currentStep);
-        }
+        saveStepData(currentStep, () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        });
     }
 });
 
@@ -328,12 +336,100 @@ document.getElementById('prevBtn').addEventListener('click', () => {
 document.querySelectorAll('.wizard-step').forEach(step => {
     step.addEventListener('click', function() {
         const targetStep = parseInt(this.dataset.step);
-        if (targetStep < currentStep || validateStep(currentStep)) {
+        if (targetStep < currentStep) {
+            // Permet de revenir en arrière sans validation
             currentStep = targetStep;
             showStep(currentStep);
+        } else if (targetStep > currentStep && validateStep(currentStep)) {
+            // Pour aller en avant, valider et sauvegarder d'abord
+            saveStepData(currentStep, () => {
+                currentStep = targetStep;
+                showStep(currentStep);
+            });
         }
     });
 });
+
+// Sauvegarder les données d'une étape via AJAX
+function saveStepData(step, callback) {
+    const formData = new FormData(document.getElementById('propertyForm'));
+    const saveBtn = step === totalSteps ? document.getElementById('submitBtn') : document.getElementById('nextBtn');
+    
+    // Afficher un loader
+    const originalText = saveBtn.innerHTML;
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Enregistrement...';
+    
+    // Déterminer l'URL en fonction de l'étape
+    let url = '<?= base_url("admin/properties/save-step") ?>';
+    formData.append('step', step);
+    formData.append('property_id', propertyId || '');
+    
+    fetch(url, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = originalText;
+        
+        if (data.success) {
+            // Stocker l'ID de la propriété si c'est une nouvelle création
+            if (data.property_id && !propertyId) {
+                propertyId = data.property_id;
+                document.getElementById('propertyId').value = propertyId;
+                // Mettre à jour l'URL du formulaire
+                document.getElementById('propertyForm').action = 
+                    '<?= base_url("admin/properties/update") ?>/' + propertyId;
+            }
+            
+            // Marquer l'étape comme complétée
+            document.querySelector(`.wizard-step[data-step="${step}"]`).classList.add('completed');
+            
+            // Afficher un message de succès
+            showToast('Étape ' + step + ' enregistrée avec succès', 'success');
+            
+            // Appeler le callback (passer à l'étape suivante)
+            if (callback) callback();
+            
+            // Si c'est la dernière étape, rediriger
+            if (step === totalSteps) {
+                setTimeout(() => {
+                    window.location.href = '<?= base_url("admin/properties") ?>';
+                }, 1000);
+            }
+        } else {
+            showToast('Erreur: ' + (data.message || 'Une erreur est survenue'), 'error');
+            console.error('Validation errors:', data.errors);
+        }
+    })
+    .catch(error => {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = originalText;
+        console.error('Error:', error);
+        showToast('Erreur de connexion', 'error');
+    });
+}
+
+// Afficher un toast message
+function showToast(message, type) {
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    toast.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 5000);
+}
 
 function showStep(step) {
     // Cacher tous les contenus
@@ -347,12 +443,10 @@ function showStep(step) {
     // Mettre à jour la progression
     document.querySelectorAll('.wizard-step').forEach(wizardStep => {
         const stepNum = parseInt(wizardStep.dataset.step);
-        wizardStep.classList.remove('active', 'completed');
+        wizardStep.classList.remove('active');
         
         if (stepNum === step) {
             wizardStep.classList.add('active');
-        } else if (stepNum < step) {
-            wizardStep.classList.add('completed');
         }
     });
     
@@ -374,6 +468,7 @@ function validateStep(step) {
         if (!field.value.trim()) {
             field.focus();
             field.classList.add('is-invalid');
+            showToast('Veuillez remplir tous les champs obligatoires', 'error');
             return false;
         }
         field.classList.remove('is-invalid');
@@ -381,6 +476,20 @@ function validateStep(step) {
     
     return true;
 }
+
+// Empêcher la soumission classique du formulaire
+document.getElementById('propertyForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    return false;
+});
+
+// Gestion du bouton Submit final
+document.getElementById('submitBtn').addEventListener('click', (e) => {
+    e.preventDefault();
+    if (validateStep(currentStep)) {
+        saveStepData(currentStep);
+    }
+});
 
 // Initialiser
 showStep(1);

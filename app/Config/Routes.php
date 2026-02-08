@@ -101,6 +101,7 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->get('/', 'Properties::index');
         $routes->get('create', 'Properties::create');
         $routes->post('store', 'Properties::store');
+        $routes->post('save-step', 'Properties::saveStep');
         $routes->get('edit/(:num)', 'Properties::edit/$1');
         $routes->post('update/(:num)', 'Properties::update/$1');
         $routes->put('update/(:num)', 'Properties::update/$1');

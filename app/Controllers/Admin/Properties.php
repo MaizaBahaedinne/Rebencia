@@ -250,6 +250,243 @@ class Properties extends BaseController
             return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
     }
+
+    public function saveStep()
+    {
+        if (!$this->request->isAJAX()) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Requête invalide']);
+        }
+
+        $step = $this->request->getPost('step');
+        $propertyId = $this->request->getPost('property_id');
+        
+        try {
+            $data = [];
+            
+            // Étape 1 : Informations générales
+            if ($step == 1) {
+                $rules = [
+                    'title_fr' => 'required|min_length[3]|max_length[255]',
+                    'type' => 'required|in_list[apartment,villa,house,land,commercial,office]',
+                    'transaction_type' => 'required|in_list[sale,rent,both]',
+                ];
+                
+                if (!$this->validate($rules)) {
+                    return $this->response->setJSON([
+                        'success' => false, 
+                        'message' => 'Veuillez remplir tous les champs obligatoires',
+                        'errors' => $this->validator->getErrors()
+                    ]);
+                }
+                
+                $data = [
+                    'type' => $this->request->getPost('type'),
+                    'transaction_type' => $this->request->getPost('transaction_type'),
+                    'title' => $this->request->getPost('title_fr'),
+                    'title_ar' => $this->request->getPost('title_ar'),
+                    'title_en' => $this->request->getPost('title_en'),
+                    'description' => $this->request->getPost('description_fr'),
+                    'description_ar' => $this->request->getPost('description_ar'),
+                    'description_en' => $this->request->getPost('description_en'),
+                    'disponibilite_date' => $this->request->getPost('disponibilite_date'),
+                    'status' => $this->request->getPost('status') ?: 'available',
+                    'featured' => $this->request->getPost('featured') ? 1 : 0,
+                ];
+                
+                // Si création, générer la référence et l'ID agent
+                if (empty($propertyId)) {
+                    $data['reference'] = 'PROP-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -6));
+                    $data['agent_id'] = $this->request->getPost('agent_id') ?: session()->get('user_id');
+                    $data['created_by'] = session()->get('user_id');
+                    $data['agency_id'] = $this->request->getPost('agency_id') ?: null;
+                }
+            }
+            
+            // Étape 2 : Localisation
+            elseif ($step == 2) {
+                $rules = [
+                    'zone_id' => 'required|is_natural_no_zero',
+                    'address' => 'required|min_length[5]',
+                ];
+                
+                if (!$this->validate($rules)) {
+                    return $this->response->setJSON([
+                        'success' => false, 
+                        'message' => 'Veuillez remplir tous les champs obligatoires',
+                        'errors' => $this->validator->getErrors()
+                    ]);
+                }
+                
+                $data = [
+                    'zone_id' => $this->request->getPost('zone_id'),
+                    'governorate' => $this->request->getPost('governorate'),
+                    'city' => $this->request->getPost('city'),
+                    'neighborhood' => $this->request->getPost('neighborhood'),
+                    'postal_code' => $this->request->getPost('postal_code'),
+                    'address' => $this->request->getPost('address'),
+                    'hide_address' => $this->request->getPost('hide_address') ? 1 : 0,
+                    'latitude' => $this->request->getPost('latitude'),
+                    'longitude' => $this->request->getPost('longitude'),
+                ];
+            }
+            
+            // Étape 3 : Caractéristiques
+            elseif ($step == 3) {
+                $rules = [
+                    'area_total' => 'required|decimal',
+                ];
+                
+                if (!$this->validate($rules)) {
+                    return $this->response->setJSON([
+                        'success' => false, 
+                        'message' => 'Veuillez remplir tous les champs obligatoires',
+                        'errors' => $this->validator->getErrors()
+                    ]);
+                }
+                
+                $data = [
+                    'area_total' => $this->request->getPost('area_total'),
+                    'area_living' => $this->request->getPost('area_living'),
+                    'area_land' => $this->request->getPost('area_land'),
+                    'rooms' => $this->request->getPost('rooms') ?: 0,
+                    'bedrooms' => $this->request->getPost('bedrooms') ?: 0,
+                    'bathrooms' => $this->request->getPost('bathrooms') ?: 0,
+                    'parking_spaces' => $this->request->getPost('parking_spaces') ?: 0,
+                    'floor' => $this->request->getPost('floor'),
+                    'total_floors' => $this->request->getPost('total_floors'),
+                    'construction_year' => $this->request->getPost('construction_year'),
+                    'orientation' => $this->request->getPost('orientation'),
+                    'floor_type' => $this->request->getPost('floor_type'),
+                    'gas_type' => $this->request->getPost('gas_type') ?: 'aucun',
+                    'standing' => $this->request->getPost('standing') ?: 'standard',
+                    'condition_state' => $this->request->getPost('condition_state') ?: 'good',
+                    'legal_status' => $this->request->getPost('legal_status') ?: 'clear',
+                    'energy_class' => $this->request->getPost('energy_class'),
+                    'energy_consumption_kwh' => $this->request->getPost('energy_consumption_kwh'),
+                    'co2_emission' => $this->request->getPost('co2_emission'),
+                    'has_elevator' => $this->request->getPost('has_elevator') ? 1 : 0,
+                    'has_parking' => $this->request->getPost('has_parking') ? 1 : 0,
+                    'has_garden' => $this->request->getPost('has_garden') ? 1 : 0,
+                    'has_pool' => $this->request->getPost('has_pool') ? 1 : 0,
+                ];
+            }
+            
+            // Étape 4 : Tarification
+            elseif ($step == 4) {
+                $rules = [
+                    'price' => 'required|decimal',
+                ];
+                
+                if (!$this->validate($rules)) {
+                    return $this->response->setJSON([
+                        'success' => false, 
+                        'message' => 'Veuillez remplir tous les champs obligatoires',
+                        'errors' => $this->validator->getErrors()
+                    ]);
+                }
+                
+                $data = [
+                    'price' => $this->request->getPost('price'),
+                    'rental_price' => $this->request->getPost('rental_price'),
+                    'promo_price' => $this->request->getPost('promo_price'),
+                    'promo_start_date' => $this->request->getPost('promo_start_date'),
+                    'promo_end_date' => $this->request->getPost('promo_end_date'),
+                    'charge_syndic' => $this->request->getPost('charge_syndic'),
+                    'charge_water' => $this->request->getPost('charge_water'),
+                    'charge_gas' => $this->request->getPost('charge_gas'),
+                    'charge_electricity' => $this->request->getPost('charge_electricity'),
+                    'charge_other' => $this->request->getPost('charge_other'),
+                ];
+            }
+            
+            // Étape 5 : Pièces et Proximités
+            elseif ($step == 5) {
+                if (empty($propertyId)) {
+                    return $this->response->setJSON([
+                        'success' => false, 
+                        'message' => 'Erreur: propriété non trouvée'
+                    ]);
+                }
+                
+                // Sauvegarder les pièces
+                $rooms = $this->request->getPost('rooms');
+                if (!empty($rooms)) {
+                    $propertyRoomModel = model('PropertyRoomModel');
+                    $propertyRoomModel->where('property_id', $propertyId)->delete();
+                    $propertyRoomModel->saveRooms($propertyId, $rooms);
+                }
+                
+                // Sauvegarder les proximités
+                $proximities = $this->request->getPost('proximities');
+                if (!empty($proximities)) {
+                    $propertyProximityModel = model('PropertyProximityModel');
+                    $propertyProximityModel->where('property_id', $propertyId)->delete();
+                    $propertyProximityModel->saveProximities($propertyId, $proximities);
+                }
+                
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Pièces et proximités enregistrées',
+                    'property_id' => $propertyId
+                ]);
+            }
+            
+            // Étape 6 : Documents et Photos
+            elseif ($step == 6) {
+                if (empty($propertyId)) {
+                    return $this->response->setJSON([
+                        'success' => false, 
+                        'message' => 'Erreur: propriété non trouvée'
+                    ]);
+                }
+                
+                // Upload des photos
+                $photoFiles = $this->request->getFileMultiple('photos');
+                if (!empty($photoFiles)) {
+                    $this->handlePhotoUpload($propertyId, $photoFiles);
+                }
+                
+                // Upload des documents
+                $documents = $this->request->getFiles();
+                if (!empty($documents['documents'])) {
+                    $this->handleDocumentUpload($propertyId, $documents['documents']);
+                }
+                
+                // Notes internes
+                $data['internal_notes'] = $this->request->getPost('internal_notes');
+            }
+            
+            // Sauvegarder ou mettre à jour la propriété
+            if (!empty($data)) {
+                if (empty($propertyId)) {
+                    // Création
+                    $propertyId = $this->propertyModel->insert($data);
+                    if (!$propertyId) {
+                        throw new \Exception('Erreur lors de la création de la propriété');
+                    }
+                } else {
+                    // Mise à jour
+                    $success = $this->propertyModel->update($propertyId, $data);
+                    if (!$success) {
+                        throw new \Exception('Erreur lors de la mise à jour de la propriété');
+                    }
+                }
+            }
+            
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Étape ' . $step . ' enregistrée avec succès',
+                'property_id' => $propertyId
+            ]);
+            
+        } catch (\Exception $e) {
+            log_message('error', 'Error saving step: ' . $e->getMessage());
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
     
     private function handlePhotoUpload($propertyId, $files)
     {

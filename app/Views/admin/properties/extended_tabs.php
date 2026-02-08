@@ -396,7 +396,7 @@ if ($config === null) {
                     <?php if (!empty($mediaFiles)): ?>
                         <?php foreach ($mediaFiles as $media): ?>
                             <div class="media-item" data-id="<?= $media['id'] ?>">
-                                <strong><?= ucfirst($media['file_type']) ?>:</strong> <?= $media['file_name'] ?>
+                                <strong><?= ucfirst($media['file_type']) ?>:</strong> <?= $media['title'] ?? $media['file_name'] ?? 'Fichier' ?>
                                 <button class="btn btn-sm btn-danger delete-media" data-id="<?= $media['id'] ?>">
                                     <i class="fas fa-trash"></i>
                                 </button>

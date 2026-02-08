@@ -30,7 +30,7 @@
                         <div class="card photo-card">
                             <img src="<?= base_url($photo['file_path']) ?>" class="card-img-top" alt="Photo">
                             <div class="card-body p-2">
-                                <small class="text-muted d-block text-truncate"><?= esc($photo['file_name']) ?></small>
+                                <small class="text-muted d-block text-truncate"><?= esc($photo['title']) ?></small>
                                 <button type="button" class="btn btn-sm btn-danger w-100 mt-1 delete-photo-btn" data-id="<?= $photo['id'] ?>">
                                     <i class="fas fa-trash"></i> Supprimer
                                 </button>
@@ -95,7 +95,7 @@
                                 <div class="d-flex align-items-center justify-content-between p-2 border rounded mb-2">
                                     <div class="flex-grow-1">
                                         <i class="fas fa-file-pdf text-danger me-2"></i>
-                                        <small><?= esc($doc['file_name']) ?></small>
+                                        <small><?= esc($doc['title'] ?? $doc['file_name'] ?? 'Document') ?></small>
                                         <br>
                                         <small class="text-muted"><?= number_format($doc['file_size'] / 1024, 2) ?> Ko</small>
                                     </div>

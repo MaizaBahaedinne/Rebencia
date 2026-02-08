@@ -444,7 +444,7 @@
                                                            target="_blank" 
                                                            class="text-decoration-none">
                                                             <i class="fas fa-download me-1"></i>
-                                                            <?= esc($doc['file_name']) ?>
+                                                            <?= esc($doc['title'] ?? $doc['file_name'] ?? 'Document') ?>
                                                         </a>
                                                         <br>
                                                         <small class="text-muted">

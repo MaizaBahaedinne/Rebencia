@@ -368,6 +368,16 @@ function saveStepData(step, callback) {
         console.log('Photo input not found or no files');
     }
     
+    // Vérifier ce que FormData contient
+    console.log('FormData entries:');
+    for (let pair of formData.entries()) {
+        if (pair[1] instanceof File) {
+            console.log(pair[0], ':', pair[1].name, pair[1].size);
+        } else {
+            console.log(pair[0], ':', pair[1]);
+        }
+    }
+    
     // Afficher un loader
     const originalText = saveBtn.innerHTML;
     saveBtn.disabled = true;
@@ -409,15 +419,17 @@ function saveStepData(step, callback) {
             // Afficher un message de succès
             showToast('Étape ' + step + ' enregistrée avec succès', 'success');
             
-            // Appeler le callback (passer à l'étape suivante)
-            if (callback) callback();
-            
-            // Si c'est la dernière étape, rediriger
+            // Si c'est la dernière étape, rediriger vers la liste
             if (step === totalSteps) {
+                console.log('Last step completed, redirecting to list...');
                 setTimeout(() => {
                     window.location.href = '<?= base_url("admin/properties") ?>';
-                }, 1000);
+                }, 500);
+                return; // Ne pas appeler le callback
             }
+            
+            // Appeler le callback (passer à l'étape suivante) seulement si ce n'est pas la dernière étape
+            if (callback) callback();
         } else {
             showToast('Erreur: ' + (data.message || 'Une erreur est survenue'), 'error');
             console.error('Validation errors:', data.errors);

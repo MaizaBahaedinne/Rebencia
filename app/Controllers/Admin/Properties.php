@@ -452,20 +452,57 @@ class Properties extends BaseController
                     ]);
                 }
                 
+                $uploadedPhotos = 0;
+                $uploadedDocs = 0;
+                
                 // Upload des photos
                 $photoFiles = $this->request->getFileMultiple('photos');
-                if (!empty($photoFiles)) {
-                    $this->handlePhotoUpload($propertyId, $photoFiles);
+                log_message('debug', 'Photos received: ' . json_encode($photoFiles));
+                
+                if (!empty($photoFiles) && is_array($photoFiles)) {
+                    foreach ($photoFiles as $file) {
+                        if ($file->isValid() && !$file->hasMoved()) {
+                            $uploadedPhotos++;
+                        }
+                    }
+                    if ($uploadedPhotos > 0) {
+                        $this->handlePhotoUpload($propertyId, $photoFiles);
+                    }
                 }
                 
-                // Upload des documents
-                $documents = $this->request->getFiles();
-                if (!empty($documents['documents'])) {
-                    $this->handleDocumentUpload($propertyId, $documents['documents']);
+                // Upload des documents par type
+                $documentTypes = [
+                    'titre_propriete', 'plan_cadastral', 'permis_construire',
+                    'certificat_conformite', 'diagnostics', 'copropriete',
+                    'bail_location', 'factures_energie', 'autre_document'
+                ];
+                
+                foreach ($documentTypes as $docType) {
+                    $docFiles = $this->request->getFileMultiple('documents[' . $docType . ']');
+                    if (!empty($docFiles) && is_array($docFiles)) {
+                        foreach ($docFiles as $file) {
+                            if ($file->isValid() && !$file->hasMoved()) {
+                                $uploadedDocs++;
+                            }
+                        }
+                        if ($uploadedDocs > 0) {
+                            $this->handleDocumentUploadByType($propertyId, $docType, $docFiles);
+                        }
+                    }
                 }
                 
                 // Notes internes
                 $data['internal_notes'] = $this->request->getPost('internal_notes');
+                
+                $message = 'Étape 6 enregistrée';
+                if ($uploadedPhotos > 0) {
+                    $message .= ' - ' . $uploadedPhotos . ' photo(s) uploadée(s)';
+                }
+                if ($uploadedDocs > 0) {
+                    $message .= ' - ' . $uploadedDocs . ' document(s) uploadé(s)';
+                }
+                
+                log_message('info', $message . ' pour la propriété ' . $propertyId);
             }
             
             // Sauvegarder ou mettre à jour la propriété
@@ -505,23 +542,48 @@ class Properties extends BaseController
         $propertyMediaModel = model('PropertyMediaModel');
         $uploadPath = FCPATH . 'uploads/properties';
         
+        log_message('info', 'Upload path for photos: ' . $uploadPath);
+        
         if (!is_dir($uploadPath)) {
             mkdir($uploadPath, 0755, true);
+            log_message('info', 'Created directory: ' . $uploadPath);
         }
         
         foreach ($files as $file) {
-            if ($file->isValid() && !$file->hasMoved()) {
-                $newName = $file->getRandomName();
-                $file->move($uploadPath, $newName);
+            try {
+                if (!$file->isValid()) {
+                    log_message('error', 'Invalid file: ' . $file->getErrorString());
+                    continue;
+                }
                 
-                $propertyMediaModel->insert([
-                    'property_id' => $propertyId,
-                    'type' => 'image',
-                    'file_name' => $file->getClientName(),
-                    'file_path' => $newName,
-                    'file_size' => $file->getSize(),
-                    'mime_type' => $file->getMimeType(),
-                ]);
+                if ($file->hasMoved()) {
+                    log_message('warning', 'File already moved: ' . $file->getName());
+                    continue;
+                }
+                
+                $originalName = $file->getClientName();
+                $fileSize = $file->getSize();
+                $mimeType = $file->getClientMimeType(); // Utiliser getClientMimeType() au lieu de getMimeType()
+                
+                $newName = $file->getRandomName();
+                
+                if ($file->move($uploadPath, $newName)) {
+                    $insertData = [
+                        'property_id' => $propertyId,
+                        'type' => 'image',
+                        'file_name' => $originalName,
+                        'file_path' => $newName,
+                        'file_size' => $fileSize,
+                        'mime_type' => $mimeType,
+                    ];
+                    
+                    $insertId = $propertyMediaModel->insert($insertData);
+                    log_message('info', 'Photo uploaded: ' . $newName . ' (ID: ' . $insertId . ') for property ' . $propertyId);
+                } else {
+                    log_message('error', 'Failed to move file: ' . $originalName);
+                }
+            } catch (\Exception $e) {
+                log_message('error', 'Error uploading photo: ' . $e->getMessage());
             }
         }
     }
@@ -555,6 +617,53 @@ class Properties extends BaseController
                         'uploaded_by' => session()->get('user_id')
                     ]);
                 }
+            }
+        }
+    }
+    
+    private function handleDocumentUploadByType($propertyId, $docType, $files)
+    {
+        $propertyDocumentModel = model('PropertyDocumentModel');
+        $uploadPath = FCPATH . 'uploads/documents';
+        
+        if (!is_dir($uploadPath)) {
+            mkdir($uploadPath, 0755, true);
+        }
+        
+        foreach ($files as $file) {
+            try {
+                if (!$file->isValid()) {
+                    log_message('error', 'Invalid document file: ' . $file->getErrorString());
+                    continue;
+                }
+                
+                if ($file->hasMoved()) {
+                    log_message('warning', 'Document file already moved: ' . $file->getName());
+                    continue;
+                }
+                
+                $originalName = $file->getClientName();
+                $fileSize = $file->getSize();
+                $mimeType = $file->getClientMimeType();
+                
+                $newName = $file->getRandomName();
+                
+                if ($file->move($uploadPath, $newName)) {
+                    $propertyDocumentModel->insert([
+                        'property_id' => $propertyId,
+                        'document_type' => $docType,
+                        'file_name' => $originalName,
+                        'file_path' => $newName,
+                        'file_size' => $fileSize,
+                        'mime_type' => $mimeType,
+                        'uploaded_by' => session()->get('user_id')
+                    ]);
+                    log_message('info', 'Document uploaded: ' . $newName . ' (type: ' . $docType . ') for property ' . $propertyId);
+                } else {
+                    log_message('error', 'Failed to move document: ' . $originalName);
+                }
+            } catch (\Exception $e) {
+                log_message('error', 'Error uploading document: ' . $e->getMessage());
             }
         }
     }

@@ -543,6 +543,8 @@ class Properties extends BaseController
         $uploadPath = FCPATH . 'uploads/properties';
         
         log_message('info', 'Upload path for photos: ' . $uploadPath);
+        log_message('info', 'Property ID: ' . $propertyId);
+        log_message('info', 'Number of files: ' . count($files));
         
         if (!is_dir($uploadPath)) {
             mkdir($uploadPath, 0755, true);
@@ -563,27 +565,37 @@ class Properties extends BaseController
                 
                 $originalName = $file->getClientName();
                 $fileSize = $file->getSize();
-                $mimeType = $file->getClientMimeType(); // Utiliser getClientMimeType() au lieu de getMimeType()
+                $mimeType = $file->getClientMimeType();
                 
                 $newName = $file->getRandomName();
                 
                 if ($file->move($uploadPath, $newName)) {
                     $insertData = [
-                        'property_id' => $propertyId,
-                        'type' => 'image',
-                        'file_name' => $originalName,
+                        'property_id' => (int)$propertyId,
+                        'type' => 'photo',
                         'file_path' => $newName,
-                        'file_size' => $fileSize,
-                        'mime_type' => $mimeType,
+                        'title' => $originalName,
+                        'display_order' => 0,
+                        'is_main' => 0
                     ];
                     
+                    log_message('info', 'Attempting to insert photo data: ' . json_encode($insertData));
+                    
                     $insertId = $propertyMediaModel->insert($insertData);
-                    log_message('info', 'Photo uploaded: ' . $newName . ' (ID: ' . $insertId . ') for property ' . $propertyId);
+                    
+                    if ($insertId) {
+                        log_message('info', 'Photo uploaded successfully: ' . $newName . ' (ID: ' . $insertId . ') for property ' . $propertyId);
+                    } else {
+                        $errors = $propertyMediaModel->errors();
+                        log_message('error', 'Failed to insert photo into database. Errors: ' . json_encode($errors));
+                        log_message('error', 'Insert data was: ' . json_encode($insertData));
+                    }
                 } else {
                     log_message('error', 'Failed to move file: ' . $originalName);
                 }
             } catch (\Exception $e) {
                 log_message('error', 'Error uploading photo: ' . $e->getMessage());
+                log_message('error', 'Stack trace: ' . $e->getTraceAsString());
             }
         }
     }

@@ -16,12 +16,10 @@ class PropertyMediaModel extends Model
         'property_id',
         'type',
         'file_path',
-        'file_name',
-        'file_size',
-        'mime_type',
         'title',
         'description',
-        'display_order'
+        'display_order',
+        'is_main'
     ];
 
     // Dates
@@ -33,7 +31,7 @@ class PropertyMediaModel extends Model
     // Validation
     protected $validationRules      = [
         'property_id' => 'required|is_natural_no_zero',
-        'type'        => 'required|in_list[image,video,document]',
+        'type'        => 'required|in_list[photo,video,document,plan]',
         'file_path'   => 'required|max_length[255]'
     ];
     protected $validationMessages   = [];
@@ -46,7 +44,7 @@ class PropertyMediaModel extends Model
     public function getPropertyImages($propertyId)
     {
         return $this->where('property_id', $propertyId)
-                    ->where('type', 'image')
+                    ->where('type', 'photo')
                     ->orderBy('display_order', 'ASC')
                     ->orderBy('created_at', 'ASC')
                     ->findAll();

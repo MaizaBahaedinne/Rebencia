@@ -28,7 +28,7 @@
                 <?php foreach ($photos as $photo): ?>
                     <div class="col-md-3">
                         <div class="card photo-card">
-                            <img src="<?= base_url($photo['file_path']) ?>" class="card-img-top" alt="Photo">
+                            <img src="<?= base_url('uploads/properties/' . $photo['file_path']) ?>" class="card-img-top" alt="Photo">
                             <div class="card-body p-2">
                                 <small class="text-muted d-block text-truncate"><?= esc($photo['title']) ?></small>
                                 <button type="button" class="btn btn-sm btn-danger w-100 mt-1 delete-photo-btn" data-id="<?= $photo['id'] ?>">

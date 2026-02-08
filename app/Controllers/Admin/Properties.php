@@ -458,9 +458,12 @@ class Properties extends BaseController
                 // Upload des photos
                 $photoFiles = $this->request->getFileMultiple('photos');
                 log_message('debug', 'Photos received: ' . json_encode($photoFiles));
+                log_message('debug', 'Is array: ' . (is_array($photoFiles) ? 'yes' : 'no'));
+                log_message('debug', 'Count: ' . (is_array($photoFiles) ? count($photoFiles) : 0));
                 
                 if (!empty($photoFiles) && is_array($photoFiles)) {
                     foreach ($photoFiles as $file) {
+                        log_message('debug', 'Processing file: ' . $file->getName() . ', Valid: ' . ($file->isValid() ? 'yes' : 'no') . ', Moved: ' . ($file->hasMoved() ? 'yes' : 'no'));
                         if ($file->isValid() && !$file->hasMoved()) {
                             $uploadedPhotos++;
                         }
@@ -469,6 +472,8 @@ class Properties extends BaseController
                         $this->handlePhotoUpload($propertyId, $photoFiles);
                     }
                 }
+                
+                log_message('info', 'Total photos to upload: ' . $uploadedPhotos);
                 
                 // Upload des documents par type
                 $documentTypes = [

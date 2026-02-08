@@ -420,6 +420,9 @@ $(document).ready(function() {
     
     // Bouton Reset Filtres
     $('#resetFiltersBtn').html('<i class="fas fa-redo"></i> Reset Filtres').on('click', function() {
+        // Effacer le cache localStorage
+        localStorage.removeItem('DataTables_properties_propertiesTable');
+        
         // Réinitialiser tous les filtres de colonnes
         dataTable.columns().every(function() {
             const column = this;

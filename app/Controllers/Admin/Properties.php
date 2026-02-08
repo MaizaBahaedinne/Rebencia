@@ -566,77 +566,27 @@ class Properties extends BaseController
     /**
      * Page de gestion des affectations
      */
+    /**
+     * ANCIENNE MÉTHODE - SUPPRIMÉE
+     * Remplacée par bulkManage()
+     */
+    /*
     public function assignments()
     {
-        $userModel = model('UserModel');
-        
-        // Filtres
-        $currentAgency = $this->request->getGet('agency_id');
-        $currentAgent = $this->request->getGet('agent_id');
-        $currentStatus = $this->request->getGet('status');
-
-        $builder = $this->propertyModel
-            ->select('properties.*, zones.name as zone_name, 
-                     agencies.name as agency_name, 
-                     CONCAT(users.first_name, " ", users.last_name) as agent_name')
-            ->join('zones', 'zones.id = properties.zone_id', 'left')
-            ->join('agencies', 'agencies.id = properties.agency_id', 'left')
-            ->join('users', 'users.id = properties.agent_id', 'left');
-
-        if ($currentAgency) {
-            $builder->where('properties.agency_id', $currentAgency);
-        }
-        if ($currentAgent) {
-            $builder->where('properties.agent_id', $currentAgent);
-        }
-        if ($currentStatus) {
-            $builder->where('properties.status', $currentStatus);
-        }
-
-        $data = [
-            'title' => 'Gestion des Affectations',
-            'properties' => $builder->orderBy('properties.created_at', 'DESC')->findAll(),
-            'agencies' => $this->agencyModel->where('status', 'active')->findAll(),
-            'agents' => $userModel->where('role_id >=', 6)->where('status', 'active')->findAll(),
-            'currentAgency' => $currentAgency,
-            'currentAgent' => $currentAgent,
-            'currentStatus' => $currentStatus
-        ];
-
-        return view('admin/properties/assignments', $data);
+        return redirect()->to('/admin/properties/bulk-manage');
     }
+    */
 
     /**
-     * Réassigner des biens en masse
+     * ANCIENNE MÉTHODE - SUPPRIMÉE
+     * Remplacée par bulkAction()
      */
+    /*
     public function reassign()
     {
-        $propertyIds = $this->request->getPost('property_ids');
-        $newAgencyId = $this->request->getPost('new_agency_id');
-        $newAgentId = $this->request->getPost('new_agent_id');
-
-        if (!$propertyIds || (!$newAgencyId && !$newAgentId)) {
-            return redirect()->back()->with('error', 'Veuillez sélectionner des biens et au moins une nouvelle affectation');
-        }
-
-        $updated = 0;
-        foreach ($propertyIds as $propertyId) {
-            $data = [];
-            if ($newAgencyId) {
-                $data['agency_id'] = $newAgencyId;
-            }
-            if ($newAgentId) {
-                $data['agent_id'] = $newAgentId;
-            }
-            
-            if ($this->propertyModel->update($propertyId, $data)) {
-                $updated++;
-            }
-        }
-
-        return redirect()->to(base_url('admin/properties/assignments'))
-            ->with('success', "$updated bien(s) réaffecté(s) avec succès");
+        return redirect()->to('/admin/properties/bulk-manage');
     }
+    */
 
     /**
      * Page de gestion en masse des biens

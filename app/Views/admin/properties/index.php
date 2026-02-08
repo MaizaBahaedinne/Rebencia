@@ -350,7 +350,7 @@ const currentRoleLevel = <?= $currentRoleLevel ?>;
 const editableUserIds = <?= json_encode($editableUserIds) ?>;
 
 // Initialisation
-document.addEventListener('DOMContentLoaded', function() {
+$(document).ready(function() {
     // Initialiser DataTables avec filtres
     dataTable = initDataTableWithFilters('propertiesTable', {
         dom: '<"row mb-3"<"col-sm-12 col-md-auto"B><"col-sm-12 col-md-auto"<"btn btn-secondary btn-sm" id="resetFiltersBtn">><"col-sm-12 col-md"f>>' +
@@ -426,6 +426,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     initMap();
+    
+    // Définir la vue table comme vue par défaut
+    setTimeout(() => {
+        toggleView('table');
+        // Activer le bouton table
+        document.querySelectorAll('.view-toggle-btn')[1].classList.add('active');
+    }, 100);
 });
 
 // Initialize map
@@ -574,37 +581,6 @@ document.addEventListener('mouseup', () => {
     if (isResizing) {
         isResizing = false;
     }
-});
-
-$(document).ready(function() {
-    // Utiliser initSimpleDataTable au lieu de initDataTableWithFilters pour éviter les filtres intrusifs
-    $('#propertiesTable').DataTable({
-        language: {
-            url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/fr-FR.json',
-            search: "Rechercher:",
-            lengthMenu: "Afficher _MENU_ entrées",
-            info: "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
-            paginate: {
-                first: "Premier",
-                last: "Dernier",
-                next: "Suivant",
-                previous: "Précédent"
-            }
-        },
-        order: [[0, 'desc']],
-        columnDefs: [
-            { orderable: false, targets: 6 }
-        ],
-        pageLength: 25,
-        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tous"]],
-        responsive: true,
-        autoWidth: false
-    });
-    
-    initMap();
-    
-    // Fix map size after DataTable initialization
-    setTimeout(() => map.invalidateSize(), 300);
 });
 </script>
 <?= $this->endSection() ?>

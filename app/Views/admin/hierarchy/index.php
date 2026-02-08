@@ -127,33 +127,75 @@
     /* Agency Group - Style Mac Finder */
     .agency-group {
         margin-bottom: 30px;
+        background: #ffffff;
+    }
+    
+    .headquarters-section {
+        margin-bottom: 40px;
         background: #f5f5f7;
         border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .headquarters-header {
+        background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+        color: white;
+        padding: 20px 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    
+    .headquarters-icon {
+        font-size: 32px;
+        width: 48px;
+        height: 48px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .headquarters-info h2 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+    }
+    
+    .headquarters-info p {
+        margin: 0;
+        font-size: 14px;
+        opacity: 0.95;
+    }
+    
+    .agencies-container {
+        padding: 20px;
+    }
+    
+    .agency-node {
+        margin-bottom: 20px;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border-left: 4px solid #667eea;
     }
     
     .agency-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 16px 20px;
+        background: #f8f9fa;
+        color: #1d1d1f;
+        padding: 14px 18px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         cursor: pointer;
-        transition: all 0.3s;
+        transition: all 0.2s;
     }
     
     .agency-header:hover {
-        background: linear-gradient(135deg, #5568d3 0%, #653a8a 100%);
-    }
-    
-    .agency-header.headquarters {
-        background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
-    }
-    
-    .agency-header.headquarters:hover {
-        background: linear-gradient(135deg, #e6c200 0%, #e67e00 100%);
+        background: #e9ecef;
     }
     
     .agency-info {
@@ -163,10 +205,11 @@
     }
     
     .agency-icon {
-        font-size: 24px;
-        width: 40px;
-        height: 40px;
-        background: rgba(255, 255, 255, 0.2);
+        font-size: 20px;
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
         border-radius: 8px;
         display: flex;
         align-items: center;
@@ -175,18 +218,20 @@
     
     .agency-details h3 {
         margin: 0;
-        font-size: 18px;
+        font-size: 16px;
         font-weight: 600;
+        color: #1d1d1f;
     }
     
     .agency-details p {
         margin: 0;
-        font-size: 13px;
-        opacity: 0.9;
+        font-size: 12px;
+        color: #86868b;
     }
     
     .agency-toggle {
-        font-size: 20px;
+        font-size: 18px;
+        color: #86868b;
         transition: transform 0.3s;
     }
     
@@ -196,7 +241,7 @@
     
     /* Tree Structure - Style Mac Finder */
     .tree-content {
-        padding: 20px;
+        padding: 16px;
         background: white;
     }
     
@@ -211,9 +256,9 @@
     .tree-item {
         display: flex;
         align-items: center;
-        padding: 10px 12px;
-        margin-bottom: 4px;
-        border-radius: 8px;
+        padding: 8px 10px;
+        margin-bottom: 3px;
+        border-radius: 6px;
         cursor: pointer;
         transition: all 0.2s;
         position: relative;
@@ -228,16 +273,17 @@
     }
     
     .tree-toggle {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-right: 8px;
+        margin-right: 6px;
         color: #86868b;
-        font-size: 12px;
+        font-size: 11px;
         cursor: pointer;
         transition: transform 0.2s;
+        flex-shrink: 0;
     }
     
     .tree-toggle.collapsed {
@@ -249,30 +295,30 @@
     }
     
     .user-avatar-small {
-        width: 32px;
-        height: 32px;
+        width: 28px;
+        height: 28px;
         border-radius: 50%;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 600;
-        margin-right: 12px;
+        margin-right: 10px;
         flex-shrink: 0;
     }
     
     .tree-item.ceo .user-avatar-small {
         background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
         border: 2px solid #fff;
-        box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+        box-shadow: 0 2px 6px rgba(255, 215, 0, 0.3);
     }
     
     .tree-item.manager .user-avatar-small {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: 2px solid #fff;
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        border: 1.5px solid #fff;
+        box-shadow: 0 2px 6px rgba(102, 126, 234, 0.25);
     }
     
     .user-info {
@@ -281,22 +327,22 @@
     }
     
     .user-name {
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 500;
         color: #1d1d1f;
-        margin-bottom: 2px;
+        margin-bottom: 1px;
     }
     
     .user-role {
-        font-size: 12px;
+        font-size: 11px;
         color: #86868b;
     }
     
     .tree-children {
-        margin-left: 40px;
-        border-left: 2px solid #e5e5e7;
-        padding-left: 12px;
-        margin-top: 4px;
+        margin-left: 32px;
+        border-left: 1.5px solid #e5e5e7;
+        padding-left: 10px;
+        margin-top: 3px;
     }
     
     .tree-children.collapsed {
@@ -306,10 +352,10 @@
     .subordinate-count {
         background: #667eea;
         color: white;
-        font-size: 11px;
-        padding: 2px 8px;
-        border-radius: 12px;
-        margin-left: 8px;
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 10px;
+        margin-left: 6px;
         font-weight: 600;
     }
     
@@ -385,6 +431,13 @@ function toggleAgency(agencyId) {
     }
 }
 
+function toggleHeadquarters() {
+    const content = document.getElementById('headquarters-content');
+    if (content) {
+        content.classList.toggle('collapsed');
+    }
+}
+
 function toggleNode(userId) {
     const children = document.getElementById('children-' + userId);
     const toggle = document.getElementById('toggle-' + userId);
@@ -397,6 +450,8 @@ function toggleNode(userId) {
 function expandAll() {
     document.querySelectorAll('.tree-content, .tree-children').forEach(el => el.classList.remove('collapsed'));
     document.querySelectorAll('.agency-toggle, .tree-toggle').forEach(el => el.classList.remove('collapsed'));
+    const hqContent = document.getElementById('headquarters-content');
+    if (hqContent) hqContent.classList.remove('collapsed');
 }
 
 function collapseAll() {
@@ -424,13 +479,13 @@ function renderTreeHierarchy() {
     
     // Admin voit tout, sinon filtre par agency
     if ($currentRoleLevel == 100 || !$currentAgencyId) {
-        $allUsers = $userModel->select('users.*, roles.name as role_name, roles.level as role_level, agencies.name as agency_name')
+        $allUsers = $userModel->select('users.*, roles.name as role_name, roles.level as role_level, agencies.name as agency_name, agencies.type as agency_type')
             ->join('roles', 'roles.id = users.role_id', 'left')
             ->join('agencies', 'agencies.id = users.agency_id', 'left')
             ->findAll();
         $agencies = $agencyModel->where('status', 'active')->findAll();
     } else {
-        $allUsers = $userModel->select('users.*, roles.name as role_name, roles.level as role_level, agencies.name as agency_name')
+        $allUsers = $userModel->select('users.*, roles.name as role_name, roles.level as role_level, agencies.name as agency_name, agencies.type as agency_type')
             ->join('roles', 'roles.id = users.role_id', 'left')
             ->join('agencies', 'agencies.id = users.agency_id', 'left')
             ->where('users.agency_id', $currentAgencyId)
@@ -438,73 +493,94 @@ function renderTreeHierarchy() {
         $agencies = $agencyModel->where('id', $currentAgencyId)->where('status', 'active')->findAll();
     }
     
-    // Grouper les utilisateurs par agence
-    $usersByAgency = [];
-    $usersWithoutAgency = [];
+    // Trouver le siège
+    $headquarters = array_filter($agencies, function($a) { return $a['type'] === 'headquarters'; });
+    $headquarters = !empty($headquarters) ? reset($headquarters) : null;
     
-    foreach ($allUsers as $user) {
-        if ($user['agency_id']) {
-            if (!isset($usersByAgency[$user['agency_id']])) {
-                $usersByAgency[$user['agency_id']] = [];
-            }
-            $usersByAgency[$user['agency_id']][] = $user;
-        } else {
-            $usersWithoutAgency[] = $user;
-        }
-    }
+    // Séparer les agences normales
+    $regularAgencies = array_filter($agencies, function($a) { return $a['type'] !== 'headquarters'; });
     
     $html = '';
     
-    // Afficher les agences avec leurs hiérarchies
-    foreach ($agencies as $agency) {
-        $agencyUsers = $usersByAgency[$agency['id']] ?? [];
-        if (empty($agencyUsers)) continue;
+    // Afficher le siège comme conteneur principal
+    if ($headquarters) {
+        $totalUsers = count($allUsers);
+        $totalAgencies = count($regularAgencies);
         
-        // Trouver les utilisateurs racines (sans manager) dans cette agence
-        $rootUsers = array_filter($agencyUsers, function($u) { return !$u['manager_id']; });
-        
-        $html .= '<div class="agency-group">';
-        $html .= '<div class="agency-header ' . ($agency['type'] === 'headquarters' ? 'headquarters' : '') . '" onclick="toggleAgency(' . $agency['id'] . ')">';
-        $html .= '<div class="agency-info">';
-        $html .= '<div class="agency-icon"><i class="fas fa-' . ($agency['type'] === 'headquarters' ? 'landmark' : 'building') . '"></i></div>';
-        $html .= '<div class="agency-details">';
-        $html .= '<h3>' . esc($agency['name']) . '</h3>';
-        $html .= '<p>' . count($agencyUsers) . ' collaborateur(s)</p>';
+        $html .= '<div class="headquarters-section">';
+        $html .= '<div class="headquarters-header">';
+        $html .= '<div class="headquarters-icon"><i class="fas fa-landmark"></i></div>';
+        $html .= '<div class="headquarters-info">';
+        $html .= '<h2>' . esc($headquarters['name']) . '</h2>';
+        $html .= '<p>' . $totalAgencies . ' agence(s) • ' . $totalUsers . ' collaborateur(s)</p>';
         $html .= '</div>';
         $html .= '</div>';
-        $html .= '<div class="agency-toggle" id="agency-toggle-' . $agency['id'] . '"><i class="fas fa-chevron-down"></i></div>';
-        $html .= '</div>';
         
-        $html .= '<div class="tree-content" id="agency-content-' . $agency['id'] . '">';
-        foreach ($rootUsers as $rootUser) {
-            $html .= renderTreeNode($rootUser, $agencyUsers, $roleModel);
+        $html .= '<div class="agencies-container" id="headquarters-content">';
+        
+        // Afficher chaque agence
+        foreach ($regularAgencies as $agency) {
+            $agencyUsers = array_filter($allUsers, function($u) use ($agency) { 
+                return $u['agency_id'] == $agency['id']; 
+            });
+            
+            if (empty($agencyUsers)) continue;
+            
+            // Trouver les utilisateurs racines (sans manager) dans cette agence
+            $rootUsers = array_filter($agencyUsers, function($u) { return !$u['manager_id']; });
+            
+            $html .= '<div class="agency-node">';
+            $html .= '<div class="agency-header" onclick="toggleAgency(' . $agency['id'] . ')">';
+            $html .= '<div class="agency-info">';
+            $html .= '<div class="agency-icon"><i class="fas fa-building"></i></div>';
+            $html .= '<div class="agency-details">';
+            $html .= '<h3>' . esc($agency['name']) . '</h3>';
+            $html .= '<p>' . count($agencyUsers) . ' collaborateur(s)</p>';
+            $html .= '</div>';
+            $html .= '</div>';
+            $html .= '<div class="agency-toggle" id="agency-toggle-' . $agency['id'] . '"><i class="fas fa-chevron-down"></i></div>';
+            $html .= '</div>';
+            
+            $html .= '<div class="tree-content" id="agency-content-' . $agency['id'] . '">';
+            foreach ($rootUsers as $rootUser) {
+                $html .= renderTreeNode($rootUser, $agencyUsers, $roleModel);
+            }
+            $html .= '</div>';
+            $html .= '</div>';
         }
-        $html .= '</div>';
-        $html .= '</div>';
-    }
-    
-    // Utilisateurs sans agence
-    if (!empty($usersWithoutAgency)) {
-        $rootUsers = array_filter($usersWithoutAgency, function($u) { return !$u['manager_id']; });
         
-        $html .= '<div class="agency-group">';
-        $html .= '<div class="agency-header" onclick="toggleAgency(0)">';
-        $html .= '<div class="agency-info">';
-        $html .= '<div class="agency-icon"><i class="fas fa-users"></i></div>';
-        $html .= '<div class="agency-details">';
-        $html .= '<h3>Sans agence</h3>';
-        $html .= '<p>' . count($usersWithoutAgency) . ' collaborateur(s)</p>';
         $html .= '</div>';
         $html .= '</div>';
-        $html .= '<div class="agency-toggle" id="agency-toggle-0"><i class="fas fa-chevron-down"></i></div>';
-        $html .= '</div>';
-        
-        $html .= '<div class="tree-content" id="agency-content-0">';
-        foreach ($rootUsers as $rootUser) {
-            $html .= renderTreeNode($rootUser, $usersWithoutAgency, $roleModel);
+    } else {
+        // Pas de siège, afficher directement les agences
+        foreach ($regularAgencies as $agency) {
+            $agencyUsers = array_filter($allUsers, function($u) use ($agency) { 
+                return $u['agency_id'] == $agency['id']; 
+            });
+            
+            if (empty($agencyUsers)) continue;
+            
+            $rootUsers = array_filter($agencyUsers, function($u) { return !$u['manager_id']; });
+            
+            $html .= '<div class="agency-node">';
+            $html .= '<div class="agency-header" onclick="toggleAgency(' . $agency['id'] . ')">';
+            $html .= '<div class="agency-info">';
+            $html .= '<div class="agency-icon"><i class="fas fa-building"></i></div>';
+            $html .= '<div class="agency-details">';
+            $html .= '<h3>' . esc($agency['name']) . '</h3>';
+            $html .= '<p>' . count($agencyUsers) . ' collaborateur(s)</p>';
+            $html .= '</div>';
+            $html .= '</div>';
+            $html .= '<div class="agency-toggle" id="agency-toggle-' . $agency['id'] . '"><i class="fas fa-chevron-down"></i></div>';
+            $html .= '</div>';
+            
+            $html .= '<div class="tree-content" id="agency-content-' . $agency['id'] . '">';
+            foreach ($rootUsers as $rootUser) {
+                $html .= renderTreeNode($rootUser, $agencyUsers, $roleModel);
+            }
+            $html .= '</div>';
+            $html .= '</div>';
         }
-        $html .= '</div>';
-        $html .= '</div>';
     }
     
     if (empty($html)) {

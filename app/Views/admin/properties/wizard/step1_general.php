@@ -46,14 +46,14 @@
 
     <!-- Titre FR -->
     <div class="col-md-12">
-        <label for="title" class="form-label">
+        <label for="title_fr" class="form-label">
             Titre (Français) <span class="text-danger">*</span>
         </label>
         <input type="text" 
                class="form-control" 
-               id="title" 
-               name="title" 
-               value="<?= old('title', $property['title'] ?? '') ?>"
+               id="title_fr" 
+               name="title_fr" 
+               value="<?= old('title_fr', $property['title'] ?? '') ?>"
                placeholder="Ex: Bel appartement au centre ville"
                required>
     </div>
@@ -81,14 +81,14 @@
 
     <!-- Description FR -->
     <div class="col-md-12">
-        <label for="description" class="form-label">
+        <label for="description_fr" class="form-label">
             Description (Français) <span class="text-danger">*</span>
         </label>
         <textarea class="form-control" 
-                  id="description" 
-                  name="description" 
+                  id="description_fr" 
+                  name="description_fr" 
                   rows="5" 
-                  required><?= old('description', $property['description'] ?? '') ?></textarea>
+                  required><?= old('description_fr', $property['description'] ?? '') ?></textarea>
     </div>
 
     <!-- Description AR -->

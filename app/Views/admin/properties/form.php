@@ -460,20 +460,62 @@ function showStep(step) {
 }
 
 function validateStep(step) {
-    // Validation basique - peut être améliorée
     const content = document.querySelector(`.wizard-content[data-step="${step}"]`);
     const requiredFields = content.querySelectorAll('[required]');
+    let hasError = false;
+    let firstErrorField = null;
+    let errorFields = [];
     
     for (let field of requiredFields) {
-        if (!field.value.trim()) {
-            field.focus();
-            field.classList.add('is-invalid');
-            showToast('Veuillez remplir tous les champs obligatoires', 'error');
-            return false;
+        // Vérifier si le champ est visible (pas dans un élément caché)
+        if (!isFieldVisible(field)) {
+            console.log('Skipping hidden field:', field.name);
+            continue;
         }
-        field.classList.remove('is-invalid');
+        
+        // Vérifier si le champ a une valeur
+        let isEmpty = false;
+        if (field.type === 'checkbox' || field.type === 'radio') {
+            // Pour les checkboxes/radios, vérifier si au moins un est coché dans le groupe
+            const groupName = field.name;
+            const checkedInGroup = content.querySelector(`[name="${groupName}"]:checked`);
+            isEmpty = !checkedInGroup;
+        } else {
+            isEmpty = !field.value || !field.value.trim();
+        }
+        
+        if (isEmpty) {
+            field.classList.add('is-invalid');
+            errorFields.push(field.name || field.id);
+            if (!firstErrorField) {
+                firstErrorField = field;
+            }
+            hasError = true;
+        } else {
+            field.classList.remove('is-invalid');
+        }
     }
     
+    if (hasError && firstErrorField) {
+        console.error('Validation errors in step ' + step + ':', errorFields);
+        firstErrorField.focus();
+        showToast('Veuillez remplir tous les champs obligatoires: ' + errorFields.join(', '), 'error');
+        return false;
+    }
+    
+    return true;
+}
+
+function isFieldVisible(field) {
+    // Vérifier si le champ ou l'un de ses parents est caché
+    let element = field;
+    while (element && element !== document.body) {
+        const style = window.getComputedStyle(element);
+        if (style.display === 'none' || style.visibility === 'hidden' || element.hidden) {
+            return false;
+        }
+        element = element.parentElement;
+    }
     return true;
 }
 

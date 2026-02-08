@@ -85,9 +85,6 @@
     <!-- Wizard Form -->
     <form id="propertyForm" method="POST" action="<?= base_url('admin/properties/' . ($isEdit ? 'update/' . $property['id'] : 'store')) ?>" enctype="multipart/form-data">
         <?= csrf_field() ?>
-        <?php if ($isEdit): ?>
-            <input type="hidden" name="_method" value="PUT">
-        <?php endif; ?>
 
         <!-- Step 1: Informations générales -->
         <div class="wizard-content active" data-step="1">

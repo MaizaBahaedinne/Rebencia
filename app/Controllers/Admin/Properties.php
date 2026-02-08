@@ -368,6 +368,13 @@ class Properties extends BaseController
 
         $validation = \Config\Services::validation();
         
+        // Pour les requêtes PUT, CodeIgniter peut avoir des problèmes avec getPost()
+        // On utilise getRawInput() si c'est une requête PUT simulée
+        $postData = $this->request->getPost();
+        
+        // Debug: vérifier si les données sont présentes
+        log_message('debug', 'Update POST data: ' . json_encode($postData));
+        
         $rules = [
             'title_fr' => 'required|min_length[3]|max_length[255]',
             'description_fr' => 'required|min_length[10]',
@@ -380,6 +387,7 @@ class Properties extends BaseController
         ];
 
         if (!$this->validate($rules)) {
+            log_message('error', 'Validation errors: ' . json_encode($validation->getErrors()));
             return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
 

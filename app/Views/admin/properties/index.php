@@ -20,6 +20,7 @@
         border-radius: 10px;
         overflow: hidden;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin: 0;
     }
     .split-view-container {
         display: flex;
@@ -36,6 +37,7 @@
         background: white;
         position: relative;
         z-index: 1;
+        padding: 0;
     }
     .map-panel {
         width: 50%;
@@ -113,6 +115,19 @@
     }
     .table-responsive {
         max-height: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    #propertiesTable {
+        margin: 0 !important;
+    }
+    #propertiesTable thead th {
+        padding: 12px 8px;
+        font-size: 13px;
+    }
+    #propertiesTable tbody td {
+        padding: 10px 8px;
+        font-size: 13px;
     }
     .leaflet-popup-content {
         min-width: 250px;

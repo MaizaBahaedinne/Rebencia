@@ -127,10 +127,21 @@
     #propertiesTable thead th {
         padding: 12px 8px;
         font-size: 13px;
+        background-color: white !important;
     }
     #propertiesTable tbody td {
         padding: 10px 8px;
         font-size: 13px;
+    }
+    .table-light {
+        background-color: white !important;
+    }
+    #propertiesTable thead tr {
+        background-color: white !important;
+    }
+    #propertiesTable tfoot th {
+        background-color: white !important;
+        border-top: 2px solid #dee2e6 !important;
     }
     .leaflet-popup-content {
         min-width: 250px;

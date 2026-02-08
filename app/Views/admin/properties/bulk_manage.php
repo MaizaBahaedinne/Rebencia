@@ -1,5 +1,19 @@
 <?= $this->extend('layouts/admin_modern') ?>
 
+<?= $this->section('styles') ?>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/colreorder/1.7.0/css/colReorder.bootstrap5.min.css">
+<style>
+    .dt-button {
+        margin: 0 2px !important;
+    }
+    .dataTables_wrapper .dataTables_filter input {
+        margin-left: 0.5em;
+    }
+</style>
+<?= $this->endSection() ?>
+
 <?= $this->section('content') ?>
 
 <div class="page-header">
@@ -147,7 +161,7 @@
 
         <!-- Liste des biens -->
         <div class="table-responsive">
-            <table class="table table-hover" id="propertiesTable">
+            <table class="table table-hover table-sm" id="propertiesTable">
                 <thead class="table-light">
                     <tr>
                         <th width="50">
@@ -156,10 +170,22 @@
                         <th>Référence</th>
                         <th>Titre</th>
                         <th>Type</th>
+                        <th>Transaction</th>
+                        <th>Prix Vente</th>
+                        <th>Prix Location</th>
+                        <th>Surface (m²)</th>
+                        <th>Chambres</th>
+                        <th>Salles de bain</th>
+                        <th>Zone</th>
+                        <th>Ville</th>
+                        <th>Adresse</th>
                         <th>Agence</th>
                         <th>Agent</th>
-                        <th>Prix</th>
                         <th>Statut</th>
+                        <th>En vedette</th>
+                        <th>Vues</th>
+                        <th>Date création</th>
+                        <th>Date publication</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -193,6 +219,24 @@
                                 <span class="badge bg-info"><?= $types[$property['type']] ?? $property['type'] ?></span>
                             </td>
                             <td>
+                                <?php
+                                $transactions = [
+                                    'sale' => 'Vente',
+                                    'rent' => 'Location',
+                                    'both' => 'Vente/Location'
+                                ];
+                                ?>
+                                <?= $transactions[$property['transaction_type']] ?? $property['transaction_type'] ?>
+                            </td>
+                            <td><?= $property['price'] ? number_format($property['price'], 0, ',', ' ') . ' TND' : '-' ?></td>
+                            <td><?= $property['rental_price'] ? number_format($property['rental_price'], 0, ',', ' ') . ' TND' : '-' ?></td>
+                            <td><?= $property['area_total'] ?? '-' ?></td>
+                            <td><?= $property['bedrooms'] ?? '-' ?></td>
+                            <td><?= $property['bathrooms'] ?? '-' ?></td>
+                            <td><?= esc($property['zone_name'] ?? '-') ?></td>
+                            <td><?= esc($property['city'] ?? '-') ?></td>
+                            <td><?= esc($property['address'] ?? '-') ?></td>
+                            <td>
                                 <?php if (!empty($property['agency_name'])): ?>
                                     <span class="badge bg-primary"><?= esc($property['agency_name']) ?></span>
                                 <?php else: ?>
@@ -206,7 +250,6 @@
                                     <span class="text-muted">-</span>
                                 <?php endif; ?>
                             </td>
-                            <td><strong><?= number_format($property['price'], 0, ',', ' ') ?> TND</strong></td>
                             <td>
                                 <?php
                                 $statusBadges = [
@@ -221,6 +264,16 @@
                                     <?= ucfirst($property['status']) ?>
                                 </span>
                             </td>
+                            <td>
+                                <?php if ($property['featured']): ?>
+                                    <i class="fas fa-star text-warning"></i>
+                                <?php else: ?>
+                                    <i class="far fa-star text-muted"></i>
+                                <?php endif; ?>
+                            </td>
+                            <td><?= number_format($property['views_count'] ?? 0) ?></td>
+                            <td><?= date('d/m/Y', strtotime($property['created_at'])) ?></td>
+                            <td><?= $property['published_at'] ? date('d/m/Y', strtotime($property['published_at'])) : '-' ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -232,29 +285,144 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/colreorder/1.7.0/js/dataTables.colReorder.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
 <script>
+let dataTable;
+let selectedPropertyIds = [];
+
+// Initialiser DataTables
+document.addEventListener('DOMContentLoaded', function() {
+    dataTable = $('#propertiesTable').DataTable({
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/fr-FR.json'
+        },
+        dom: '<"row mb-3"<"col-sm-12 col-md-6"B><"col-sm-12 col-md-6"f>>' +
+             '<"row"<"col-sm-12"tr>>' +
+             '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+        buttons: [
+            {
+                extend: 'colvis',
+                text: '<i class="fas fa-columns"></i> Colonnes',
+                className: 'btn btn-sm btn-outline-secondary me-1',
+                columns: ':not(:first-child)'
+            },
+            {
+                extend: 'csv',
+                text: '<i class="fas fa-file-csv"></i> CSV',
+                className: 'btn btn-sm btn-outline-primary me-1',
+                exportOptions: {
+                    columns: ':visible:not(:first-child)'
+                }
+            },
+            {
+                extend: 'excel',
+                text: '<i class="fas fa-file-excel"></i> Excel',
+                className: 'btn btn-sm btn-outline-success me-1',
+                exportOptions: {
+                    columns: ':visible:not(:first-child)'
+                }
+            },
+            {
+                extend: 'print',
+                text: '<i class="fas fa-print"></i> Imprimer',
+                className: 'btn btn-sm btn-outline-info',
+                exportOptions: {
+                    columns: ':visible:not(:first-child)'
+                }
+            }
+        ],
+        order: [[1, 'desc']],
+        pageLength: 25,
+        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tous"]],
+        colReorder: {
+            fixedColumnsLeft: 1
+        },
+        stateSave: true,
+        stateSaveCallback: function(settings, data) {
+            localStorage.setItem('DataTables_bulkManage_' + settings.sInstance, JSON.stringify(data));
+        },
+        stateLoadCallback: function(settings) {
+            return JSON.parse(localStorage.getItem('DataTables_bulkManage_' + settings.sInstance));
+        },
+        columnDefs: [
+            {
+                targets: 0,
+                orderable: false,
+                searchable: false
+            }
+        ],
+        drawCallback: function() {
+            // Re-appliquer les sélections après redraw
+            selectedPropertyIds.forEach(id => {
+                $(`.property-checkbox[value="${id}"]`).prop('checked', true);
+            });
+            updateSelection();
+        }
+    });
+    
+    // Événement pour les checkbox de propriétés
+    $('#propertiesTable').on('change', '.property-checkbox', function() {
+        const id = parseInt($(this).val());
+        if ($(this).is(':checked')) {
+            if (!selectedPropertyIds.includes(id)) {
+                selectedPropertyIds.push(id);
+            }
+        } else {
+            selectedPropertyIds = selectedPropertyIds.filter(i => i !== id);
+        }
+        updateSelection();
+    });
+});
+
 // Gestion de la sélection
 function updateSelection() {
-    const checkboxes = document.querySelectorAll('.property-checkbox:checked');
-    document.getElementById('selectedCount').textContent = checkboxes.length;
-    document.getElementById('executeBtn').disabled = checkboxes.length === 0;
+    document.getElementById('selectedCount').textContent = selectedPropertyIds.length;
+    document.getElementById('executeBtn').disabled = selectedPropertyIds.length === 0;
 }
 
 function selectAll() {
-    document.querySelectorAll('.property-checkbox').forEach(cb => cb.checked = true);
+    dataTable.rows({page: 'current'}).every(function() {
+        const checkbox = $(this.node()).find('.property-checkbox');
+        if (checkbox.length) {
+            const id = parseInt(checkbox.val());
+            checkbox.prop('checked', true);
+            if (!selectedPropertyIds.includes(id)) {
+                selectedPropertyIds.push(id);
+            }
+        }
+    });
     document.getElementById('selectAllCheckbox').checked = true;
     updateSelection();
 }
 
 function deselectAll() {
-    document.querySelectorAll('.property-checkbox').forEach(cb => cb.checked = false);
+    dataTable.rows({page: 'current'}).every(function() {
+        const checkbox = $(this.node()).find('.property-checkbox');
+        if (checkbox.length) {
+            const id = parseInt(checkbox.val());
+            checkbox.prop('checked', false);
+            selectedPropertyIds = selectedPropertyIds.filter(i => i !== id);
+        }
+    });
     document.getElementById('selectAllCheckbox').checked = false;
     updateSelection();
 }
 
 document.getElementById('selectAllCheckbox').addEventListener('change', function() {
-    document.querySelectorAll('.property-checkbox').forEach(cb => cb.checked = this.checked);
-    updateSelection();
+    if (this.checked) {
+        selectAll();
+    } else {
+        deselectAll();
+    }
 });
 
 // Gestion des champs d'action
@@ -283,19 +451,23 @@ function applyFilters() {
     const statusFilter = document.getElementById('filterStatus').value;
     const typeFilter = document.getElementById('filterType').value;
     
-    document.querySelectorAll('#propertiesTable tbody tr').forEach(row => {
-        const agency = row.dataset.agency;
-        const agent = row.dataset.agent;
-        const status = row.dataset.status;
-        const type = row.dataset.type;
+    $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+        const row = dataTable.row(dataIndex).node();
+        const agency = $(row).data('agency');
+        const agent = $(row).data('agent');
+        const status = $(row).data('status');
+        const type = $(row).data('type');
         
-        const showAgency = !agencyFilter || agency === agencyFilter;
-        const showAgent = !agentFilter || agent === agentFilter;
+        const showAgency = !agencyFilter || agency == agencyFilter;
+        const showAgent = !agentFilter || agent == agentFilter;
         const showStatus = !statusFilter || status === statusFilter;
         const showType = !typeFilter || type === typeFilter;
         
-        row.style.display = (showAgency && showAgent && showStatus && showType) ? '' : 'none';
+        return showAgency && showAgent && showStatus && showType;
     });
+    
+    dataTable.draw();
+    $.fn.dataTable.ext.search.pop();
 }
 
 // Exécution de l'action
@@ -306,10 +478,7 @@ function executeBulkAction() {
         return;
     }
     
-    const selectedIds = Array.from(document.querySelectorAll('.property-checkbox:checked'))
-        .map(cb => cb.value);
-    
-    if (selectedIds.length === 0) {
+    if (selectedPropertyIds.length === 0) {
         alert('Veuillez sélectionner au moins un bien');
         return;
     }
@@ -347,7 +516,7 @@ function executeBulkAction() {
             'X-Requested-With': 'XMLHttpRequest'
         },
         body: JSON.stringify({
-            property_ids: selectedIds,
+            property_ids: selectedPropertyIds,
             action: action,
             value: value
         })

@@ -358,12 +358,14 @@ function saveStepData(step, callback) {
     const saveBtn = step === totalSteps ? document.getElementById('submitBtn') : document.getElementById('nextBtn');
     
     // Déboguer les fichiers photos
-    const photoInput = document.getElementById('photos');
+    const photoInput = document.getElementById('photo-input');
     if (photoInput && photoInput.files) {
         console.log('Photos in input:', photoInput.files.length);
         for (let i = 0; i < photoInput.files.length; i++) {
             console.log('Photo', i, ':', photoInput.files[i].name, photoInput.files[i].size);
         }
+    } else {
+        console.log('Photo input not found or no files');
     }
     
     // Afficher un loader

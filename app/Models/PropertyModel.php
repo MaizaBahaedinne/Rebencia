@@ -20,10 +20,15 @@ class PropertyModel extends Model
         'rooms', 'bedrooms', 'bathrooms', 'floor', 'total_floors',
         'has_elevator', 'has_parking', 'parking_spaces', 'has_garden', 'has_pool',
         'construction_year', 'standing', 'condition_state', 'legal_status',
-        'zone_id', 'address', 'city', 'governorate', 'postal_code',
+        'zone_id', 'address', 'city', 'governorate', 'postal_code', 'neighborhood',
         'latitude', 'longitude', 'agency_id', 'agent_id',
         'owner_name', 'owner_phone', 'owner_email',
-        'status', 'featured', 'views_count', 'published_at'
+        'status', 'featured', 'views_count', 'published_at',
+        'disponibilite_date', 'hide_address', 'orientation', 'floor_type', 'gas_type',
+        'energy_class', 'energy_consumption_kwh', 'co2_emission',
+        'promo_price', 'promo_start_date', 'promo_end_date',
+        'charge_syndic', 'charge_water', 'charge_gas', 'charge_electricity', 'charge_other',
+        'internal_notes', 'created_by'
     ];
 
     protected bool $allowEmptyInserts = false;

@@ -133,10 +133,10 @@ class Properties extends BaseController
             'reference' => $reference,
             'type' => $this->request->getPost('type'),
             'transaction_type' => $this->request->getPost('transaction_type'),
-            'title_fr' => $this->request->getPost('title_fr'),
+            'title' => $this->request->getPost('title_fr'),
             'title_ar' => $this->request->getPost('title_ar'),
             'title_en' => $this->request->getPost('title_en'),
-            'description_fr' => $this->request->getPost('description_fr'),
+            'description' => $this->request->getPost('description_fr'),
             'description_ar' => $this->request->getPost('description_ar'),
             'description_en' => $this->request->getPost('description_en'),
             'disponibilite_date' => $this->request->getPost('disponibilite_date'),
@@ -387,10 +387,10 @@ class Properties extends BaseController
             // Step 1: General
             'type' => $this->request->getPost('type'),
             'transaction_type' => $this->request->getPost('transaction_type'),
-            'title_fr' => $this->request->getPost('title_fr'),
+            'title' => $this->request->getPost('title_fr'),
             'title_ar' => $this->request->getPost('title_ar'),
             'title_en' => $this->request->getPost('title_en'),
-            'description_fr' => $this->request->getPost('description_fr'),
+            'description' => $this->request->getPost('description_fr'),
             'description_ar' => $this->request->getPost('description_ar'),
             'description_en' => $this->request->getPost('description_en'),
             'disponibilite_date' => $this->request->getPost('disponibilite_date'),
@@ -458,8 +458,12 @@ class Properties extends BaseController
         
         try {
             // Mettre à jour la propriété
-            if (!$this->propertyModel->update($id, $data)) {
-                throw new \Exception('Erreur lors de la mise à jour de la propriété');
+            $updateResult = $this->propertyModel->update($id, $data);
+            
+            if ($updateResult === false) {
+                $errors = $this->propertyModel->errors();
+                log_message('error', 'Property update failed: ' . json_encode($errors));
+                throw new \Exception('Erreur lors de la mise à jour: ' . json_encode($errors));
             }
             
             // Step 5: Mettre à jour les pièces

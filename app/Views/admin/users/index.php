@@ -7,9 +7,11 @@
         <i class="fas fa-user-tie"></i> Gestion des Utilisateurs
     </h1>
     <div class="d-flex gap-2">
-        <a href="<?= base_url('admin/users/bulk-manage') ?>" class="btn btn-outline-primary">
-            <i class="fas fa-users-cog"></i> Gestion en masse
-        </a>
+        <?php if (session()->get('role_level') == 100): ?>
+            <a href="<?= base_url('admin/users/bulk-manage') ?>" class="btn btn-outline-primary">
+                <i class="fas fa-users-cog"></i> Gestion en masse
+            </a>
+        <?php endif; ?>
         <a href="<?= base_url('admin/users/create') ?>" class="btn btn-primary">
             <i class="fas fa-user-plus"></i> Nouvel Utilisateur
         </a>

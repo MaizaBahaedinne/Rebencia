@@ -83,9 +83,9 @@
         </div>
         
         <!-- Pyramid Container -->
-        <div class="pyramid-wrapper">
-            <div class="pyramid-container" id="orgChart">
-                <?= renderPyramidChart() ?>
+        <div class="hierarchy-wrapper">
+            <div class="hierarchy-container" id="orgChart">
+                <?= renderTreeHierarchy() ?>
             </div>
         </div>
     </div>
@@ -96,22 +96,19 @@
 
 <?= $this->section('styles') ?>
 <style>
-    /* Pyramid Wrapper */
-    .pyramid-wrapper {
+    /* Hierarchy Wrapper - Style Mac Finder */
+    .hierarchy-wrapper {
         overflow: auto;
-        background: #f8f9fa;
+        background: #ffffff;
         height: calc(100vh - 350px);
         min-height: 700px;
+        padding: 20px;
     }
     
-    .pyramid-container {
-        padding: 40px;
-        transform-origin: top center;
+    .hierarchy-container {
+        max-width: 100%;
+        transform-origin: top left;
         transition: transform 0.3s ease;
-        min-width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
     }
     
     .controls-bar {
@@ -127,253 +124,226 @@
         padding: 6px 10px;
     }
     
-    /* Pyramid Structure */
-    .org-level {
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        margin-bottom: 60px;
-        position: relative;
-        width: 100%;
-    }
-    
-    .org-group {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin: 0 20px;
-        position: relative;
-    }
-    
-    /* Entity Card (Siège/Agence) */
-    .entity-box {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Agency Group - Style Mac Finder */
+    .agency-group {
+        margin-bottom: 30px;
+        background: #f5f5f7;
         border-radius: 12px;
-        padding: 20px;
-        min-width: 200px;
-        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .agency-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         cursor: pointer;
         transition: all 0.3s;
-        position: relative;
-        text-align: center;
-        color: white;
-        margin-bottom: 20px;
     }
     
-    .entity-box.headquarters {
+    .agency-header:hover {
+        background: linear-gradient(135deg, #5568d3 0%, #653a8a 100%);
+    }
+    
+    .agency-header.headquarters {
         background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
-        box-shadow: 0 8px 24px rgba(255, 215, 0, 0.4);
-        min-width: 250px;
     }
     
-    .entity-box:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
+    .agency-header.headquarters:hover {
+        background: linear-gradient(135deg, #e6c200 0%, #e67e00 100%);
     }
     
-    .entity-box .icon {
-        font-size: 32px;
-        margin-bottom: 12px;
+    .agency-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
     
-    .entity-box .name {
+    .agency-icon {
+        font-size: 24px;
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .agency-details h3 {
+        margin: 0;
         font-size: 18px;
-        font-weight: 700;
-        margin-bottom: 8px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+        font-weight: 600;
     }
     
-    .entity-box .count {
+    .agency-details p {
+        margin: 0;
         font-size: 13px;
         opacity: 0.9;
     }
     
-    /* User Card */
-    .user-box {
+    .agency-toggle {
+        font-size: 20px;
+        transition: transform 0.3s;
+    }
+    
+    .agency-toggle.collapsed {
+        transform: rotate(-90deg);
+    }
+    
+    /* Tree Structure - Style Mac Finder */
+    .tree-content {
+        padding: 20px;
         background: white;
-        border-radius: 10px;
-        padding: 16px;
-        min-width: 180px;
-        max-width: 180px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .tree-content.collapsed {
+        display: none;
+    }
+    
+    .tree-node {
+        margin-left: 0;
+    }
+    
+    .tree-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 12px;
+        margin-bottom: 4px;
+        border-radius: 8px;
         cursor: pointer;
-        transition: all 0.3s;
+        transition: all 0.2s;
         position: relative;
-        margin: 0 10px 30px;
-        border: 2px solid #e0e0e0;
     }
     
-    .user-box:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        border-color: #667eea;
+    .tree-item:hover {
+        background: #f5f5f7;
     }
     
-    .user-box.ceo {
-        border-color: #ffd700;
-        background: linear-gradient(135deg, #fff9e6 0%, #ffffff 100%);
+    .tree-item.has-children {
+        font-weight: 500;
     }
     
-    .user-box.manager {
-        border-color: #667eea;
+    .tree-toggle {
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 8px;
+        color: #86868b;
+        font-size: 12px;
+        cursor: pointer;
+        transition: transform 0.2s;
     }
     
-    .user-avatar {
-        width: 56px;
-        height: 56px;
+    .tree-toggle.collapsed {
+        transform: rotate(-90deg);
+    }
+    
+    .tree-toggle.empty {
+        visibility: hidden;
+    }
+    
+    .user-avatar-small {
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 20px;
+        font-size: 12px;
         font-weight: 600;
-        margin: 0 auto 12px;
+        margin-right: 12px;
+        flex-shrink: 0;
     }
     
-    .user-box.ceo .user-avatar {
+    .tree-item.ceo .user-avatar-small {
         background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+        border: 2px solid #fff;
+        box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+    }
+    
+    .tree-item.manager .user-avatar-small {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: 2px solid #fff;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+    
+    .user-info {
+        flex: 1;
+        min-width: 0;
     }
     
     .user-name {
         font-size: 14px;
-        font-weight: 600;
+        font-weight: 500;
         color: #1d1d1f;
-        margin-bottom: 4px;
-        text-align: center;
+        margin-bottom: 2px;
     }
     
     .user-role {
-        font-size: 11px;
-        color: #86868b;
-        text-align: center;
-        margin-bottom: 8px;
-    }
-    
-    /* Connection Lines */
-    .org-level::before {
-        content: '';
-        position: absolute;
-        top: -30px;
-        left: 50%;
-        width: 2px;
-        height: 30px;
-        background: #cbd5e0;
-        transform: translateX(-50%);
-    }
-    
-    .org-level:first-child::before {
-        display: none;
-    }
-    
-    .users-row {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        position: relative;
-        gap: 10px;
-    }
-    
-    .users-row::before {
-        content: '';
-        position: absolute;
-        top: -30px;
-        left: 10%;
-        right: 10%;
-        height: 2px;
-        background: #cbd5e0;
-    }
-    
-    .users-row .user-box::before {
-        content: '';
-        position: absolute;
-        top: -30px;
-        left: 50%;
-        width: 2px;
-        height: 30px;
-        background: #cbd5e0;
-        transform: translateX(-50%);
-    }
-    
-    /* Collapse/Expand */
-    .collapsible-section {
-        width: 100%;
-        transition: all 0.3s;
-    }
-    
-    .collapsible-section.collapsed {
-        display: none;
-    }
-    
-    .toggle-btn {
-        position: absolute;
-        bottom: -12px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 24px;
-        height: 24px;
-        background: white;
-        border: 2px solid #667eea;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        color: #667eea;
         font-size: 12px;
-        z-index: 5;
-        transition: all 0.3s;
+        color: #86868b;
     }
     
-    .toggle-btn:hover {
+    .tree-children {
+        margin-left: 40px;
+        border-left: 2px solid #e5e5e7;
+        padding-left: 12px;
+        margin-top: 4px;
+    }
+    
+    .tree-children.collapsed {
+        display: none;
+    }
+    
+    .subordinate-count {
         background: #667eea;
         color: white;
-        transform: translateX(-50%) scale(1.1);
-    }
-    
-    .toggle-btn.collapsed i {
-        transform: rotate(180deg);
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 12px;
+        margin-left: 8px;
+        font-weight: 600;
     }
     
     /* Empty State */
     .empty-message {
         text-align: center;
-        padding: 40px;
+        padding: 60px 20px;
         color: #86868b;
-        font-style: italic;
+    }
+    
+    .empty-message i {
+        font-size: 48px;
+        margin-bottom: 16px;
+        opacity: 0.5;
     }
     
     /* Responsive */
-    @media (max-width: 1200px) {
-        .user-box {
-            min-width: 160px;
-            max-width: 160px;
-        }
-    }
-    
     @media (max-width: 768px) {
-        .pyramid-container {
-            padding: 20px;
-        }
-        
-        .org-level {
-            margin-bottom: 40px;
-        }
-        
-        .user-box {
-            min-width: 140px;
-            max-width: 140px;
-            margin: 0 5px 20px;
-        }
-        
-        .entity-box {
-            min-width: 160px;
-        }
-        
-        .pyramid-wrapper {
+        .hierarchy-wrapper {
             height: calc(100vh - 400px);
+            padding: 10px;
+        }
+        
+        .agency-header {
+            padding: 12px 16px;
+        }
+        
+        .tree-content {
+            padding: 12px;
+        }
+        
+        .tree-children {
+            margin-left: 24px;
+            padding-left: 8px;
         }
     }
 </style>
@@ -406,23 +376,32 @@ function resetZoom() {
     document.getElementById('zoomLevel').textContent = '100%';
 }
 
-function toggleSection(id) {
-    const section = document.getElementById('section-' + id);
-    const btn = document.getElementById('btn-' + id);
-    if (section && btn) {
-        section.classList.toggle('collapsed');
-        btn.classList.toggle('collapsed');
+function toggleAgency(agencyId) {
+    const content = document.getElementById('agency-content-' + agencyId);
+    const toggle = document.getElementById('agency-toggle-' + agencyId);
+    if (content && toggle) {
+        content.classList.toggle('collapsed');
+        toggle.classList.toggle('collapsed');
+    }
+}
+
+function toggleNode(userId) {
+    const children = document.getElementById('children-' + userId);
+    const toggle = document.getElementById('toggle-' + userId);
+    if (children && toggle) {
+        children.classList.toggle('collapsed');
+        toggle.classList.toggle('collapsed');
     }
 }
 
 function expandAll() {
-    document.querySelectorAll('.collapsible-section').forEach(el => el.classList.remove('collapsed'));
-    document.querySelectorAll('.toggle-btn').forEach(el => el.classList.remove('collapsed'));
+    document.querySelectorAll('.tree-content, .tree-children').forEach(el => el.classList.remove('collapsed'));
+    document.querySelectorAll('.agency-toggle, .tree-toggle').forEach(el => el.classList.remove('collapsed'));
 }
 
 function collapseAll() {
-    document.querySelectorAll('.collapsible-section').forEach(el => el.classList.add('collapsed'));
-    document.querySelectorAll('.toggle-btn').forEach(el => el.classList.add('collapsed'));
+    document.querySelectorAll('.tree-content, .tree-children').forEach(el => el.classList.add('collapsed'));
+    document.querySelectorAll('.agency-toggle, .tree-toggle').forEach(el => el.classList.add('collapsed'));
 }
 
 function goToUser(userId) {
@@ -432,8 +411,10 @@ function goToUser(userId) {
 <?= $this->endSection() ?>
 
 <?php
-function renderPyramidChart() {
+function renderTreeHierarchy() {
     $userModel = new \App\Models\UserModel();
+    $agencyModel = new \App\Models\AgencyModel();
+    $roleModel = new \App\Models\RoleModel();
     
     // Récupérer l'utilisateur connecté
     $currentUserId = session()->get('user_id');
@@ -441,66 +422,146 @@ function renderPyramidChart() {
     $currentRoleLevel = session()->get('role_level');
     $currentAgencyId = $currentUser['agency_id'] ?? null;
     
-    // Admin (role_level 100) voit tout, sinon filtre par agency
+    // Admin voit tout, sinon filtre par agency
     if ($currentRoleLevel == 100 || !$currentAgencyId) {
-        $allUsers = $userModel->findAll();
+        $allUsers = $userModel->select('users.*, roles.name as role_name, roles.level as role_level, agencies.name as agency_name')
+            ->join('roles', 'roles.id = users.role_id', 'left')
+            ->join('agencies', 'agencies.id = users.agency_id', 'left')
+            ->findAll();
+        $agencies = $agencyModel->where('status', 'active')->findAll();
     } else {
-        $allUsers = $userModel->where('agency_id', $currentAgencyId)->findAll();
+        $allUsers = $userModel->select('users.*, roles.name as role_name, roles.level as role_level, agencies.name as agency_name')
+            ->join('roles', 'roles.id = users.role_id', 'left')
+            ->join('agencies', 'agencies.id = users.agency_id', 'left')
+            ->where('users.agency_id', $currentAgencyId)
+            ->findAll();
+        $agencies = $agencyModel->where('id', $currentAgencyId)->where('status', 'active')->findAll();
     }
     
-    $ceos = array_filter($allUsers, function($u) { return !$u['manager_id']; });
+    // Grouper les utilisateurs par agence
+    $usersByAgency = [];
+    $usersWithoutAgency = [];
+    
+    foreach ($allUsers as $user) {
+        if ($user['agency_id']) {
+            if (!isset($usersByAgency[$user['agency_id']])) {
+                $usersByAgency[$user['agency_id']] = [];
+            }
+            $usersByAgency[$user['agency_id']][] = $user;
+        } else {
+            $usersWithoutAgency[] = $user;
+        }
+    }
     
     $html = '';
-    if (!empty($ceos)) {
-        $html .= '<div class="org-level"><div class="users-row">';
-        foreach ($ceos as $ceo) {
-            $html .= renderUserCard($ceo, new \App\Models\RoleModel(), 'ceo');
-            $subs = array_filter($allUsers, function($u) use ($ceo) { return $u['manager_id'] == $ceo['id']; });
-            if (!empty($subs)) {
-                $html .= '<div class="toggle-btn" id="btn-ceo-' . $ceo['id'] . '" onclick="toggleSection(\'ceo-' . $ceo['id'] . '\')"><i class="fas fa-minus"></i></div>';
-            }
+    
+    // Afficher les agences avec leurs hiérarchies
+    foreach ($agencies as $agency) {
+        $agencyUsers = $usersByAgency[$agency['id']] ?? [];
+        if (empty($agencyUsers)) continue;
+        
+        // Trouver les utilisateurs racines (sans manager) dans cette agence
+        $rootUsers = array_filter($agencyUsers, function($u) { return !$u['manager_id']; });
+        
+        $html .= '<div class="agency-group">';
+        $html .= '<div class="agency-header ' . ($agency['type'] === 'headquarters' ? 'headquarters' : '') . '" onclick="toggleAgency(' . $agency['id'] . ')">';
+        $html .= '<div class="agency-info">';
+        $html .= '<div class="agency-icon"><i class="fas fa-' . ($agency['type'] === 'headquarters' ? 'landmark' : 'building') . '"></i></div>';
+        $html .= '<div class="agency-details">';
+        $html .= '<h3>' . esc($agency['name']) . '</h3>';
+        $html .= '<p>' . count($agencyUsers) . ' collaborateur(s)</p>';
+        $html .= '</div>';
+        $html .= '</div>';
+        $html .= '<div class="agency-toggle" id="agency-toggle-' . $agency['id'] . '"><i class="fas fa-chevron-down"></i></div>';
+        $html .= '</div>';
+        
+        $html .= '<div class="tree-content" id="agency-content-' . $agency['id'] . '">';
+        foreach ($rootUsers as $rootUser) {
+            $html .= renderTreeNode($rootUser, $agencyUsers, $roleModel);
         }
-        $html .= '</div></div>';
-        foreach ($ceos as $ceo) {
-            $html .= renderSubordinates($ceo['id'], $allUsers, new \App\Models\RoleModel(), 'ceo-' . $ceo['id']);
-        }
-    } else {
-        $agencyName = $currentAgencyId ? ' pour votre agence' : '';
-        $html = '<div class="empty-message"><i class="fas fa-sitemap fa-3x mb-3"></i><p>Aucune structure hiérarchique trouvée' . $agencyName . '</p></div>';
+        $html .= '</div>';
+        $html .= '</div>';
     }
+    
+    // Utilisateurs sans agence
+    if (!empty($usersWithoutAgency)) {
+        $rootUsers = array_filter($usersWithoutAgency, function($u) { return !$u['manager_id']; });
+        
+        $html .= '<div class="agency-group">';
+        $html .= '<div class="agency-header" onclick="toggleAgency(0)">';
+        $html .= '<div class="agency-info">';
+        $html .= '<div class="agency-icon"><i class="fas fa-users"></i></div>';
+        $html .= '<div class="agency-details">';
+        $html .= '<h3>Sans agence</h3>';
+        $html .= '<p>' . count($usersWithoutAgency) . ' collaborateur(s)</p>';
+        $html .= '</div>';
+        $html .= '</div>';
+        $html .= '<div class="agency-toggle" id="agency-toggle-0"><i class="fas fa-chevron-down"></i></div>';
+        $html .= '</div>';
+        
+        $html .= '<div class="tree-content" id="agency-content-0">';
+        foreach ($rootUsers as $rootUser) {
+            $html .= renderTreeNode($rootUser, $usersWithoutAgency, $roleModel);
+        }
+        $html .= '</div>';
+        $html .= '</div>';
+    }
+    
+    if (empty($html)) {
+        $html = '<div class="empty-message"><i class="fas fa-sitemap"></i><p>Aucune structure hiérarchique trouvée</p></div>';
+    }
+    
     return $html;
 }
 
-function renderSubordinates($managerId, $allUsers, $roleModel, $parentId) {
-    $subs = array_filter($allUsers, function($u) use ($managerId) { return $u['manager_id'] == $managerId; });
-    if (empty($subs)) return '';
+function renderTreeNode($user, $allUsers, $roleModel) {
+    $initials = strtoupper(substr($user['first_name'], 0, 1) . substr($user['last_name'], 0, 1));
+    $roleName = ucfirst(str_replace('_', ' ', $user['role_name'] ?? 'N/A'));
     
-    $html = '<div class="collapsible-section" id="section-' . $parentId . '"><div class="org-level"><div class="users-row">';
-    foreach ($subs as $sub) {
-        $html .= renderUserCard($sub, $roleModel, 'manager');
-        $subSubs = array_filter($allUsers, function($u) use ($sub) { return $u['manager_id'] == $sub['id']; });
-        if (!empty($subSubs)) {
-            $html .= '<div class="toggle-btn" id="btn-sub-' . $sub['id'] . '" onclick="toggleSection(\'sub-' . $sub['id'] . '\')"><i class="fas fa-minus"></i></div>';
-        }
+    // Trouver les subordonnés
+    $subordinates = array_filter($allUsers, function($u) use ($user) { 
+        return $u['manager_id'] == $user['id']; 
+    });
+    $hasChildren = !empty($subordinates);
+    
+    // Déterminer la classe CSS
+    $cssClass = '';
+    if (!$user['manager_id']) {
+        $cssClass = 'ceo';
+    } elseif ($hasChildren) {
+        $cssClass = 'manager';
     }
-    $html .= '</div></div>';
-    foreach ($subs as $sub) {
-        $html .= renderSubordinates($sub['id'], $allUsers, $roleModel, 'sub-' . $sub['id']);
+    
+    $html = '<div class="tree-node">';
+    $html .= '<div class="tree-item ' . $cssClass . '" onclick="goToUser(' . $user['id'] . ')">';
+    
+    if ($hasChildren) {
+        $html .= '<span class="tree-toggle" id="toggle-' . $user['id'] . '" onclick="event.stopPropagation(); toggleNode(' . $user['id'] . ')"><i class="fas fa-chevron-down"></i></span>';
+    } else {
+        $html .= '<span class="tree-toggle empty"></span>';
+    }
+    
+    $html .= '<div class="user-avatar-small">' . $initials . '</div>';
+    $html .= '<div class="user-info">';
+    $html .= '<div class="user-name">' . esc($user['first_name'] . ' ' . $user['last_name']);
+    if ($hasChildren) {
+        $html .= '<span class="subordinate-count">' . count($subordinates) . '</span>';
     }
     $html .= '</div>';
-    return $html;
-}
-
-function renderUserCard($user, $roleModel, $class = '') {
-    $initials = strtoupper(substr($user['first_name'], 0, 1) . substr($user['last_name'], 0, 1));
-    $role = $roleModel->find($user['role_id']);
-    $roleName = $role ? ucfirst(str_replace('_', ' ', $role['name'])) : 'N/A';
-    
-    $html = '<div class="user-box ' . $class . '" onclick="goToUser(' . $user['id'] . ')">';
-    $html .= '<div class="user-avatar">' . $initials . '</div>';
-    $html .= '<div class="user-name">' . esc($user['first_name'] . ' ' . $user['last_name']) . '</div>';
     $html .= '<div class="user-role">' . esc($roleName) . '</div>';
     $html .= '</div>';
+    $html .= '</div>';
+    
+    if ($hasChildren) {
+        $html .= '<div class="tree-children" id="children-' . $user['id'] . '">';
+        foreach ($subordinates as $sub) {
+            $html .= renderTreeNode($sub, $allUsers, $roleModel);
+        }
+        $html .= '</div>';
+    }
+    
+    $html .= '</div>';
+    
     return $html;
 }
 ?>

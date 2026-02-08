@@ -661,6 +661,11 @@ class Users extends BaseController
      */
     public function bulkManage()
     {
+        // Seulement l'admin peut accéder à la gestion en masse
+        if (session()->get('role_level') != 100) {
+            return redirect()->to('/admin/users')->with('error', 'Accès non autorisé. Seul l\'administrateur peut gérer en masse.');
+        }
+        
         $data = [
             'title' => 'Gestion en masse des utilisateurs',
             'users' => $this->userModel->select('users.*, roles.name as role_name, agencies.name as agency_name, 
@@ -686,6 +691,14 @@ class Users extends BaseController
      */
     public function bulkAction()
     {
+        // Seulement l'admin peut exécuter les actions en masse
+        if (session()->get('role_level') != 100) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Accès non autorisé. Seul l\'administrateur peut effectuer des actions en masse.'
+            ]);
+        }
+        
         if (!$this->request->isAJAX()) {
             return redirect()->to('/admin/users/bulk-manage');
         }

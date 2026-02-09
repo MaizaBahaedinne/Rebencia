@@ -59,7 +59,28 @@ class Theme extends BaseController
             'font_family_primary' => $this->request->getPost('font_family_primary'),
             'font_family_secondary' => $this->request->getPost('font_family_secondary'),
             'font_size_base' => $this->request->getPost('font_size_base'),
-            'border_radius' => $this->request->getPost('border_radius')
+            'border_radius' => $this->request->getPost('border_radius'),
+            // Boutons primaires
+            'button_bg_color' => $this->request->getPost('button_bg_color'),
+            'button_text_color' => $this->request->getPost('button_text_color'),
+            'button_hover_bg_color' => $this->request->getPost('button_hover_bg_color'),
+            'button_hover_text_color' => $this->request->getPost('button_hover_text_color'),
+            'button_border_width' => $this->request->getPost('button_border_width'),
+            'button_border_color' => $this->request->getPost('button_border_color'),
+            'button_padding' => $this->request->getPost('button_padding'),
+            'button_font_size' => $this->request->getPost('button_font_size'),
+            'button_font_weight' => $this->request->getPost('button_font_weight'),
+            // Boutons secondaires
+            'button_secondary_bg_color' => $this->request->getPost('button_secondary_bg_color'),
+            'button_secondary_text_color' => $this->request->getPost('button_secondary_text_color'),
+            'button_secondary_hover_bg_color' => $this->request->getPost('button_secondary_hover_bg_color'),
+            'button_secondary_hover_text_color' => $this->request->getPost('button_secondary_hover_text_color'),
+            // Liens
+            'link_color' => $this->request->getPost('link_color'),
+            'link_hover_color' => $this->request->getPost('link_hover_color'),
+            'link_decoration' => $this->request->getPost('link_decoration'),
+            // Mise en page
+            'page_max_width' => $this->request->getPost('page_max_width')
         ];
 
         // Mettre à jour le thème (il n'y a qu'une seule ligne)
@@ -76,8 +97,7 @@ class Theme extends BaseController
      */
     private function generateThemeCSS()
     {
-        $theme = $this->themeModel->getCurrentTheme();
-        $css = $this->themeModel->generateCSS($theme);
+        $css = $this->themeModel->generateCSS();
 
         // Créer le dossier si nécessaire
         $cssPath = FCPATH . 'assets/css';
@@ -104,7 +124,28 @@ class Theme extends BaseController
             'font_family_primary' => 'Poppins',
             'font_family_secondary' => 'Roboto',
             'font_size_base' => '16px',
-            'border_radius' => '8px'
+            'border_radius' => '8px',
+            // Boutons primaires
+            'button_bg_color' => '#667eea',
+            'button_text_color' => '#ffffff',
+            'button_hover_bg_color' => '#764ba2',
+            'button_hover_text_color' => '#ffffff',
+            'button_border_width' => '0px',
+            'button_border_color' => '#667eea',
+            'button_padding' => '12px 30px',
+            'button_font_size' => '16px',
+            'button_font_weight' => '500',
+            // Boutons secondaires
+            'button_secondary_bg_color' => '#6c757d',
+            'button_secondary_text_color' => '#ffffff',
+            'button_secondary_hover_bg_color' => '#5a6268',
+            'button_secondary_hover_text_color' => '#ffffff',
+            // Liens
+            'link_color' => '#667eea',
+            'link_hover_color' => '#764ba2',
+            'link_decoration' => 'none',
+            // Mise en page
+            'page_max_width' => '1200px'
         ];
 
         $this->themeModel->where('id', 1)->set($defaultTheme)->update();

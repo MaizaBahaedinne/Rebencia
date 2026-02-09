@@ -186,20 +186,20 @@ $sliders = $sliderModel->getActiveSliders();
 }
 
 .slide-title {
-    color: #ffffff;
+    color: var(--text-light);
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
     line-height: 1.2;
     font-weight: 700;
 }
 
 .slide-subtitle {
-    color: #f0f0f0;
+    color: rgba(255, 255, 255, 0.95);
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
     font-weight: 500;
 }
 
 .slide-description {
-    color: #e0e0e0;
+    color: rgba(255, 255, 255, 0.9);
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
     max-width: 700px;
     margin-left: auto;
@@ -223,7 +223,7 @@ $sliders = $sliderModel->getActiveSliders();
 
 .slide-buttons .btn-outline-light:hover {
     background-color: rgba(255, 255, 255, 0.2);
-    border-color: #ffffff;
+    border-color: var(--text-light);
 }
 
 /* Carousel Controls */
@@ -265,7 +265,7 @@ $sliders = $sliderModel->getActiveSliders();
 }
 
 .carousel-indicators button.active {
-    background-color: #ffffff;
+    background-color: var(--text-light);
     width: 40px;
     border-radius: 6px;
 }

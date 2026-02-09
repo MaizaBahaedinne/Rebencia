@@ -30,6 +30,53 @@
     <!-- Thème personnalisé (généré depuis la base de données) -->
     <style>
     <?= load_theme_css() ?>
+    
+    /* Application du thème aux classes Bootstrap */
+    .bg-primary { background-color: var(--primary-color) !important; }
+    .text-primary { color: var(--primary-color) !important; }
+    .border-primary { border-color: var(--primary-color) !important; }
+    
+    .bg-secondary { background-color: var(--secondary-color) !important; }
+    .text-secondary { color: var(--secondary-color) !important; }
+    .border-secondary { border-color: var(--secondary-color) !important; }
+    
+    .btn-primary {
+        background-color: var(--button-bg-color);
+        color: var(--button-text-color);
+        border: none;
+    }
+    
+    .btn-primary:hover, .btn-primary:focus {
+        background-color: var(--button-hover-bg-color);
+        color: var(--button-hover-text-color);
+    }
+    
+    .btn-outline-primary {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+    
+    .badge.bg-primary {
+        background-color: var(--primary-color) !important;
+    }
+    
+    .badge.bg-secondary {
+        background-color: var(--secondary-color) !important;
+    }
+    
+    a {
+        color: var(--primary-color);
+    }
+    
+    a:hover {
+        color: var(--secondary-color);
+    }
     </style>
     
     <!-- Custom CSS -->

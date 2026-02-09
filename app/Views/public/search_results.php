@@ -3,7 +3,7 @@
 <?= $this->section('content') ?>
 
 <!-- Search Results Header -->
-<section class="py-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+<section class="py-4" style="background: var(--primary-gradient); color: white;">
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center">
             <div>
@@ -301,7 +301,7 @@
 }
 
 .property-card-map.active {
-    border: 2px solid #667eea;
+    border: 2px solid var(--primary-color);
     box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
 }
 
@@ -379,10 +379,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!isNaN(lat) && !isNaN(lng)) {
                     bounds.push([lat, lng]);
                     
+                    // Get primary color from CSS variable
+                    const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim() || '#667eea';
+                    
                     // Custom icon
                     const icon = L.divIcon({
                         className: 'custom-marker',
-                        html: `<div style="background: #667eea; color: white; padding: 5px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+                        html: `<div style="background: ${primaryColor}; color: white; padding: 5px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
                                 ${Number(property.price).toLocaleString('fr-FR')} TND
                               </div>`,
                         iconSize: [120, 40],

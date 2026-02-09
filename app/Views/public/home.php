@@ -3,7 +3,7 @@
 <?= $this->section('content') ?>
 
 <!-- Hero Section -->
-<section class="hero-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 100px 0; color: white;">
+<section class="hero-section" style="background: var(--primary-gradient); padding: 100px 0; color: white;">
     <div class="container text-center">
         <h1 class="display-3 fw-bold mb-4">Trouvez votre propriété de rêve</h1>
         <p class="lead mb-5">Des milliers de biens immobiliers à vendre et à louer en Tunisie</p>

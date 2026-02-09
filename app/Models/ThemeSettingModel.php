@@ -22,7 +22,16 @@ class ThemeSettingModel extends Model
         'font_family_primary',
         'font_family_secondary',
         'font_size_base',
-        'border_radius'
+        'border_radius',
+        'button_bg_color',
+        'button_text_color',
+        'button_hover_bg_color',
+        'button_hover_text_color',
+        'button_border_width',
+        'button_border_color',
+        'button_padding',
+        'button_font_size',
+        'button_font_weight'
     ];
 
     protected bool $allowEmptyInserts = false;
@@ -71,6 +80,15 @@ class ThemeSettingModel extends Model
                 'font_family_secondary' => 'Roboto',
                 'font_size_base' => '16px',
                 'border_radius' => '8px',
+                'button_bg_color' => '#667eea',
+                'button_text_color' => '#ffffff',
+                'button_hover_bg_color' => '#764ba2',
+                'button_hover_text_color' => '#ffffff',
+                'button_border_width' => '0px',
+                'button_border_color' => '#667eea',
+                'button_padding' => '12px 30px',
+                'button_font_size' => '16px',
+                'button_font_weight' => '500',
             ];
         }
         
@@ -111,6 +129,17 @@ class ThemeSettingModel extends Model
         $css .= "    /* Bordures */\n";
         $css .= "    --border-radius: {$theme['border_radius']};\n";
         $css .= "    --border-color: rgba(0, 0, 0, 0.1);\n";
+        $css .= "    \n";
+        $css .= "    /* Boutons */\n";
+        $css .= "    --button-bg-color: {$theme['button_bg_color']};\n";
+        $css .= "    --button-text-color: {$theme['button_text_color']};\n";
+        $css .= "    --button-hover-bg-color: {$theme['button_hover_bg_color']};\n";
+        $css .= "    --button-hover-text-color: {$theme['button_hover_text_color']};\n";
+        $css .= "    --button-border-width: {$theme['button_border_width']};\n";
+        $css .= "    --button-border-color: {$theme['button_border_color']};\n";
+        $css .= "    --button-padding: {$theme['button_padding']};\n";
+        $css .= "    --button-font-size: {$theme['button_font_size']};\n";
+        $css .= "    --button-font-weight: {$theme['button_font_weight']};\n";
         $css .= "}\n\n";
         
         // Ajouter les styles de base
@@ -133,10 +162,24 @@ class ThemeSettingModel extends Model
         $css .= "    color: var(--secondary-color);\n";
         $css .= "}\n\n";
         
-        $css .= ".btn-primary {\n";
-        $css .= "    background: var(--primary-gradient);\n";
-        $css .= "    border: none;\n";
+        // Styles des boutons
+        $css .= "/* Styles des boutons */\n";
+        $css .= ".btn, .button, button.btn-primary, a.btn-primary {\n";
+        $css .= "    background-color: var(--button-bg-color);\n";
+        $css .= "    color: var(--button-text-color);\n";
+        $css .= "    padding: var(--button-padding);\n";
+        $css .= "    font-size: var(--button-font-size);\n";
+        $css .= "    font-weight: var(--button-font-weight);\n";
+        $css .= "    border-width: var(--button-border-width);\n";
+        $css .= "    border-color: var(--button-border-color);\n";
+        $css .= "    border-style: solid;\n";
         $css .= "    border-radius: var(--border-radius);\n";
+        $css .= "    transition: all 0.3s ease;\n";
+        $css .= "}\n\n";
+        
+        $css .= ".btn:hover, .button:hover, button.btn-primary:hover, a.btn-primary:hover {\n";
+        $css .= "    background-color: var(--button-hover-bg-color);\n";
+        $css .= "    color: var(--button-hover-text-color);\n";
         $css .= "}\n\n";
         
         $css .= ".card {\n";

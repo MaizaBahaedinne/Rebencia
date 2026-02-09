@@ -65,6 +65,51 @@ class CreateThemeSettingsTable extends Migration
                 'constraint' => 20,
                 'default'    => '8px',
             ],
+            'button_bg_color' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 7,
+                'default'    => '#667eea',
+            ],
+            'button_text_color' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 7,
+                'default'    => '#ffffff',
+            ],
+            'button_hover_bg_color' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 7,
+                'default'    => '#764ba2',
+            ],
+            'button_hover_text_color' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 7,
+                'default'    => '#ffffff',
+            ],
+            'button_border_width' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 10,
+                'default'    => '0px',
+            ],
+            'button_border_color' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 7,
+                'default'    => '#667eea',
+            ],
+            'button_padding' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 20,
+                'default'    => '12px 30px',
+            ],
+            'button_font_size' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 20,
+                'default'    => '16px',
+            ],
+            'button_font_weight' => [
+                'type'       => 'VARCHAR',
+                'constraint' => 10,
+                'default'    => '500',
+            ],
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true,
@@ -90,6 +135,15 @@ class CreateThemeSettingsTable extends Migration
             'font_family_secondary' => 'Roboto',
             'font_size_base' => '16px',
             'border_radius' => '8px',
+            'button_bg_color' => '#667eea',
+            'button_text_color' => '#ffffff',
+            'button_hover_bg_color' => '#764ba2',
+            'button_hover_text_color' => '#ffffff',
+            'button_border_width' => '0px',
+            'button_border_color' => '#667eea',
+            'button_padding' => '12px 30px',
+            'button_font_size' => '16px',
+            'button_font_weight' => '500',
             'created_at' => date('Y-m-d H:i:s'),
         ]);
     }

@@ -209,6 +209,133 @@
                     </div>
                 </div>
 
+                <!-- Design des Boutons -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-hand-pointer"></i> Design des Boutons
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Couleur fond bouton -->
+                            <div class="col-md-3 mb-3">
+                                <label for="button_bg_color" class="form-label">Couleur Fond</label>
+                                <div class="input-group">
+                                    <input type="color" class="form-control form-control-color" 
+                                           id="button_bg_color" name="button_bg_color" 
+                                           value="<?= old('button_bg_color', $theme['button_bg_color'] ?? '#667eea') ?>"
+                                           onchange="updatePreview()">
+                                    <input type="text" class="form-control" 
+                                           value="<?= old('button_bg_color', $theme['button_bg_color'] ?? '#667eea') ?>"
+                                           readonly>
+                                </div>
+                            </div>
+
+                            <!-- Couleur texte bouton -->
+                            <div class="col-md-3 mb-3">
+                                <label for="button_text_color" class="form-label">Couleur Texte</label>
+                                <div class="input-group">
+                                    <input type="color" class="form-control form-control-color" 
+                                           id="button_text_color" name="button_text_color" 
+                                           value="<?= old('button_text_color', $theme['button_text_color'] ?? '#ffffff') ?>"
+                                           onchange="updatePreview()">
+                                    <input type="text" class="form-control" 
+                                           value="<?= old('button_text_color', $theme['button_text_color'] ?? '#ffffff') ?>"
+                                           readonly>
+                                </div>
+                            </div>
+
+                            <!-- Couleur fond hover -->
+                            <div class="col-md-3 mb-3">
+                                <label for="button_hover_bg_color" class="form-label">Fond Survol</label>
+                                <div class="input-group">
+                                    <input type="color" class="form-control form-control-color" 
+                                           id="button_hover_bg_color" name="button_hover_bg_color" 
+                                           value="<?= old('button_hover_bg_color', $theme['button_hover_bg_color'] ?? '#764ba2') ?>"
+                                           onchange="updatePreview()">
+                                    <input type="text" class="form-control" 
+                                           value="<?= old('button_hover_bg_color', $theme['button_hover_bg_color'] ?? '#764ba2') ?>"
+                                           readonly>
+                                </div>
+                            </div>
+
+                            <!-- Couleur texte hover -->
+                            <div class="col-md-3 mb-3">
+                                <label for="button_hover_text_color" class="form-label">Texte Survol</label>
+                                <div class="input-group">
+                                    <input type="color" class="form-control form-control-color" 
+                                           id="button_hover_text_color" name="button_hover_text_color" 
+                                           value="<?= old('button_hover_text_color', $theme['button_hover_text_color'] ?? '#ffffff') ?>"
+                                           onchange="updatePreview()">
+                                    <input type="text" class="form-control" 
+                                           value="<?= old('button_hover_text_color', $theme['button_hover_text_color'] ?? '#ffffff') ?>"
+                                           readonly>
+                                </div>
+                            </div>
+
+                            <!-- Largeur bordure -->
+                            <div class="col-md-3 mb-3">
+                                <label for="button_border_width" class="form-label">Largeur Bordure</label>
+                                <select class="form-select" id="button_border_width" name="button_border_width" onchange="updatePreview()">
+                                    <option value="0px" <?= ($theme['button_border_width'] ?? '0px') === '0px' ? 'selected' : '' ?>>Aucune</option>
+                                    <option value="1px" <?= ($theme['button_border_width'] ?? '0px') === '1px' ? 'selected' : '' ?>>1px - Fine</option>
+                                    <option value="2px" <?= ($theme['button_border_width'] ?? '0px') === '2px' ? 'selected' : '' ?>>2px - Standard</option>
+                                    <option value="3px" <?= ($theme['button_border_width'] ?? '0px') === '3px' ? 'selected' : '' ?>>3px - Épaisse</option>
+                                </select>
+                            </div>
+
+                            <!-- Couleur bordure -->
+                            <div class="col-md-3 mb-3">
+                                <label for="button_border_color" class="form-label">Couleur Bordure</label>
+                                <div class="input-group">
+                                    <input type="color" class="form-control form-control-color" 
+                                           id="button_border_color" name="button_border_color" 
+                                           value="<?= old('button_border_color', $theme['button_border_color'] ?? '#667eea') ?>"
+                                           onchange="updatePreview()">
+                                    <input type="text" class="form-control" 
+                                           value="<?= old('button_border_color', $theme['button_border_color'] ?? '#667eea') ?>"
+                                           readonly>
+                                </div>
+                            </div>
+
+                            <!-- Padding -->
+                            <div class="col-md-3 mb-3">
+                                <label for="button_padding" class="form-label">Espacement</label>
+                                <select class="form-select" id="button_padding" name="button_padding" onchange="updatePreview()">
+                                    <option value="8px 20px" <?= ($theme['button_padding'] ?? '12px 30px') === '8px 20px' ? 'selected' : '' ?>>Petit</option>
+                                    <option value="12px 30px" <?= ($theme['button_padding'] ?? '12px 30px') === '12px 30px' ? 'selected' : '' ?>>Standard</option>
+                                    <option value="16px 40px" <?= ($theme['button_padding'] ?? '12px 30px') === '16px 40px' ? 'selected' : '' ?>>Grand</option>
+                                    <option value="20px 50px" <?= ($theme['button_padding'] ?? '12px 30px') === '20px 50px' ? 'selected' : '' ?>>Très Grand</option>
+                                </select>
+                            </div>
+
+                            <!-- Taille police -->
+                            <div class="col-md-3 mb-3">
+                                <label for="button_font_size" class="form-label">Taille Police</label>
+                                <select class="form-select" id="button_font_size" name="button_font_size" onchange="updatePreview()">
+                                    <option value="14px" <?= ($theme['button_font_size'] ?? '16px') === '14px' ? 'selected' : '' ?>>14px - Petit</option>
+                                    <option value="16px" <?= ($theme['button_font_size'] ?? '16px') === '16px' ? 'selected' : '' ?>>16px - Standard</option>
+                                    <option value="18px" <?= ($theme['button_font_size'] ?? '16px') === '18px' ? 'selected' : '' ?>>18px - Grand</option>
+                                    <option value="20px" <?= ($theme['button_font_size'] ?? '16px') === '20px' ? 'selected' : '' ?>>20px - Très Grand</option>
+                                </select>
+                            </div>
+
+                            <!-- Poids police -->
+                            <div class="col-md-3 mb-3">
+                                <label for="button_font_weight" class="form-label">Poids Police</label>
+                                <select class="form-select" id="button_font_weight" name="button_font_weight" onchange="updatePreview()">
+                                    <option value="300" <?= ($theme['button_font_weight'] ?? '500') === '300' ? 'selected' : '' ?>>300 - Léger</option>
+                                    <option value="400" <?= ($theme['button_font_weight'] ?? '500') === '400' ? 'selected' : '' ?>>400 - Normal</option>
+                                    <option value="500" <?= ($theme['button_font_weight'] ?? '500') === '500' ? 'selected' : '' ?>>500 - Moyen</option>
+                                    <option value="600" <?= ($theme['button_font_weight'] ?? '500') === '600' ? 'selected' : '' ?>>600 - Semi-Gras</option>
+                                    <option value="700" <?= ($theme['button_font_weight'] ?? '500') === '700' ? 'selected' : '' ?>>700 - Gras</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Actions -->
                 <div class="card shadow mb-4">
                     <div class="card-body text-end">
@@ -360,6 +487,40 @@ function updatePreview() {
     root.style.setProperty('--font-size', document.getElementById('font_size_base').value);
     root.style.setProperty('--radius', document.getElementById('border_radius').value);
     
+    // Mettre à jour les styles des boutons
+    const previewButton = document.getElementById('previewButton');
+    if (previewButton && document.getElementById('button_bg_color')) {
+        const buttonBg = document.getElementById('button_bg_color').value;
+        const buttonText = document.getElementById('button_text_color').value;
+        const buttonHoverBg = document.getElementById('button_hover_bg_color').value;
+        const buttonHoverText = document.getElementById('button_hover_text_color').value;
+        const buttonBorderWidth = document.getElementById('button_border_width').value;
+        const buttonBorderColor = document.getElementById('button_border_color').value;
+        const buttonPadding = document.getElementById('button_padding').value;
+        const buttonFontSize = document.getElementById('button_font_size').value;
+        const buttonFontWeight = document.getElementById('button_font_weight').value;
+        
+        previewButton.style.backgroundColor = buttonBg;
+        previewButton.style.color = buttonText;
+        previewButton.style.borderWidth = buttonBorderWidth;
+        previewButton.style.borderColor = buttonBorderColor;
+        previewButton.style.borderStyle = 'solid';
+        previewButton.style.padding = buttonPadding;
+        previewButton.style.fontSize = buttonFontSize;
+        previewButton.style.fontWeight = buttonFontWeight;
+        previewButton.style.borderRadius = document.getElementById('border_radius').value;
+        
+        // Gestion du survol
+        previewButton.onmouseenter = function() {
+            this.style.backgroundColor = buttonHoverBg;
+            this.style.color = buttonHoverText;
+        };
+        previewButton.onmouseleave = function() {
+            this.style.backgroundColor = buttonBg;
+            this.style.color = buttonText;
+        };
+    }
+    
     // Mettre à jour les champs texte des couleurs
     document.querySelectorAll('input[type="color"]').forEach(input => {
         const textInput = input.nextElementSibling;
@@ -381,6 +542,9 @@ const link = document.createElement('link');
 link.href = 'https://fonts.googleapis.com/css2?family=' + fonts.join(':wght@300;400;500;600;700&family=') + ':wght@300;400;500;600;700&display=swap';
 link.rel = 'stylesheet';
 document.head.appendChild(link);
+
+// Initialiser l'aperçu au chargement
+document.addEventListener('DOMContentLoaded', updatePreview);
 </script>
 
 <?= $this->endSection() ?>

@@ -47,6 +47,15 @@ if (!function_exists('get_default_theme_css')) {
     --font-size-base: 16px;
     --border-radius: 8px;
     --border-color: rgba(0, 0, 0, 0.1);
+    --button-bg-color: #667eea;
+    --button-text-color: #ffffff;
+    --button-hover-bg-color: #764ba2;
+    --button-hover-text-color: #ffffff;
+    --button-border-width: 0px;
+    --button-border-color: #667eea;
+    --button-padding: 12px 30px;
+    --button-font-size: 16px;
+    --button-font-weight: 500;
 }
 
 body {
@@ -65,6 +74,24 @@ a {
 
 a:hover {
     color: var(--secondary-color);
+}
+
+.btn, .button, button.btn-primary, a.btn-primary {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    padding: var(--button-padding);
+    font-size: var(--button-font-size);
+    font-weight: var(--button-font-weight);
+    border-width: var(--button-border-width);
+    border-color: var(--button-border-color);
+    border-style: solid;
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+}
+
+.btn:hover, .button:hover, button.btn-primary:hover, a.btn-primary:hover {
+    background-color: var(--button-hover-bg-color);
+    color: var(--button-hover-text-color);
 }
 
 .btn-primary {

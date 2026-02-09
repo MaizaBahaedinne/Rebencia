@@ -27,8 +27,11 @@ CREATE TABLE `sliders` (
   KEY `is_active` (`is_active`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- Supprimer la table theme_settings si elle existe déjà avec l'ancienne structure
+DROP TABLE IF EXISTS `theme_settings`;
+
 -- Table theme_settings
-CREATE TABLE IF NOT EXISTS `theme_settings` (
+CREATE TABLE `theme_settings` (
   `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `primary_color` varchar(7) DEFAULT '#667eea',
   `secondary_color` varchar(7) DEFAULT '#764ba2',
@@ -40,13 +43,34 @@ CREATE TABLE IF NOT EXISTS `theme_settings` (
   `font_family_secondary` varchar(100) DEFAULT 'Roboto',
   `font_size_base` varchar(20) DEFAULT '16px',
   `border_radius` varchar(20) DEFAULT '8px',
+  `button_bg_color` varchar(7) DEFAULT '#667eea',
+  `button_text_color` varchar(7) DEFAULT '#ffffff',
+  `button_hover_bg_color` varchar(7) DEFAULT '#764ba2',
+  `button_hover_text_color` varchar(7) DEFAULT '#ffffff',
+  `button_border_width` varchar(10) DEFAULT '0px',
+  `button_border_color` varchar(7) DEFAULT '#667eea',
+  `button_padding` varchar(20) DEFAULT '12px 30px',
+  `button_font_size` varchar(20) DEFAULT '16px',
+  `button_font_weight` varchar(10) DEFAULT '500',
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Insérer les valeurs par défaut du thème
-INSERT INTO `theme_settings` (`id`, `primary_color`, `secondary_color`, `accent_color`, `text_dark`, `text_light`, `background_light`, `font_family_primary`, `font_family_secondary`, `font_size_base`, `border_radius`, `updated_at`) 
-VALUES (1, '#667eea', '#764ba2', '#f5576c', '#2d3748', '#ffffff', '#f7fafc', 'Poppins', 'Roboto', '16px', '8px', NOW())
+INSERT INTO `theme_settings` (
+  `id`, `primary_color`, `secondary_color`, `accent_color`, `text_dark`, `text_light`, `background_light`, 
+  `font_family_primary`, `font_family_secondary`, `font_size_base`, `border_radius`,
+  `button_bg_color`, `button_text_color`, `button_hover_bg_color`, `button_hover_text_color`,
+  `button_border_width`, `button_border_color`, `button_padding`, `button_font_size`, `button_font_weight`,
+  `updated_at`
+) 
+VALUES (
+  1, '#667eea', '#764ba2', '#f5576c', '#2d3748', '#ffffff', '#f7fafc', 
+  'Poppins', 'Roboto', '16px', '8px',
+  '#667eea', '#ffffff', '#764ba2', '#ffffff',
+  '0px', '#667eea', '12px 30px', '16px', '500',
+  NOW()
+)
 ON DUPLICATE KEY UPDATE updated_at = NOW();
 
 -- Exemples de sliders (optionnel)

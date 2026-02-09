@@ -51,7 +51,7 @@ class Home extends BaseController
             'latest_properties' => $latest_properties
         ];
 
-        return view('public/home', $data);
+        return view('public/home_orpi_style', $data);
     }
     
     public function getCities()

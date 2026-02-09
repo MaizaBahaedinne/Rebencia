@@ -94,9 +94,9 @@
     
     .orpi-nav-link {
         color: var(--text-dark);
-        font-weight: 600;
-        font-size: 0.95rem;
-        padding: 12px 20px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        padding: 8px 12px;
         text-decoration: none;
         border-radius: 8px;
         transition: all 0.3s ease;
@@ -179,10 +179,11 @@
     .btn-orpi-primary {
         background: var(--button-bg-color);
         color: var(--button-text-color);
-        padding: var(--button-padding);
+        padding: 6px 16px;
         border: none;
-        border-radius: 25px;
-        font-weight: 600;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.85rem;
         text-decoration: none;
         transition: all 0.3s;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);

@@ -1,4 +1,4 @@
-<?= $this->extend('layouts/public') ?>
+<?= $this->extend('layouts/public_orpi_style') ?>
 
 <?= $this->section('content') ?>
 

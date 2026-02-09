@@ -21,32 +21,19 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;600;700&family=Montserrat:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Raleway:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
     <?php
-    // Charger le thème personnalisé depuis la base de données
-    $themeModel = model('ThemeSettingModel');
-    $themeCSS = $themeModel->generateCSS();
+    // Charger les helpers
+    helper('theme');
     ?>
+    <link href="<?= get_theme_fonts() ?>" rel="stylesheet">
     
     <!-- Thème personnalisé (généré depuis la base de données) -->
     <style>
-    <?= $themeCSS ?>
+    <?= load_theme_css() ?>
     </style>
     
     <!-- Custom CSS -->
     <style>
-        :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --primary-color: #667eea;
-            --secondary-color: #764ba2;
-            --accent-color: #f5576c;
-            --text-dark: #2d3748;
-            --text-light: #718096;
-            --bg-light: #f7fafc;
-            --border-color: #e2e8f0;
-        }
         
         * {
             margin: 0;

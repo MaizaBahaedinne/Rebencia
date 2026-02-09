@@ -419,11 +419,11 @@ function saveStepData(step, callback) {
             // Afficher un message de succès
             showToast('Étape ' + step + ' enregistrée avec succès', 'success');
             
-            // Si c'est la dernière étape, rediriger vers la liste
+            // Si c'est la dernière étape, rediriger vers la page de détails
             if (step === totalSteps) {
-                console.log('Last step completed, redirecting to list...');
+                console.log('Last step completed, redirecting to details...');
                 setTimeout(() => {
-                    window.location.href = '<?= base_url("admin/properties") ?>';
+                    window.location.href = '<?= base_url("admin/properties/view") ?>/' + propertyId;
                 }, 500);
                 return; // Ne pas appeler le callback
             }

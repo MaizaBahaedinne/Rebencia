@@ -455,20 +455,34 @@ class Properties extends BaseController
                 $uploadedPhotos = 0;
                 $uploadedDocs = 0;
                 
-                // Upload des photos
-                $photoFiles = $this->request->getFileMultiple('photos');
-                log_message('debug', 'Photos received: ' . json_encode($photoFiles));
+                // Récupérer tous les fichiers photos (méthode alternative)
+                $files = $this->request->getFiles();
+                log_message('debug', 'All files received: ' . json_encode(array_keys($files)));
+                
+                $photoFiles = [];
+                if (isset($files['photos'])) {
+                    log_message('debug', 'Photos found in files array');
+                    $photoFiles = is_array($files['photos']) ? $files['photos'] : [$files['photos']];
+                } else {
+                    log_message('debug', 'No photos key, trying getFileMultiple');
+                    $photoFiles = $this->request->getFileMultiple('photos');
+                }
+                
+                log_message('debug', 'Photos array: ' . json_encode($photoFiles));
                 log_message('debug', 'Is array: ' . (is_array($photoFiles) ? 'yes' : 'no'));
                 log_message('debug', 'Count: ' . (is_array($photoFiles) ? count($photoFiles) : 0));
                 
                 if (!empty($photoFiles) && is_array($photoFiles)) {
                     foreach ($photoFiles as $file) {
-                        log_message('debug', 'Processing file: ' . $file->getName() . ', Valid: ' . ($file->isValid() ? 'yes' : 'no') . ', Moved: ' . ($file->hasMoved() ? 'yes' : 'no'));
-                        if ($file->isValid() && !$file->hasMoved()) {
-                            $uploadedPhotos++;
+                        if (is_object($file)) {
+                            log_message('debug', 'Processing file: ' . $file->getName() . ', Valid: ' . ($file->isValid() ? 'yes' : 'no') . ', Moved: ' . ($file->hasMoved() ? 'yes' : 'no'));
+                            if ($file->isValid() && !$file->hasMoved()) {
+                                $uploadedPhotos++;
+                            }
                         }
                     }
                     if ($uploadedPhotos > 0) {
+                        log_message('info', 'Uploading ' . $uploadedPhotos . ' photos');
                         $this->handlePhotoUpload($propertyId, $photoFiles);
                     }
                 }

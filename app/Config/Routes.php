@@ -17,6 +17,7 @@ $routes->get('search', 'Search::index');
 
 // Properties routes (public)
 $routes->get('properties', 'Properties::index');
+$routes->post('properties/submit-request', 'Properties::submitRequest');
 $routes->get('properties/(:any)', 'Properties::view/$1');
 
 // ==========================================

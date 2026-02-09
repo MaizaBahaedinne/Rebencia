@@ -604,64 +604,104 @@
             <!-- Right Column - Contact Forms -->
             <div class="col-lg-4">
                 <div class="sticky-top" style="top: 20px;">
-                    <!-- Visit Request Form -->
+                    <!-- Contact Forms Card -->
                     <div class="card mb-3 shadow">
                         <div class="card-body">
                             <h5 class="card-title mb-3">
-                                <i class="fas fa-calendar-check text-primary"></i> Demander une visite
+                                <i class="fas fa-paper-plane text-primary"></i> Contactez-nous
                             </h5>
-                            <form id="visitForm">
-                                <input type="hidden" name="property_id" value="<?= $property['id'] ?>">
-                                <input type="hidden" name="request_type" value="visit">
-                                
-                                <div class="mb-3">
-                                    <input type="text" class="form-control" name="name" placeholder="Nom complet *" required>
-                                </div>
-                                <div class="mb-3">
-                                    <input type="email" class="form-control" name="email" placeholder="Email *" required>
-                                </div>
-                                <div class="mb-3">
-                                    <input type="tel" class="form-control" name="phone" placeholder="Téléphone *" required>
-                                </div>
-                                <div class="mb-3">
-                                    <input type="date" class="form-control" name="visit_date" placeholder="Date souhaitée">
-                                </div>
-                                <div class="mb-3">
-                                    <textarea class="form-control" name="message" rows="3" placeholder="Message (optionnel)"></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary w-100">
-                                    <i class="fas fa-paper-plane"></i> Demander une visite
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+                            
+                            <!-- Tabs Navigation -->
+                            <ul class="nav nav-tabs mb-3" id="contactTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="visit-tab" data-bs-toggle="tab" data-bs-target="#visit-form" type="button" role="tab">
+                                        <i class="fas fa-calendar-check"></i> Visite
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-form" type="button" role="tab">
+                                        <i class="fas fa-envelope"></i> Information
+                                    </button>
+                                </li>
+                            </ul>
 
-                    <!-- Information Request Form -->
-                    <div class="card mb-3 shadow">
-                        <div class="card-body">
-                            <h5 class="card-title mb-3">
-                                <i class="fas fa-envelope text-primary"></i> Demande d'information
-                            </h5>
-                            <form id="infoForm">
-                                <input type="hidden" name="property_id" value="<?= $property['id'] ?>">
-                                <input type="hidden" name="request_type" value="information">
-                                
-                                <div class="mb-3">
-                                    <input type="text" class="form-control" name="name" placeholder="Nom complet *" required>
+                            <!-- Tabs Content -->
+                            <div class="tab-content" id="contactTabsContent">
+                                <!-- Visit Request Tab -->
+                                <div class="tab-pane fade show active" id="visit-form" role="tabpanel">
+                                    <form id="visitForm">
+                                        <input type="hidden" name="property_id" value="<?= $property['id'] ?>">
+                                        <input type="hidden" name="property_reference" value="<?= $property['reference'] ?>">
+                                        <input type="hidden" name="request_type" value="visit">
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label">Nom complet <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="name" required placeholder="Votre nom">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Téléphone <span class="text-danger">*</span></label>
+                                            <input type="tel" class="form-control" name="phone" required placeholder="+216 12 345 678">
+                                            <small class="text-muted">Format: +216 XX XXX XXX</small>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" class="form-control" name="email" placeholder="votre@email.com">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Date souhaitée</label>
+                                            <input type="date" class="form-control" name="visit_date" min="<?= date('Y-m-d') ?>">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Heure préférée</label>
+                                            <select class="form-select" name="visit_time">
+                                                <option value="">Choisir...</option>
+                                                <option value="morning">Matin (9h-12h)</option>
+                                                <option value="afternoon">Après-midi (14h-17h)</option>
+                                                <option value="evening">Soir (17h-19h)</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Message (optionnel)</label>
+                                            <textarea class="form-control" name="message" rows="3" placeholder="Questions ou remarques..."></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <i class="fas fa-paper-plane"></i> Demander une visite
+                                        </button>
+                                    </form>
+                                    <div id="visitAlert" class="mt-3"></div>
                                 </div>
-                                <div class="mb-3">
-                                    <input type="email" class="form-control" name="email" placeholder="Email *" required>
+
+                                <!-- Information Request Tab -->
+                                <div class="tab-pane fade" id="info-form" role="tabpanel">
+                                    <form id="infoForm">
+                                        <input type="hidden" name="property_id" value="<?= $property['id'] ?>">
+                                        <input type="hidden" name="property_reference" value="<?= $property['reference'] ?>">
+                                        <input type="hidden" name="request_type" value="information">
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label">Nom complet <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="name" required placeholder="Votre nom">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Téléphone <span class="text-danger">*</span></label>
+                                            <input type="tel" class="form-control" name="phone" required placeholder="+216 12 345 678">
+                                            <small class="text-muted">Format: +216 XX XXX XXX</small>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" class="form-control" name="email" placeholder="votre@email.com">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Votre message <span class="text-danger">*</span></label>
+                                            <textarea class="form-control" name="message" rows="4" required placeholder="Décrivez votre demande..."></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-outline-primary w-100">
+                                            <i class="fas fa-info-circle"></i> Demander des informations
+                                        </button>
+                                    </form>
+                                    <div id="infoAlert" class="mt-3"></div>
                                 </div>
-                                <div class="mb-3">
-                                    <input type="tel" class="form-control" name="phone" placeholder="Téléphone *" required>
-                                </div>
-                                <div class="mb-3">
-                                    <textarea class="form-control" name="message" rows="4" placeholder="Votre message *" required></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-outline-primary w-100">
-                                    <i class="fas fa-info-circle"></i> Demander des informations
-                                </button>
-                            </form>
+                            </div>
                         </div>
                     </div>
 
@@ -814,28 +854,87 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Visit Form
+    // Visit Form Submission
     const visitForm = document.getElementById('visitForm');
     if (visitForm) {
         visitForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            // Here you would send the form data via AJAX
-            alert('Demande de visite envoyée avec succès!');
-            this.reset();
+            submitRequest(new FormData(this), 'visitAlert', visitForm);
         });
     }
     
-    // Info Form
+    // Info Form Submission
     const infoForm = document.getElementById('infoForm');
     if (infoForm) {
         infoForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            // Here you would send the form data via AJAX
-            alert('Demande d\'information envoyée avec succès!');
-            this.reset();
+            submitRequest(new FormData(this), 'infoAlert', infoForm);
         });
     }
 });
+
+// Submit request function
+function submitRequest(formData, alertId, form) {
+    const alertDiv = document.getElementById(alertId);
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+    
+    // Disable button and show loading
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
+    
+    // Add property characteristics for client preferences
+    formData.append('property_type', '<?= $property['type'] ?>');
+    formData.append('property_transaction_type', '<?= $property['transaction_type'] ?>');
+    formData.append('property_price', '<?= $property['price'] ?>');
+    formData.append('property_city', '<?= $property['city'] ?? '' ?>');
+    formData.append('property_governorate', '<?= $property['governorate'] ?? '' ?>');
+    <?php if (isset($property['area_total']) && $property['area_total']): ?>
+    formData.append('property_area', '<?= $property['area_total'] ?>');
+    <?php endif; ?>
+    <?php if (isset($property['bedrooms']) && $property['bedrooms']): ?>
+    formData.append('property_bedrooms', '<?= $property['bedrooms'] ?>');
+    <?php endif; ?>
+    <?php if (isset($property['bathrooms']) && $property['bathrooms']): ?>
+    formData.append('property_bathrooms', '<?= $property['bathrooms'] ?>');
+    <?php endif; ?>
+    
+    fetch('<?= base_url('properties/submit-request') ?>', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alertDiv.innerHTML = `
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>${data.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            form.reset();
+        } else {
+            alertDiv.innerHTML = `
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>${data.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        alertDiv.innerHTML = `
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>Une erreur est survenue. Veuillez réessayer.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+    });
+}
 
 function shareProperty(platform) {
     const url = window.location.href;

@@ -100,6 +100,40 @@ class Settings extends BaseController
 
         return view('admin/settings/notifications', $data);
     }
+    
+    /**
+     * Footer & Social settings
+     */
+    public function footer()
+    {
+        $siteSettingModel = model('SiteSettingModel');
+        $settings = $siteSettingModel->getAllSettings();
+        
+        $data = [
+            'title' => 'Paramètres Footer & Réseaux Sociaux',
+            'page_title' => 'Paramètres Footer & Réseaux Sociaux',
+            'settings' => $settings
+        ];
+
+        return view('admin/settings/footer', $data);
+    }
+    
+    /**
+     * Update footer settings
+     */
+    public function updateFooter()
+    {
+        $siteSettingModel = model('SiteSettingModel');
+        $postData = $this->request->getPost();
+        
+        foreach ($postData as $key => $value) {
+            if ($key !== 'csrf_test_name') {
+                $siteSettingModel->setSetting($key, $value);
+            }
+        }
+
+        return redirect()->to(base_url('admin/settings/footer'))->with('success', 'Paramètres footer mis à jour avec succès');
+    }
 
     /**
      * Update settings

@@ -604,6 +604,71 @@
             <!-- Right Column - Contact Forms -->
             <div class="col-lg-4">
                 <div class="sticky-top" style="top: 20px;">
+                    <!-- Agent & Agency Card -->
+                    <?php if ($agent || $agency): ?>
+                    <div class="card mb-3 shadow">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">
+                                <i class="fas fa-user-tie text-primary"></i> Votre contact
+                            </h5>
+                            
+                            <?php if ($agent): ?>
+                            <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                                <div class="me-3">
+                                    <?php if (!empty($agent['photo'])): ?>
+                                        <img src="<?= base_url('uploads/users/' . $agent['photo']) ?>" 
+                                             class="rounded-circle" 
+                                             style="width: 60px; height: 60px; object-fit: cover;"
+                                             alt="<?= esc($agent['first_name'] . ' ' . $agent['last_name']) ?>">
+                                    <?php else: ?>
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" 
+                                             style="width: 60px; height: 60px;">
+                                            <i class="fas fa-user fa-2x"></i>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1"><?= esc($agent['first_name'] . ' ' . $agent['last_name']) ?></h6>
+                                    <small class="text-muted d-block">Agent immobilier</small>
+                                    <?php if (!empty($agent['phone'])): ?>
+                                        <a href="tel:<?= esc($agent['phone']) ?>" class="text-primary d-block">
+                                            <i class="fas fa-phone"></i> <?= esc($agent['phone']) ?>
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if (!empty($agent['email'])): ?>
+                                        <a href="mailto:<?= esc($agent['email']) ?>" class="text-muted small d-block">
+                                            <i class="fas fa-envelope"></i> <?= esc($agent['email']) ?>
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                            
+                            <?php if ($agency): ?>
+                            <div class="text-center">
+                                <?php if (!empty($agency['logo'])): ?>
+                                    <img src="<?= base_url('uploads/agencies/' . $agency['logo']) ?>" 
+                                         class="mb-2" 
+                                         style="max-height: 50px;"
+                                         alt="<?= esc($agency['name']) ?>">
+                                <?php endif; ?>
+                                <h6 class="mb-1"><?= esc($agency['name']) ?></h6>
+                                <?php if (!empty($agency['phone'])): ?>
+                                    <small class="text-muted d-block">
+                                        <i class="fas fa-phone"></i> <?= esc($agency['phone']) ?>
+                                    </small>
+                                <?php endif; ?>
+                                <?php if (!empty($agency['address'])): ?>
+                                    <small class="text-muted d-block">
+                                        <i class="fas fa-map-marker-alt"></i> <?= esc($agency['address']) ?>
+                                    </small>
+                                <?php endif; ?>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                    
                     <!-- Contact Forms Card -->
                     <div class="card mb-3 shadow">
                         <div class="card-body">
@@ -614,21 +679,53 @@
                             <!-- Tabs Navigation -->
                             <ul class="nav nav-tabs mb-3" id="contactTabs" role="tablist">
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link active" id="visit-tab" data-bs-toggle="tab" data-bs-target="#visit-form" type="button" role="tab">
-                                        <i class="fas fa-calendar-check"></i> Visite
+                                    <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-form" type="button" role="tab">
+                                        <i class="fas fa-envelope"></i> Information
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-form" type="button" role="tab">
-                                        <i class="fas fa-envelope"></i> Information
+                                    <button class="nav-link" id="visit-tab" data-bs-toggle="tab" data-bs-target="#visit-form" type="button" role="tab">
+                                        <i class="fas fa-calendar-check"></i> Visite
                                     </button>
                                 </li>
                             </ul>
 
                             <!-- Tabs Content -->
                             <div class="tab-content" id="contactTabsContent">
+                                <!-- Information Request Tab -->
+                                <div class="tab-pane fade show active" id="info-form" role="tabpanel">
+                                    <div class="alert d-none" id="infoAlert"></div>
+                                    
+                                    <form id="infoForm">
+                                        <input type="hidden" name="property_id" value="<?= $property['id'] ?>">
+                                        <input type="hidden" name="property_reference" value="<?= $property['reference'] ?>">
+                                        <input type="hidden" name="request_type" value="information">
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label">Nom complet <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="name" required placeholder="Votre nom">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Téléphone <span class="text-danger">*</span></label>
+                                            <input type="tel" class="form-control" name="phone" required placeholder="+216 12 345 678">
+                                            <small class="text-muted">Format: +216 XX XXX XXX</small>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" class="form-control" name="email" placeholder="votre@email.com">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Votre message <span class="text-danger">*</span></label>
+                                            <textarea class="form-control" name="message" rows="4" required placeholder="Décrivez votre demande..."></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <i class="fas fa-paper-plane"></i> Envoyer ma demande
+                                        </button>
+                                    </form>
+                                </div>
+                                
                                 <!-- Visit Request Tab -->
-                                <div class="tab-pane fade show active" id="visit-form" role="tabpanel">
+                                <div class="tab-pane fade" id="visit-form" role="tabpanel">
                                     <form id="visitForm">
                                         <input type="hidden" name="property_id" value="<?= $property['id'] ?>">
                                         <input type="hidden" name="property_reference" value="<?= $property['reference'] ?>">
@@ -668,42 +765,81 @@
                                             <i class="fas fa-paper-plane"></i> Demander une visite
                                         </button>
                                     </form>
-                                    <div id="visitAlert" class="mt-3"></div>
-                                </div>
-
-                                <!-- Information Request Tab -->
-                                <div class="tab-pane fade" id="info-form" role="tabpanel">
-                                    <form id="infoForm">
-                                        <input type="hidden" name="property_id" value="<?= $property['id'] ?>">
-                                        <input type="hidden" name="property_reference" value="<?= $property['reference'] ?>">
-                                        <input type="hidden" name="request_type" value="information">
-                                        
-                                        <div class="mb-3">
-                                            <label class="form-label">Nom complet <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="name" required placeholder="Votre nom">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Téléphone <span class="text-danger">*</span></label>
-                                            <input type="tel" class="form-control" name="phone" required placeholder="+216 12 345 678">
-                                            <small class="text-muted">Format: +216 XX XXX XXX</small>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Email</label>
-                                            <input type="email" class="form-control" name="email" placeholder="votre@email.com">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Votre message <span class="text-danger">*</span></label>
-                                            <textarea class="form-control" name="message" rows="4" required placeholder="Décrivez votre demande..."></textarea>
-                                        </div>
-                                        <button type="submit" class="btn btn-outline-primary w-100">
-                                            <i class="fas fa-info-circle"></i> Demander des informations
-                                        </button>
-                                    </form>
-                                    <div id="infoAlert" class="mt-3"></div>
+                                    <div class="alert d-none mt-3" id="visitAlert"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Loan Simulator Card -->
+                    <div class="card mb-3 shadow">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">
+                                <i class="fas fa-calculator text-primary"></i> Simulateur de crédit
+                            </h5>
+                            
+                            <form id="loanCalculator">
+                                <div class="mb-3">
+                                    <label class="form-label">Prix du bien (TND)</label>
+                                    <input type="number" class="form-control" id="loanPrice" value="<?= $property['price'] ?>" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Apport initial (TND)</label>
+                                    <input type="number" class="form-control" id="loanDown" value="<?= round($property['price'] * 0.2) ?>" min="0">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Durée (années)</label>
+                                    <select class="form-select" id="loanDuration">
+                                        <option value="5">5 ans</option>
+                                        <option value="10">10 ans</option>
+                                        <option value="15" selected>15 ans</option>
+                                        <option value="20">20 ans</option>
+                                        <option value="25">25 ans</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Taux d'intérêt (%)</label>
+                                    <input type="number" class="form-control" id="loanRate" value="7.5" step="0.1" min="0" max="20">
+                                </div>
+                                <button type="button" class="btn btn-primary w-100" onclick="calculateLoan()">
+                                    <i class="fas fa-calculator"></i> Calculer
+                                </button>
+                            </form>
+                            
+                            <div id="loanResults" class="mt-4" style="display: none;">
+                                <div class="alert alert-info">
+                                    <strong>Mensualité :</strong>
+                                    <h4 class="text-primary mb-0" id="monthlyPayment"></h4>
+                                </div>
+                                <div class="small">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Montant emprunté :</span>
+                                        <strong id="loanAmount"></strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Coût total du crédit :</span>
+                                        <strong id="totalInterest"></strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Montant total à rembourser :</span>
+                                        <strong id="totalPayment"></strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Map Card -->
+                    <?php if (!empty($property['latitude']) && !empty($property['longitude'])): ?>
+                    <div class="card mb-3 shadow">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">
+                                <i class="fas fa-map-marked-alt text-primary"></i> Localisation
+                            </h5>
+                            <div id="propertyMap" style="height: 300px; border-radius: 8px;"></div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
 
                     <!-- Share -->
                     <div class="card shadow">
@@ -963,6 +1099,56 @@ function copyLink() {
         alert('Lien copié dans le presse-papier!');
     });
 }
+
+// Loan Calculator
+function calculateLoan() {
+    const price = parseFloat(document.getElementById('loanPrice').value);
+    const downPayment = parseFloat(document.getElementById('loanDown').value);
+    const duration = parseInt(document.getElementById('loanDuration').value);
+    const rate = parseFloat(document.getElementById('loanRate').value) / 100;
+    
+    // Calculate loan amount
+    const loanAmount = price - downPayment;
+    
+    // Calculate monthly payment using amortization formula
+    const monthlyRate = rate / 12;
+    const numberOfPayments = duration * 12;
+    const monthlyPayment = loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / 
+                          (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
+    
+    // Calculate total payment and interest
+    const totalPayment = monthlyPayment * numberOfPayments;
+    const totalInterest = totalPayment - loanAmount;
+    
+    // Display results
+    document.getElementById('monthlyPayment').textContent = 
+        monthlyPayment.toLocaleString('fr-TN', {minimumFractionDigits: 0, maximumFractionDigits: 0}) + ' TND/mois';
+    document.getElementById('loanAmount').textContent = 
+        loanAmount.toLocaleString('fr-TN', {minimumFractionDigits: 0, maximumFractionDigits: 0}) + ' TND';
+    document.getElementById('totalInterest').textContent = 
+        totalInterest.toLocaleString('fr-TN', {minimumFractionDigits: 0, maximumFractionDigits: 0}) + ' TND';
+    document.getElementById('totalPayment').textContent = 
+        totalPayment.toLocaleString('fr-TN', {minimumFractionDigits: 0, maximumFractionDigits: 0}) + ' TND';
+    
+    document.getElementById('loanResults').style.display = 'block';
+}
+
+// Initialize map if coordinates exist
+<?php if (!empty($property['latitude']) && !empty($property['longitude'])): ?>
+document.addEventListener('DOMContentLoaded', function() {
+    const lat = <?= $property['latitude'] ?>;
+    const lng = <?= $property['longitude'] ?>;
+    
+    const map = L.map('propertyMap').setView([lat, lng], 15);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+    
+    const marker = L.marker([lat, lng]).addTo(map);
+    marker.bindPopup('<strong><?= addslashes($property['title']) ?></strong><br><?= addslashes($property['city']) ?>').openPopup();
+});
+<?php endif; ?>
 </script>
 
 <?= $this->endSection() ?>

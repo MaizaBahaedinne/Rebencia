@@ -283,7 +283,9 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->get('sms', 'Settings::sms');
         $routes->get('payment', 'Settings::payment');
         $routes->get('notifications', 'Settings::notifications');
+        $routes->get('footer', 'Settings::footer');
         $routes->post('update', 'Settings::update');
+        $routes->post('updateFooter', 'Settings::updateFooter');
     });
     
     // Analytics

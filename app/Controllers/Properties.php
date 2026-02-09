@@ -10,6 +10,8 @@ class Properties extends BaseController
         $mediaModel = model('PropertyMediaModel');
         $roomModel = model('PropertyRoomModel');
         $proximityModel = model('PropertyProximityModel');
+        $userModel = model('UserModel');
+        $agencyModel = model('AgencyModel');
         
         // Get property by reference
         $property = $propertyModel->where('reference', $reference)
@@ -32,6 +34,18 @@ class Properties extends BaseController
         
         // Get property proximities
         $proximities = $proximityModel->where('property_id', $property['id'])->findAll();
+        
+        // Get assigned agent information
+        $agent = null;
+        if (!empty($property['assigned_to'])) {
+            $agent = $userModel->find($property['assigned_to']);
+        }
+        
+        // Get agency information
+        $agency = null;
+        if (!empty($property['agency_id'])) {
+            $agency = $agencyModel->find($property['agency_id']);
+        }
         
         // Get similar properties (same type and city)
         $similarProperties = $propertyModel
@@ -60,7 +74,9 @@ class Properties extends BaseController
             'images' => $images,
             'rooms' => $rooms,
             'proximities' => $proximities,
-            'similar_properties' => $similarProperties
+            'similar_properties' => $similarProperties,
+            'agent' => $agent,
+            'agency' => $agency
         ];
         
         return view('public/property_detail', $data);

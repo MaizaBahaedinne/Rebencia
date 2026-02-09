@@ -492,11 +492,25 @@
                         </h6>
                     </div>
                     <div class="card-body" id="previewPanel">
-                        <!-- Exemple de bouton -->
+                        <!-- Exemple de bouton primaire -->
                         <div class="mb-3">
                             <button class="btn btn-preview-primary w-100" id="previewButton">
                                 Bouton Primaire
                             </button>
+                        </div>
+
+                        <!-- Exemple de bouton secondaire -->
+                        <div class="mb-3">
+                            <button class="btn btn-preview-secondary w-100" id="preview-button-secondary">
+                                Bouton Secondaire
+                            </button>
+                        </div>
+
+                        <!-- Exemple de lien hypertexte -->
+                        <div class="mb-3">
+                            <a href="#" id="preview-link" class="preview-link d-block text-center">
+                                <i class="fas fa-link"></i> Lien Hypertexte
+                            </a>
                         </div>
 
                         <!-- Exemple de texte -->
@@ -556,16 +570,73 @@
     --font-secondary: <?= $theme['font_family_secondary'] ?>, sans-serif;
     --font-size: <?= $theme['font_size_base'] ?>;
     --radius: <?= $theme['border_radius'] ?>;
+    
+    /* Boutons primaires */
+    --button-bg: <?= $theme['button_bg_color'] ?>;
+    --button-text: <?= $theme['button_text_color'] ?>;
+    --button-hover-bg: <?= $theme['button_hover_bg_color'] ?>;
+    --button-hover-text: <?= $theme['button_hover_text_color'] ?>;
+    --button-border-width: <?= $theme['button_border_width'] ?>;
+    --button-border-color: <?= $theme['button_border_color'] ?>;
+    --button-padding: <?= $theme['button_padding'] ?>;
+    --button-font-size: <?= $theme['button_font_size'] ?>;
+    --button-font-weight: <?= $theme['button_font_weight'] ?>;
+    
+    /* Boutons secondaires */
+    --button-secondary-bg: <?= $theme['button_secondary_bg_color'] ?>;
+    --button-secondary-text: <?= $theme['button_secondary_text_color'] ?>;
+    --button-secondary-hover-bg: <?= $theme['button_secondary_hover_bg_color'] ?>;
+    --button-secondary-hover-text: <?= $theme['button_secondary_hover_text_color'] ?>;
+    
+    /* Liens */
+    --link-color: <?= $theme['link_color'] ?>;
+    --link-hover-color: <?= $theme['link_hover_color'] ?>;
+    --link-decoration: <?= $theme['link_decoration'] ?>;
 }
 
 .btn-preview-primary {
-    background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
-    border: none;
-    color: var(--theme-text-light);
+    background: var(--button-bg);
+    color: var(--button-text);
+    border: var(--button-border-width) solid var(--button-border-color);
     border-radius: var(--radius);
-    padding: 12px 24px;
+    padding: var(--button-padding);
     font-family: var(--font-primary);
+    font-size: var(--button-font-size);
+    font-weight: var(--button-font-weight);
+    transition: all 0.3s ease;
+}
+
+.btn-preview-primary:hover {
+    background: var(--button-hover-bg);
+    color: var(--button-hover-text);
+}
+
+.btn-preview-secondary {
+    background: var(--button-secondary-bg);
+    color: var(--button-secondary-text);
+    border: none;
+    border-radius: var(--radius);
+    padding: var(--button-padding);
+    font-family: var(--font-primary);
+    font-size: var(--button-font-size);
+    font-weight: var(--button-font-weight);
+    transition: all 0.3s ease;
+}
+
+.btn-preview-secondary:hover {
+    background: var(--button-secondary-hover-bg);
+    color: var(--button-secondary-hover-text);
+}
+
+.preview-link {
+    color: var(--link-color);
+    text-decoration: var(--link-decoration);
     font-size: var(--font-size);
+    transition: all 0.3s ease;
+}
+
+.preview-link:hover {
+    color: var(--link-hover-color);
 }
 
 .btn-preview-accent {
@@ -624,80 +695,32 @@ function updatePreview() {
     root.style.setProperty('--font-size', document.getElementById('font_size_base').value);
     root.style.setProperty('--radius', document.getElementById('border_radius').value);
     
-    // Mettre à jour les styles des boutons
-    const previewButton = document.getElementById('previewButton');
-    if (previewButton && document.getElementById('button_bg_color')) {
-        const buttonBg = document.getElementById('button_bg_color').value;
-        const buttonText = document.getElementById('button_text_color').value;
-        const buttonHoverBg = document.getElementById('button_hover_bg_color').value;
-        const buttonHoverText = document.getElementById('button_hover_text_color').value;
-        const buttonBorderWidth = document.getElementById('button_border_width').value;
-        const buttonBorderColor = document.getElementById('button_border_color').value;
-        const buttonPadding = document.getElementById('button_padding').value;
-        const buttonFontSize = document.getElementById('button_font_size').value;
-        const buttonFontWeight = document.getElementById('button_font_weight').value;
-        
-        previewButton.style.backgroundColor = buttonBg;
-        previewButton.style.color = buttonText;
-        previewButton.style.borderWidth = buttonBorderWidth;
-        previewButton.style.borderColor = buttonBorderColor;
-        previewButton.style.borderStyle = 'solid';
-        previewButton.style.padding = buttonPadding;
-        previewButton.style.fontSize = buttonFontSize;
-        previewButton.style.fontWeight = buttonFontWeight;
-        previewButton.style.borderRadius = document.getElementById('border_radius').value;
-        
-        // Gestion du survol
-        previewButton.onmouseenter = function() {
-            this.style.backgroundColor = buttonHoverBg;
-            this.style.color = buttonHoverText;
-        };
-        previewButton.onmouseleave = function() {
-            this.style.backgroundColor = buttonBg;
-            this.style.color = buttonText;
-        };
+    // Mettre à jour les variables CSS des boutons primaires
+    if (document.getElementById('button_bg_color')) {
+        root.style.setProperty('--button-bg', document.getElementById('button_bg_color').value);
+        root.style.setProperty('--button-text', document.getElementById('button_text_color').value);
+        root.style.setProperty('--button-hover-bg', document.getElementById('button_hover_bg_color').value);
+        root.style.setProperty('--button-hover-text', document.getElementById('button_hover_text_color').value);
+        root.style.setProperty('--button-border-width', document.getElementById('button_border_width').value);
+        root.style.setProperty('--button-border-color', document.getElementById('button_border_color').value);
+        root.style.setProperty('--button-padding', document.getElementById('button_padding').value);
+        root.style.setProperty('--button-font-size', document.getElementById('button_font_size').value);
+        root.style.setProperty('--button-font-weight', document.getElementById('button_font_weight').value);
     }
     
-    // Mettre à jour les styles des boutons secondaires
-    const previewButtonSecondary = document.getElementById('preview-button-secondary');
-    if (previewButtonSecondary && document.getElementById('button_secondary_bg_color')) {
-        const buttonBg = document.getElementById('button_secondary_bg_color').value;
-        const buttonText = document.getElementById('button_secondary_text_color').value;
-        const buttonHoverBg = document.getElementById('button_secondary_hover_bg_color').value;
-        const buttonHoverText = document.getElementById('button_secondary_hover_text_color').value;
-        
-        previewButtonSecondary.style.backgroundColor = buttonBg;
-        previewButtonSecondary.style.color = buttonText;
-        previewButtonSecondary.style.borderRadius = document.getElementById('border_radius').value;
-        
-        // Gestion du survol
-        previewButtonSecondary.onmouseenter = function() {
-            this.style.backgroundColor = buttonHoverBg;
-            this.style.color = buttonHoverText;
-        };
-        previewButtonSecondary.onmouseleave = function() {
-            this.style.backgroundColor = buttonBg;
-            this.style.color = buttonText;
-        };
+    // Mettre à jour les variables CSS des boutons secondaires
+    if (document.getElementById('button_secondary_bg_color')) {
+        root.style.setProperty('--button-secondary-bg', document.getElementById('button_secondary_bg_color').value);
+        root.style.setProperty('--button-secondary-text', document.getElementById('button_secondary_text_color').value);
+        root.style.setProperty('--button-secondary-hover-bg', document.getElementById('button_secondary_hover_bg_color').value);
+        root.style.setProperty('--button-secondary-hover-text', document.getElementById('button_secondary_hover_text_color').value);
     }
     
-    // Mettre à jour les styles des liens
-    const previewLink = document.getElementById('preview-link');
-    if (previewLink && document.getElementById('link_color')) {
-        const linkColor = document.getElementById('link_color').value;
-        const linkHoverColor = document.getElementById('link_hover_color').value;
-        const linkDecoration = document.getElementById('link_decoration').value;
-        
-        previewLink.style.color = linkColor;
-        previewLink.style.textDecoration = linkDecoration;
-        
-        // Gestion du survol
-        previewLink.onmouseenter = function() {
-            this.style.color = linkHoverColor;
-        };
-        previewLink.onmouseleave = function() {
-            this.style.color = linkColor;
-        };
+    // Mettre à jour les variables CSS des liens
+    if (document.getElementById('link_color')) {
+        root.style.setProperty('--link-color', document.getElementById('link_color').value);
+        root.style.setProperty('--link-hover-color', document.getElementById('link_hover_color').value);
+        root.style.setProperty('--link-decoration', document.getElementById('link_decoration').value);
     }
     
     // Mettre à jour les champs texte des couleurs

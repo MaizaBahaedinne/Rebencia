@@ -138,79 +138,344 @@
                     </div>
                 </div>
 
+                <!-- Prix & Charges -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="fas fa-money-bill-wave text-primary"></i> Prix & Charges mensuelles
+                        </h5>
+                        
+                        <!-- Prix -->
+                        <h6 class="fw-bold mb-3">
+                            <i class="fas fa-tag text-success"></i> Prix
+                        </h6>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <table class="table table-sm table-borderless">
+                                    <tbody>
+                                        <?php if ($property['transaction_type'] === 'sale' && isset($property['price'])): ?>
+                                        <tr>
+                                            <td class="text-muted">Prix de vente</td>
+                                            <td class="fw-bold text-end text-primary h5">
+                                                <?= number_format($property['price'], 2, ',', ' ') ?> TND
+                                            </td>
+                                        </tr>
+                                        <?php endif; ?>
+                                        
+                                        <?php if ($property['transaction_type'] === 'rent' && isset($property['rental_price']) && $property['rental_price']): ?>
+                                        <tr>
+                                            <td class="text-muted">Prix de location (mensuel)</td>
+                                            <td class="fw-bold text-end text-primary h5">
+                                                <?= number_format($property['rental_price'], 2, ',', ' ') ?> TND/mois
+                                            </td>
+                                        </tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Promotion -->
+                        <?php if (isset($property['promo_price']) && $property['promo_price'] > 0): ?>
+                        <h6 class="fw-bold mb-3">
+                            <i class="fas fa-percent text-danger"></i> Promotion
+                        </h6>
+                        <div class="alert alert-danger mb-4">
+                            <div class="row">
+                                <div class="col-md-12 mb-2">
+                                    <strong>Prix promotionnel:</strong>
+                                    <span class="h5 text-danger ms-2"><?= number_format($property['promo_price'], 2, ',', ' ') ?> TND</span>
+                                    <span class="badge bg-danger ms-2">
+                                        -<?= round((($property['price'] - $property['promo_price']) / $property['price']) * 100) ?>%
+                                    </span>
+                                </div>
+                                <?php if (isset($property['promo_start_date']) && $property['promo_start_date']): ?>
+                                <div class="col-md-6">
+                                    <small><i class="fas fa-calendar-alt"></i> Début: <?= date('d/m/Y', strtotime($property['promo_start_date'])) ?></small>
+                                </div>
+                                <?php endif; ?>
+                                <?php if (isset($property['promo_end_date']) && $property['promo_end_date']): ?>
+                                <div class="col-md-6">
+                                    <small><i class="fas fa-calendar-times"></i> Fin: <?= date('d/m/Y', strtotime($property['promo_end_date'])) ?></small>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                        
+                        <!-- Charges mensuelles -->
+                        <?php 
+                        $hasCharges = (isset($property['charge_syndic']) && $property['charge_syndic'] > 0) ||
+                                     (isset($property['charge_water']) && $property['charge_water'] > 0) ||
+                                     (isset($property['charge_gas']) && $property['charge_gas'] > 0) ||
+                                     (isset($property['charge_electricity']) && $property['charge_electricity'] > 0) ||
+                                     (isset($property['charge_other']) && $property['charge_other'] > 0);
+                        
+                        if ($hasCharges):
+                            $totalCharges = ($property['charge_syndic'] ?? 0) + 
+                                          ($property['charge_water'] ?? 0) + 
+                                          ($property['charge_gas'] ?? 0) + 
+                                          ($property['charge_electricity'] ?? 0) + 
+                                          ($property['charge_other'] ?? 0);
+                        ?>
+                        <h6 class="fw-bold mb-3">
+                            <i class="fas fa-file-invoice-dollar text-warning"></i> Charges mensuelles
+                        </h6>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <table class="table table-sm table-borderless">
+                                    <tbody>
+                                        <?php if (isset($property['charge_syndic']) && $property['charge_syndic'] > 0): ?>
+                                        <tr>
+                                            <td class="text-muted">Charges de syndic</td>
+                                            <td class="fw-bold text-end"><?= number_format($property['charge_syndic'], 2, ',', ' ') ?> TND/mois</td>
+                                        </tr>
+                                        <?php endif; ?>
+                                        
+                                        <?php if (isset($property['charge_water']) && $property['charge_water'] > 0): ?>
+                                        <tr>
+                                            <td class="text-muted">Charges d'eau</td>
+                                            <td class="fw-bold text-end"><?= number_format($property['charge_water'], 2, ',', ' ') ?> TND/mois</td>
+                                        </tr>
+                                        <?php endif; ?>
+                                        
+                                        <?php if (isset($property['charge_gas']) && $property['charge_gas'] > 0): ?>
+                                        <tr>
+                                            <td class="text-muted">Charges de gaz</td>
+                                            <td class="fw-bold text-end"><?= number_format($property['charge_gas'], 2, ',', ' ') ?> TND/mois</td>
+                                        </tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-sm table-borderless">
+                                    <tbody>
+                                        <?php if (isset($property['charge_electricity']) && $property['charge_electricity'] > 0): ?>
+                                        <tr>
+                                            <td class="text-muted">Charges d'électricité</td>
+                                            <td class="fw-bold text-end"><?= number_format($property['charge_electricity'], 2, ',', ' ') ?> TND/mois</td>
+                                        </tr>
+                                        <?php endif; ?>
+                                        
+                                        <?php if (isset($property['charge_other']) && $property['charge_other'] > 0): ?>
+                                        <tr>
+                                            <td class="text-muted">Autres charges</td>
+                                            <td class="fw-bold text-end"><?= number_format($property['charge_other'], 2, ',', ' ') ?> TND/mois</td>
+                                        </tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info mb-0">
+                            <strong>Total des charges mensuelles:</strong>
+                            <span class="h5 text-primary ms-2"><?= number_format($totalCharges, 2, ',', ' ') ?> TND</span>
+                        </div>
+                        <?php else: ?>
+                        <div class="alert alert-light mb-0">
+                            <i class="fas fa-info-circle"></i> Aucune charge mensuelle renseignée pour ce bien
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
                 <!-- Detailed Characteristics -->
                 <div class="card mb-3">
                     <div class="card-body">
-                        <h5 class="card-title mb-3">Caractéristiques détaillées</h5>
-                        <div class="row">
+                        <h5 class="card-title mb-4">
+                            <i class="fas fa-info-circle text-primary"></i> Caractéristiques détaillées
+                        </h5>
+                        
+                        <!-- Surfaces -->
+                        <h6 class="fw-bold mb-3">
+                            <i class="fas fa-ruler-horizontal text-primary"></i> Surfaces
+                        </h6>
+                        <div class="row mb-4">
                             <div class="col-md-6">
-                                <table class="table table-sm">
+                                <table class="table table-sm table-borderless">
                                     <tbody>
+                                        <?php if (isset($property['area_total']) && $property['area_total']): ?>
                                         <tr>
-                                            <td class="text-muted">Type de bien</td>
-                                            <td class="fw-bold"><?= ucfirst($property['type']) ?></td>
+                                            <td class="text-muted">Surface totale (m²)</td>
+                                            <td class="fw-bold text-end"><?= number_format($property['area_total'], 2, ',', ' ') ?></td>
                                         </tr>
+                                        <?php endif; ?>
+                                        <?php if (isset($property['area_living']) && $property['area_living']): ?>
                                         <tr>
-                                            <td class="text-muted">Transaction</td>
-                                            <td class="fw-bold"><?= $property['transaction_type'] === 'sale' ? 'Vente' : 'Location' ?></td>
+                                            <td class="text-muted">Surface habitable (m²)</td>
+                                            <td class="fw-bold text-end"><?= number_format($property['area_living'], 2, ',', ' ') ?></td>
                                         </tr>
-                                        <?php if (isset($property['surface']) && $property['surface']): ?>
+                                        <?php endif; ?>
+                                        <?php if (isset($property['area_land']) && $property['area_land']): ?>
                                         <tr>
-                                            <td class="text-muted">Surface habitable</td>
-                                            <td class="fw-bold"><?= $property['surface'] ?> m²</td>
+                                            <td class="text-muted">Surface terrain (m²)</td>
+                                            <td class="fw-bold text-end"><?= number_format($property['area_land'], 2, ',', ' ') ?></td>
+                                        </tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Composition -->
+                        <h6 class="fw-bold mb-3">
+                            <i class="fas fa-th-large text-primary"></i> Composition
+                        </h6>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <table class="table table-sm table-borderless">
+                                    <tbody>
+                                        <?php if (isset($property['rooms']) && $property['rooms']): ?>
+                                        <tr>
+                                            <td class="text-muted">Nombre de pièces</td>
+                                            <td class="fw-bold text-end"><?= $property['rooms'] ?></td>
                                         </tr>
                                         <?php endif; ?>
                                         <?php if (isset($property['bedrooms']) && $property['bedrooms']): ?>
                                         <tr>
-                                            <td class="text-muted">Nombre de chambres</td>
-                                            <td class="fw-bold"><?= $property['bedrooms'] ?></td>
+                                            <td class="text-muted">Chambres</td>
+                                            <td class="fw-bold text-end"><?= $property['bedrooms'] ?></td>
                                         </tr>
                                         <?php endif; ?>
                                         <?php if (isset($property['bathrooms']) && $property['bathrooms']): ?>
                                         <tr>
                                             <td class="text-muted">Salles de bain</td>
-                                            <td class="fw-bold"><?= $property['bathrooms'] ?></td>
+                                            <td class="fw-bold text-end"><?= $property['bathrooms'] ?></td>
+                                        </tr>
+                                        <?php endif; ?>
+                                        <?php if (isset($property['parking_spaces'])): ?>
+                                        <tr>
+                                            <td class="text-muted">Places parking</td>
+                                            <td class="fw-bold text-end"><?= $property['parking_spaces'] ?? 0 ?></td>
                                         </tr>
                                         <?php endif; ?>
                                     </tbody>
                                 </table>
                             </div>
                             <div class="col-md-6">
-                                <table class="table table-sm">
+                                <table class="table table-sm table-borderless">
                                     <tbody>
                                         <?php if (isset($property['floor']) && $property['floor']): ?>
                                         <tr>
                                             <td class="text-muted">Étage</td>
-                                            <td class="fw-bold"><?= $property['floor'] ?></td>
+                                            <td class="fw-bold text-end"><?= $property['floor'] ?></td>
                                         </tr>
                                         <?php endif; ?>
-                                        <?php if (isset($property['parking_spaces']) && $property['parking_spaces']): ?>
+                                        <?php if (isset($property['total_floors']) && $property['total_floors']): ?>
                                         <tr>
-                                            <td class="text-muted">Parking</td>
-                                            <td class="fw-bold"><?= $property['parking_spaces'] ?> place(s)</td>
+                                            <td class="text-muted">Nombre total d'étages</td>
+                                            <td class="fw-bold text-end"><?= $property['total_floors'] ?></td>
                                         </tr>
                                         <?php endif; ?>
-                                        <?php if (isset($property['year_built']) && $property['year_built']): ?>
+                                        <?php if (isset($property['construction_year']) && $property['construction_year']): ?>
                                         <tr>
                                             <td class="text-muted">Année de construction</td>
-                                            <td class="fw-bold"><?= $property['year_built'] ?></td>
+                                            <td class="fw-bold text-end"><?= $property['construction_year'] ?></td>
                                         </tr>
                                         <?php endif; ?>
-                                        <tr>
-                                            <td class="text-muted">Référence</td>
-                                            <td class="fw-bold"><?= esc($property['reference']) ?></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-muted">Disponibilité</td>
-                                            <td class="fw-bold">
-                                                <?= (isset($property['available']) && $property['available']) ? 
-                                                    '<span class="text-success">Disponible</span>' : 
-                                                    '<span class="text-danger">Non disponible</span>' ?>
-                                            </td>
-                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
+                        </div>
+                        
+                        <!-- Caractéristiques -->
+                        <h6 class="fw-bold mb-3">
+                            <i class="fas fa-star text-primary"></i> Caractéristiques
+                        </h6>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <table class="table table-sm table-borderless">
+                                    <tbody>
+                                        <?php if (isset($property['orientation']) && $property['orientation']): ?>
+                                        <tr>
+                                            <td class="text-muted">Orientation</td>
+                                            <td class="fw-bold text-end"><?= ucfirst($property['orientation']) ?></td>
+                                        </tr>
+                                        <?php endif; ?>
+                                        <?php if (isset($property['floor_type']) && $property['floor_type']): ?>
+                                        <tr>
+                                            <td class="text-muted">Type de sol</td>
+                                            <td class="fw-bold text-end"><?= ucfirst($property['floor_type']) ?></td>
+                                        </tr>
+                                        <?php endif; ?>
+                                        <?php if (isset($property['gas_type']) && $property['gas_type']): ?>
+                                        <tr>
+                                            <td class="text-muted">Type de gaz</td>
+                                            <td class="fw-bold text-end"><?= ucfirst($property['gas_type']) ?></td>
+                                        </tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-sm table-borderless">
+                                    <tbody>
+                                        <?php if (isset($property['standing']) && $property['standing']): ?>
+                                        <tr>
+                                            <td class="text-muted">Standing</td>
+                                            <td class="fw-bold text-end">
+                                                <?php
+                                                $standing = ucfirst($property['standing']);
+                                                $standingLabels = [
+                                                    'Economique' => 'Économique',
+                                                    'Standard' => 'Standard',
+                                                    'Standing' => 'Standing',
+                                                    'Premium' => 'Premium',
+                                                    'Luxe' => 'Luxe'
+                                                ];
+                                                echo $standingLabels[$standing] ?? $standing;
+                                                ?>
+                                            </td>
+                                        </tr>
+                                        <?php endif; ?>
+                                        <?php if (isset($property['condition_state']) && $property['condition_state']): ?>
+                                        <tr>
+                                            <td class="text-muted">État du bien</td>
+                                            <td class="fw-bold text-end"><?= ucfirst($property['condition_state']) ?></td>
+                                        </tr>
+                                        <?php endif; ?>
+                                        <?php if (isset($property['legal_status']) && $property['legal_status']): ?>
+                                        <tr>
+                                            <td class="text-muted">Statut légal</td>
+                                            <td class="fw-bold text-end"><?= ucfirst($property['legal_status']) ?></td>
+                                        </tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Équipements -->
+                        <h6 class="fw-bold mb-3">
+                            <i class="fas fa-tools text-primary"></i> Équipements
+                        </h6>
+                        <div class="row">
+                            <?php
+                            $equipments = [];
+                            if (isset($property['has_elevator']) && $property['has_elevator']) $equipments[] = ['icon' => 'fa-elevator', 'label' => 'Ascenseur'];
+                            if (isset($property['has_parking']) && $property['has_parking']) $equipments[] = ['icon' => 'fa-parking', 'label' => 'Parking'];
+                            if (isset($property['has_garden']) && $property['has_garden']) $equipments[] = ['icon' => 'fa-tree', 'label' => 'Jardin'];
+                            if (isset($property['has_pool']) && $property['has_pool']) $equipments[] = ['icon' => 'fa-swimming-pool', 'label' => 'Piscine'];
+                            
+                            if (!empty($equipments)):
+                                foreach ($equipments as $equipment):
+                            ?>
+                                <div class="col-md-3 col-6 mb-3">
+                                    <div class="d-flex align-items-center p-2 bg-light rounded">
+                                        <i class="fas <?= $equipment['icon'] ?> text-success me-2"></i>
+                                        <span class="small"><?= $equipment['label'] ?></span>
+                                    </div>
+                                </div>
+                            <?php 
+                                endforeach;
+                            else:
+                            ?>
+                                <div class="col-12">
+                                    <p class="text-muted small mb-0">Aucun équipement spécifique renseigné</p>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -272,13 +537,38 @@
                         <h5 class="card-title mb-3">
                             <i class="fas fa-leaf text-success"></i> Performance énergétique
                         </h5>
-                        <div class="row">
+                        
+                        <?php if (isset($property['energy_class']) && $property['energy_class']): ?>
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3">
+                                <h6 class="small text-muted mb-2">Classe énergétique</h6>
+                                <div class="alert alert-info mb-2">
+                                    <strong>Classe <?= strtoupper($property['energy_class']) ?></strong>
+                                    <?php
+                                    $energyLabels = [
+                                        'A' => '(Très économe)',
+                                        'B' => '(Économe)',
+                                        'C' => '(Assez économe)',
+                                        'D' => '(Moyennement économe)',
+                                        'E' => '(Peu économe)',
+                                        'F' => '(Énergivore)',
+                                        'G' => '(Très énergivore)'
+                                    ];
+                                    echo ' ' . ($energyLabels[strtoupper($property['energy_class'])] ?? '');
+                                    ?>
+                                </div>
+                                <?php if (isset($property['energy_consumption_kwh']) && $property['energy_consumption_kwh']): ?>
+                                <p class="small mb-0">
+                                    <strong>Consommation:</strong> <?= number_format($property['energy_consumption_kwh'], 2, ',', ' ') ?> kWh/m²/an
+                                </p>
+                                <?php endif; ?>
+                            </div>
                             <div class="col-md-6 mb-3">
                                 <h6 class="small text-muted mb-2">Consommation énergétique</h6>
                                 <div class="energy-scale">
                                     <?php
                                     $energy_classes = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
-                                    $energy_class = $property['energy_class'] ?? 'N/A';
+                                    $energy_class = strtoupper($property['energy_class'] ?? 'N/A');
                                     foreach ($energy_classes as $class):
                                         $active = ($class === $energy_class) ? 'active' : '';
                                     ?>
@@ -288,25 +578,24 @@
                                     <?php endforeach; ?>
                                 </div>
                             </div>
-                            <div class="col-md-6 mb-3">
+                        </div>
+                        
+                        <?php if (isset($property['co2_emission']) && $property['co2_emission']): ?>
+                        <div class="row">
+                            <div class="col-12">
                                 <h6 class="small text-muted mb-2">Émissions de gaz à effet de serre</h6>
-                                <div class="energy-scale">
-                                    <?php
-                                    $ges_class = $property['ges_class'] ?? 'N/A';
-                                    foreach ($energy_classes as $class):
-                                        $active = ($class === $ges_class) ? 'active' : '';
-                                    ?>
-                                        <div class="energy-bar energy-<?= strtolower($class) ?> <?= $active ?>">
-                                            <span><?= $class ?></span>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
+                                <p class="mb-0">
+                                    <i class="fas fa-cloud text-warning"></i> 
+                                    <strong><?= number_format($property['co2_emission'], 2, ',', ' ') ?> kg CO₂/m²/an</strong>
+                                </p>
                             </div>
                         </div>
-                        <?php if (!isset($property['energy_class']) || $property['energy_class'] === null): ?>
-                            <div class="alert alert-info mb-0">
-                                <i class="fas fa-info-circle"></i> Informations non disponibles pour ce bien
-                            </div>
+                        <?php endif; ?>
+                        
+                        <?php else: ?>
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle"></i> Informations de performance énergétique non disponibles pour ce bien
+                        </div>
                         <?php endif; ?>
                     </div>
                 </div>

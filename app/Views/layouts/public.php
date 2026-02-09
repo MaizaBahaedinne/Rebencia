@@ -21,7 +21,18 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;600;700&family=Montserrat:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Raleway:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <?php
+    // Charger le thème personnalisé depuis la base de données
+    $themeModel = model('ThemeSettingModel');
+    $themeCSS = $themeModel->generateCSS();
+    ?>
+    
+    <!-- Thème personnalisé (généré depuis la base de données) -->
+    <style>
+    <?= $themeCSS ?>
+    </style>
     
     <!-- Custom CSS -->
     <style>

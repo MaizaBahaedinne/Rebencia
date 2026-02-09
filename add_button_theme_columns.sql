@@ -18,7 +18,8 @@ ADD COLUMN IF NOT EXISTS `button_secondary_hover_bg_color` varchar(7) DEFAULT '#
 ADD COLUMN IF NOT EXISTS `button_secondary_hover_text_color` varchar(7) DEFAULT '#ffffff' AFTER `button_secondary_hover_bg_color`,
 ADD COLUMN IF NOT EXISTS `link_color` varchar(7) DEFAULT '#667eea' AFTER `button_secondary_hover_text_color`,
 ADD COLUMN IF NOT EXISTS `link_hover_color` varchar(7) DEFAULT '#764ba2' AFTER `link_color`,
-ADD COLUMN IF NOT EXISTS `link_decoration` varchar(20) DEFAULT 'none' AFTER `link_hover_color`;
+ADD COLUMN IF NOT EXISTS `link_decoration` varchar(20) DEFAULT 'none' AFTER `link_hover_color`,
+ADD COLUMN IF NOT EXISTS `page_max_width` varchar(20) DEFAULT '1200px' AFTER `link_decoration`;
 
 -- Mettre à jour la ligne existante avec les valeurs par défaut si elles sont NULL
 UPDATE `theme_settings` 
@@ -38,7 +39,8 @@ SET
     `button_secondary_hover_text_color` = COALESCE(`button_secondary_hover_text_color`, '#ffffff'),
     `link_color` = COALESCE(`link_color`, '#667eea'),
     `link_hover_color` = COALESCE(`link_hover_color`, '#764ba2'),
-    `link_decoration` = COALESCE(`link_decoration`, 'none')
+    `link_decoration` = COALESCE(`link_decoration`, 'none'),
+    `page_max_width` = COALESCE(`page_max_width`, '1200px')
 WHERE id = 1;
 
 SELECT 'Colonnes de personnalisation des boutons ajoutées avec succès!' AS message;

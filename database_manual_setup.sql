@@ -59,6 +59,7 @@ CREATE TABLE `theme_settings` (
   `link_color` varchar(7) DEFAULT '#667eea',
   `link_hover_color` varchar(7) DEFAULT '#764ba2',
   `link_decoration` varchar(20) DEFAULT 'none',
+  `page_max_width` varchar(20) DEFAULT '1200px',
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -70,7 +71,7 @@ INSERT INTO `theme_settings` (
   `button_bg_color`, `button_text_color`, `button_hover_bg_color`, `button_hover_text_color`,
   `button_border_width`, `button_border_color`, `button_padding`, `button_font_size`, `button_font_weight`,
   `button_secondary_bg_color`, `button_secondary_text_color`, `button_secondary_hover_bg_color`, `button_secondary_hover_text_color`,
-  `link_color`, `link_hover_color`, `link_decoration`,
+  `link_color`, `link_hover_color`, `link_decoration`, `page_max_width`,
   `updated_at`
 ) 
 VALUES (
@@ -79,7 +80,7 @@ VALUES (
   '#667eea', '#ffffff', '#764ba2', '#ffffff',
   '0px', '#667eea', '12px 30px', '16px', '500',
   '#6c757d', '#ffffff', '#5a6268', '#ffffff',
-  '#667eea', '#764ba2', 'none',
+  '#667eea', '#764ba2', 'none', '1200px',
   NOW()
 )
 ON DUPLICATE KEY UPDATE updated_at = NOW();

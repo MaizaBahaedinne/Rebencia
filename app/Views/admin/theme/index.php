@@ -205,6 +205,20 @@
                                 </select>
                                 <small class="text-muted">Arrondi des coins</small>
                             </div>
+
+                            <!-- Largeur maximale des pages -->
+                            <div class="col-md-4 mb-3">
+                                <label for="page_max_width" class="form-label">Largeur Maximale des Pages</label>
+                                <select class="form-select" id="page_max_width" name="page_max_width" onchange="updatePreview()">
+                                    <option value="1140px" <?= $theme['page_max_width'] === '1140px' ? 'selected' : '' ?>>1140px - Étroit</option>
+                                    <option value="1200px" <?= $theme['page_max_width'] === '1200px' ? 'selected' : '' ?>>1200px - Standard</option>
+                                    <option value="1320px" <?= $theme['page_max_width'] === '1320px' ? 'selected' : '' ?>>1320px - Large</option>
+                                    <option value="1400px" <?= $theme['page_max_width'] === '1400px' ? 'selected' : '' ?>>1400px - Très Large</option>
+                                    <option value="1600px" <?= $theme['page_max_width'] === '1600px' ? 'selected' : '' ?>>1600px - Extra Large</option>
+                                    <option value="100%" <?= $theme['page_max_width'] === '100%' ? 'selected' : '' ?>>100% - Pleine largeur</option>
+                                </select>
+                                <small class="text-muted">Largeur du contenu principal</small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -694,6 +708,11 @@ function updatePreview() {
     root.style.setProperty('--font-secondary', document.getElementById('font_family_secondary').value + ', sans-serif');
     root.style.setProperty('--font-size', document.getElementById('font_size_base').value);
     root.style.setProperty('--radius', document.getElementById('border_radius').value);
+    
+    // Mettre à jour la largeur de page
+    if (document.getElementById('page_max_width')) {
+        root.style.setProperty('--page-max-width', document.getElementById('page_max_width').value);
+    }
     
     // Mettre à jour les variables CSS des boutons primaires
     if (document.getElementById('button_bg_color')) {

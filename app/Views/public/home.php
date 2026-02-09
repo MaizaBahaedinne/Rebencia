@@ -150,7 +150,7 @@
                                     <span class="h5 text-primary mb-0">
                                         <?= number_format($property['price'], 0, ',', ' ') ?> TND
                                     </span>
-                                    <a href="<?= base_url('properties/' . $property['reference']) ?>" class="btn btn-sm btn-outline-primary">
+                                    <a href="<?= base_url('properties/' . $property['reference']) ?>" class="btn btn-sm btn-primary">
                                         Voir détails
                                     </a>
                                 </div>

@@ -47,7 +47,7 @@
                                         <span><i class="fas fa-bath"></i> <?= $property['bathrooms'] ?></span>
                                     <?php endif; ?>
                                 </div>
-                                <a href="<?= base_url('properties/' . $property['reference']) ?>" class="btn btn-outline-primary w-100">
+                                <a href="<?= base_url('properties/' . $property['reference']) ?>" class="btn btn-primary w-100">
                                     Voir détails
                                 </a>
                             </div>

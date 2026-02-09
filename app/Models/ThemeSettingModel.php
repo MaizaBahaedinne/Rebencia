@@ -38,7 +38,8 @@ class ThemeSettingModel extends Model
         'button_secondary_hover_text_color',
         'link_color',
         'link_hover_color',
-        'link_decoration'
+        'link_decoration',
+        'page_max_width'
     ];
 
     protected bool $allowEmptyInserts = false;
@@ -103,6 +104,7 @@ class ThemeSettingModel extends Model
                 'link_color' => '#667eea',
                 'link_hover_color' => '#764ba2',
                 'link_decoration' => 'none',
+                'page_max_width' => '1200px'
             ];
         }
         
@@ -163,6 +165,9 @@ class ThemeSettingModel extends Model
         $css .= "    --link-color: {$theme['link_color']};\n";
         $css .= "    --link-hover-color: {$theme['link_hover_color']};\n";
         $css .= "    --link-decoration: {$theme['link_decoration']};\n";
+        $css .= "    \n";
+        $css .= "    /* Mise en page */\n";
+        $css .= "    --page-max-width: {$theme['page_max_width']};\n";
         $css .= "}\n\n";
         
         // Ajouter les styles de base

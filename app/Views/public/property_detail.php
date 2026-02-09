@@ -904,7 +904,7 @@
                                     <span><i class="fas fa-bed"></i> <?= $simProperty['bedrooms'] ?></span>
                                 <?php endif; ?>
                             </div>
-                            <a href="<?= base_url('properties/' . $simProperty['reference']) ?>" class="btn btn-outline-primary btn-sm w-100">
+                            <a href="<?= base_url('properties/' . $simProperty['reference']) ?>" class="btn btn-primary btn-sm w-100">
                                 Voir ce bien
                             </a>
                         </div>

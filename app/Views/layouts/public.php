@@ -100,6 +100,11 @@
     a:hover {
         color: var(--link-hover-color);
     }
+    
+    /* Largeur maximale des conteneurs */
+    .container {
+        max-width: var(--page-max-width) !important;
+    }
     </style>
     
     <!-- Custom CSS -->

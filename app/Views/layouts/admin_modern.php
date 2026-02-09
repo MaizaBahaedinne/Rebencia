@@ -815,6 +815,28 @@
             <?php endif; ?>
 
             <?php if (isAdmin()): ?>
+            <div class="menu-section-title">SITE WEB</div>
+            
+            <a href="<?= base_url('admin/sliders') ?>" class="menu-item <?= url_is('admin/sliders*') ? 'active' : '' ?>">
+                <i class="fas fa-images"></i>
+                <span>Sliders</span>
+            </a>
+            
+            <a href="<?= base_url('admin/theme') ?>" class="menu-item <?= url_is('admin/theme*') ? 'active' : '' ?>">
+                <i class="fas fa-palette"></i>
+                <span>Thème</span>
+            </a>
+            
+            <a href="<?= base_url('admin/settings/footer') ?>" class="menu-item <?= url_is('admin/settings/footer') ? 'active' : '' ?>">
+                <i class="fas fa-columns"></i>
+                <span>Footer</span>
+            </a>
+            
+            <a href="<?= base_url('admin/pages') ?>" class="menu-item <?= url_is('admin/pages*') ? 'active' : '' ?>">
+                <i class="fas fa-file-alt"></i>
+                <span>Pages CMS</span>
+            </a>
+            
             <div class="menu-section-title">SYSTÈME</div>
             
             <a href="<?= base_url('admin/system') ?>" class="menu-item <?= url_is('admin/system*') ? 'active' : '' ?>">

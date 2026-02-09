@@ -52,6 +52,13 @@ CREATE TABLE `theme_settings` (
   `button_padding` varchar(20) DEFAULT '12px 30px',
   `button_font_size` varchar(20) DEFAULT '16px',
   `button_font_weight` varchar(10) DEFAULT '500',
+  `button_secondary_bg_color` varchar(7) DEFAULT '#6c757d',
+  `button_secondary_text_color` varchar(7) DEFAULT '#ffffff',
+  `button_secondary_hover_bg_color` varchar(7) DEFAULT '#5a6268',
+  `button_secondary_hover_text_color` varchar(7) DEFAULT '#ffffff',
+  `link_color` varchar(7) DEFAULT '#667eea',
+  `link_hover_color` varchar(7) DEFAULT '#764ba2',
+  `link_decoration` varchar(20) DEFAULT 'none',
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -62,6 +69,8 @@ INSERT INTO `theme_settings` (
   `font_family_primary`, `font_family_secondary`, `font_size_base`, `border_radius`,
   `button_bg_color`, `button_text_color`, `button_hover_bg_color`, `button_hover_text_color`,
   `button_border_width`, `button_border_color`, `button_padding`, `button_font_size`, `button_font_weight`,
+  `button_secondary_bg_color`, `button_secondary_text_color`, `button_secondary_hover_bg_color`, `button_secondary_hover_text_color`,
+  `link_color`, `link_hover_color`, `link_decoration`,
   `updated_at`
 ) 
 VALUES (
@@ -69,6 +78,8 @@ VALUES (
   'Poppins', 'Roboto', '16px', '8px',
   '#667eea', '#ffffff', '#764ba2', '#ffffff',
   '0px', '#667eea', '12px 30px', '16px', '500',
+  '#6c757d', '#ffffff', '#5a6268', '#ffffff',
+  '#667eea', '#764ba2', 'none',
   NOW()
 )
 ON DUPLICATE KEY UPDATE updated_at = NOW();

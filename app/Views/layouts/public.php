@@ -36,9 +36,9 @@
     .text-primary { color: var(--primary-color) !important; }
     .border-primary { border-color: var(--primary-color) !important; }
     
-    .bg-secondary { background-color: var(--secondary-color) !important; }
-    .text-secondary { color: var(--secondary-color) !important; }
-    .border-secondary { border-color: var(--secondary-color) !important; }
+    .bg-secondary { background-color: var(--button-secondary-bg-color) !important; }
+    .text-secondary { color: var(--button-secondary-text-color) !important; }
+    .border-secondary { border-color: var(--button-secondary-bg-color) !important; }
     
     .btn-primary {
         background-color: var(--button-bg-color);
@@ -49,6 +49,17 @@
     .btn-primary:hover, .btn-primary:focus {
         background-color: var(--button-hover-bg-color);
         color: var(--button-hover-text-color);
+    }
+    
+    .btn-secondary {
+        background-color: var(--button-secondary-bg-color);
+        color: var(--button-secondary-text-color);
+        border: none;
+    }
+    
+    .btn-secondary:hover, .btn-secondary:focus {
+        background-color: var(--button-secondary-hover-bg-color);
+        color: var(--button-secondary-hover-text-color);
     }
     
     .btn-outline-primary {
@@ -62,20 +73,32 @@
         color: white;
     }
     
+    .btn-outline-secondary {
+        color: var(--button-secondary-bg-color);
+        border-color: var(--button-secondary-bg-color);
+    }
+    
+    .btn-outline-secondary:hover {
+        background-color: var(--button-secondary-bg-color);
+        border-color: var(--button-secondary-bg-color);
+        color: white;
+    }
+    
     .badge.bg-primary {
         background-color: var(--primary-color) !important;
     }
     
     .badge.bg-secondary {
-        background-color: var(--secondary-color) !important;
+        background-color: var(--button-secondary-bg-color) !important;
     }
     
     a {
-        color: var(--primary-color);
+        color: var(--link-color);
+        text-decoration: var(--link-decoration);
     }
     
     a:hover {
-        color: var(--secondary-color);
+        color: var(--link-hover-color);
     }
     </style>
     

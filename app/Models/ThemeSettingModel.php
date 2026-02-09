@@ -31,7 +31,14 @@ class ThemeSettingModel extends Model
         'button_border_color',
         'button_padding',
         'button_font_size',
-        'button_font_weight'
+        'button_font_weight',
+        'button_secondary_bg_color',
+        'button_secondary_text_color',
+        'button_secondary_hover_bg_color',
+        'button_secondary_hover_text_color',
+        'link_color',
+        'link_hover_color',
+        'link_decoration'
     ];
 
     protected bool $allowEmptyInserts = false;
@@ -89,6 +96,13 @@ class ThemeSettingModel extends Model
                 'button_padding' => '12px 30px',
                 'button_font_size' => '16px',
                 'button_font_weight' => '500',
+                'button_secondary_bg_color' => '#6c757d',
+                'button_secondary_text_color' => '#ffffff',
+                'button_secondary_hover_bg_color' => '#5a6268',
+                'button_secondary_hover_text_color' => '#ffffff',
+                'link_color' => '#667eea',
+                'link_hover_color' => '#764ba2',
+                'link_decoration' => 'none',
             ];
         }
         
@@ -140,6 +154,17 @@ class ThemeSettingModel extends Model
         $css .= "    --button-padding: {$theme['button_padding']};\n";
         $css .= "    --button-font-size: {$theme['button_font_size']};\n";
         $css .= "    --button-font-weight: {$theme['button_font_weight']};\n";
+        $css .= "    \n";
+        $css .= "    /* Boutons Secondaires */\n";
+        $css .= "    --button-secondary-bg-color: {$theme['button_secondary_bg_color']};\n";
+        $css .= "    --button-secondary-text-color: {$theme['button_secondary_text_color']};\n";
+        $css .= "    --button-secondary-hover-bg-color: {$theme['button_secondary_hover_bg_color']};\n";
+        $css .= "    --button-secondary-hover-text-color: {$theme['button_secondary_hover_text_color']};\n";
+        $css .= "    \n";
+        $css .= "    /* Liens */\n";
+        $css .= "    --link-color: {$theme['link_color']};\n";
+        $css .= "    --link-hover-color: {$theme['link_hover_color']};\n";
+        $css .= "    --link-decoration: {$theme['link_decoration']};\n";
         $css .= "}\n\n";
         
         // Ajouter les styles de base
@@ -155,11 +180,12 @@ class ThemeSettingModel extends Model
         $css .= "}\n\n";
         
         $css .= "a {\n";
-        $css .= "    color: var(--primary-color);\n";
+        $css .= "    color: var(--link-color);\n";
+        $css .= "    text-decoration: var(--link-decoration);\n";
         $css .= "}\n\n";
         
         $css .= "a:hover {\n";
-        $css .= "    color: var(--secondary-color);\n";
+        $css .= "    color: var(--link-hover-color);\n";
         $css .= "}\n\n";
         
         // Styles des boutons
@@ -180,6 +206,17 @@ class ThemeSettingModel extends Model
         $css .= ".btn:hover, .button:hover, button.btn-primary:hover, a.btn-primary:hover {\n";
         $css .= "    background-color: var(--button-hover-bg-color);\n";
         $css .= "    color: var(--button-hover-text-color);\n";
+        $css .= "}\n\n";
+        
+        $css .= ".btn-secondary, button.btn-secondary, a.btn-secondary {\n";
+        $css .= "    background-color: var(--button-secondary-bg-color);\n";
+        $css .= "    color: var(--button-secondary-text-color);\n";
+        $css .= "    border: none;\n";
+        $css .= "}\n\n";
+        
+        $css .= ".btn-secondary:hover, button.btn-secondary:hover, a.btn-secondary:hover {\n";
+        $css .= "    background-color: var(--button-secondary-hover-bg-color);\n";
+        $css .= "    color: var(--button-secondary-hover-text-color);\n";
         $css .= "}\n\n";
         
         $css .= ".card {\n";

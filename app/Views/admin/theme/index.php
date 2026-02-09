@@ -336,6 +336,143 @@
                     </div>
                 </div>
 
+                <!-- Design des Boutons Secondaires -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-hand-pointer"></i> Design des Boutons Secondaires
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Couleur fond bouton secondaire -->
+                            <div class="col-md-3 mb-3">
+                                <label for="button_secondary_bg_color" class="form-label">Couleur Fond</label>
+                                <div class="input-group">
+                                    <input type="color" class="form-control form-control-color" 
+                                           id="button_secondary_bg_color" name="button_secondary_bg_color" 
+                                           value="<?= old('button_secondary_bg_color', $theme['button_secondary_bg_color'] ?? '#6c757d') ?>"
+                                           onchange="updatePreview()">
+                                    <input type="text" class="form-control" 
+                                           value="<?= old('button_secondary_bg_color', $theme['button_secondary_bg_color'] ?? '#6c757d') ?>"
+                                           readonly>
+                                </div>
+                            </div>
+
+                            <!-- Couleur texte bouton secondaire -->
+                            <div class="col-md-3 mb-3">
+                                <label for="button_secondary_text_color" class="form-label">Couleur Texte</label>
+                                <div class="input-group">
+                                    <input type="color" class="form-control form-control-color" 
+                                           id="button_secondary_text_color" name="button_secondary_text_color" 
+                                           value="<?= old('button_secondary_text_color', $theme['button_secondary_text_color'] ?? '#ffffff') ?>"
+                                           onchange="updatePreview()">
+                                    <input type="text" class="form-control" 
+                                           value="<?= old('button_secondary_text_color', $theme['button_secondary_text_color'] ?? '#ffffff') ?>"
+                                           readonly>
+                                </div>
+                            </div>
+
+                            <!-- Couleur fond hover secondaire -->
+                            <div class="col-md-3 mb-3">
+                                <label for="button_secondary_hover_bg_color" class="form-label">Fond Survol</label>
+                                <div class="input-group">
+                                    <input type="color" class="form-control form-control-color" 
+                                           id="button_secondary_hover_bg_color" name="button_secondary_hover_bg_color" 
+                                           value="<?= old('button_secondary_hover_bg_color', $theme['button_secondary_hover_bg_color'] ?? '#5a6268') ?>"
+                                           onchange="updatePreview()">
+                                    <input type="text" class="form-control" 
+                                           value="<?= old('button_secondary_hover_bg_color', $theme['button_secondary_hover_bg_color'] ?? '#5a6268') ?>"
+                                           readonly>
+                                </div>
+                            </div>
+
+                            <!-- Couleur texte hover secondaire -->
+                            <div class="col-md-3 mb-3">
+                                <label for="button_secondary_hover_text_color" class="form-label">Texte Survol</label>
+                                <div class="input-group">
+                                    <input type="color" class="form-control form-control-color" 
+                                           id="button_secondary_hover_text_color" name="button_secondary_hover_text_color" 
+                                           value="<?= old('button_secondary_hover_text_color', $theme['button_secondary_hover_text_color'] ?? '#ffffff') ?>"
+                                           onchange="updatePreview()">
+                                    <input type="text" class="form-control" 
+                                           value="<?= old('button_secondary_hover_text_color', $theme['button_secondary_hover_text_color'] ?? '#ffffff') ?>"
+                                           readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Aperçu bouton secondaire -->
+                        <div class="mt-3 p-3 bg-light rounded">
+                            <label class="form-label fw-bold">Aperçu :</label>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-secondary" id="preview-button-secondary">
+                                    <i class="fas fa-times"></i> Bouton Secondaire
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Design des Liens -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-link"></i> Design des Liens Hypertexte
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Couleur lien -->
+                            <div class="col-md-4 mb-3">
+                                <label for="link_color" class="form-label">Couleur Normale</label>
+                                <div class="input-group">
+                                    <input type="color" class="form-control form-control-color" 
+                                           id="link_color" name="link_color" 
+                                           value="<?= old('link_color', $theme['link_color'] ?? '#667eea') ?>"
+                                           onchange="updatePreview()">
+                                    <input type="text" class="form-control" 
+                                           value="<?= old('link_color', $theme['link_color'] ?? '#667eea') ?>"
+                                           readonly>
+                                </div>
+                            </div>
+
+                            <!-- Couleur lien hover -->
+                            <div class="col-md-4 mb-3">
+                                <label for="link_hover_color" class="form-label">Couleur Survol</label>
+                                <div class="input-group">
+                                    <input type="color" class="form-control form-control-color" 
+                                           id="link_hover_color" name="link_hover_color" 
+                                           value="<?= old('link_hover_color', $theme['link_hover_color'] ?? '#764ba2') ?>"
+                                           onchange="updatePreview()">
+                                    <input type="text" class="form-control" 
+                                           value="<?= old('link_hover_color', $theme['link_hover_color'] ?? '#764ba2') ?>"
+                                           readonly>
+                                </div>
+                            </div>
+
+                            <!-- Décoration lien -->
+                            <div class="col-md-4 mb-3">
+                                <label for="link_decoration" class="form-label">Soulignement</label>
+                                <select class="form-select" id="link_decoration" name="link_decoration" onchange="updatePreview()">
+                                    <option value="none" <?= ($theme['link_decoration'] ?? 'none') === 'none' ? 'selected' : '' ?>>Aucun</option>
+                                    <option value="underline" <?= ($theme['link_decoration'] ?? 'none') === 'underline' ? 'selected' : '' ?>>Souligné</option>
+                                    <option value="underline dotted" <?= ($theme['link_decoration'] ?? 'none') === 'underline dotted' ? 'selected' : '' ?>>Pointillé</option>
+                                    <option value="underline dashed" <?= ($theme['link_decoration'] ?? 'none') === 'underline dashed' ? 'selected' : '' ?>>Tirets</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Aperçu lien -->
+                        <div class="mt-3 p-3 bg-light rounded">
+                            <label class="form-label fw-bold">Aperçu :</label>
+                            <div>
+                                <a href="#" id="preview-link" onclick="return false;">Ceci est un lien hypertexte d'exemple</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Actions -->
                 <div class="card shadow mb-4">
                     <div class="card-body text-end">
@@ -518,6 +655,48 @@ function updatePreview() {
         previewButton.onmouseleave = function() {
             this.style.backgroundColor = buttonBg;
             this.style.color = buttonText;
+        };
+    }
+    
+    // Mettre à jour les styles des boutons secondaires
+    const previewButtonSecondary = document.getElementById('preview-button-secondary');
+    if (previewButtonSecondary && document.getElementById('button_secondary_bg_color')) {
+        const buttonBg = document.getElementById('button_secondary_bg_color').value;
+        const buttonText = document.getElementById('button_secondary_text_color').value;
+        const buttonHoverBg = document.getElementById('button_secondary_hover_bg_color').value;
+        const buttonHoverText = document.getElementById('button_secondary_hover_text_color').value;
+        
+        previewButtonSecondary.style.backgroundColor = buttonBg;
+        previewButtonSecondary.style.color = buttonText;
+        previewButtonSecondary.style.borderRadius = document.getElementById('border_radius').value;
+        
+        // Gestion du survol
+        previewButtonSecondary.onmouseenter = function() {
+            this.style.backgroundColor = buttonHoverBg;
+            this.style.color = buttonHoverText;
+        };
+        previewButtonSecondary.onmouseleave = function() {
+            this.style.backgroundColor = buttonBg;
+            this.style.color = buttonText;
+        };
+    }
+    
+    // Mettre à jour les styles des liens
+    const previewLink = document.getElementById('preview-link');
+    if (previewLink && document.getElementById('link_color')) {
+        const linkColor = document.getElementById('link_color').value;
+        const linkHoverColor = document.getElementById('link_hover_color').value;
+        const linkDecoration = document.getElementById('link_decoration').value;
+        
+        previewLink.style.color = linkColor;
+        previewLink.style.textDecoration = linkDecoration;
+        
+        // Gestion du survol
+        previewLink.onmouseenter = function() {
+            this.style.color = linkHoverColor;
+        };
+        previewLink.onmouseleave = function() {
+            this.style.color = linkColor;
         };
     }
     

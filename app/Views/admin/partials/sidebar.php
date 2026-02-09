@@ -40,6 +40,26 @@
                 <i class="fas fa-chart-bar"></i> Rapports
             </a>
             
+            <hr class="border-secondary">
+            
+            <div class="px-3 py-2 text-muted small">
+                <i class="fas fa-paint-brush"></i> Site Web
+            </div>
+            
+            <a href="<?= base_url('admin/sliders') ?>" class="nav-link text-white <?= strpos(service('router')->controllerName(), 'Sliders') !== false ? 'active bg-primary' : '' ?>">
+                <i class="fas fa-images"></i> Sliders
+            </a>
+            
+            <a href="<?= base_url('admin/theme') ?>" class="nav-link text-white <?= strpos(service('router')->controllerName(), 'Theme') !== false ? 'active bg-primary' : '' ?>">
+                <i class="fas fa-palette"></i> Thème
+            </a>
+            
+            <a href="<?= base_url('admin/settings/footer') ?>" class="nav-link text-white">
+                <i class="fas fa-columns"></i> Footer
+            </a>
+            
+            <hr class="border-secondary">
+            
             <a href="<?= base_url('admin/settings') ?>" class="nav-link text-white">
                 <i class="fas fa-cog"></i> Paramètres
             </a>

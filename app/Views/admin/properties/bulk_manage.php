@@ -120,9 +120,14 @@
         </div>
 
         <!-- Liste des biens -->
-        <div class="alert alert-info mb-3">
-            <i class="fas fa-info-circle"></i> 
-            <strong>Debug:</strong> <?= count($properties) ?> bien(s) chargé(s) depuis la base de données
+        <div class="alert alert-info mb-3 d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-info-circle"></i> 
+                <strong>Debug:</strong> <?= count($properties) ?> bien(s) chargé(s) depuis la base de données
+            </div>
+            <button class="btn btn-sm btn-outline-danger" onclick="resetDataTableFilters()">
+                <i class="fas fa-redo"></i> Réinitialiser tous les filtres
+            </button>
         </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm" id="propertiesTable">
@@ -467,6 +472,27 @@ function executeBulkAction() {
         console.error('Error:', error);
         alert('Une erreur est survenue');
     });
+}
+
+// Réinitialiser tous les filtres DataTable
+function resetDataTableFilters() {
+    if (confirm('Voulez-vous vraiment réinitialiser tous les filtres et colonnes visibles ?')) {
+        // Effacer le state localStorage
+        localStorage.removeItem('DataTables_bulkManage_propertiesTable');
+        
+        // Réinitialiser la recherche
+        dataTable.search('').draw();
+        
+        // Réinitialiser les filtres de colonnes
+        dataTable.columns().every(function() {
+            var column = this;
+            $('input', column.footer()).val('');
+            $('select', column.footer()).val('');
+        });
+        
+        // Recharger la page pour réinitialiser complètement
+        location.reload();
+    }
 }
 </script>
 <?= $this->endSection() ?>

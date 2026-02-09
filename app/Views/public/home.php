@@ -54,7 +54,12 @@
                 <?php foreach ($featured_properties as $property): ?>
                     <div class="col-md-4">
                         <div class="card property-card h-100">
-                            <img src="<?= base_url('uploads/properties/placeholder.jpg') ?>" class="card-img-top" alt="<?= esc($property['title']) ?>" style="height: 200px; object-fit: cover;">
+                            <?php 
+                            $imageSrc = !empty($property['main_image']) && !empty($property['main_image']['file_path']) 
+                                ? base_url('uploads/properties/' . $property['main_image']['file_path'])
+                                : base_url('uploads/properties/placeholder.jpg');
+                            ?>
+                            <img src="<?= $imageSrc ?>" class="card-img-top" alt="<?= esc($property['title']) ?>" style="height: 200px; object-fit: cover;">
                             <div class="card-body">
                                 <span class="badge bg-primary mb-2"><?= ucfirst($property['type']) ?></span>
                                 <h5 class="card-title"><?= esc($property['title']) ?></h5>
@@ -127,7 +132,12 @@
                 <?php foreach ($latest_properties as $property): ?>
                     <div class="col-md-3">
                         <div class="card property-card h-100">
-                            <img src="<?= base_url('uploads/properties/placeholder.jpg') ?>" class="card-img-top" alt="<?= esc($property['title']) ?>" style="height: 150px; object-fit: cover;">
+                            <?php 
+                            $imageSrc = !empty($property['main_image']) && !empty($property['main_image']['file_path']) 
+                                ? base_url('uploads/properties/' . $property['main_image']['file_path'])
+                                : base_url('uploads/properties/placeholder.jpg');
+                            ?>
+                            <img src="<?= $imageSrc ?>" class="card-img-top" alt="<?= esc($property['title']) ?>" style="height: 150px; object-fit: cover;">
                             <div class="card-body">
                                 <h6 class="card-title"><?= esc(substr($property['title'], 0, 40)) ?>...</h6>
                                 <p class="text-primary fw-bold mb-0">

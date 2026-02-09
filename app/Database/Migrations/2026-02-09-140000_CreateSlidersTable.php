@@ -33,22 +33,22 @@ class CreateSlidersTable extends Migration
                 'constraint' => 255,
                 'null'       => true,
             ],
-            'button_text' => [
+            'button1_text' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 100,
                 'null'       => true,
             ],
-            'button_link' => [
+            'button1_link' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 255,
                 'null'       => true,
             ],
-            'button_text_2' => [
+            'button2_text' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 100,
                 'null'       => true,
             ],
-            'button_link_2' => [
+            'button2_link' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 255,
                 'null'       => true,

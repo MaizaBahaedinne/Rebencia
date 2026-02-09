@@ -57,7 +57,7 @@ class CreateMenusTable extends Migration
         ]);
         $this->forge->addKey('id', true);
         $this->forge->addKey('parent_id');
-        $this->forge->createTable('menus');
+        $this->forge->createTable('menus', true); // true = IF NOT EXISTS
 
         // Table de liaison menu-rôle
         $this->forge->addField([
@@ -96,7 +96,7 @@ class CreateMenusTable extends Migration
         $this->forge->addKey(['menu_id', 'role_id']);
         $this->forge->addForeignKey('menu_id', 'menus', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('role_id', 'roles', 'id', 'CASCADE', 'CASCADE');
-        $this->forge->createTable('role_menus');
+        $this->forge->createTable('role_menus', true); // true = IF NOT EXISTS
     }
 
     public function down()

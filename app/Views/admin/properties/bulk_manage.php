@@ -316,13 +316,7 @@ document.addEventListener('DOMContentLoaded', function() {
         colReorder: {
             fixedColumnsLeft: 1
         },
-        stateSave: true,
-        stateSaveCallback: function(settings, data) {
-            localStorage.setItem('DataTables_bulkManage_' + settings.sInstance, JSON.stringify(data));
-        },
-        stateLoadCallback: function(settings) {
-            return JSON.parse(localStorage.getItem('DataTables_bulkManage_' + settings.sInstance));
-        },
+        stateSave: false,
         columnDefs: [
             {
                 targets: 0,

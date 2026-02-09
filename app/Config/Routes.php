@@ -15,6 +15,10 @@ $routes->get('api/cities', 'Home::getCities');
 // Search routes
 $routes->get('search', 'Search::index');
 
+// Properties routes (public)
+$routes->get('properties', 'Properties::index');
+$routes->get('properties/(:any)', 'Properties::view/$1');
+
 // ==========================================
 // ADMIN ROUTES
 // ==========================================

@@ -137,10 +137,12 @@
                                     <div class="col-md-6">
                                         <div class="card">
                                             <div class="card-body">
-                                                <h6 class="card-title"><?= esc($room['name']) ?></h6>
+                                                <h6 class="card-title"><?= esc($room['name'] ?? $room['room_type'] ?? 'Pièce') ?></h6>
                                                 <p class="card-text small text-muted mb-0">
-                                                    <?= $room['surface'] ?> m²
-                                                    <?php if ($room['description']): ?>
+                                                    <?php if (isset($room['surface']) && $room['surface']): ?>
+                                                        <?= $room['surface'] ?> m²
+                                                    <?php endif; ?>
+                                                    <?php if (isset($room['description']) && $room['description']): ?>
                                                         <br><?= esc($room['description']) ?>
                                                     <?php endif; ?>
                                                 </p>
@@ -158,8 +160,8 @@
                                     <div class="col-md-6">
                                         <div class="d-flex align-items-center">
                                             <i class="fas fa-check-circle text-success me-2"></i>
-                                            <span><?= esc($proximity['name']) ?></span>
-                                            <?php if ($proximity['distance']): ?>
+                                            <span><?= esc($proximity['name'] ?? $proximity['proximity_type'] ?? 'Proximité') ?></span>
+                                            <?php if (isset($proximity['distance']) && $proximity['distance']): ?>
                                                 <span class="text-muted ms-2">(<?= $proximity['distance'] ?> m)</span>
                                             <?php endif; ?>
                                         </div>

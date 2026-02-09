@@ -183,6 +183,62 @@
             font-weight: 600;
         }
 
+        /* ========== SUBMENU ========== */
+        .menu-item.has-submenu {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .menu-item.has-submenu .submenu-toggle {
+            margin-left: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-item.has-submenu.open .submenu-toggle {
+            transform: rotate(180deg);
+        }
+
+        .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding-left: 1rem;
+        }
+
+        .submenu.open {
+            max-height: 1000px;
+        }
+
+        .submenu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.15rem;
+            color: #9ca3af;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .submenu-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            padding-left: 1.25rem;
+        }
+
+        .submenu-item.active {
+            background: rgba(13, 110, 253, 0.15);
+            color: white;
+            border-left: 2px solid var(--primary-color);
+        }
+
+        .submenu-item i {
+            width: 16px;
+            font-size: 0.9rem;
+        }
+
         /* ========== HEADER ========== */
         .admin-header {
             position: fixed;
@@ -676,198 +732,236 @@
                 <span>Dashboard</span>
             </a>
 
-            <div class="menu-section-title">GESTION</div>
+            <div class="menu-section-title">MENU</div>
             
-            <?php if (canRead('properties')): ?>
-            <a href="<?= base_url('admin/properties') ?>" class="menu-item <?= url_is('admin/properties*') && !url_is('admin/properties/assignments*') ? 'active' : '' ?>">
-                <i class="fas fa-building"></i>
-                <span>Biens Immobiliers</span>
-            </a>
+            <!-- GESTION -->
+            <?php if (canRead('properties') || canRead('clients') || canRead('transactions') || canAccessCommissions()): ?>
+            <div class="menu-item has-submenu <?= url_is('admin/properties*') || url_is('admin/clients*') || url_is('admin/transactions*') || url_is('admin/commission-settings*') ? 'open' : '' ?>">
+                <i class="fas fa-briefcase"></i>
+                <span>Gestion</span>
+                <i class="fas fa-chevron-down submenu-toggle"></i>
+            </div>
+            <div class="submenu <?= url_is('admin/properties*') || url_is('admin/clients*') || url_is('admin/transactions*') || url_is('admin/commission-settings*') ? 'open' : '' ?>">
+                <?php if (canRead('properties')): ?>
+                <a href="<?= base_url('admin/properties') ?>" class="submenu-item <?= url_is('admin/properties*') && !url_is('admin/properties/assignments*') ? 'active' : '' ?>">
+                    <i class="fas fa-building"></i>
+                    <span>Biens Immobiliers</span>
+                </a>
+                <?php endif; ?>
+                
+                <?php if (canUpdate('properties') || isAdmin()): ?>
+                <a href="<?= base_url('admin/properties/assignments') ?>" class="submenu-item <?= url_is('admin/properties/assignments*') ? 'active' : '' ?>">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Affectation des Biens</span>
+                </a>
+                <?php endif; ?>
+                
+                <?php if (canRead('clients')): ?>
+                <a href="<?= base_url('admin/clients') ?>" class="submenu-item <?= url_is('admin/clients*') ? 'active' : '' ?>">
+                    <i class="fas fa-users"></i>
+                    <span>Clients</span>
+                </a>
+                <?php endif; ?>
+                
+                <?php if (canRead('transactions')): ?>
+                <a href="<?= base_url('admin/transactions') ?>" class="submenu-item <?= url_is('admin/transactions*') ? 'active' : '' ?>">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Transactions</span>
+                </a>
+                <?php endif; ?>
+                
+                <?php if (canAccessCommissions()): ?>
+                <a href="<?= base_url('admin/commission-settings') ?>" class="submenu-item <?= url_is('admin/commission-settings*') ? 'active' : '' ?>">
+                    <i class="fas fa-dollar-sign"></i>
+                    <span>Commissions</span>
+                </a>
+                <?php endif; ?>
+            </div>
             <?php endif; ?>
 
-            <?php if (canUpdate('properties') || isAdmin()): ?>
-            <a href="<?= base_url('admin/properties/assignments') ?>" class="menu-item <?= url_is('admin/properties/assignments*') ? 'active' : '' ?>">
-                <i class="fas fa-exchange-alt"></i>
-                <span>Affectation des Biens</span>
-            </a>
-            <?php endif; ?>
-            
-            <?php if (canRead('clients')): ?>
-            <a href="<?= base_url('admin/clients') ?>" class="menu-item <?= url_is('admin/clients*') ? 'active' : '' ?>">
-                <i class="fas fa-users"></i>
-                <span>Clients</span>
-            </a>
-            <?php endif; ?>
-            
-            <?php if (canRead('transactions')): ?>
-            <a href="<?= base_url('admin/transactions') ?>" class="menu-item <?= url_is('admin/transactions*') ? 'active' : '' ?>">
-                <i class="fas fa-file-invoice-dollar"></i>
-                <span>Transactions</span>
-            </a>
-            <?php endif; ?>
-            
-            <?php if (canAccessCommissions()): ?>
-            <a href="<?= base_url('admin/commission-settings') ?>" class="menu-item <?= url_is('admin/commission-settings*') ? 'active' : '' ?>">
-                <i class="fas fa-dollar-sign"></i>
-                <span>Commissions</span>
-            </a>
-            <?php endif; ?>
-
+            <!-- ORGANISATION -->
             <?php if (canRead('agencies') || canRead('users')): ?>
-            <div class="menu-section-title">ORGANISATION</div>
-            <?php endif; ?>
-            
-            <?php if (canRead('agencies')): ?>
-            <a href="<?= base_url('admin/agencies') ?>" class="menu-item <?= url_is('admin/agencies*') ? 'active' : '' ?>">
-                <i class="fas fa-store"></i>
-                <span>Agences</span>
-            </a>
-            <?php endif; ?>
-            
-            <?php if (canRead('users')): ?>
-            <a href="<?= base_url('admin/users') ?>" class="menu-item <?= url_is('admin/users*') ? 'active' : '' ?>">
-                <i class="fas fa-user-tie"></i>
-                <span>Utilisateurs</span>
-            </a>
-            <?php endif; ?>
-            
-            <?php if (canRead('users')): ?>
-            <a href="<?= base_url('admin/hierarchy') ?>" class="menu-item <?= url_is('admin/hierarchy*') ? 'active' : '' ?>">
+            <div class="menu-item has-submenu <?= url_is('admin/agencies*') || url_is('admin/users*') || url_is('admin/hierarchy*') ? 'open' : '' ?>">
                 <i class="fas fa-sitemap"></i>
-                <span>Hiérarchie</span>
-            </a>
+                <span>Organisation</span>
+                <i class="fas fa-chevron-down submenu-toggle"></i>
+            </div>
+            <div class="submenu <?= url_is('admin/agencies*') || url_is('admin/users*') || url_is('admin/hierarchy*') ? 'open' : '' ?>">
+                <?php if (canRead('agencies')): ?>
+                <a href="<?= base_url('admin/agencies') ?>" class="submenu-item <?= url_is('admin/agencies*') ? 'active' : '' ?>">
+                    <i class="fas fa-store"></i>
+                    <span>Agences</span>
+                </a>
+                <?php endif; ?>
+                
+                <?php if (canRead('users')): ?>
+                <a href="<?= base_url('admin/users') ?>" class="submenu-item <?= url_is('admin/users*') ? 'active' : '' ?>">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Utilisateurs</span>
+                </a>
+                
+                <a href="<?= base_url('admin/hierarchy') ?>" class="submenu-item <?= url_is('admin/hierarchy*') ? 'active' : '' ?>">
+                    <i class="fas fa-network-wired"></i>
+                    <span>Hiérarchie</span>
+                </a>
+                <?php endif; ?>
+            </div>
             <?php endif; ?>
 
+            <!-- SÉCURITÉ -->
             <?php if (canRead('roles') || isSuperAdmin()): ?>
-            <div class="menu-section-title">SÉCURITÉ</div>
-            
-            <a href="<?= base_url('admin/roles') ?>" class="menu-item <?= url_is('admin/roles') ? 'active' : '' ?>">
-                <i class="fas fa-user-shield"></i>
-                <span>Rôles</span>
-            </a>
-            
-            <a href="<?= base_url('admin/roles/matrix') ?>" class="menu-item <?= url_is('admin/roles/matrix') ? 'active' : '' ?>">
-                <i class="fas fa-table"></i>
-                <span>Matrice Permissions</span>
-            </a>
-            
-            <a href="<?= base_url('admin/menus/role-menus') ?>" class="menu-item <?= url_is('admin/menus*') ? 'active' : '' ?>">
-                <i class="fas fa-bars"></i>
-                <span>Gestion des Menus</span>
-            </a>
+            <div class="menu-item has-submenu <?= url_is('admin/roles*') || url_is('admin/menus*') ? 'open' : '' ?>">
+                <i class="fas fa-shield-alt"></i>
+                <span>Sécurité</span>
+                <i class="fas fa-chevron-down submenu-toggle"></i>
+            </div>
+            <div class="submenu <?= url_is('admin/roles*') || url_is('admin/menus*') ? 'open' : '' ?>">
+                <a href="<?= base_url('admin/roles') ?>" class="submenu-item <?= url_is('admin/roles') && !url_is('admin/roles/matrix') ? 'active' : '' ?>">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Rôles</span>
+                </a>
+                
+                <a href="<?= base_url('admin/roles/matrix') ?>" class="submenu-item <?= url_is('admin/roles/matrix') ? 'active' : '' ?>">
+                    <i class="fas fa-table"></i>
+                    <span>Matrice Permissions</span>
+                </a>
+                
+                <a href="<?= base_url('admin/menus/role-menus') ?>" class="submenu-item <?= url_is('admin/menus*') ? 'active' : '' ?>">
+                    <i class="fas fa-bars"></i>
+                    <span>Gestion des Menus</span>
+                </a>
+            </div>
             <?php endif; ?>
 
-            <div class="menu-section-title">OUTILS</div>
-            
-            <?php if (canRead('properties')): ?>
-            <a href="<?= base_url('admin/workflows/pipeline/property') ?>" class="menu-item <?= url_is('admin/workflows*') ? 'active' : '' ?>">
-                <i class="fas fa-project-diagram"></i>
-                <span>Pipeline Ventes</span>
-            </a>
-            <?php endif; ?>
-            
-            <?php if (canRead('zones') || isAdmin()): ?>
-            <a href="<?= base_url('admin/zones') ?>" class="menu-item <?= url_is('admin/zones*') ? 'active' : '' ?>">
-                <i class="fas fa-map-marked-alt"></i>
-                <span>Zones</span>
-            </a>
-            <?php endif; ?>
-            
-            <?php if (canRead('properties')): ?>
-            <a href="<?= base_url('admin/estimations') ?>" class="menu-item <?= url_is('admin/estimations*') ? 'active' : '' ?>">
-                <i class="fas fa-chart-line"></i>
-                <span>Estimation IA</span>
-            </a>
-            <?php endif; ?>
-            
-            <?php if (canRead('transactions') || canRead('properties')): ?>
-            <a href="<?= base_url('admin/reports') ?>" class="menu-item <?= url_is('admin/reports*') ? 'active' : '' ?>">
-                <i class="fas fa-chart-bar"></i>
-                <span>Rapports & Export</span>
-            </a>
-            <?php endif; ?>
-            
-            <a href="<?= base_url('admin/analytics') ?>" class="menu-item <?= url_is('admin/analytics*') ? 'active' : '' ?>">
-                <i class="fas fa-chart-line"></i>
-                <span>Analytics</span>
-            </a>
-            
-            <a href="<?= base_url('admin/appointments') ?>" class="menu-item <?= url_is('admin/appointments*') ? 'active' : '' ?>">
-                <i class="fas fa-calendar-alt"></i>
-                <span>Agenda</span>
-            </a>
-            
-            <a href="<?= base_url('admin/tasks') ?>" class="menu-item <?= url_is('admin/tasks*') ? 'active' : '' ?>">
-                <i class="fas fa-tasks"></i>
-                <span>Tâches</span>
-            </a>
-            
-            <a href="<?= base_url('admin/chat') ?>" class="menu-item <?= url_is('admin/chat*') ? 'active' : '' ?>">
-                <i class="fas fa-comments"></i>
-                <span>Chat</span>
-            </a>
-            
-            <?php if (isAdmin()): ?>
-            <a href="<?= base_url('admin/objectives') ?>" class="menu-item <?= url_is('admin/objectives*') ? 'active' : '' ?>">
-                <i class="fas fa-bullseye"></i>
-                <span>Objectifs</span>
-            </a>
-            <?php endif; ?>
+            <!-- OUTILS -->
+            <div class="menu-item has-submenu <?= url_is('admin/workflows*') || url_is('admin/zones*') || url_is('admin/estimations*') || url_is('admin/reports*') || url_is('admin/analytics*') || url_is('admin/appointments*') || url_is('admin/tasks*') || url_is('admin/chat*') || url_is('admin/objectives*') ? 'open' : '' ?>">
+                <i class="fas fa-tools"></i>
+                <span>Outils</span>
+                <i class="fas fa-chevron-down submenu-toggle"></i>
+            </div>
+            <div class="submenu <?= url_is('admin/workflows*') || url_is('admin/zones*') || url_is('admin/estimations*') || url_is('admin/reports*') || url_is('admin/analytics*') || url_is('admin/appointments*') || url_is('admin/tasks*') || url_is('admin/chat*') || url_is('admin/objectives*') ? 'open' : '' ?>">
+                <?php if (canRead('properties')): ?>
+                <a href="<?= base_url('admin/workflows/pipeline/property') ?>" class="submenu-item <?= url_is('admin/workflows*') ? 'active' : '' ?>">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>Pipeline Ventes</span>
+                </a>
+                <?php endif; ?>
+                
+                <?php if (canRead('zones') || isAdmin()): ?>
+                <a href="<?= base_url('admin/zones') ?>" class="submenu-item <?= url_is('admin/zones*') ? 'active' : '' ?>">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <span>Zones</span>
+                </a>
+                <?php endif; ?>
+                
+                <?php if (canRead('properties')): ?>
+                <a href="<?= base_url('admin/estimations') ?>" class="submenu-item <?= url_is('admin/estimations*') ? 'active' : '' ?>">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Estimation IA</span>
+                </a>
+                <?php endif; ?>
+                
+                <?php if (canRead('transactions') || canRead('properties')): ?>
+                <a href="<?= base_url('admin/reports') ?>" class="submenu-item <?= url_is('admin/reports*') ? 'active' : '' ?>">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Rapports & Export</span>
+                </a>
+                <?php endif; ?>
+                
+                <a href="<?= base_url('admin/analytics') ?>" class="submenu-item <?= url_is('admin/analytics*') ? 'active' : '' ?>">
+                    <i class="fas fa-analytics"></i>
+                    <span>Analytics</span>
+                </a>
+                
+                <a href="<?= base_url('admin/appointments') ?>" class="submenu-item <?= url_is('admin/appointments*') ? 'active' : '' ?>">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Agenda</span>
+                </a>
+                
+                <a href="<?= base_url('admin/tasks') ?>" class="submenu-item <?= url_is('admin/tasks*') ? 'active' : '' ?>">
+                    <i class="fas fa-tasks"></i>
+                    <span>Tâches</span>
+                </a>
+                
+                <a href="<?= base_url('admin/chat') ?>" class="submenu-item <?= url_is('admin/chat*') ? 'active' : '' ?>">
+                    <i class="fas fa-comments"></i>
+                    <span>Chat</span>
+                </a>
+                
+                <?php if (isAdmin()): ?>
+                <a href="<?= base_url('admin/objectives') ?>" class="submenu-item <?= url_is('admin/objectives*') ? 'active' : '' ?>">
+                    <i class="fas fa-bullseye"></i>
+                    <span>Objectifs</span>
+                </a>
+                <?php endif; ?>
+            </div>
 
+            <!-- SITE WEB -->
             <?php if (isAdmin()): ?>
-            <div class="menu-section-title">SITE WEB</div>
-            
-            <a href="<?= base_url('admin/sliders') ?>" class="menu-item <?= url_is('admin/sliders*') ? 'active' : '' ?>">
-                <i class="fas fa-images"></i>
-                <span>Sliders</span>
-            </a>
-            
-            <a href="<?= base_url('admin/theme') ?>" class="menu-item <?= url_is('admin/theme*') ? 'active' : '' ?>">
-                <i class="fas fa-palette"></i>
-                <span>Thème</span>
-            </a>
-            
-            <a href="<?= base_url('admin/settings/footer') ?>" class="menu-item <?= url_is('admin/settings/footer') ? 'active' : '' ?>">
-                <i class="fas fa-columns"></i>
-                <span>Footer</span>
-            </a>
-            
-            <a href="<?= base_url('admin/pages') ?>" class="menu-item <?= url_is('admin/pages*') ? 'active' : '' ?>">
-                <i class="fas fa-file-alt"></i>
-                <span>Pages CMS</span>
-            </a>
-            
-            <div class="menu-section-title">SYSTÈME</div>
-            
-            <a href="<?= base_url('admin/system') ?>" class="menu-item <?= url_is('admin/system*') ? 'active' : '' ?>">
-                <i class="fas fa-server"></i>
-                <span>Système & Backup</span>
-            </a>
-            
-            <a href="<?= base_url('admin/settings/general') ?>" class="menu-item <?= url_is('admin/settings/general') ? 'active' : '' ?>">
-                <i class="fas fa-sliders-h"></i>
-                <span>Paramètres Généraux</span>
-            </a>
-            
-            <a href="<?= base_url('admin/settings/email') ?>" class="menu-item <?= url_is('admin/settings/email') ? 'active' : '' ?>">
-                <i class="fas fa-envelope"></i>
-                <span>Configuration Email</span>
-            </a>
-            
-            <a href="<?= base_url('admin/settings/sms') ?>" class="menu-item <?= url_is('admin/settings/sms') ? 'active' : '' ?>">
-                <i class="fas fa-sms"></i>
-                <span>Configuration SMS</span>
-            </a>
-            
-            <a href="<?= base_url('admin/settings/payment') ?>" class="menu-item <?= url_is('admin/settings/payment') ? 'active' : '' ?>">
-                <i class="fas fa-credit-card"></i>
-                <span>Moyens de Paiement</span>
-            </a>
-            
-            <a href="<?= base_url('admin/settings/notifications') ?>" class="menu-item <?= url_is('admin/settings/notifications') ? 'active' : '' ?>">
-                <i class="fas fa-bell"></i>
-                <span>Notifications</span>
-            </a>
+            <div class="menu-item has-submenu <?= url_is('admin/sliders*') || url_is('admin/theme*') || url_is('admin/settings/footer') || url_is('admin/pages*') ? 'open' : '' ?>">
+                <i class="fas fa-globe"></i>
+                <span>Site Web</span>
+                <i class="fas fa-chevron-down submenu-toggle"></i>
+            </div>
+            <div class="submenu <?= url_is('admin/sliders*') || url_is('admin/theme*') || url_is('admin/settings/footer') || url_is('admin/pages*') ? 'open' : '' ?>">
+                <a href="<?= base_url('admin/sliders') ?>" class="submenu-item <?= url_is('admin/sliders*') ? 'active' : '' ?>">
+                    <i class="fas fa-images"></i>
+                    <span>Sliders</span>
+                </a>
+                
+                <a href="<?= base_url('admin/theme') ?>" class="submenu-item <?= url_is('admin/theme*') ? 'active' : '' ?>">
+                    <i class="fas fa-palette"></i>
+                    <span>Thème</span>
+                </a>
+                
+                <a href="<?= base_url('admin/settings/footer') ?>" class="submenu-item <?= url_is('admin/settings/footer') ? 'active' : '' ?>">
+                    <i class="fas fa-columns"></i>
+                    <span>Footer</span>
+                </a>
+                
+                <a href="<?= base_url('admin/pages') ?>" class="submenu-item <?= url_is('admin/pages*') ? 'active' : '' ?>">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Pages CMS</span>
+                </a>
+            </div>
+
+            <!-- SYSTÈME -->
+            <div class="menu-item has-submenu <?= url_is('admin/system*') || url_is('admin/settings*') ? 'open' : '' ?>">
+                <i class="fas fa-cog"></i>
+                <span>Système</span>
+                <i class="fas fa-chevron-down submenu-toggle"></i>
+            </div>
+            <div class="submenu <?= url_is('admin/system*') || url_is('admin/settings*') ? 'open' : '' ?>">
+                <a href="<?= base_url('admin/system') ?>" class="submenu-item <?= url_is('admin/system*') ? 'active' : '' ?>">
+                    <i class="fas fa-server"></i>
+                    <span>Système & Backup</span>
+                </a>
+                
+                <a href="<?= base_url('admin/settings/general') ?>" class="submenu-item <?= url_is('admin/settings/general') ? 'active' : '' ?>">
+                    <i class="fas fa-sliders-h"></i>
+                    <span>Paramètres Généraux</span>
+                </a>
+                
+                <a href="<?= base_url('admin/settings/email') ?>" class="submenu-item <?= url_is('admin/settings/email') ? 'active' : '' ?>">
+                    <i class="fas fa-envelope"></i>
+                    <span>Config. Email</span>
+                </a>
+                
+                <a href="<?= base_url('admin/settings/sms') ?>" class="submenu-item <?= url_is('admin/settings/sms') ? 'active' : '' ?>">
+                    <i class="fas fa-sms"></i>
+                    <span>Config. SMS</span>
+                </a>
+                
+                <a href="<?= base_url('admin/settings/payment') ?>" class="submenu-item <?= url_is('admin/settings/payment') ? 'active' : '' ?>">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Paiement</span>
+                </a>
+                
+                <a href="<?= base_url('admin/settings/notifications') ?>" class="submenu-item <?= url_is('admin/settings/notifications') ? 'active' : '' ?>">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </a>
+            </div>
             <?php endif; ?>
             
             <a href="<?= base_url('admin/logout') ?>" class="menu-item" style="margin-top: 2rem; color: #ef4444;">
@@ -1195,6 +1289,42 @@
             // Sauvegarder l'état
             const isCollapsed = body.classList.contains('sidebar-collapsed');
             localStorage.setItem('sidebarCollapsed', isCollapsed);
+        });
+    });
+
+    // ========== SUBMENU TOGGLE ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuItems = document.querySelectorAll('.menu-item.has-submenu');
+        
+        menuItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Trouver le submenu associé
+                const submenu = this.nextElementSibling;
+                
+                // Toggle l'état ouvert
+                this.classList.toggle('open');
+                submenu.classList.toggle('open');
+                
+                // Sauvegarder l'état dans localStorage
+                const menuText = this.querySelector('span').textContent;
+                const isOpen = this.classList.contains('open');
+                localStorage.setItem('submenu_' + menuText, isOpen);
+            });
+            
+            // Restaurer l'état sauvegardé
+            const menuText = item.querySelector('span').textContent;
+            const savedState = localStorage.getItem('submenu_' + menuText);
+            
+            // Si un sous-menu est actif, l'ouvrir automatiquement
+            const submenu = item.nextElementSibling;
+            const hasActiveItem = submenu && submenu.querySelector('.submenu-item.active');
+            
+            if (hasActiveItem || savedState === 'true') {
+                item.classList.add('open');
+                submenu.classList.add('open');
+            }
         });
     });
     </script>

@@ -132,7 +132,7 @@
         }
         
         .header-top {
-            background: var(--primary-gradient);
+            background: var(--primary-color);
             color: white;
             padding: 8px 0;
             font-size: 0.85rem;
@@ -156,17 +156,14 @@
         .navbar-brand-modern {
             font-size: 1.8rem;
             font-weight: 700;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--primary-color);
             display: flex;
             align-items: center;
             gap: 10px;
         }
         
         .navbar-brand-modern i {
-            -webkit-text-fill-color: var(--primary-color);
+            color: var(--primary-color);
         }
         
         .nav-link-modern {
@@ -196,44 +193,35 @@
             transform: translateX(-50%);
             width: 30px;
             height: 3px;
-            background: var(--primary-gradient);
+            background: var(--primary-color);
             border-radius: 3px 3px 0 0;
         }
         
         .btn-gradient {
-            background: var(--primary-gradient);
+            background: var(--primary-color);
             color: white;
             border: none;
             padding: 10px 25px;
             border-radius: 25px;
             font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         
         .btn-gradient:hover {
+            background: var(--secondary-color);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
             color: white;
         }
         
         /* Modern Footer */
         .modern-footer {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            background: var(--text-dark);
             color: #cbd5e1;
             padding: 60px 0 0;
             margin-top: 80px;
             position: relative;
-        }
-        
-        .modern-footer::before {
-            content: '';
-            position: absolute;
-            top: -50px;
-            left: 0;
-            right: 0;
-            height: 50px;
-            background: linear-gradient(to bottom, transparent, rgba(30, 41, 59, 0.1));
         }
         
         .footer-section {
@@ -256,7 +244,7 @@
             left: 0;
             width: 50px;
             height: 3px;
-            background: var(--primary-gradient);
+            background: var(--primary-color);
             border-radius: 3px;
         }
         
@@ -298,9 +286,9 @@
         }
         
         .social-link:hover {
-            background: var(--primary-gradient);
+            background: var(--primary-color);
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
             color: white;
         }
         
@@ -348,15 +336,6 @@
             color: #fff;
             padding: 3rem 0 1rem;
             margin-top: 5rem;
-        }
-        .btn-primary {
-            background: var(--primary-gradient);
-            border: none;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }
         
         /* Smooth animations */

@@ -26,8 +26,6 @@
     <!-- Custom CSS -->
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             --primary-color: #667eea;
             --secondary-color: #764ba2;
             --accent-color: #f5576c;
@@ -64,7 +62,7 @@
         }
         
         .header-top {
-            background: var(--primary-gradient);
+            background: var(--primary-color);
             color: white;
             padding: 8px 0;
             font-size: 0.85rem;
@@ -88,10 +86,7 @@
         .navbar-brand-modern {
             font-size: 1.8rem;
             font-weight: 700;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--primary-color);
             display: flex;
             align-items: center;
             gap: 10px;
@@ -128,12 +123,12 @@
             transform: translateX(-50%);
             width: 30px;
             height: 3px;
-            background: var(--primary-gradient);
+            background: var(--primary-color);
             border-radius: 3px 3px 0 0;
         }
         
         .btn-gradient {
-            background: var(--primary-gradient);
+            background: var(--primary-color);
             color: white;
             border: none;
             padding: 10px 25px;
@@ -144,6 +139,7 @@
         }
         
         .btn-gradient:hover {
+            background: var(--secondary-color);
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
             color: white;
@@ -151,21 +147,11 @@
         
         /* Modern Footer */
         .modern-footer {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            background: var(--text-dark);
             color: #cbd5e1;
             padding: 60px 0 0;
             margin-top: 80px;
             position: relative;
-        }
-        
-        .modern-footer::before {
-            content: '';
-            position: absolute;
-            top: -50px;
-            left: 0;
-            right: 0;
-            height: 50px;
-            background: linear-gradient(to bottom, transparent, rgba(30, 41, 59, 0.1));
         }
         
         .footer-section {
@@ -188,7 +174,7 @@
             left: 0;
             width: 50px;
             height: 3px;
-            background: var(--primary-gradient);
+            background: var(--primary-color);
             border-radius: 3px;
         }
         
@@ -230,7 +216,7 @@
         }
         
         .social-link:hover {
-            background: var(--primary-gradient);
+            background: var(--primary-color);
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
             color: white;
@@ -276,11 +262,12 @@
         }
         
         .btn-primary {
-            background: var(--primary-gradient);
+            background: var(--primary-color);
             border: none;
         }
         
         .btn-primary:hover {
+            background: var(--secondary-color);
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }

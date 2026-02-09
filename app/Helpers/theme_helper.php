@@ -40,8 +40,6 @@ if (!function_exists('get_default_theme_css')) {
     --text-dark: #2d3748;
     --text-light: #ffffff;
     --bg-light: #f7fafc;
-    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --secondary-gradient: linear-gradient(135deg, #f5576c 0%, #764ba2 100%);
     --font-primary: 'Poppins', sans-serif;
     --font-secondary: 'Roboto', sans-serif;
     --font-size-base: 16px;
@@ -95,9 +93,15 @@ a:hover {
 }
 
 .btn-primary {
-    background: var(--primary-gradient);
+    background: var(--button-bg-color);
+    color: var(--button-text-color);
     border: none;
     border-radius: var(--border-radius);
+}
+
+.btn-primary:hover {
+    background: var(--button-hover-bg-color);
+    color: var(--button-hover-text-color);
 }
 
 .card {

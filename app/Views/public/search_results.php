@@ -3,7 +3,7 @@
 <?= $this->section('content') ?>
 
 <!-- Search Results Header -->
-<section class="py-4" style="background: var(--primary-gradient); color: white;">
+<section class="py-4" style="background: var(--primary-color); color: white;">
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center">
             <div>

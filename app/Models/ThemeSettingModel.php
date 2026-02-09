@@ -132,8 +132,6 @@ class ThemeSettingModel extends Model
         $css .= "    --text-dark: {$theme['text_dark']};\n";
         $css .= "    --text-light: {$theme['text_light']};\n";
         $css .= "    --bg-light: {$theme['background_light']};\n";
-        $css .= "    --primary-gradient: linear-gradient(135deg, {$theme['primary_color']} 0%, {$theme['secondary_color']} 100%);\n";
-        $css .= "    --secondary-gradient: linear-gradient(135deg, {$theme['accent_color']} 0%, {$theme['secondary_color']} 100%);\n";
         $css .= "    \n";
         $css .= "    /* Typographie */\n";
         $css .= "    --font-primary: '{$theme['font_family_primary']}', sans-serif;\n";

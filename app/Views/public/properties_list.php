@@ -3,7 +3,7 @@
 <?= $this->section('content') ?>
 
 <!-- Page Header -->
-<section class="py-4" style="background: var(--primary-gradient); color: white;">
+<section class="py-4" style="background: var(--primary-color); color: white;">
     <div class="container">
         <h1 class="h3 mb-0">Toutes les propriétés</h1>
         <p class="mb-0"><?= count($properties) ?> propriété(s) disponible(s)</p>

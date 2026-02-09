@@ -52,7 +52,7 @@
             left: 0;
             width: var(--sidebar-width);
             height: 100vh;
-            background: linear-gradient(180deg, var(--sidebar-bg) 0%, #151820 100%);
+            background: var(--sidebar-bg);
             z-index: 1050;
             box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -112,7 +112,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, var(--primary-color), #0a58ca);
+            background: var(--primary-color);
             border-radius: 12px;
             font-size: 1.3rem;
         }

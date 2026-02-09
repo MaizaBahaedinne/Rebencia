@@ -125,9 +125,14 @@
                 <i class="fas fa-info-circle"></i> 
                 <strong>Debug:</strong> <?= count($properties) ?> bien(s) chargé(s) depuis la base de données
             </div>
-            <button class="btn btn-sm btn-outline-danger" onclick="resetDataTableFilters()">
-                <i class="fas fa-redo"></i> Réinitialiser tous les filtres
-            </button>
+            <div>
+                <button class="btn btn-sm btn-outline-danger me-2" onclick="clearAllFiltersNow()">
+                    <i class="fas fa-times-circle"></i> Effacer filtres (force)
+                </button>
+                <button class="btn btn-sm btn-outline-warning" onclick="resetDataTableFilters()">
+                    <i class="fas fa-redo"></i> Réinitialiser tous les filtres
+                </button>
+            </div>
         </div>
         <div class="table-responsive">
             <table class="table table-hover table-sm" id="propertiesTable">
@@ -493,6 +498,20 @@ function resetDataTableFilters() {
         // Recharger la page pour réinitialiser complètement
         location.reload();
     }
+}
+
+// Forcer l'effacement immédiat de tous les filtres
+function clearAllFiltersNow() {
+    // Effacer TOUS les localStorage liés aux DataTables
+    Object.keys(localStorage).forEach(key => {
+        if (key.includes('DataTables')) {
+            localStorage.removeItem(key);
+            console.log('Removed:', key);
+        }
+    });
+    
+    alert('Tous les filtres ont été effacés. La page va se recharger.');
+    location.reload();
 }
 </script>
 <?= $this->endSection() ?>

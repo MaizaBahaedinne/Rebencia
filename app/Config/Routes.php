@@ -288,6 +288,25 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->post('updateFooter', 'Settings::updateFooter');
     });
     
+    // Sliders Management
+    $routes->group('sliders', function($routes) {
+        $routes->get('/', 'Sliders::index');
+        $routes->get('create', 'Sliders::create');
+        $routes->post('store', 'Sliders::store');
+        $routes->get('edit/(:num)', 'Sliders::edit/$1');
+        $routes->post('update/(:num)', 'Sliders::update/$1');
+        $routes->post('delete/(:num)', 'Sliders::delete/$1');
+        $routes->post('toggle-status/(:num)', 'Sliders::toggleStatus/$1');
+    });
+    
+    // Theme Management
+    $routes->group('theme', function($routes) {
+        $routes->get('/', 'Theme::index');
+        $routes->post('update', 'Theme::update');
+        $routes->get('reset', 'Theme::reset');
+        $routes->post('preview', 'Theme::preview');
+    });
+    
     // Analytics
     $routes->group('analytics', function($routes) {
         $routes->get('/', 'Analytics::index');

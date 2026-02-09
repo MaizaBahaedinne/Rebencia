@@ -1,0 +1,238 @@
+:root {
+    /* Couleurs par défaut - Seront remplacées par les valeurs de la base de données */
+    --theme-primary: #667eea;
+    --theme-secondary: #764ba2;
+    --theme-accent: #f5576c;
+    --theme-text-dark: #2d3748;
+    --theme-text-light: #ffffff;
+    --theme-bg-light: #f7fafc;
+    
+    /* Typographie par défaut */
+    --font-primary: 'Poppins', sans-serif;
+    --font-secondary: 'Roboto', sans-serif;
+    --font-size-base: 16px;
+    --border-radius: 8px;
+}
+
+/* Application des variables au thème */
+body {
+    font-family: var(--font-secondary);
+    font-size: var(--font-size-base);
+    color: var(--theme-text-dark);
+    background-color: var(--theme-bg-light);
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: var(--font-primary);
+}
+
+/* Boutons */
+.btn-primary {
+    background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+    border: none;
+    color: var(--theme-text-light);
+    border-radius: var(--border-radius);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--theme-secondary), var(--theme-primary));
+    color: var(--theme-text-light);
+}
+
+.btn-outline-primary {
+    border-color: var(--theme-primary);
+    color: var(--theme-primary);
+    border-radius: var(--border-radius);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--theme-primary);
+    border-color: var(--theme-primary);
+    color: var(--theme-text-light);
+}
+
+/* Liens */
+a {
+    color: var(--theme-primary);
+}
+
+a:hover {
+    color: var(--theme-secondary);
+}
+
+/* Navigation */
+.navbar-brand {
+    font-family: var(--font-primary);
+    color: var(--theme-primary) !important;
+}
+
+.nav-link {
+    font-family: var(--font-primary);
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: var(--theme-primary) !important;
+}
+
+/* Cartes */
+.card {
+    border-radius: var(--border-radius);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+    color: var(--theme-text-light);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    font-family: var(--font-primary);
+}
+
+/* Badges */
+.badge.bg-primary {
+    background: var(--theme-primary) !important;
+}
+
+.badge.bg-secondary {
+    background: var(--theme-secondary) !important;
+}
+
+/* Alertes */
+.alert-primary {
+    background-color: rgba(var(--theme-primary), 0.1);
+    border-color: var(--theme-primary);
+    color: var(--theme-primary);
+}
+
+/* Formulaires */
+.form-control:focus {
+    border-color: var(--theme-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--theme-primary), 0.25);
+}
+
+input[type="radio"]:checked,
+input[type="checkbox"]:checked {
+    background-color: var(--theme-primary);
+    border-color: var(--theme-primary);
+}
+
+/* Pagination */
+.page-link {
+    color: var(--theme-primary);
+}
+
+.page-link:hover {
+    color: var(--theme-secondary);
+    background-color: var(--theme-bg-light);
+}
+
+.page-item.active .page-link {
+    background-color: var(--theme-primary);
+    border-color: var(--theme-primary);
+}
+
+/* Spinner/Loader */
+.spinner-border {
+    color: var(--theme-primary);
+}
+
+/* Progress bars */
+.progress-bar {
+    background-color: var(--theme-primary);
+}
+
+/* Tabs */
+.nav-tabs .nav-link.active {
+    color: var(--theme-primary);
+    border-color: var(--theme-primary) var(--theme-primary) #fff;
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: var(--theme-primary);
+}
+
+/* Dropdowns */
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: rgba(var(--theme-primary), 0.1);
+    color: var(--theme-primary);
+}
+
+.dropdown-item.active {
+    background-color: var(--theme-primary);
+}
+
+/* Footer */
+footer {
+    background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+    color: var(--theme-text-light);
+}
+
+footer a {
+    color: var(--theme-text-light);
+}
+
+footer a:hover {
+    color: var(--theme-accent);
+}
+
+/* Accents personnalisés */
+.text-primary {
+    color: var(--theme-primary) !important;
+}
+
+.text-secondary {
+    color: var(--theme-secondary) !important;
+}
+
+.text-accent {
+    color: var(--theme-accent) !important;
+}
+
+.bg-primary {
+    background-color: var(--theme-primary) !important;
+}
+
+.bg-secondary {
+    background-color: var(--theme-secondary) !important;
+}
+
+.bg-accent {
+    background-color: var(--theme-accent) !important;
+}
+
+.bg-gradient {
+    background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary)) !important;
+}
+
+/* Bordures arrondies */
+.rounded {
+    border-radius: var(--border-radius) !important;
+}
+
+.rounded-lg {
+    border-radius: calc(var(--border-radius) * 1.5) !important;
+}
+
+.rounded-xl {
+    border-radius: calc(var(--border-radius) * 2) !important;
+}
+
+/* Scrollbar personnalisée */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--theme-bg-light);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--theme-primary);
+    border-radius: calc(var(--border-radius) / 2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--theme-secondary);
+}

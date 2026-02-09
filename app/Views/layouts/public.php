@@ -174,11 +174,12 @@
         .nav-link-modern {
             color: var(--text-dark);
             font-weight: 500;
-            padding: 8px 20px;
-            margin: 0 5px;
-            border-radius: 8px;
+            padding: 6px 12px;
+            margin: 0 2px;
+            border-radius: 6px;
             transition: all 0.3s ease;
             position: relative;
+            font-size: 0.9rem;
         }
         
         .nav-link-modern:hover {
@@ -206,11 +207,12 @@
             background: var(--primary-color);
             color: white;
             border: none;
-            padding: 10px 25px;
-            border-radius: 25px;
-            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.85rem;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
         
         .btn-gradient:hover {
@@ -438,9 +440,9 @@
                             <a class="nav-link-modern" href="<?= base_url('contact') ?>">
                                 <i class="fas fa-envelope me-1"></i> Contact
                             </a>
-                        </li>
-                        <li class="nav-item ms-3">
+                        </li>2">
                             <a class="btn btn-gradient" href="<?= base_url('admin/login') ?>">
+                                <i class="fas fa-user me-1ef="<?= base_url('admin/login') ?>">
                                 <i class="fas fa-user me-2"></i> Espace Pro
                             </a>
                         </li>

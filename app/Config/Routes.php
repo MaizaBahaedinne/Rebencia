@@ -12,6 +12,11 @@ $routes->get('/', 'Home::index');
 // API routes (public)
 $routes->get('api/cities', 'Home::getCities');
 
+// Public pages
+$routes->get('about', 'Pages::about');
+$routes->get('contact', 'Pages::contact');
+$routes->post('contact/send', 'Pages::sendContact');
+
 // Search routes
 $routes->get('search', 'Search::index');
 

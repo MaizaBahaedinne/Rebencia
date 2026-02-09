@@ -922,15 +922,67 @@ class Properties extends BaseController
             return redirect()->to('/admin/properties')->with('error', 'Vous n\'avez pas la permission de supprimer ce bien.');
         }
 
-        // Supprimer les images associées
-        $propertyMediaModel = model('PropertyMediaModel');
-        $propertyMediaModel->deletePropertyMedia($id);
-
-        if ($this->propertyModel->delete($id)) {
-            return redirect()->to('/admin/properties')->with('success', 'Bien supprimé avec succès');
+        // Vérifier s'il y a des transactions liées
+        $transactionModel = model('TransactionModel');
+        $transactions = $transactionModel->where('property_id', $id)->countAllResults();
+        
+        if ($transactions > 0) {
+            return redirect()->to('/admin/properties')->with('error', 
+                'Impossible de supprimer ce bien car il est lié à ' . $transactions . ' transaction(s). Supprimez d\'abord les transactions associées.');
         }
 
-        return redirect()->to('/admin/properties')->with('error', 'Erreur lors de la suppression');
+        $db = \Config\Database::connect();
+        $db->transStart();
+        
+        try {
+            // Supprimer les médias
+            $propertyMediaModel = model('PropertyMediaModel');
+            $medias = $propertyMediaModel->where('property_id', $id)->findAll();
+            foreach ($medias as $media) {
+                // Supprimer le fichier physique
+                $filePath = FCPATH . 'uploads/properties/' . $media['file_path'];
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+            }
+            $propertyMediaModel->where('property_id', $id)->delete();
+            
+            // Supprimer les documents
+            $propertyDocumentModel = model('PropertyDocumentModel');
+            $documents = $propertyDocumentModel->where('property_id', $id)->findAll();
+            foreach ($documents as $doc) {
+                // Supprimer le fichier physique
+                $filePath = FCPATH . 'uploads/documents/' . $doc['file_path'];
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+            }
+            $propertyDocumentModel->where('property_id', $id)->delete();
+            
+            // Supprimer les pièces
+            $propertyRoomModel = model('PropertyRoomModel');
+            $propertyRoomModel->where('property_id', $id)->delete();
+            
+            // Supprimer les proximités
+            $propertyProximityModel = model('PropertyProximityModel');
+            $propertyProximityModel->where('property_id', $id)->delete();
+            
+            // Supprimer la propriété
+            $this->propertyModel->delete($id);
+            
+            $db->transComplete();
+            
+            if ($db->transStatus() === false) {
+                throw new \Exception('Erreur lors de la suppression');
+            }
+            
+            return redirect()->to('/admin/properties')->with('success', 'Bien et toutes ses données associées supprimés avec succès');
+            
+        } catch (\Exception $e) {
+            $db->transRollback();
+            log_message('error', 'Error deleting property: ' . $e->getMessage());
+            return redirect()->to('/admin/properties')->with('error', 'Erreur lors de la suppression: ' . $e->getMessage());
+        }
     }
 
     public function deleteImage($imageId)

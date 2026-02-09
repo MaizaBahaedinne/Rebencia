@@ -46,12 +46,12 @@ class Home extends BaseController
         unset($property);
         
         $data = [
-            'title' => 'REBENCIA REAL ESTATE - Votre partenaire immobilier en Tunisie',
+            'title' => 'REBENCIA - Immobilier de prestige en Tunisie',
             'featured_properties' => $featured_properties,
             'latest_properties' => $latest_properties
         ];
 
-        return view('public/home', $data);
+        return view('public/home_orpi_style', $data);
     }
     
     public function getCities()

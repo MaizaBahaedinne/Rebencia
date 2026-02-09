@@ -53,4 +53,23 @@ class Home extends BaseController
 
         return view('public/home', $data);
     }
+    
+    public function getCities()
+    {
+        $propertyModel = model('PropertyModel');
+        
+        // Get unique cities from properties table
+        $cities = $propertyModel
+            ->select('city')
+            ->where('status', 'published')
+            ->where('city IS NOT NULL')
+            ->where('city !=', '')
+            ->groupBy('city')
+            ->orderBy('city', 'ASC')
+            ->findAll();
+        
+        $cityList = array_column($cities, 'city');
+        
+        return $this->response->setJSON($cityList);
+    }
 }

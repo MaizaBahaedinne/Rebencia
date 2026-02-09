@@ -9,6 +9,12 @@ use CodeIgniter\Router\RouteCollection;
 // Default routes
 $routes->get('/', 'Home::index');
 
+// API routes (public)
+$routes->get('api/cities', 'Home::getCities');
+
+// Search routes
+$routes->get('search', 'Search::index');
+
 // ==========================================
 // ADMIN ROUTES
 // ==========================================

@@ -9,34 +9,114 @@
         <p class="lead mb-5">Des milliers de biens immobiliers à vendre et à louer en Tunisie</p>
         
         <!-- Quick Search -->
-        <div class="card shadow-lg" style="max-width: 900px; margin: 0 auto;">
+        <div class="card shadow-lg" style="max-width: 1100px; margin: 0 auto;">
             <div class="card-body p-4">
-                <form action="<?= base_url('search') ?>" method="get">
+                <form action="<?= base_url('search') ?>" method="get" id="searchForm">
                     <div class="row g-3">
                         <div class="col-md-3">
                             <select name="transaction_type" class="form-select">
-                                <option value="">Type</option>
+                                <option value="">Type de transaction</option>
                                 <option value="sale">Vente</option>
                                 <option value="rent">Location</option>
                             </select>
                         </div>
                         <div class="col-md-3">
                             <select name="type" class="form-select">
-                                <option value="">Catégorie</option>
+                                <option value="">Type de bien</option>
                                 <option value="apartment">Appartement</option>
                                 <option value="villa">Villa</option>
                                 <option value="house">Maison</option>
                                 <option value="land">Terrain</option>
                                 <option value="office">Bureau</option>
+                                <option value="commercial">Commercial</option>
                             </select>
                         </div>
-                        <div class="col-md-3">
-                            <input type="text" name="city" class="form-control" placeholder="Ville">
+                        <div class="col-md-4 position-relative">
+                            <input type="text" name="city" id="cityAutocomplete" class="form-control" placeholder="Ville (ex: Tunis, Sousse...)" autocomplete="off">
+                            <div id="cityDropdown" class="autocomplete-dropdown" style="display: none; position: absolute; z-index: 1000; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 300px; overflow-y: auto; width: 100%;"></div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <button type="submit" class="btn btn-primary w-100">
                                 <i class="fas fa-search"></i> Rechercher
                             </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Advanced Filters Toggle -->
+                    <div class="row mt-3">
+                        <div class="col-12 text-center">
+                            <button type="button" class="btn btn-link text-white" id="toggleAdvanced">
+                                <i class="fas fa-sliders-h"></i> Filtres avancés
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Advanced Filters -->
+                    <div id="advancedFilters" style="display: none;">
+                        <hr class="my-3">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label small">Prix minimum (TND)</label>
+                                <input type="number" name="price_min" class="form-control" placeholder="0">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small">Prix maximum (TND)</label>
+                                <input type="number" name="price_max" class="form-control" placeholder="Illimité">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small">Surface min (m²)</label>
+                                <input type="number" name="area_min" class="form-control" placeholder="0">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small">Surface max (m²)</label>
+                                <input type="number" name="area_max" class="form-control" placeholder="Illimité">
+                            </div>
+                        </div>
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-3">
+                                <label class="form-label small">Chambres min</label>
+                                <select name="bedrooms_min" class="form-select">
+                                    <option value="">Toutes</option>
+                                    <option value="1">1+</option>
+                                    <option value="2">2+</option>
+                                    <option value="3">3+</option>
+                                    <option value="4">4+</option>
+                                    <option value="5">5+</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small">Salles de bain min</label>
+                                <select name="bathrooms_min" class="form-select">
+                                    <option value="">Toutes</option>
+                                    <option value="1">1+</option>
+                                    <option value="2">2+</option>
+                                    <option value="3">3+</option>
+                                    <option value="4">4+</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small">Gouvernorat</label>
+                                <select name="governorate" class="form-select">
+                                    <option value="">Tous</option>
+                                    <option value="Tunis">Tunis</option>
+                                    <option value="Ariana">Ariana</option>
+                                    <option value="Ben Arous">Ben Arous</option>
+                                    <option value="Manouba">Manouba</option>
+                                    <option value="Nabeul">Nabeul</option>
+                                    <option value="Sousse">Sousse</option>
+                                    <option value="Monastir">Monastir</option>
+                                    <option value="Mahdia">Mahdia</option>
+                                    <option value="Sfax">Sfax</option>
+                                    <option value="Bizerte">Bizerte</option>
+                                    <option value="Gabès">Gabès</option>
+                                    <option value="Médenine">Médenine</option>
+                                    <option value="Autre">Autre</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small">Référence</label>
+                                <input type="text" name="reference" class="form-control" placeholder="Ex: REF-001">
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -156,5 +236,90 @@
         </div>
     </div>
 </section>
+
+<!-- Autocomplete Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const cityInput = document.getElementById('cityAutocomplete');
+    const cityDropdown = document.getElementById('cityDropdown');
+    const toggleBtn = document.getElementById('toggleAdvanced');
+    const advancedFilters = document.getElementById('advancedFilters');
+    let cities = [];
+    let debounceTimer;
+    
+    // Toggle advanced filters
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function() {
+            if (advancedFilters.style.display === 'none') {
+                advancedFilters.style.display = 'block';
+                toggleBtn.innerHTML = '<i class="fas fa-sliders-h"></i> Masquer les filtres';
+            } else {
+                advancedFilters.style.display = 'none';
+                toggleBtn.innerHTML = '<i class="fas fa-sliders-h"></i> Filtres avancés';
+            }
+        });
+    }
+    
+    // Load cities
+    fetch('<?= base_url('api/cities') ?>')
+        .then(response => response.json())
+        .then(data => {
+            cities = data;
+        })
+        .catch(error => console.error('Erreur chargement villes:', error));
+    
+    // Autocomplete functionality
+    cityInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        const searchTerm = this.value.trim().toLowerCase();
+        
+        if (searchTerm.length < 2) {
+            cityDropdown.style.display = 'none';
+            return;
+        }
+        
+        debounceTimer = setTimeout(() => {
+            const filtered = cities.filter(city => 
+                city.toLowerCase().includes(searchTerm)
+            ).slice(0, 10);
+            
+            if (filtered.length > 0) {
+                cityDropdown.innerHTML = filtered.map(city => 
+                    `<div class="autocomplete-item" style="padding: 10px; cursor: pointer; border-bottom: 1px solid #f0f0f0;" data-city="${city}">
+                        <i class="fas fa-map-marker-alt text-primary me-2"></i>${city}
+                    </div>`
+                ).join('');
+                
+                cityDropdown.style.display = 'block';
+                
+                // Add click handlers
+                cityDropdown.querySelectorAll('.autocomplete-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        cityInput.value = this.dataset.city;
+                        cityDropdown.style.display = 'none';
+                    });
+                    
+                    item.addEventListener('mouseenter', function() {
+                        this.style.backgroundColor = '#f8f9fa';
+                    });
+                    
+                    item.addEventListener('mouseleave', function() {
+                        this.style.backgroundColor = 'white';
+                    });
+                });
+            } else {
+                cityDropdown.style.display = 'none';
+            }
+        }, 300);
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!cityInput.contains(e.target) && !cityDropdown.contains(e.target)) {
+            cityDropdown.style.display = 'none';
+        }
+    });
+});
+</script>
 
 <?= $this->endSection() ?>

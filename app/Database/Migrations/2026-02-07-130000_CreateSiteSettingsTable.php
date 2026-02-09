@@ -45,7 +45,6 @@ class CreateSiteSettingsTable extends Migration
         ]);
         
         $this->forge->addKey('id', true);
-        $this->forge->addKey('setting_key');
         $this->forge->addKey('group_name');
         
         $this->forge->createTable('site_settings', true);

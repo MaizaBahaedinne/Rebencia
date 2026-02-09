@@ -76,15 +76,15 @@
                             <h3 class="h4 text-primary mb-0"><?= number_format($property['price'], 0, ',', ' ') ?> TND</h3>
                             <p class="text-muted">
                                 <i class="fas fa-map-marker-alt"></i> 
-                                <?= esc($property['address']) ?>, <?= esc($property['city']) ?>
-                                <?php if ($property['governorate']): ?>
+                                <?= esc($property['address'] ?? '') ?>, <?= esc($property['city'] ?? '') ?>
+                                <?php if (isset($property['governorate']) && $property['governorate']): ?>
                                     , <?= esc($property['governorate']) ?>
                                 <?php endif; ?>
                             </p>
                         </div>
 
                         <div class="row g-3 mb-4">
-                            <?php if ($property['surface']): ?>
+                            <?php if (isset($property['surface']) && $property['surface']): ?>
                                 <div class="col-md-3">
                                     <div class="text-center p-3 bg-light rounded">
                                         <i class="fas fa-ruler-combined fa-2x text-primary mb-2"></i>
@@ -94,7 +94,7 @@
                                 </div>
                             <?php endif; ?>
                             
-                            <?php if ($property['bedrooms']): ?>
+                            <?php if (isset($property['bedrooms']) && $property['bedrooms']): ?>
                                 <div class="col-md-3">
                                     <div class="text-center p-3 bg-light rounded">
                                         <i class="fas fa-bed fa-2x text-primary mb-2"></i>
@@ -104,7 +104,7 @@
                                 </div>
                             <?php endif; ?>
                             
-                            <?php if ($property['bathrooms']): ?>
+                            <?php if (isset($property['bathrooms']) && $property['bathrooms']): ?>
                                 <div class="col-md-3">
                                     <div class="text-center p-3 bg-light rounded">
                                         <i class="fas fa-bath fa-2x text-primary mb-2"></i>
@@ -114,7 +114,7 @@
                                 </div>
                             <?php endif; ?>
                             
-                            <?php if ($property['floor']): ?>
+                            <?php if (isset($property['floor']) && $property['floor']): ?>
                                 <div class="col-md-3">
                                     <div class="text-center p-3 bg-light rounded">
                                         <i class="fas fa-building fa-2x text-primary mb-2"></i>
@@ -207,19 +207,19 @@
                             <li class="mb-2">
                                 <strong>Référence:</strong> <?= esc($property['reference']) ?>
                             </li>
-                            <?php if ($property['year_built']): ?>
+                            <?php if (isset($property['year_built']) && $property['year_built']): ?>
                                 <li class="mb-2">
                                     <strong>Année de construction:</strong> <?= $property['year_built'] ?>
                                 </li>
                             <?php endif; ?>
-                            <?php if ($property['parking_spaces']): ?>
+                            <?php if (isset($property['parking_spaces']) && $property['parking_spaces']): ?>
                                 <li class="mb-2">
                                     <strong>Parking:</strong> <?= $property['parking_spaces'] ?> place(s)
                                 </li>
                             <?php endif; ?>
                             <li class="mb-2">
                                 <strong>Disponible:</strong> 
-                                <?= $property['available'] ? '<span class="text-success">Oui</span>' : '<span class="text-danger">Non</span>' ?>
+                                <?= (isset($property['available']) && $property['available']) ? '<span class="text-success">Oui</span>' : '<span class="text-danger">Non</span>' ?>
                             </li>
                         </ul>
                     </div>

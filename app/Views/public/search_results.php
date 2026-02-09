@@ -165,13 +165,13 @@
                                             <span class="text-primary fw-bold"><?= number_format($property['price'], 0, ',', ' ') ?> TND</span>
                                         </div>
                                         <div class="d-flex gap-3 text-muted small mb-2">
-                                            <?php if ($property['surface']): ?>
+                                            <?php if (isset($property['surface']) && $property['surface']): ?>
                                                 <span><i class="fas fa-ruler-combined"></i> <?= $property['surface'] ?> m²</span>
                                             <?php endif; ?>
-                                            <?php if ($property['bedrooms']): ?>
+                                            <?php if (isset($property['bedrooms']) && $property['bedrooms']): ?>
                                                 <span><i class="fas fa-bed"></i> <?= $property['bedrooms'] ?></span>
                                             <?php endif; ?>
-                                            <?php if ($property['bathrooms']): ?>
+                                            <?php if (isset($property['bathrooms']) && $property['bathrooms']): ?>
                                                 <span><i class="fas fa-bath"></i> <?= $property['bathrooms'] ?></span>
                                             <?php endif; ?>
                                         </div>

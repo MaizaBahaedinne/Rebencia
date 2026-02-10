@@ -91,8 +91,7 @@ class Transactions extends BaseController
         // Créer la transaction
         $transactionData = [
             'property_id' => $propertyId,
-            'buyer_id' => $this->request->getPost('buyer_id'),
-            'seller_id' => $this->request->getPost('seller_id'),
+            'client_id' => $this->request->getPost('buyer_id'),
             'agent_id' => $agentId,
             'agency_id' => $this->request->getPost('agency_id') ?? $agent['agency_id'] ?? session()->get('agency_id'),
             'type' => $type,
@@ -206,8 +205,7 @@ class Transactions extends BaseController
 
         $data = [
             'property_id' => $propertyId,
-            'buyer_id' => $this->request->getPost('buyer_id'),
-            'seller_id' => $this->request->getPost('seller_id'),
+            'client_id' => $this->request->getPost('buyer_id'),
             'agent_id' => $agentId,
             'agency_id' => $this->request->getPost('agency_id'),
             'type' => $type,
@@ -302,8 +300,7 @@ class Transactions extends BaseController
         // Récupérer les détails de la transaction
         $property = $this->propertyModel->find($transaction['property_id']);
         $agent = $this->userModel->find($transaction['agent_id']);
-        $buyer = $this->clientModel->find($transaction['buyer_id']);
-        $seller = $transaction['seller_id'] ? $this->clientModel->find($transaction['seller_id']) : null;
+        $client = $this->clientModel->find($transaction['client_id']);
         
         $data = [
             'title' => 'Détails Commission - Transaction #' . $transaction['reference'],
@@ -311,8 +308,7 @@ class Transactions extends BaseController
             'commission' => $commission,
             'property' => $property,
             'agent' => $agent,
-            'buyer' => $buyer,
-            'seller' => $seller
+            'client' => $client
         ];
         
         return view('admin/transactions/commission_details', $data);

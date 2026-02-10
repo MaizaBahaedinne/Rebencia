@@ -13,7 +13,7 @@ class TransactionModel extends Model
     protected $useSoftDeletes = false;
     protected $protectFields = true;
     protected $allowedFields = [
-        'reference', 'property_id', 'buyer_id', 'seller_id', 'agent_id', 'agency_id',
+        'reference', 'property_id', 'client_id', 'agent_id', 'agency_id',
         'type', 'transaction_date', 'amount', 'commission_percentage', 'commission_amount',
         'commission_paid', 'contract_number', 'notary', 'status', 
         'signature_date', 'completion_date', 'start_date', 'end_date',

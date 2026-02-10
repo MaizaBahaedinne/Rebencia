@@ -270,54 +270,50 @@ class Users extends BaseController
             ->get()
             ->getResultArray();
 
-        // Get team members if this user is a manager
-        $teamMembers = [];
-        $teamStats = [];
-        if ($user['role_name'] === 'Manager' || $user['role_name'] === 'Admin') {
-            $teamMembers = $this->userModel->select('users.*, agencies.name as agency_name')
-                ->join('agencies', 'agencies.id = users.agency_id', 'left')
-                ->where('users.manager_id', $id)
-                ->where('users.status', 'active')
-                ->orderBy('users.first_name', 'ASC')
-                ->findAll();
+        // Get team members (anyone who has this user as their manager)
+        $teamMembers = $this->userModel->select('users.*, agencies.name as agency_name')
+            ->join('agencies', 'agencies.id = users.agency_id', 'left')
+            ->where('users.manager_id', $id)
+            ->where('users.status', 'active')
+            ->orderBy('users.first_name', 'ASC')
+            ->findAll();
+        
+        // Get stats for each team member
+        foreach ($teamMembers as &$member) {
+            $memberId = $member['id'];
             
-            // Get stats for each team member
-            foreach ($teamMembers as &$member) {
-                $memberId = $member['id'];
-                
-                // Count properties
-                $propertiesCount = $db->table('properties')
-                    ->where('agent_id', $memberId)
-                    ->countAllResults();
-                
-                // Count clients
-                $clientsCount = $db->table('clients')
-                    ->where('assigned_to', $memberId)
-                    ->countAllResults();
-                
-                // Count transactions and calculate total
-                $memberTransactions = $db->table('transactions')
-                    ->select('SUM(final_price) as total_sales, COUNT(*) as count')
-                    ->where('agent_id', $memberId)
-                    ->where('status', 'completed')
-                    ->get()
-                    ->getRowArray();
-                
-                // Calculate commissions
-                $memberCommissions = $db->table('transaction_commissions')
-                    ->select('SUM(agent_commission_amount) as total_commission')
-                    ->where('agent_id', $memberId)
-                    ->get()
-                    ->getRowArray();
-                
-                $member['stats'] = [
-                    'properties' => $propertiesCount,
-                    'clients' => $clientsCount,
-                    'transactions' => $memberTransactions['count'] ?? 0,
-                    'total_sales' => $memberTransactions['total_sales'] ?? 0,
-                    'total_commission' => $memberCommissions['total_commission'] ?? 0
-                ];
-            }
+            // Count properties
+            $propertiesCount = $db->table('properties')
+                ->where('agent_id', $memberId)
+                ->countAllResults();
+            
+            // Count clients
+            $clientsCount = $db->table('clients')
+                ->where('assigned_to', $memberId)
+                ->countAllResults();
+            
+            // Count transactions and calculate total
+            $memberTransactions = $db->table('transactions')
+                ->select('SUM(final_price) as total_sales, COUNT(*) as count')
+                ->where('agent_id', $memberId)
+                ->where('status', 'completed')
+                ->get()
+                ->getRowArray();
+            
+            // Calculate commissions
+            $memberCommissions = $db->table('transaction_commissions')
+                ->select('SUM(agent_commission_amount) as total_commission')
+                ->where('agent_id', $memberId)
+                ->get()
+                ->getRowArray();
+            
+            $member['stats'] = [
+                'properties' => $propertiesCount,
+                'clients' => $clientsCount,
+                'transactions' => $memberTransactions['count'] ?? 0,
+                'total_sales' => $memberTransactions['total_sales'] ?? 0,
+                'total_commission' => $memberCommissions['total_commission'] ?? 0
+            ];
         }
 
         $data = [

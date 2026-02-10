@@ -193,17 +193,18 @@
     </div>
 
     <!-- Team Members Section (Manager/Admin only) -->
-    <?php if (!empty($team_members)): ?>
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-white">
-            <h5 class="mb-0">
-                <i class="fas fa-users-cog text-primary"></i>
-                Mon Équipe (<?= count($team_members) ?> membres actifs)
-            </h5>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
+    <?php if (isset($team_members)): ?>
+        <?php if (!empty($team_members)): ?>
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-users-cog text-primary"></i>
+                    Mon Équipe (<?= count($team_members) ?> membres actifs)
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
                     <thead class="table-light">
                         <tr>
                             <th>Agent</th>
@@ -302,6 +303,13 @@
             </div>
         </div>
     </div>
+        <?php else: ?>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            Aucun membre d'équipe actif assigné à ce manager. 
+            <small class="d-block mt-2">Pour assigner des agents à ce manager, modifiez le champ "Manager" dans le profil de chaque agent.</small>
+        </div>
+        <?php endif; ?>
     <?php endif; ?>
 
     <!-- Tabs Navigation -->

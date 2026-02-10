@@ -603,7 +603,7 @@
 
             <!-- Right Column - Contact Forms -->
             <div class="col-lg-4">
-                <div class="sticky-top" style="top: 100px;">
+                <div class="sticky-top" style="top: 140px;">
                     <!-- Agent & Agency Card -->
                     <?php if ($agent || $agency): ?>
                     <div class="card mb-3 shadow">
@@ -966,7 +966,8 @@
 
 .sticky-top {
     position: sticky;
-    top: 100px;
+    top: 140px;
+    z-index: 100;
 }
 
 @media (max-width: 991px) {

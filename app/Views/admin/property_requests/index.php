@@ -242,7 +242,11 @@
 <script>
 // DataTable with proper column configuration
 $(document).ready(function() {
-    if ($.fn.DataTable) {
+    // Only initialize DataTables if there are rows
+    const tableBody = $('#requestsTable tbody tr');
+    const hasData = tableBody.length > 0 && !tableBody.first().find('td[colspan]').length;
+    
+    if ($.fn.DataTable && hasData) {
         $('#requestsTable').DataTable({
             order: [[0, 'desc']],
             pageLength: 25,

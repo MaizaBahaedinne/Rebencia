@@ -32,7 +32,7 @@
                 
                 <div class="row g-3">
                     <div class="col-md-3">
-                        <label class="form-label fw-semibold">Type de bien</label>
+                        <label class="form-label fw-semibold text-dark">Type de bien</label>
                         <select name="type" class="form-select form-select-lg">
                             <option value="">Tous les types</option>
                             <option value="apartment">Appartement</option>
@@ -44,21 +44,15 @@
                         </select>
                     </div>
                     
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">Ville</label>
-                        <input type="text" name="city" class="form-control form-control-lg" placeholder="Ex: Tunis, Sousse, Hammamet...">
+                    <div class="col-md-4 position-relative">
+                        <label class="form-label fw-semibold text-dark">Ville</label>
+                        <input type="text" name="city" id="cityAutocomplete" class="form-control form-control-lg" placeholder="Ex: Tunis, Sousse, Hammamet..." autocomplete="off">
+                        <div id="cityDropdown" class="autocomplete-dropdown" style="display: none; position: absolute; z-index: 1000; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 300px; overflow-y: auto; width: 100%;"></div>
                     </div>
                     
                     <div class="col-md-3">
-                        <label class="form-label fw-semibold">Budget (TND)</label>
-                        <select name="price_max" class="form-select form-select-lg">
-                            <option value="">Sans limite</option>
-                            <option value="100000">100 000</option>
-                            <option value="200000">200 000</option>
-                            <option value="300000">300 000</option>
-                            <option value="500000">500 000</option>
-                            <option value="1000000">1 000 000</option>
-                        </select>
+                        <label class="form-label fw-semibold text-dark">Budget max (TND)</label>
+                        <input type="number" name="price_max" class="form-control form-control-lg" placeholder="Ex: 500000">
                     </div>
                     
                     <div class="col-md-2">
@@ -71,7 +65,7 @@
                 
                 <!-- Advanced Filters -->
                 <div class="text-center mt-3">
-                    <a href="#" class="text-decoration-none fw-semibold" onclick="toggleAdvanced(); return false;">
+                    <a href="#" class="text-decoration-none fw-semibold" style="color: var(--primary-color);" onclick="toggleAdvanced(); return false;">
                         <i class="fas fa-sliders-h me-2"></i> Plus de critères
                     </a>
                 </div>
@@ -79,32 +73,99 @@
                 <div id="advancedFilters" style="display: none;">
                     <hr class="my-3">
                     <div class="row g-3">
-                        <div class="col-md-3">
-                            <label class="form-label">Surface min (m²)</label>
-                            <input type="number" name="area_min" class="form-control" placeholder="0">
+                        <div class="col-md-2">
+                            <label class="form-label text-dark">Prix min (TND)</label>
+                            <input type="number" name="price_min" class="form-control" placeholder="0">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label text-dark">Prix max (TND)</label>
+                            <input type="number" name="price_max_advanced" class="form-control" placeholder="Ex: 500000">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label text-dark">Surface min (m²)</label>
+                            <input type="number" name="surface_min" class="form-control" placeholder="0">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label text-dark">Surface max (m²)</label>
+                            <input type="number" name="surface_max" class="form-control" placeholder="Ex: 200">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label text-dark">Chambres min</label>
+                            <input type="number" name="bedrooms_min" class="form-control" placeholder="0">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label text-dark">Salles de bain</label>
+                            <input type="number" name="bathrooms_min" class="form-control" placeholder="0">
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mt-2">
+                        <div class="col-12">
+                            <label class="form-label text-dark fw-semibold">Équipements</label>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Chambres min</label>
-                            <select name="bedrooms_min" class="form-select">
-                                <option value="">Toutes</option>
-                                <option value="1">1+</option>
-                                <option value="2">2+</option>
-                                <option value="3">3+</option>
-                                <option value="4">4+</option>
-                            </select>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="amenities[]" value="parking" id="parking">
+                                <label class="form-check-label text-dark" for="parking">
+                                    <i class="fas fa-car me-2"></i> Parking
+                                </label>
+                            </div>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Salles de bain min</label>
-                            <select name="bathrooms_min" class="form-select">
-                                <option value="">Toutes</option>
-                                <option value="1">1+</option>
-                                <option value="2">2+</option>
-                                <option value="3">3+</option>
-                            </select>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="amenities[]" value="piscine" id="piscine">
+                                <label class="form-check-label text-dark" for="piscine">
+                                    <i class="fas fa-swimming-pool me-2"></i> Piscine
+                                </label>
+                            </div>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Référence</label>
-                            <input type="text" name="reference" class="form-control" placeholder="REF-XXX">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="amenities[]" value="jardin" id="jardin">
+                                <label class="form-check-label text-dark" for="jardin">
+                                    <i class="fas fa-tree me-2"></i> Jardin
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="amenities[]" value="balcon" id="balcon">
+                                <label class="form-check-label text-dark" for="balcon">
+                                    <i class="fas fa-home me-2"></i> Balcon
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="amenities[]" value="ascenseur" id="ascenseur">
+                                <label class="form-check-label text-dark" for="ascenseur">
+                                    <i class="fas fa-elevator me-2"></i> Ascenseur
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="amenities[]" value="climatisation" id="climatisation">
+                                <label class="form-check-label text-dark" for="climatisation">
+                                    <i class="fas fa-snowflake me-2"></i> Climatisation
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="amenities[]" value="meuble" id="meuble">
+                                <label class="form-check-label text-dark" for="meuble">
+                                    <i class="fas fa-couch me-2"></i> Meublé
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="amenities[]" value="securite" id="securite">
+                                <label class="form-check-label text-dark" for="securite">
+                                    <i class="fas fa-shield-alt me-2"></i> Sécurité 24/7
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -335,6 +396,59 @@ function switchTab(type) {
 function toggleAdvanced() {
     const advanced = document.getElementById('advancedFilters');
     advanced.style.display = advanced.style.display === 'none' ? 'block' : 'none';
+}
+
+// City autocomplete
+const cities = [
+    'Tunis', 'Ariana', 'Ben Arous', 'Manouba', 'Sfax', 'Sousse', 'Monastir', 
+    'Hammamet', 'Nabeul', 'Bizerte', 'Gabès', 'Kairouan', 'Gafsa', 'Kasserine',
+    'Mahdia', 'Médenine', 'Tataouine', 'Tozeur', 'Kébili', 'Jendouba', 
+    'Le Kef', 'Siliana', 'Béja', 'Zaghouan', 'La Marsa', 'Carthage', 
+    'Sidi Bou Said', 'La Goulette', 'Ennasr', 'Menzah', 'Manar', 'Lac'
+];
+
+const cityInput = document.getElementById('cityAutocomplete');
+const cityDropdown = document.getElementById('cityDropdown');
+
+if (cityInput) {
+    cityInput.addEventListener('input', function() {
+        const value = this.value.toLowerCase();
+        
+        if (value.length < 2) {
+            cityDropdown.style.display = 'none';
+            return;
+        }
+        
+        const filtered = cities.filter(city => 
+            city.toLowerCase().includes(value)
+        );
+        
+        if (filtered.length === 0) {
+            cityDropdown.style.display = 'none';
+            return;
+        }
+        
+        cityDropdown.innerHTML = filtered.map(city => 
+            `<div class="autocomplete-item" style="padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #eee; color: #333;" 
+                  onmouseover="this.style.background='#f8f9fa'" 
+                  onmouseout="this.style.background='white'"
+                  onclick="selectCity('${city}')">${city}</div>`
+        ).join('');
+        
+        cityDropdown.style.display = 'block';
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (e.target !== cityInput && e.target.parentElement !== cityDropdown) {
+            cityDropdown.style.display = 'none';
+        }
+    });
+}
+
+function selectCity(city) {
+    cityInput.value = city;
+    cityDropdown.style.display = 'none';
 }
 </script>
 <?= $this->endSection() ?>

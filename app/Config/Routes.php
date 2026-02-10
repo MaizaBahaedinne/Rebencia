@@ -343,6 +343,8 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->get('getEvents', 'Appointments::getEvents');
         $routes->post('updateStatus', 'Appointments::updateStatus');
         $routes->get('sendReminders', 'Appointments::sendReminders');
+        $routes->post('check-availability', 'Appointments::checkAvailability');
+        $routes->post('schedule-visit', 'Appointments::scheduleVisit');
     });
     
     // Tasks

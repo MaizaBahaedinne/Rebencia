@@ -230,6 +230,32 @@
                 </div>
             </div>
 
+            <!-- Schedule Visit Card (only for visit requests) -->
+            <?php if ($request['request_type'] === 'visit'): ?>
+            <div class="card mb-4 border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calendar-plus"></i> Planifier la visite
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <?php if ($request['visit_date']): ?>
+                        <div class="alert alert-info mb-3">
+                            <strong>Date souhaitée:</strong> <?= date('d/m/Y', strtotime($request['visit_date'])) ?>
+                            <?php if ($request['visit_time']): ?>
+                                <br><strong>Heure:</strong> <?= esc($request['visit_time']) ?>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <button class="btn btn-info w-100" data-bs-toggle="modal" data-bs-target="#scheduleModal">
+                        <i class="fas fa-calendar-check"></i> Planifier dans l'agenda
+                    </button>
+                    <small class="text-muted d-block mt-2 text-center">Durée: 60 min max</small>
+                </div>
+            </div>
+            <?php endif; ?>
+
             <!-- Quick Actions -->
             <div class="card">
                 <div class="card-header">
@@ -251,6 +277,92 @@
                         <i class="fas fa-trash"></i> Supprimer
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Schedule Visit Modal -->
+<div class="modal fade" id="scheduleModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-calendar-plus"></i> Planifier la visite
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="scheduleForm">
+                    <input type="hidden" name="request_id" value="<?= $request['id'] ?>">
+                    <input type="hidden" name="property_id" value="<?= $request['property_id'] ?>">
+                    <input type="hidden" name="client_id" value="<?= $request['client_id'] ?>">
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Client:</strong> <?= esc($request['first_name'] . ' ' . $request['last_name']) ?> - <?= esc($request['phone']) ?><br>
+                        <strong>Propriété:</strong> <?= esc($request['reference']) ?> - <?= esc($request['title']) ?>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Date de la visite <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="visit_date" id="visitDate" required 
+                                   min="<?= date('Y-m-d') ?>" 
+                                   value="<?= $request['visit_date'] ?? date('Y-m-d') ?>">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Heure de début <span class="text-danger">*</span></label>
+                            <input type="time" class="form-control" name="start_time" id="startTime" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Durée (minutes)</label>
+                            <select class="form-select" name="duration" id="duration">
+                                <option value="30">30 minutes</option>
+                                <option value="45">45 minutes</option>
+                                <option value="60" selected>60 minutes</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Agent</label>
+                            <select class="form-select" name="agent_id">
+                                <?php foreach ($agents as $agent): ?>
+                                    <option value="<?= $agent['id'] ?>" <?= $request['assigned_to'] == $agent['id'] ? 'selected' : '' ?>>
+                                        <?= esc($agent['first_name'] . ' ' . $agent['last_name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Notes (optionnel)</label>
+                        <textarea class="form-control" name="notes" rows="3" placeholder="Remarques sur la visite..."></textarea>
+                    </div>
+                    
+                    <!-- Availability Check -->
+                    <div id="availabilityCheck" class="mb-3 d-none">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-spinner fa-spin"></i> Vérification des disponibilités...
+                        </div>
+                    </div>
+                    
+                    <div id="availabilityResult"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-info" onclick="checkAvailability()">
+                    <i class="fas fa-search"></i> Vérifier disponibilité
+                </button>
+                <button type="button" class="btn btn-success" id="confirmScheduleBtn" disabled>
+                    <i class="fas fa-calendar-check"></i> Confirmer la visite
+                </button>
             </div>
         </div>
     </div>
@@ -309,5 +421,94 @@ function confirmDelete(id) {
         window.location.href = '<?= base_url('admin/property-requests/delete/') ?>' + id;
     }
 }
+
+// Check Availability for Visit
+function checkAvailability() {
+    const date = document.getElementById('visitDate').value;
+    const time = document.getElementById('startTime').value;
+    const duration = document.getElementById('duration').value;
+    const agentId = document.querySelector('[name="agent_id"]').value;
+    
+    if (!date || !time) {
+        alert('Veuillez sélectionner une date et une heure');
+        return;
+    }
+    
+    // Show loading
+    document.getElementById('availabilityCheck').classList.remove('d-none');
+    document.getElementById('availabilityResult').innerHTML = '';
+    document.getElementById('confirmScheduleBtn').disabled = true;
+    
+    // Check availability
+    fetch('<?= base_url('admin/appointments/check-availability') ?>', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: new URLSearchParams({
+            date: date,
+            time: time,
+            duration: duration,
+            agent_id: agentId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('availabilityCheck').classList.add('d-none');
+        
+        if (data.available) {
+            document.getElementById('availabilityResult').innerHTML = `
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <strong>Créneau disponible !</strong><br>
+                    ${data.message}
+                </div>
+            `;
+            document.getElementById('confirmScheduleBtn').disabled = false;
+        } else {
+            document.getElementById('availabilityResult').innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-times-circle"></i>
+                    <strong>Créneau indisponible</strong><br>
+                    ${data.message}
+                </div>
+                ${data.suggestions ? '<div class="alert alert-info mt-2"><strong>Créneaux disponibles:</strong><br>' + data.suggestions.join('<br>') + '</div>' : ''}
+            `;
+        }
+    })
+    .catch(error => {
+        document.getElementById('availabilityCheck').classList.add('d-none');
+        document.getElementById('availabilityResult').innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i> Erreur lors de la vérification
+            </div>
+        `;
+    });
+}
+
+// Confirm Schedule
+document.getElementById('confirmScheduleBtn').addEventListener('click', function() {
+    const formData = new FormData(document.getElementById('scheduleForm'));
+    
+    this.disabled = true;
+    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enregistrement...';
+    
+    fetch('<?= base_url('admin/appointments/schedule-visit') ?>', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Visite planifiée avec succès !');
+            location.reload();
+        } else {
+            alert('Erreur: ' + data.message);
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-calendar-check"></i> Confirmer la visite';
+        }
+    });
+});
 </script>
 <?= $this->endSection() ?>

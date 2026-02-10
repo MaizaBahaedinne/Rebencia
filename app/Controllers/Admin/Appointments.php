@@ -240,4 +240,162 @@ class Appointments extends BaseController
             'link' => '/admin/appointments'
         ]);
     }
+
+    /**
+     * Check availability for a time slot
+     */
+    public function checkAvailability()
+    {
+        $date = $this->request->getPost('date');
+        $time = $this->request->getPost('time');
+        $duration = $this->request->getPost('duration') ?: 60;
+        $agentId = $this->request->getPost('agent_id');
+
+        if (!$date || !$time) {
+            return $this->response->setJSON([
+                'available' => false,
+                'message' => 'Date et heure requises'
+            ]);
+        }
+
+        // Create datetime
+        $startDateTime = $date . ' ' . $time;
+        $endDateTime = date('Y-m-d H:i:s', strtotime($startDateTime . ' +' . $duration . ' minutes'));
+
+        // Check for conflicts
+        $conflicts = $this->appointmentModel
+            ->where('date >=', $date)
+            ->where('date <', date('Y-m-d', strtotime($date . ' +1 day')))
+            ->where('user_id', $agentId)
+            ->where('status !=', 'cancelled')
+            ->findAll();
+
+        $hasConflict = false;
+        foreach ($conflicts as $appointment) {
+            $existingStart = strtotime($appointment['date'] . ' ' . $appointment['time']);
+            $existingEnd = strtotime($appointment['date'] . ' ' . $appointment['time'] . ' +60 minutes');
+            $newStart = strtotime($startDateTime);
+            $newEnd = strtotime($endDateTime);
+
+            // Check overlap
+            if (($newStart >= $existingStart && $newStart < $existingEnd) ||
+                ($newEnd > $existingStart && $newEnd <= $existingEnd) ||
+                ($newStart <= $existingStart && $newEnd >= $existingEnd)) {
+                $hasConflict = true;
+                break;
+            }
+        }
+
+        if ($hasConflict) {
+            // Suggest alternative times
+            $suggestions = [];
+            for ($i = 9; $i <= 17; $i++) {
+                $testTime = sprintf('%02d:00:00', $i);
+                $testStart = strtotime($date . ' ' . $testTime);
+                $testEnd = $testStart + ($duration * 60);
+                
+                $available = true;
+                foreach ($conflicts as $appointment) {
+                    $existingStart = strtotime($appointment['date'] . ' ' . $appointment['time']);
+                    $existingEnd = strtotime($appointment['date'] . ' ' . $appointment['time'] . ' +60 minutes');
+                    
+                    if (($testStart >= $existingStart && $testStart < $existingEnd) ||
+                        ($testEnd > $existingStart && $testEnd <= $existingEnd)) {
+                        $available = false;
+                        break;
+                    }
+                }
+                
+                if ($available) {
+                    $suggestions[] = sprintf('%02d:00', $i);
+                }
+            }
+
+            return $this->response->setJSON([
+                'available' => false,
+                'message' => 'Ce créneau est déjà réservé',
+                'suggestions' => array_slice($suggestions, 0, 3)
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'available' => true,
+            'message' => 'Créneau disponible de ' . date('H:i', strtotime($time)) . ' à ' . date('H:i', strtotime($endDateTime))
+        ]);
+    }
+
+    /**
+     * Schedule a visit from property request
+     */
+    public function scheduleVisit()
+    {
+        $requestId = $this->request->getPost('request_id');
+        $propertyId = $this->request->getPost('property_id');
+        $clientId = $this->request->getPost('client_id');
+        $visitDate = $this->request->getPost('visit_date');
+        $startTime = $this->request->getPost('start_time');
+        $duration = $this->request->getPost('duration') ?: 60;
+        $agentId = $this->request->getPost('agent_id');
+        $notes = $this->request->getPost('notes');
+
+        // Get property and client info
+        $property = $this->propertyModel->find($propertyId);
+        $client = $this->clientModel->find($clientId);
+
+        if (!$property || !$client) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Propriété ou client introuvable'
+            ]);
+        }
+
+        // Create appointment
+        $appointmentData = [
+            'user_id' => $agentId,
+            'client_id' => $clientId,
+            'property_id' => $propertyId,
+            'type' => 'visit',
+            'title' => 'Visite - ' . $property['title'],
+            'description' => 'Visite de la propriété ' . $property['reference'] . ' avec ' . $client['first_name'] . ' ' . $client['last_name'],
+            'date' => $visitDate,
+            'time' => $startTime,
+            'duration' => $duration,
+            'location' => $property['address'] ?? '',
+            'status' => 'scheduled',
+            'notes' => $notes
+        ];
+
+        try {
+            $appointmentId = $this->appointmentModel->insert($appointmentData);
+
+            if (!$appointmentId) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Erreur lors de la création du rendez-vous'
+                ]);
+            }
+
+            // Update property request status
+            $requestModel = model('PropertyRequestModel');
+            $requestModel->update($requestId, [
+                'status' => 'scheduled'
+            ]);
+
+            // Create notification
+            $this->createNotification($appointmentId, 'created');
+
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Visite planifiée avec succès',
+                'appointment_id' => $appointmentId
+            ]);
+
+        } catch (\Exception $e) {
+            log_message('error', 'Schedule visit error: ' . $e->getMessage());
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Erreur technique: ' . $e->getMessage()
+            ]);
+        }
+    }
 }

@@ -170,6 +170,15 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->get('(:num)/projection/(:num)', 'PropertyAnalysisController::getProjection/$1/$2');
     });
     
+    // Property Requests (Demandes clients)
+    $routes->group('property-requests', function($routes) {
+        $routes->get('/', 'PropertyRequests::index');
+        $routes->get('view/(:num)', 'PropertyRequests::view/$1');
+        $routes->post('update-status', 'PropertyRequests::updateStatus');
+        $routes->post('assign', 'PropertyRequests::assign');
+        $routes->get('delete/(:num)', 'PropertyRequests::delete/$1');
+    });
+    
     // Clients & CRM
     $routes->group('clients', function($routes) {
         $routes->get('/', 'Clients::index');

@@ -736,12 +736,12 @@
             
             <!-- GESTION -->
             <?php if (canRead('properties') || canRead('clients') || canRead('transactions') || canAccessCommissions()): ?>
-            <div class="menu-item has-submenu <?= url_is('admin/properties*') || url_is('admin/clients*') || url_is('admin/transactions*') || url_is('admin/commission-settings*') ? 'open' : '' ?>">
+            <div class="menu-item has-submenu <?= url_is('admin/properties*') || url_is('admin/clients*') || url_is('admin/transactions*') || url_is('admin/commission-settings*') || url_is('admin/property-requests*') ? 'open' : '' ?>">
                 <i class="fas fa-briefcase"></i>
                 <span>Gestion</span>
                 <i class="fas fa-chevron-down submenu-toggle"></i>
             </div>
-            <div class="submenu <?= url_is('admin/properties*') || url_is('admin/clients*') || url_is('admin/transactions*') || url_is('admin/commission-settings*') ? 'open' : '' ?>">
+            <div class="submenu <?= url_is('admin/properties*') || url_is('admin/clients*') || url_is('admin/transactions*') || url_is('admin/commission-settings*') || url_is('admin/property-requests*') ? 'open' : '' ?>">
                 <?php if (canRead('properties')): ?>
                 <a href="<?= base_url('admin/properties') ?>" class="submenu-item <?= url_is('admin/properties*') && !url_is('admin/properties/assignments*') ? 'active' : '' ?>">
                     <i class="fas fa-building"></i>
@@ -753,6 +753,20 @@
                 <a href="<?= base_url('admin/properties/assignments') ?>" class="submenu-item <?= url_is('admin/properties/assignments*') ? 'active' : '' ?>">
                     <i class="fas fa-exchange-alt"></i>
                     <span>Affectation des Biens</span>
+                </a>
+                <?php endif; ?>
+                
+                <?php if (canRead('properties')): ?>
+                <a href="<?= base_url('admin/property-requests') ?>" class="submenu-item <?= url_is('admin/property-requests*') ? 'active' : '' ?>">
+                    <i class="fas fa-envelope-open-text"></i>
+                    <span>Demandes Clients</span>
+                    <?php 
+                    $requestModel = model('PropertyRequestModel');
+                    $pendingCount = $requestModel->where('status', 'pending')->countAllResults();
+                    if ($pendingCount > 0):
+                    ?>
+                        <span class="badge bg-danger rounded-pill ms-auto"><?= $pendingCount ?></span>
+                    <?php endif; ?>
                 </a>
                 <?php endif; ?>
                 

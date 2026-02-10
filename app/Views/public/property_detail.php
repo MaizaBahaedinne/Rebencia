@@ -1039,6 +1039,9 @@ function submitRequest(formData, alertId, form) {
     
     fetch('<?= base_url('properties/submit-request') ?>', {
         method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
         body: formData
     })
     .then(response => response.json())

@@ -208,7 +208,7 @@ async function updateCommission() {
     `;
     
     try {
-        const response = await fetch('<?= base_url("admin/commission-settings/process-simulation") ?>', {
+        const response = await fetch(COMMISSION_SIMULATION_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -428,5 +428,10 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
+<script>
+// Pass PHP variables to JavaScript
+const BASE_URL = '<?= base_url() ?>';
+const COMMISSION_SIMULATION_URL = '<?= base_url("admin/commission-settings/process-simulation") ?>';
+</script>
 <script src="<?= base_url('assets/js/transactions-wizard.js') ?>"></script>
 <?= $this->endSection() ?>

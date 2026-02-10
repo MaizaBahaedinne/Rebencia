@@ -503,17 +503,6 @@
                         </li>
                     </ul>
                     
-                    <!-- CTA Buttons -->
-                    <div class="orpi-cta-buttons d-none d-lg-flex">
-                        <a href="tel:<?= esc($settings['phone'] ?? '+216 70 123 456') ?>" class="orpi-phone">
-                            <i class="fas fa-phone-alt"></i>
-                            <?= esc($settings['phone'] ?? '+216 70 123 456') ?>
-                        </a>
-                        <a href="<?= base_url('contact') ?>" class="btn-orpi-primary">
-                            <i class="fas fa-paper-plane"></i> Estimer mon bien
-                        </a>
-                    </div>
-                    
                     <!-- Mobile Menu Button -->
                     <button class="btn btn-link d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
                         <i class="fas fa-bars fa-2x"></i>

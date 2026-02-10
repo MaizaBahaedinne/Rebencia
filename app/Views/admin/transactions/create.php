@@ -94,8 +94,8 @@
     </div>
 <?php endif ?>
 
-<!-- DEBUG: <?= site_url('admin/transactions/store') ?> -->
-<form action="<?= site_url('admin/transactions/store') ?>" method="POST" id="transactionForm" autocomplete="off">
+<!-- DEBUG: <?= base_url('admin/transactions/store') ?> -->
+<form action="<?= base_url('admin/transactions/store') ?>" method="POST" id="transactionForm" autocomplete="off">
     <?= csrf_field() ?>
     
     <div class="row">

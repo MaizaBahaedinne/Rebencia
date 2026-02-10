@@ -726,6 +726,8 @@
                                 
                                 <!-- Visit Request Tab -->
                                 <div class="tab-pane fade" id="visit-form" role="tabpanel">
+                                    <div class="alert d-none" id="visitAlert"></div>
+                                    
                                     <form id="visitForm">
                                         <input type="hidden" name="property_id" value="<?= $property['id'] ?>">
                                         <input type="hidden" name="property_reference" value="<?= $property['reference'] ?>">
@@ -765,7 +767,6 @@
                                             <i class="fas fa-paper-plane"></i> Demander une visite
                                         </button>
                                     </form>
-                                    <div class="alert d-none mt-3" id="visitAlert"></div>
                                 </div>
                             </div>
                         </div>

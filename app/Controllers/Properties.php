@@ -191,7 +191,7 @@ class Properties extends BaseController
             'property_id' => $propertyId,
             'client_id' => $clientId,
             'request_type' => $requestType,
-            'message' => $message,
+            'message' => $message ?? '',  // Ensure message is never null
             'status' => 'pending',
             'source' => 'website'
         ];
@@ -202,7 +202,25 @@ class Properties extends BaseController
             $requestData['visit_time'] = $this->request->getPost('visit_time');
         }
         
-        $requestModel->insert($requestData);
+        try {
+            $requestId = $requestModel->insert($requestData);
+            
+            if (!$requestId) {
+                log_message('error', 'Failed to insert property request: ' . json_encode($requestModel->errors()));
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Erreur lors de l\'enregistrement de la demande. Veuillez réessayer.'
+                ]);
+            }
+            
+            log_message('info', 'Property request created successfully: ID=' . $requestId);
+        } catch (\Exception $e) {
+            log_message('error', 'Exception while inserting property request: ' . $e->getMessage());
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Erreur technique. Veuillez réessayer plus tard.'
+            ]);
+        }
         
         // Message de succès selon le type
         $successMessage = $requestType === 'visit' 

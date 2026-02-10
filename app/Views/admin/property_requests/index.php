@@ -160,75 +160,39 @@
                         <?php else: ?>
                             <?php foreach ($requests as $request): ?>
                                 <tr>
-                                    <td>
-                                        <small><?= date('d/m/Y', strtotime($request['created_at'])) ?></small>
+                                    <td data-order="<?= strtotime($request['created_at']) ?>">
+                                        <?= date('d/m/Y', strtotime($request['created_at'])) ?>
                                     </td>
                                     <td>
                                         <?php if ($request['request_type'] === 'visit'): ?>
-                                            <span class="badge bg-info">
-                                                <i class="fas fa-calendar-check"></i> Visite
-                                            </span>
+                                            <span class="badge bg-info">Visite</span>
                                         <?php else: ?>
-                                            <span class="badge bg-primary">
-                                                <i class="fas fa-info-circle"></i> Info
-                                            </span>
+                                            <span class="badge bg-primary">Info</span>
                                         <?php endif; ?>
                                     </td>
+                                    <td><?= esc($request['first_name'] . ' ' . $request['last_name']) ?></td>
+                                    <td><?= esc($request['phone']) ?></td>
+                                    <td><?= esc($request['title']) ?></td>
                                     <td>
-                                        <?= esc($request['first_name'] . ' ' . $request['last_name']) ?>
-                                    </td>
-                                    <td>
-                                        <a href="tel:<?= esc($request['phone']) ?>" class="text-decoration-none">
-                                            <?= esc($request['phone']) ?>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <small class="text-muted"><?= esc($request['reference']) ?></small>
-                                        <div class="text-truncate" style="max-width: 200px;" title="<?= esc($request['title']) ?>">
-                                            <?= esc($request['title']) ?>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <?php
-                                        $statusColors = [
-                                            'pending' => 'warning',
-                                            'contacted' => 'info',
-                                            'scheduled' => 'primary',
-                                            'completed' => 'success',
-                                            'cancelled' => 'danger'
-                                        ];
-                                        $statusLabels = [
-                                            'pending' => 'En attente',
-                                            'contacted' => 'Contacté',
-                                            'scheduled' => 'Planifié',
-                                            'completed' => 'Complété',
-                                            'cancelled' => 'Annulé'
-                                        ];
-                                        ?>
-                                        <span class="badge bg-<?= $statusColors[$request['status']] ?>">
-                                            <?= $statusLabels[$request['status']] ?>
+                                        <span class="badge bg-<?= ['pending'=>'warning','contacted'=>'info','scheduled'=>'primary','completed'=>'success','cancelled'=>'danger'][$request['status']] ?>">
+                                            <?= ['pending'=>'En attente','contacted'=>'Contacté','scheduled'=>'Planifié','completed'=>'Complété','cancelled'=>'Annulé'][$request['status']] ?>
                                         </span>
                                     </td>
                                     <td>
                                         <?php if ($request['assigned_to']): ?>
-                                            <small><?= esc($request['agent_first_name'] . ' ' . $request['agent_last_name']) ?></small>
+                                            <?= esc($request['agent_first_name'] . ' ' . $request['agent_last_name']) ?>
                                         <?php else: ?>
-                                            <span class="text-muted">-</span>
+                                            -
                                         <?php endif; ?>
                                     </td>
                                     <td class="text-nowrap">
-                                        <a href="<?= base_url('admin/property-requests/view/' . $request['id']) ?>" 
-                                           class="btn btn-sm btn-primary" title="Voir détails">
+                                        <a href="<?= base_url('admin/property-requests/view/' . $request['id']) ?>" class="btn btn-sm btn-primary">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <button class="btn btn-sm btn-success" 
-                                                onclick="assignAgent(<?= $request['id'] ?>)" 
-                                                title="Assigner">
+                                        <button class="btn btn-sm btn-success" onclick="assignAgent(<?= $request['id'] ?>)">
                                             <i class="fas fa-user-plus"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-danger" 
-                                                onclick="confirmDelete(<?= $request['id'] ?>)" 
-                                                title="Supprimer">
+                                        <button class="btn btn-sm btn-danger" onclick="confirmDelete(<?= $request['id'] ?>)">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </td>
@@ -276,14 +240,20 @@
 
 <?= $this->section('scripts') ?>
 <script>
-// DataTable
+// DataTable with proper column configuration
 $(document).ready(function() {
-    $('#requestsTable').DataTable({
-        order: [[0, 'desc']],
-        language: {
-            url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/fr-FR.json'
-        }
-    });
+    if ($.fn.DataTable) {
+        $('#requestsTable').DataTable({
+            order: [[0, 'desc']],
+            pageLength: 25,
+            columnDefs: [
+                { orderable: false, targets: [7] } // Actions column not sortable
+            ],
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/fr-FR.json'
+            }
+        });
+    }
 });
 
 // Assign Agent

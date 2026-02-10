@@ -70,6 +70,14 @@ class Appointments extends BaseController
         $data = $this->request->getPost();
         $data['user_id'] = session()->get('user_id');
 
+        // Convert scheduled_at from French format (d/m/Y H:i) to MySQL format (Y-m-d H:i:s)
+        if (!empty($data['scheduled_at'])) {
+            $date = \DateTime::createFromFormat('d/m/Y H:i', $data['scheduled_at']);
+            if ($date) {
+                $data['scheduled_at'] = $date->format('Y-m-d H:i:s');
+            }
+        }
+
         if (!$this->appointmentModel->insert($data)) {
             return redirect()->back()
                 ->withInput()
@@ -106,6 +114,11 @@ class Appointments extends BaseController
             return redirect()->back()->with('error', 'Rendez-vous non trouvé');
         }
 
+        // Format scheduled_at for Flatpickr (d/m/Y H:i)
+        if (!empty($appointment['scheduled_at'])) {
+            $appointment['scheduled_at'] = date('d/m/Y H:i', strtotime($appointment['scheduled_at']));
+        }
+
         $data = [
             'title' => 'Modifier Rendez-vous',
             'page_title' => 'Modifier le Rendez-vous',
@@ -123,6 +136,14 @@ class Appointments extends BaseController
     public function update($id)
     {
         $data = $this->request->getPost();
+
+        // Convert scheduled_at from French format (d/m/Y H:i) to MySQL format (Y-m-d H:i:s)
+        if (!empty($data['scheduled_at'])) {
+            $date = \DateTime::createFromFormat('d/m/Y H:i', $data['scheduled_at']);
+            if ($date) {
+                $data['scheduled_at'] = $date->format('Y-m-d H:i:s');
+            }
+        }
 
         if (!$this->appointmentModel->update($id, $data)) {
             return redirect()->back()

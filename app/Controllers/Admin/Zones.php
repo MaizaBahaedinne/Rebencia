@@ -15,8 +15,33 @@ class Zones extends BaseController
 
     public function index()
     {
+        // Get all governorates with their cities
+        $governorates = $this->zoneModel
+            ->where('type', 'governorate')
+            ->orderBy('name', 'ASC')
+            ->findAll();
+        
+        // Get all cities grouped by parent_id
+        $cities = $this->zoneModel
+            ->where('type', 'city')
+            ->orderBy('popularity_score', 'DESC')
+            ->orderBy('name', 'ASC')
+            ->findAll();
+        
+        // Group cities by parent
+        $citiesByParent = [];
+        foreach ($cities as $city) {
+            $parentId = $city['parent_id'] ?? 0;
+            if (!isset($citiesByParent[$parentId])) {
+                $citiesByParent[$parentId] = [];
+            }
+            $citiesByParent[$parentId][] = $city;
+        }
+        
         $data = [
             'title' => 'Gestion des Zones',
+            'governorates' => $governorates,
+            'citiesByParent' => $citiesByParent,
             'zones' => $this->zoneModel->orderBy('type', 'ASC')->orderBy('name', 'ASC')->findAll()
         ];
 

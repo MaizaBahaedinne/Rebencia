@@ -28,18 +28,16 @@ class Appointments extends BaseController
         $currentUserId = session()->get('user_id');
         $userRole = session()->get('role');
         
-        // If manager, get team members
-        $userIds = $currentUserId;
+        // Get team members if manager
         $teamMembers = [];
         if ($userRole === 'manager' || $userRole === 'admin') {
-            $userIds = $userModel->getTeamMemberIds($currentUserId);
             $teamMembers = $userModel->getTeamMembers($currentUserId);
         }
         
         $data = [
             'title' => 'Agenda & Rendez-vous',
             'page_title' => 'Calendrier',
-            'upcoming' => $this->appointmentModel->getUpcoming($userIds, 10),
+            'upcoming' => $this->appointmentModel->getUpcoming($currentUserId, 10),
             'team_members' => $teamMembers,
             'is_manager' => ($userRole === 'manager' || $userRole === 'admin'),
             'current_user_id' => $currentUserId
@@ -55,25 +53,21 @@ class Appointments extends BaseController
     {
         $start = $this->request->getGet('start');
         $end = $this->request->getGet('end');
-        $filterUserId = $this->request->getGet('user_id');
+        $filterUserIds = $this->request->getGet('user_ids'); // Comma-separated IDs
         $currentUserId = session()->get('user_id');
-        $userRole = session()->get('role');
         
-        $userModel = model('UserModel');
-        
-        // Determine which user IDs to show
-        if ($filterUserId) {
-            // Specific user selected
-            $userId = $filterUserId;
-        } elseif ($userRole === 'manager' || $userRole === 'admin') {
-            // Manager: show all team
-            $userId = $userModel->getTeamMemberIds($currentUserId);
+        // Parse user IDs
+        if ($filterUserIds) {
+            $userIds = array_filter(array_map('intval', explode(',', $filterUserIds)));
+            if (empty($userIds)) {
+                $userIds = $currentUserId;
+            }
         } else {
-            // Regular user: show only their own
-            $userId = $currentUserId;
+            // Default: show only current user
+            $userIds = $currentUserId;
         }
 
-        $events = $this->appointmentModel->getForCalendar($userId, $start, $end);
+        $events = $this->appointmentModel->getForCalendar($userIds, $start, $end);
 
         return $this->response->setJSON($events);
     }

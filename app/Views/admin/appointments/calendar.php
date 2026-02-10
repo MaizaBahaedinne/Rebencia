@@ -16,17 +16,6 @@
         </nav>
     </div>
     <div class="d-flex gap-2">
-        <?php if ($is_manager): ?>
-            <select id="agentFilter" class="form-select" style="width: auto;">
-                <option value="">Toute l'équipe</option>
-                <option value="<?= $current_user_id ?>">Mes rendez-vous</option>
-                <?php foreach ($team_members as $member): ?>
-                    <option value="<?= $member['id'] ?>">
-                        <?= esc($member['first_name'] . ' ' . $member['last_name']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-        <?php endif; ?>
         <a href="<?= base_url('admin/appointments/create') ?>" class="btn btn-primary">
             <i class="fas fa-plus"></i> Nouveau Rendez-vous
         </a>
@@ -38,7 +27,7 @@
 
 <div class="row g-4">
     <!-- Calendar -->
-    <div class="col-lg-9">
+    <div class="col-lg-<?= $is_manager ? '8' : '9' ?>">
         <div class="card border-0 shadow-sm">
             <div class="card-body" style="min-height: 600px;">
                 <div id="calendar"></div>
@@ -46,8 +35,45 @@
         </div>
     </div>
 
+    <!-- Team Members Filter (Manager only) -->
+    <?php if ($is_manager): ?>
+    <div class="col-lg-2">
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0">
+                    <i class="fas fa-users text-primary"></i> 
+                    Mon équipe
+                </h6>
+            </div>
+            <div class="card-body p-2">
+                <div class="form-check mb-2">
+                    <input class="form-check-input team-member-check" 
+                           type="checkbox" 
+                           value="<?= $current_user_id ?>" 
+                           id="user_<?= $current_user_id ?>" 
+                           checked>
+                    <label class="form-check-label" for="user_<?= $current_user_id ?>">
+                        <small>Moi</small>
+                    </label>
+                </div>
+                <?php foreach ($team_members as $member): ?>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input team-member-check" 
+                               type="checkbox" 
+                               value="<?= $member['id'] ?>" 
+                               id="user_<?= $member['id'] ?>">
+                        <label class="form-check-label" for="user_<?= $member['id'] ?>">
+                            <small><?= esc($member['first_name'] . ' ' . $member['last_name']) ?></small>
+                        </label>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Upcoming Appointments -->
-    <div class="col-lg-3">
+    <div class="col-lg-<?= $is_manager ? '2' : '3' ?>">
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-white">
                 <h5 class="mb-0">
@@ -113,6 +139,15 @@
 document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
     
+    function getSelectedUserIds() {
+        var checkboxes = document.querySelectorAll('.team-member-check:checked');
+        var ids = [];
+        checkboxes.forEach(function(cb) {
+            ids.push(cb.value);
+        });
+        return ids.join(',');
+    }
+    
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'fr',
@@ -130,8 +165,8 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         height: 'auto',
         events: function(info, successCallback, failureCallback) {
-            var userId = document.getElementById('agentFilter') ? document.getElementById('agentFilter').value : '';
-            fetch('<?= base_url('admin/appointments/getEvents') ?>?start=' + info.startStr + '&end=' + info.endStr + '&user_id=' + userId)
+            var userIds = getSelectedUserIds();
+            fetch('<?= base_url('admin/appointments/getEvents') ?>?start=' + info.startStr + '&end=' + info.endStr + '&user_ids=' + userIds)
                 .then(response => response.json())
                 .then(data => successCallback(data))
                 .catch(() => {
@@ -161,10 +196,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     calendar.render();
     
-    // Reload calendar when agent filter changes
+    // Reload calendar when checkboxes change
     <?php if ($is_manager): ?>
-    document.getElementById('agentFilter').addEventListener('change', function() {
-        calendar.refetchEvents();
+    document.querySelectorAll('.team-member-check').forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            calendar.refetchEvents();
+        });
     });
     <?php endif; ?>
 });

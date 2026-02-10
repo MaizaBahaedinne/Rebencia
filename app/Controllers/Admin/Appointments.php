@@ -262,18 +262,22 @@ class Appointments extends BaseController
         $startDateTime = $date . ' ' . $time;
         $endDateTime = date('Y-m-d H:i:s', strtotime($startDateTime . ' +' . $duration . ' minutes'));
 
-        // Check for conflicts
+        // Check for conflicts - get appointments for the same day
+        $dayStart = $date . ' 00:00:00';
+        $dayEnd = $date . ' 23:59:59';
+        
         $conflicts = $this->appointmentModel
-            ->where('date >=', $date)
-            ->where('date <', date('Y-m-d', strtotime($date . ' +1 day')))
+            ->where('scheduled_at >=', $dayStart)
+            ->where('scheduled_at <=', $dayEnd)
             ->where('user_id', $agentId)
             ->where('status !=', 'cancelled')
             ->findAll();
 
         $hasConflict = false;
         foreach ($conflicts as $appointment) {
-            $existingStart = strtotime($appointment['date'] . ' ' . $appointment['time']);
-            $existingEnd = strtotime($appointment['date'] . ' ' . $appointment['time'] . ' +60 minutes');
+            $existingStart = strtotime($appointment['scheduled_at']);
+            $appointmentDuration = $appointment['duration'] ?: 60;
+            $existingEnd = $existingStart + ($appointmentDuration * 60);
             $newStart = strtotime($startDateTime);
             $newEnd = strtotime($endDateTime);
 
@@ -296,8 +300,9 @@ class Appointments extends BaseController
                 
                 $available = true;
                 foreach ($conflicts as $appointment) {
-                    $existingStart = strtotime($appointment['date'] . ' ' . $appointment['time']);
-                    $existingEnd = strtotime($appointment['date'] . ' ' . $appointment['time'] . ' +60 minutes');
+                    $existingStart = strtotime($appointment['scheduled_at']);
+                    $appointmentDuration = $appointment['duration'] ?: 60;
+                    $existingEnd = $existingStart + ($appointmentDuration * 60);
                     
                     if (($testStart >= $existingStart && $testStart < $existingEnd) ||
                         ($testEnd > $existingStart && $testEnd <= $existingEnd)) {
@@ -350,15 +355,16 @@ class Appointments extends BaseController
         }
 
         // Create appointment
+        $scheduledAt = $visitDate . ' ' . $startTime;
+        
         $appointmentData = [
             'user_id' => $agentId,
             'client_id' => $clientId,
             'property_id' => $propertyId,
-            'type' => 'visit',
+            'appointment_type' => 'visit',
             'title' => 'Visite - ' . $property['title'],
             'description' => 'Visite de la propriété ' . $property['reference'] . ' avec ' . $client['first_name'] . ' ' . $client['last_name'],
-            'date' => $visitDate,
-            'time' => $startTime,
+            'scheduled_at' => $scheduledAt,
             'duration' => $duration,
             'location' => $property['address'] ?? '',
             'status' => 'scheduled',

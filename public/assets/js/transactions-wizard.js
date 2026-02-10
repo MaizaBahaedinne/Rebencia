@@ -196,6 +196,20 @@ async function updateCommission() {
         return;
     }
     
+    // Check if COMMISSION_SIMULATION_URL is defined
+    if (typeof COMMISSION_SIMULATION_URL === 'undefined') {
+        console.error('COMMISSION_SIMULATION_URL is not defined');
+        const previewDiv = document.getElementById('commissionPreview');
+        previewDiv.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle"></i> Configuration error: COMMISSION_SIMULATION_URL is not defined
+            </div>
+        `;
+        return;
+    }
+    
+    console.log('Calling commission API:', COMMISSION_SIMULATION_URL);
+    
     // Show loading
     const previewDiv = document.getElementById('commissionPreview');
     previewDiv.innerHTML = `
@@ -222,7 +236,9 @@ async function updateCommission() {
             })
         });
         
+        console.log('Response status:', response.status);
         const result = await response.json();
+        console.log('Result:', result);
         
         if (result.success) {
             commissionData = result.data;

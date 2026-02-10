@@ -294,7 +294,7 @@ class Users extends BaseController
             
             // Count transactions and calculate total
             $memberTransactions = $db->table('transactions')
-                ->select('SUM(final_price) as total_sales, COUNT(*) as count')
+                ->select('SUM(amount) as total_sales, COUNT(*) as count')
                 ->where('agent_id', $memberId)
                 ->where('status', 'completed')
                 ->get()

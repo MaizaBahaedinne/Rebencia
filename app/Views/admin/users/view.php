@@ -66,6 +66,9 @@
         width: 20px;
         opacity: 0.9;
     }
+    .text-purple {
+        color: #9333ea !important;
+    }
 </style>
 <?= $this->endSection() ?>
 
@@ -190,11 +193,20 @@
                 <div class="stat-label">Total TND</div>
             </div>
         </div>
+        <?php if (isset($team_members) && !empty($team_members)): ?>
+        <div class="col-md-2">
+            <div class="stat-card-compact" style="cursor: pointer;" onclick="document.getElementById('teamDetails').scrollIntoView({behavior: 'smooth'})">
+                <i class="fas fa-users-cog fa-2x text-purple"></i>
+                <div class="stat-number text-purple"><?= count($team_members) ?></div>
+                <div class="stat-label">Mon Équipe</div>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
 
-    <!-- Team Members Section (Manager/Admin only) -->
+    <!-- Team Members Details (Manager/Admin only) -->
     <?php if (isset($team_members) && !empty($team_members)): ?>
-    <div class="row g-3 mb-4">
+    <div class="row g-3 mb-4" id="teamDetails">
         <div class="col-12">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white">

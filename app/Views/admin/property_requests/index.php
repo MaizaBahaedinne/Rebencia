@@ -142,8 +142,8 @@
                             <th>Date</th>
                             <th>Type</th>
                             <th>Client</th>
+                            <th>Téléphone</th>
                             <th>Propriété</th>
-                            <th>Message</th>
                             <th>Statut</th>
                             <th>Agent</th>
                             <th>Actions</th>
@@ -161,16 +161,13 @@
                             <?php foreach ($requests as $request): ?>
                                 <tr>
                                     <td>
-                                        <small><?= date('d/m/Y H:i', strtotime($request['created_at'])) ?></small>
+                                        <small><?= date('d/m/Y', strtotime($request['created_at'])) ?></small>
                                     </td>
                                     <td>
                                         <?php if ($request['request_type'] === 'visit'): ?>
                                             <span class="badge bg-info">
                                                 <i class="fas fa-calendar-check"></i> Visite
                                             </span>
-                                            <?php if ($request['visit_date']): ?>
-                                                <br><small class="text-muted"><?= date('d/m/Y', strtotime($request['visit_date'])) ?></small>
-                                            <?php endif; ?>
                                         <?php else: ?>
                                             <span class="badge bg-primary">
                                                 <i class="fas fa-info-circle"></i> Info
@@ -178,18 +175,18 @@
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <strong><?= esc($request['first_name'] . ' ' . $request['last_name']) ?></strong><br>
-                                        <small class="text-muted">
-                                            <i class="fas fa-phone"></i> <?= esc($request['phone']) ?>
-                                        </small>
+                                        <?= esc($request['first_name'] . ' ' . $request['last_name']) ?>
                                     </td>
                                     <td>
-                                        <small class="text-muted"><?= esc($request['reference']) ?></small><br>
-                                        <strong><?= esc($request['title']) ?></strong><br>
-                                        <small class="text-primary"><?= number_format($request['price'], 0, ',', ' ') ?> TND</small>
+                                        <a href="tel:<?= esc($request['phone']) ?>" class="text-decoration-none">
+                                            <?= esc($request['phone']) ?>
+                                        </a>
                                     </td>
                                     <td>
-                                        <small><?= esc(mb_substr($request['message'], 0, 50)) ?><?= mb_strlen($request['message']) > 50 ? '...' : '' ?></small>
+                                        <small class="text-muted"><?= esc($request['reference']) ?></small>
+                                        <div class="text-truncate" style="max-width: 200px;" title="<?= esc($request['title']) ?>">
+                                            <?= esc($request['title']) ?>
+                                        </div>
                                     </td>
                                     <td>
                                         <?php
@@ -216,10 +213,10 @@
                                         <?php if ($request['assigned_to']): ?>
                                             <small><?= esc($request['agent_first_name'] . ' ' . $request['agent_last_name']) ?></small>
                                         <?php else: ?>
-                                            <span class="text-muted">Non assigné</span>
+                                            <span class="text-muted">-</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td>
+                                    <td class="text-nowrap">
                                         <a href="<?= base_url('admin/property-requests/view/' . $request['id']) ?>" 
                                            class="btn btn-sm btn-primary" title="Voir détails">
                                             <i class="fas fa-eye"></i>

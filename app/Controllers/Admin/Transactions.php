@@ -45,16 +45,12 @@ class Transactions extends BaseController
         $userModel = model('UserModel');
         $agencyModel = model('AgencyModel');
         
-        // Get properties with owner and agent info
+        // Get properties with agent and agency info
         $properties = $this->propertyModel
             ->select('properties.*, 
-                     properties.owner_id,
-                     properties.agent_id,
                      agents.agency_id as agent_agency_id,
-                     CONCAT(owners.first_name, " ", owners.last_name) as owner_name,
                      CONCAT(agents.first_name, " ", agents.last_name) as agent_name,
                      agencies.name as agency_name')
-            ->join('clients as owners', 'owners.id = properties.owner_id', 'left')
             ->join('users as agents', 'agents.id = properties.agent_id', 'left')
             ->join('agencies', 'agencies.id = agents.agency_id', 'left')
             ->findAll();

@@ -1043,14 +1043,22 @@ function submitRequest(formData, alertId, form) {
     })
     .then(response => response.json())
     .then(data => {
+        // Afficher l'alerte
+        alertDiv.classList.remove('d-none');
+        
         if (data.success) {
             alertDiv.innerHTML = `
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle me-2"></i>${data.message}
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>Demande envoyée !</strong><br>
+                    ${data.message}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             `;
             form.reset();
+            
+            // Scroll vers l'alerte
+            alertDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         } else {
             alertDiv.innerHTML = `
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -1061,6 +1069,7 @@ function submitRequest(formData, alertId, form) {
         }
     })
     .catch(error => {
+        alertDiv.classList.remove('d-none');
         alertDiv.innerHTML = `
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <i class="fas fa-exclamation-circle me-2"></i>Une erreur est survenue. Veuillez réessayer.

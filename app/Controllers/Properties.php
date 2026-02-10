@@ -224,8 +224,8 @@ class Properties extends BaseController
         
         // Message de succès selon le type
         $successMessage = $requestType === 'visit' 
-            ? 'Votre demande de visite a été envoyée avec succès ! Nous vous contacterons bientôt.'
-            : 'Votre demande d\'information a été envoyée avec succès ! Nous vous répondrons dans les plus brefs délais.';
+            ? 'Votre demande de visite a été envoyée avec succès ! Notre équipe vous contactera dans les 24 heures pour confirmer le rendez-vous.'
+            : 'Votre demande d\'information a été envoyée avec succès ! Nous vous répondrons sous 24 heures.';
         
         return $this->response->setJSON([
             'success' => true,

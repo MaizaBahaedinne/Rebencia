@@ -24,10 +24,25 @@ class Appointments extends BaseController
      */
     public function index()
     {
+        $userModel = model('UserModel');
+        $currentUserId = session()->get('user_id');
+        $userRole = session()->get('role');
+        
+        // If manager, get team members
+        $userIds = $currentUserId;
+        $teamMembers = [];
+        if ($userRole === 'manager' || $userRole === 'admin') {
+            $userIds = $userModel->getTeamMemberIds($currentUserId);
+            $teamMembers = $userModel->getTeamMembers($currentUserId);
+        }
+        
         $data = [
             'title' => 'Agenda & Rendez-vous',
             'page_title' => 'Calendrier',
-            'upcoming' => $this->appointmentModel->getUpcoming(session()->get('user_id'), 10)
+            'upcoming' => $this->appointmentModel->getUpcoming($userIds, 10),
+            'team_members' => $teamMembers,
+            'is_manager' => ($userRole === 'manager' || $userRole === 'admin'),
+            'current_user_id' => $currentUserId
         ];
 
         return view('admin/appointments/calendar', $data);
@@ -40,7 +55,23 @@ class Appointments extends BaseController
     {
         $start = $this->request->getGet('start');
         $end = $this->request->getGet('end');
-        $userId = $this->request->getGet('user_id') ?: session()->get('user_id');
+        $filterUserId = $this->request->getGet('user_id');
+        $currentUserId = session()->get('user_id');
+        $userRole = session()->get('role');
+        
+        $userModel = model('UserModel');
+        
+        // Determine which user IDs to show
+        if ($filterUserId) {
+            // Specific user selected
+            $userId = $filterUserId;
+        } elseif ($userRole === 'manager' || $userRole === 'admin') {
+            // Manager: show all team
+            $userId = $userModel->getTeamMemberIds($currentUserId);
+        } else {
+            // Regular user: show only their own
+            $userId = $currentUserId;
+        }
 
         $events = $this->appointmentModel->getForCalendar($userId, $start, $end);
 

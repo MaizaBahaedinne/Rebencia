@@ -74,11 +74,17 @@ class AppointmentModel extends Model
         $builder = $this->select('appointments.id, appointments.title, 
             appointments.scheduled_at as start, 
             appointments.status, appointments.appointment_type,
-            CONCAT(clients.first_name, " ", clients.last_name) as client_name')
-            ->join('clients', 'clients.id = appointments.client_id', 'left');
+            CONCAT(clients.first_name, " ", clients.last_name) as client_name,
+            CONCAT(users.first_name, " ", users.last_name) as agent_name')
+            ->join('clients', 'clients.id = appointments.client_id', 'left')
+            ->join('users', 'users.id = appointments.user_id', 'left');
 
         if ($userId) {
-            $builder->where('appointments.user_id', $userId);
+            if (is_array($userId)) {
+                $builder->whereIn('appointments.user_id', $userId);
+            } else {
+                $builder->where('appointments.user_id', $userId);
+            }
         }
 
         if ($start && $end) {
@@ -122,15 +128,23 @@ class AppointmentModel extends Model
     {
         $builder = $this->select('appointments.*, 
             CONCAT(clients.first_name, " ", clients.last_name) as client_name,
+            CONCAT(users.first_name, " ", users.last_name) as agent_name,
             properties.title as property_title')
             ->join('clients', 'clients.id = appointments.client_id', 'left')
+            ->join('users', 'users.id = appointments.user_id', 'left')
             ->join('properties', 'properties.id = appointments.property_id', 'left')
             ->where('appointments.scheduled_at >', date('Y-m-d H:i:s'))
-            ->where('appointments.status', 'scheduled')
-            ->orWhere('appointments.status', 'confirmed');
+            ->groupStart()
+                ->where('appointments.status', 'scheduled')
+                ->orWhere('appointments.status', 'confirmed')
+            ->groupEnd();
 
         if ($userId) {
-            $builder->where('appointments.user_id', $userId);
+            if (is_array($userId)) {
+                $builder->whereIn('appointments.user_id', $userId);
+            } else {
+                $builder->where('appointments.user_id', $userId);
+            }
         }
 
         return $builder->orderBy('appointments.scheduled_at', 'ASC')

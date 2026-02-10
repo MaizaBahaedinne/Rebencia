@@ -15,7 +15,18 @@
             </ol>
         </nav>
     </div>
-    <div>
+    <div class="d-flex gap-2">
+        <?php if ($is_manager): ?>
+            <select id="agentFilter" class="form-select" style="width: auto;">
+                <option value="">Toute l'équipe</option>
+                <option value="<?= $current_user_id ?>">Mes rendez-vous</option>
+                <?php foreach ($team_members as $member): ?>
+                    <option value="<?= $member['id'] ?>">
+                        <?= esc($member['first_name'] . ' ' . $member['last_name']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        <?php endif; ?>
         <a href="<?= base_url('admin/appointments/create') ?>" class="btn btn-primary">
             <i class="fas fa-plus"></i> Nouveau Rendez-vous
         </a>
@@ -72,6 +83,12 @@
                                         <?= esc($apt['client_name']) ?>
                                     </div>
                                 <?php endif; ?>
+                                <?php if (!empty($apt['agent_name'])): ?>
+                                    <div>
+                                        <i class="fas fa-user-tie"></i>
+                                        <?= esc($apt['agent_name']) ?>
+                                    </div>
+                                <?php endif; ?>
                                 <?php if ($apt['property_title']): ?>
                                     <div>
                                         <i class="fas fa-home"></i>
@@ -112,12 +129,15 @@ document.addEventListener('DOMContentLoaded', function() {
             list: 'Liste'
         },
         height: 'auto',
-        events: {
-            url: '<?= base_url('admin/appointments/getEvents') ?>',
-            method: 'GET',
-            failure: function() {
-                alert('Erreur lors du chargement des rendez-vous');
-            }
+        events: function(info, successCallback, failureCallback) {
+            var userId = document.getElementById('agentFilter') ? document.getElementById('agentFilter').value : '';
+            fetch('<?= base_url('admin/appointments/getEvents') ?>?start=' + info.startStr + '&end=' + info.endStr + '&user_id=' + userId)
+                .then(response => response.json())
+                .then(data => successCallback(data))
+                .catch(() => {
+                    alert('Erreur lors du chargement des rendez-vous');
+                    failureCallback();
+                });
         },
         eventClick: function(info) {
             if (confirm('Voulez-vous voir les détails de ce rendez-vous?')) {
@@ -130,12 +150,23 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         },
         eventDidMount: function(info) {
-            // Add tooltips
-            info.el.title = info.event.extendedProps.type + ' - ' + info.event.extendedProps.status;
+            // Add tooltips with agent name
+            var tooltip = info.event.extendedProps.type + ' - ' + info.event.extendedProps.status;
+            if (info.event.extendedProps.agent_name) {
+                tooltip += '\nAgent: ' + info.event.extendedProps.agent_name;
+            }
+            info.el.title = tooltip;
         }
     });
     
     calendar.render();
+    
+    // Reload calendar when agent filter changes
+    <?php if ($is_manager): ?>
+    document.getElementById('agentFilter').addEventListener('change', function() {
+        calendar.refetchEvents();
+    });
+    <?php endif; ?>
 });
 </script>
 

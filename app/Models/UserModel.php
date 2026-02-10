@@ -55,6 +55,27 @@ class UserModel extends Model
     protected $beforeDelete = [];
     protected $afterDelete = [];
 
+    /**
+     * Get team members for a manager
+     */
+    public function getTeamMembers($managerId)
+    {
+        return $this->where('manager_id', $managerId)
+            ->where('status', 'active')
+            ->findAll();
+    }
+
+    /**
+     * Get all team member IDs for a manager (including the manager)
+     */
+    public function getTeamMemberIds($managerId)
+    {
+        $team = $this->getTeamMembers($managerId);
+        $ids = array_column($team, 'id');
+        $ids[] = $managerId; // Include manager themselves
+        return $ids;
+    }
+
     protected function hashPassword(array $data)
     {
         // Only hash if password_hash is set AND it's not already hashed

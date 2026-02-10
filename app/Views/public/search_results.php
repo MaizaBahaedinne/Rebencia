@@ -104,11 +104,32 @@
                                 <label class="form-label fw-bold">Surface (m²)</label>
                                 <div class="row g-2">
                                     <div class="col-6">
-                                        <input type="number" name="area_min" class="form-control form-control-sm" placeholder="Min" value="<?= esc($filters['area_min'] ?? '') ?>">
+                                        <input type="number" name="surface_min" class="form-control form-control-sm" placeholder="Min" value="<?= esc($filters['surface_min'] ?? '') ?>">
                                     </div>
                                     <div class="col-6">
-                                        <input type="number" name="area_max" class="form-control form-control-sm" placeholder="Max" value="<?= esc($filters['area_max'] ?? '') ?>">
+                                        <input type="number" name="surface_max" class="form-control form-control-sm" placeholder="Max" value="<?= esc($filters['surface_max'] ?? '') ?>">
                                     </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Amenities -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Équipements</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="amenities[]" value="parking" id="filter_parking" <?= in_array('parking', $filters['amenities'] ?? []) ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="filter_parking">Parking</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="amenities[]" value="piscine" id="filter_piscine" <?= in_array('piscine', $filters['amenities'] ?? []) ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="filter_piscine">Piscine</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="amenities[]" value="jardin" id="filter_jardin" <?= in_array('jardin', $filters['amenities'] ?? []) ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="filter_jardin">Jardin</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="amenities[]" value="ascenseur" id="filter_ascenseur" <?= in_array('ascenseur', $filters['amenities'] ?? []) ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="filter_ascenseur">Ascenseur</label>
                                 </div>
                             </div>
                             

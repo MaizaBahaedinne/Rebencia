@@ -17,10 +17,12 @@ class Search extends BaseController
             'governorate' => $this->request->getGet('governorate'),
             'price_min' => $this->request->getGet('price_min'),
             'price_max' => $this->request->getGet('price_max'),
-            'area_min' => $this->request->getGet('area_min'),
-            'area_max' => $this->request->getGet('area_max'),
+            'price_max_advanced' => $this->request->getGet('price_max_advanced'),
+            'surface_min' => $this->request->getGet('surface_min'),
+            'surface_max' => $this->request->getGet('surface_max'),
             'bedrooms_min' => $this->request->getGet('bedrooms_min'),
             'bathrooms_min' => $this->request->getGet('bathrooms_min'),
+            'amenities' => $this->request->getGet('amenities'),
             'reference' => $this->request->getGet('reference')
         ];
         
@@ -52,12 +54,36 @@ class Search extends BaseController
             $query->where('price <=', $filters['price_max']);
         }
         
-        if (!empty($filters['area_min'])) {
-            $query->where('surface >=', $filters['area_min']);
+        if (!empty($filters['price_max_advanced'])) {
+            $query->where('price <=', $filters['price_max_advanced']);
         }
         
-        if (!empty($filters['area_max'])) {
-            $query->where('surface <=', $filters['area_max']);
+        if (!empty($filters['surface_min'])) {
+            $query->where('area_total >=', $filters['surface_min']);
+        }
+        
+        if (!empty($filters['surface_max'])) {
+            $query->where('area_total <=', $filters['surface_max']);
+        }
+        
+        // Amenities filters
+        if (!empty($filters['amenities']) && is_array($filters['amenities'])) {
+            foreach ($filters['amenities'] as $amenity) {
+                switch($amenity) {
+                    case 'parking':
+                        $query->where('has_parking', 1);
+                        break;
+                    case 'piscine':
+                        $query->where('has_pool', 1);
+                        break;
+                    case 'jardin':
+                        $query->where('has_garden', 1);
+                        break;
+                    case 'ascenseur':
+                        $query->where('has_elevator', 1);
+                        break;
+                }
+            }
         }
         
         if (!empty($filters['bedrooms_min'])) {

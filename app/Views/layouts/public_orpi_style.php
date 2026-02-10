@@ -214,7 +214,7 @@
     
     /* Hero Section */
     .orpi-hero {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        background: var(--primary-color);
         padding: 120px 0 80px;
         color: white;
         position: relative;
@@ -292,7 +292,7 @@
     .orpi-service-icon {
         width: 80px;
         height: 80px;
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        background: var(--primary-color);
         border-radius: 50%;
         display: flex;
         align-items: center;

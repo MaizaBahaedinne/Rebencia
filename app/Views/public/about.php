@@ -50,7 +50,7 @@
         <div class="row g-4">
             <div class="col-md-4">
                 <div class="text-center p-4 bg-white rounded shadow-sm h-100">
-                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: white; font-size: 2rem;">
+                    <div style="width: 80px; height: 80px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: white; font-size: 2rem;">
                         <i class="fas fa-handshake"></i>
                     </div>
                     <h4 class="mb-3">Confiance</h4>
@@ -62,7 +62,7 @@
             
             <div class="col-md-4">
                 <div class="text-center p-4 bg-white rounded shadow-sm h-100">
-                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: white; font-size: 2rem;">
+                    <div style="width: 80px; height: 80px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: white; font-size: 2rem;">
                         <i class="fas fa-user-tie"></i>
                     </div>
                     <h4 class="mb-3">Professionnalisme</h4>
@@ -74,7 +74,7 @@
             
             <div class="col-md-4">
                 <div class="text-center p-4 bg-white rounded shadow-sm h-100">
-                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: white; font-size: 2rem;">
+                    <div style="width: 80px; height: 80px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: white; font-size: 2rem;">
                         <i class="fas fa-heart"></i>
                     </div>
                     <h4 class="mb-3">Proximité</h4>
@@ -132,7 +132,7 @@
 </section>
 
 <!-- Chiffres Clés -->
-<section class="py-5" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white;">
+<section class="py-5" style="background: var(--primary-color); color: white;">
     <div class="container">
         <div class="text-center mb-5">
             <h2 class="display-5 fw-bold">REBENCIA en Chiffres</h2>
@@ -178,7 +178,7 @@
         <div class="row g-4 justify-content-center">
             <div class="col-md-4">
                 <div class="text-center">
-                    <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: white; font-size: 3rem;">
+                    <div style="width: 150px; height: 150px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: white; font-size: 3rem;">
                         <i class="fas fa-user"></i>
                     </div>
                     <h4>Direction</h4>
@@ -188,7 +188,7 @@
             
             <div class="col-md-4">
                 <div class="text-center">
-                    <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: white; font-size: 3rem;">
+                    <div style="width: 150px; height: 150px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: white; font-size: 3rem;">
                         <i class="fas fa-users"></i>
                     </div>
                     <h4>Conseillers</h4>
@@ -198,7 +198,7 @@
             
             <div class="col-md-4">
                 <div class="text-center">
-                    <div style="width: 150px; height: 150px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: white; font-size: 3rem;">
+                    <div style="width: 150px; height: 150px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: white; font-size: 3rem;">
                         <i class="fas fa-headset"></i>
                     </div>
                     <h4>Support</h4>

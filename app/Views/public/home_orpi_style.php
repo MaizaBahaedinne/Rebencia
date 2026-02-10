@@ -243,7 +243,7 @@
 </section>
 
 <!-- Stats Section -->
-<section class="py-5" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white;">
+<section class="py-5" style="background: var(--primary-color); color: white;">
     <div class="container">
         <div class="row text-center">
             <div class="col-md-3">

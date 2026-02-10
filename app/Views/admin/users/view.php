@@ -192,6 +192,118 @@
         </div>
     </div>
 
+    <!-- Team Members Section (Manager/Admin only) -->
+    <?php if (!empty($team_members)): ?>
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">
+                <i class="fas fa-users-cog text-primary"></i>
+                Mon Équipe (<?= count($team_members) ?> membres actifs)
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Agent</th>
+                            <th>Agence</th>
+                            <th class="text-center">Biens</th>
+                            <th class="text-center">Clients</th>
+                            <th class="text-center">Transactions</th>
+                            <th class="text-end">CA Total</th>
+                            <th class="text-end">Commissions</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($team_members as $member): ?>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <?php if (!empty($member['avatar'])): ?>
+                                        <img src="<?= base_url('uploads/avatars/' . $member['avatar']) ?>" 
+                                             alt="Avatar" 
+                                             class="rounded-circle me-2" 
+                                             style="width: 40px; height: 40px; object-fit: cover;">
+                                    <?php else: ?>
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" 
+                                             style="width: 40px; height: 40px; font-size: 0.875rem; font-weight: 600;">
+                                            <?= strtoupper(substr($member['first_name'], 0, 1) . substr($member['last_name'], 0, 1)) ?>
+                                        </div>
+                                    <?php endif; ?>
+                                    <div>
+                                        <div class="fw-semibold"><?= esc($member['first_name'] . ' ' . $member['last_name']) ?></div>
+                                        <small class="text-muted"><?= esc($member['email']) ?></small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-building"></i>
+                                    <?= esc($member['agency_name'] ?? 'N/A') ?>
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-primary"><?= $member['stats']['properties'] ?></span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-info"><?= $member['stats']['clients'] ?></span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-success"><?= $member['stats']['transactions'] ?></span>
+                            </td>
+                            <td class="text-end">
+                                <strong class="text-success">
+                                    <?= number_format($member['stats']['total_sales'], 0, ',', ' ') ?> TND
+                                </strong>
+                            </td>
+                            <td class="text-end">
+                                <strong class="text-warning">
+                                    <?= number_format($member['stats']['total_commission'], 0, ',', ' ') ?> TND
+                                </strong>
+                            </td>
+                            <td class="text-center">
+                                <a href="<?= base_url('admin/users/view/' . $member['id']) ?>" 
+                                   class="btn btn-sm btn-outline-primary" 
+                                   title="Voir le profil">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr>
+                            <th colspan="2" class="text-end">Total Équipe:</th>
+                            <th class="text-center">
+                                <?= array_sum(array_column(array_column($team_members, 'stats'), 'properties')) ?>
+                            </th>
+                            <th class="text-center">
+                                <?= array_sum(array_column(array_column($team_members, 'stats'), 'clients')) ?>
+                            </th>
+                            <th class="text-center">
+                                <?= array_sum(array_column(array_column($team_members, 'stats'), 'transactions')) ?>
+                            </th>
+                            <th class="text-end">
+                                <strong class="text-success">
+                                    <?= number_format(array_sum(array_column(array_column($team_members, 'stats'), 'total_sales')), 0, ',', ' ') ?> TND
+                                </strong>
+                            </th>
+                            <th class="text-end">
+                                <strong class="text-warning">
+                                    <?= number_format(array_sum(array_column(array_column($team_members, 'stats'), 'total_commission')), 0, ',', ' ') ?> TND
+                                </strong>
+                            </th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Tabs Navigation -->
     <ul class="nav nav-tabs mb-3" id="userTabs" role="tablist">
         <li class="nav-item" role="presentation">

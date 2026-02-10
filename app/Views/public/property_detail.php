@@ -3,7 +3,7 @@
 <?= $this->section('content') ?>
 
 <!-- Image Gallery Section -->
-<section class="position-relative" style="background: #000;">
+<section class="position-relative">
     <?php if (!empty($images)): ?>
         <div id="propertyCarousel" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
@@ -12,7 +12,7 @@
                         <img src="<?= base_url('uploads/properties/' . $image['file_path']) ?>" 
                              class="d-block w-100" 
                              alt="<?= esc($image['title']) ?>"
-                             style="height: 600px; object-fit: contain;">
+                             style="height: 600px; object-fit: cover;">
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -603,7 +603,7 @@
 
             <!-- Right Column - Contact Forms -->
             <div class="col-lg-4">
-                <div class="sticky-top" style="top: 20px;">
+                <div class="sticky-top" style="top: 100px;">
                     <!-- Agent & Agency Card -->
                     <?php if ($agent || $agency): ?>
                     <div class="card mb-3 shadow">
@@ -966,7 +966,7 @@
 
 .sticky-top {
     position: sticky;
-    top: 20px;
+    top: 100px;
 }
 
 @media (max-width: 991px) {

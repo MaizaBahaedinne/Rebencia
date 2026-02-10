@@ -107,6 +107,12 @@ function selectProperty(propertyId, element) {
     const transaction = propertyItem.getAttribute('data-transaction');
     const price = parseFloat(propertyItem.getAttribute('data-price'));
     const rental = parseFloat(propertyItem.getAttribute('data-rental'));
+    const ownerId = propertyItem.getAttribute('data-owner-id');
+    const ownerName = propertyItem.getAttribute('data-owner-name');
+    const agentId = propertyItem.getAttribute('data-agent-id');
+    const agentName = propertyItem.getAttribute('data-agent-name');
+    const agencyId = propertyItem.getAttribute('data-agency-id');
+    const agencyName = propertyItem.getAttribute('data-agency-name');
     
     // Store selected property data
     selectedPropertyData = {
@@ -116,7 +122,13 @@ function selectProperty(propertyId, element) {
         type: type,
         transaction_type: transaction,
         price: price,
-        rental_price: rental
+        rental_price: rental,
+        owner_id: ownerId,
+        owner_name: ownerName,
+        agent_id: agentId,
+        agent_name: agentName,
+        agency_id: agencyId,
+        agency_name: agencyName
     };
     
     // Set hidden input
@@ -130,6 +142,34 @@ function selectProperty(propertyId, element) {
     } else if (transaction === 'rent') {
         typeSelect.value = 'rent';
         document.getElementById('amount').value = rental;
+    }
+    
+    // Auto-fill seller (owner), agent, and agency
+    if (ownerId) {
+        const sellerSelect = document.getElementById('seller_id');
+        if (sellerSelect) {
+            sellerSelect.value = ownerId;
+            sellerSelect.disabled = true;
+            sellerSelect.style.backgroundColor = '#f8f9fa';
+        }
+    }
+    
+    if (agentId) {
+        const agentSelect = document.getElementById('agent_id');
+        if (agentSelect) {
+            agentSelect.value = agentId;
+            agentSelect.disabled = true;
+            agentSelect.style.backgroundColor = '#f8f9fa';
+        }
+    }
+    
+    if (agencyId) {
+        const agencySelect = document.getElementById('agency_id');
+        if (agencySelect) {
+            agencySelect.value = agencyId;
+            agencySelect.disabled = true;
+            agencySelect.style.backgroundColor = '#f8f9fa';
+        }
     }
     
     // Update summary

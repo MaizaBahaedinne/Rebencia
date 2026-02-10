@@ -165,7 +165,13 @@
                                      data-transaction="<?= $property['transaction_type'] ?>"
                                      data-property-id="<?= $property['id'] ?>"
                                      data-price="<?= $property['price'] ?>"
-                                     data-rental="<?= $property['rental_price'] ?? 0 ?>">
+                                     data-rental="<?= $property['rental_price'] ?? 0 ?>"
+                                     data-owner-id="<?= $property['owner_id'] ?? '' ?>"
+                                     data-owner-name="<?= esc($property['owner_name'] ?? '') ?>"
+                                     data-agent-id="<?= $property['agent_id'] ?? '' ?>"
+                                     data-agent-name="<?= esc($property['agent_name'] ?? '') ?>"
+                                     data-agency-id="<?= $property['agent_agency_id'] ?? '' ?>"
+                                     data-agency-name="<?= esc($property['agency_name'] ?? '') ?>">
                                     <div class="property-card card h-100" onclick="selectProperty(<?= $property['id'] ?>, this)">
                                         <div class="card-body">
                                             <div class="d-flex justify-content-between align-items-start mb-2">

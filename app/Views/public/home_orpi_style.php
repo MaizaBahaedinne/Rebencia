@@ -399,18 +399,33 @@ function toggleAdvanced() {
 }
 
 // City autocomplete
-const cities = [
-    'Tunis', 'Ariana', 'Ben Arous', 'Manouba', 'Sfax', 'Sousse', 'Monastir', 
-    'Hammamet', 'Nabeul', 'Bizerte', 'Gabès', 'Kairouan', 'Gafsa', 'Kasserine',
-    'Mahdia', 'Médenine', 'Tataouine', 'Tozeur', 'Kébili', 'Jendouba', 
-    'Le Kef', 'Siliana', 'Béja', 'Zaghouan', 'La Marsa', 'Carthage', 
-    'Sidi Bou Said', 'La Goulette', 'Ennasr', 'Menzah', 'Manar', 'Lac'
-];
-
 const cityInput = document.getElementById('cityAutocomplete');
 const cityDropdown = document.getElementById('cityDropdown');
 
 if (cityInput) {
+    let citiesData = [];
+    
+    // Charger les villes depuis la base de données
+    fetch('<?= base_url('api/zones/cities') ?>')
+        .then(response => response.json())
+        .then(data => {
+            citiesData = data;
+        })
+        .catch(error => {
+            console.error('Erreur lors du chargement des villes:', error);
+            // Fallback avec quelques villes si l'API ne fonctionne pas
+            citiesData = [
+                {name: 'La Marsa', governorate: 'Tunis'},
+                {name: 'Carthage', governorate: 'Tunis'},
+                {name: 'Ennasr', governorate: 'Tunis'},
+                {name: 'El Menzah', governorate: 'Tunis'},
+                {name: 'Ariana Ville', governorate: 'Ariana'},
+                {name: 'Soukra', governorate: 'Ariana'},
+                {name: 'El Mourouj', governorate: 'Ben Arous'},
+                {name: 'Megrine', governorate: 'Ben Arous'}
+            ];
+        });
+    
     cityInput.addEventListener('input', function() {
         const value = this.value.toLowerCase();
         
@@ -419,8 +434,9 @@ if (cityInput) {
             return;
         }
         
-        const filtered = cities.filter(city => 
-            city.toLowerCase().includes(value)
+        const filtered = citiesData.filter(city => 
+            city.name.toLowerCase().includes(value) || 
+            city.governorate.toLowerCase().includes(value)
         );
         
         if (filtered.length === 0) {
@@ -428,11 +444,13 @@ if (cityInput) {
             return;
         }
         
-        cityDropdown.innerHTML = filtered.map(city => 
+        cityDropdown.innerHTML = filtered.slice(0, 10).map(city => 
             `<div class="autocomplete-item" style="padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #eee; color: #333;" 
                   onmouseover="this.style.background='#f8f9fa'" 
                   onmouseout="this.style.background='white'"
-                  onclick="selectCity('${city}')">${city}</div>`
+                  onclick="selectCity('${city.name}')">
+                  <strong>${city.name}</strong> <small class="text-muted">- ${city.governorate}</small>
+              </div>`
         ).join('');
         
         cityDropdown.style.display = 'block';

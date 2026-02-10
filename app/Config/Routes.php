@@ -11,6 +11,9 @@ $routes->get('/', 'Home::index');
 
 // API routes (public)
 $routes->get('api/cities', 'Home::getCities');
+$routes->get('api/zones/cities', 'Api\Zones::cities');
+$routes->get('api/zones/governorates', 'Api\Zones::governorates');
+$routes->get('api/zones/cities-by-governorate/(:num)', 'Api\Zones::citiesByGovernorate/$1');
 
 // Public pages
 $routes->get('about', 'Pages::about');

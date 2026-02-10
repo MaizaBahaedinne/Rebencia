@@ -158,27 +158,32 @@ class Properties extends BaseController
                 'phone' => $phone,
                 'email' => $email,
                 'source' => 'website',
-                'status' => 'lead',
-                // Préférences basées sur la propriété consultée
-                'property_type_preference' => $this->request->getPost('property_type'),
-                'transaction_type_preference' => $this->request->getPost('property_transaction_type'),
-                'budget_min' => $this->request->getPost('property_price') ? $this->request->getPost('property_price') * 0.8 : null, // -20%
-                'budget_max' => $this->request->getPost('property_price') ? $this->request->getPost('property_price') * 1.2 : null, // +20%
-                'preferred_zones' => json_encode([
+                'status' => 'lead'
+            ];
+            
+            // Ajouter les préférences seulement si les colonnes existent
+            $db = \Config\Database::connect();
+            if ($db->fieldExists('property_type_preference', 'clients')) {
+                $clientData['property_type_preference'] = $this->request->getPost('property_type');
+                $clientData['transaction_type_preference'] = $this->request->getPost('property_transaction_type');
+                $clientData['budget_min'] = $this->request->getPost('property_price') ? $this->request->getPost('property_price') * 0.8 : null;
+                $clientData['budget_max'] = $this->request->getPost('property_price') ? $this->request->getPost('property_price') * 1.2 : null;
+                $clientData['preferred_zones'] = json_encode([
                     'city' => $this->request->getPost('property_city'),
                     'governorate' => $this->request->getPost('property_governorate')
-                ]),
-                'area_preference' => $this->request->getPost('property_area') ? json_encode([
+                ]);
+                $clientData['area_preference'] = $this->request->getPost('property_area') ? json_encode([
                     'min' => $this->request->getPost('property_area') * 0.8,
                     'max' => $this->request->getPost('property_area') * 1.2,
                     'bedrooms_min' => $this->request->getPost('property_bedrooms'),
                     'bathrooms_min' => $this->request->getPost('property_bathrooms')
-                ]) : null,
-            ];
+                ]) : null;
+            }
             
             try {
                 $clientId = $clientModel->insert($clientData);
             } catch (\Exception $e) {
+                log_message('error', 'Client creation error: ' . $e->getMessage());
                 return $this->response->setJSON([
                     'success' => false,
                     'message' => 'Erreur lors de la création du client. Veuillez réessayer.'

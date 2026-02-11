@@ -202,8 +202,8 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->get('view/(:num)', 'Clients::view/$1');
     });
     
-    // Property Estimations
-    $routes->group('property-estimations', function($routes) {
+    // Property Estimations (Requests)
+    $routes->group('property-requests', function($routes) {
         $routes->get('/', 'PropertyEstimations::index');
         $routes->get('view/(:num)', 'PropertyEstimations::view/$1');
         $routes->post('updateStatus/(:num)', 'PropertyEstimations::updateStatus/$1');

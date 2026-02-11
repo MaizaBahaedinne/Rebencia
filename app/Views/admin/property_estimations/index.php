@@ -124,10 +124,10 @@
                 <input type="text" name="city" class="form-control" placeholder="Ville" value="<?= esc($filters['city']) ?>">
             </div>
             <div class="col-md-2">
-                <select name="assigned_to" class="form-select" onchange="this.form.submit()">
+                <select name="agent_id" class="form-select" onchange="this.form.submit()">
                     <option value="">Tous les agents</option>
                     <?php foreach ($agents as $agent): ?>
-                        <option value="<?= $agent['id'] ?>" <?= $filters['assigned_to'] == $agent['id'] ? 'selected' : '' ?>>
+                        <option value="<?= $agent['id'] ?>" <?= $filters['agent_id'] == $agent['id'] ? 'selected' : '' ?>>
                             <?= esc($agent['first_name'] . ' ' . $agent['last_name']) ?>
                         </option>
                     <?php endforeach; ?>
@@ -167,12 +167,12 @@
                             <td><strong>#<?= $estimation['id'] ?></strong></td>
                             <td><?= date('d/m/Y', strtotime($estimation['created_at'])) ?></td>
                             <td>
-                                <strong><?= esc($estimation['client_first_name'] . ' ' . $estimation['client_last_name']) ?></strong>
+                                <strong><?= esc($estimation['first_name'] . ' ' . $estimation['last_name']) ?></strong>
                             </td>
                             <td>
                                 <small>
-                                    <i class="fas fa-phone text-muted"></i> <?= esc($estimation['client_phone']) ?><br>
-                                    <i class="fas fa-envelope text-muted"></i> <?= esc($estimation['client_email']) ?>
+                                    <i class="fas fa-phone text-muted"></i> <?= esc($estimation['phone']) ?><br>
+                                    <i class="fas fa-envelope text-muted"></i> <?= esc($estimation['email']) ?>
                                 </small>
                             </td>
                             <td>

@@ -14,6 +14,10 @@ class PropertyEstimationModel extends Model
     protected $protectFields = true;
     protected $allowedFields = [
         'client_id',
+        'first_name',
+        'last_name',
+        'email',
+        'phone',
         'property_type',
         'transaction_type',
         'address',
@@ -33,9 +37,8 @@ class PropertyEstimationModel extends Model
         'description',
         'estimated_price',
         'status',
-        'assigned_to',
-        'response',
-        'responded_at'
+        'agent_id',
+        'notes'
     ];
 
     protected $useTimestamps = true;
@@ -61,15 +64,10 @@ class PropertyEstimationModel extends Model
     {
         $builder = $this->db->table($this->table);
         $builder->select('property_estimations.*, 
-                         clients.first_name as client_first_name,
-                         clients.last_name as client_last_name,
-                         clients.email as client_email,
-                         clients.phone as client_phone,
                          users.first_name as agent_first_name,
                          users.last_name as agent_last_name,
                          zones.name as zone_name');
-        $builder->join('clients', 'clients.id = property_estimations.client_id', 'left');
-        $builder->join('users', 'users.id = property_estimations.assigned_to', 'left');
+        $builder->join('users', 'users.id = property_estimations.agent_id', 'left');
         $builder->join('zones', 'zones.id = property_estimations.zone_id', 'left');
 
         // Apply filters
@@ -98,8 +96,8 @@ class PropertyEstimationModel extends Model
         }
 
         $builder->orderBy('property_estimations.created_at', 'DESC');
-
-        return $builder->get()->getResultArray();
+gent_id'])) {
+            $builder->where('property_estimations.agent_id', $filters['agent_id
     }
 
     /**

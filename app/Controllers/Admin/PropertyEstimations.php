@@ -28,7 +28,7 @@ class PropertyEstimations extends BaseController
             'transaction_type' => $this->request->getGet('transaction_type'),
             'city' => $this->request->getGet('city'),
             'governorate' => $this->request->getGet('governorate'),
-            'assigned_to' => $this->request->getGet('assigned_to'),
+            'agent_id' => $this->request->getGet('agent_id'),
         ];
 
         // Get estimations with details
@@ -59,13 +59,16 @@ class PropertyEstimations extends BaseController
             return redirect()->to('/admin/property-estimations')->with('error', 'Estimation non trouvée');
         }
 
-        // Get client details
-        $client = $this->clientModel->find($estimation['client_id']);
+        // Client info is in the estimation itself
+        $client = null;
+        if ($estimation['client_id']) {
+            $client = $this->clientModel->find($estimation['client_id']);
+        }
 
         // Get assigned agent
         $agent = null;
-        if ($estimation['assigned_to']) {
-            $agent = $this->userModel->find($estimation['assigned_to']);
+        if ($estimation['agent_id']) {
+            $agent = $this->userModel->find($estimation['agent_id']);
         }
 
         // Get zone
@@ -104,8 +107,8 @@ class PropertyEstimations extends BaseController
         }
 
         // Update assigned agent
-        if ($this->request->getPost('assigned_to')) {
-            $updateData['assigned_to'] = $this->request->getPost('assigned_to');
+        if ($this->request->getPost('agent_id')) {
+            $updateData['agent_id'] = $this->request->getPost('agent_id');
         }
 
         // Update estimated price
@@ -113,10 +116,9 @@ class PropertyEstimations extends BaseController
             $updateData['estimated_price'] = $this->request->getPost('estimated_price');
         }
 
-        // Update response
-        if ($this->request->getPost('response')) {
-            $updateData['response'] = $this->request->getPost('response');
-            $updateData['responded_at'] = date('Y-m-d H:i:s');
+        // Update notes
+        if ($this->request->getPost('notes')) {
+            $updateData['notes'] = $this->request->getPost('notes');
         }
 
         if ($this->estimationModel->update($id, $updateData)) {

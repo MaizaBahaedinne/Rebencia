@@ -80,6 +80,10 @@ class PropertyEstimations extends BaseController
         
         $data = [
             'client_id' => $clientId,
+            'first_name' => $this->request->getVar('first_name'),
+            'last_name' => $this->request->getVar('last_name'),
+            'email' => $this->request->getVar('email'),
+            'phone' => $this->request->getVar('phone'),
             'property_type' => $this->request->getVar('property_type'),
             'transaction_type' => $this->request->getVar('transaction_type'),
             'address' => $this->request->getVar('address'),

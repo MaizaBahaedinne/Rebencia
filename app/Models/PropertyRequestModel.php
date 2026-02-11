@@ -17,6 +17,7 @@ class PropertyRequestModel extends Model
         'client_id',
         'request_type',
         'message',
+        'estimation_data',
         'visit_date',
         'visit_time',
         'status',

@@ -338,7 +338,7 @@
                                         <td><?= esc($transaction['property_title'] ?? 'N/A') ?></td>
                                         <td><?= esc($transaction['first_name'] . ' ' . $transaction['last_name']) ?></td>
                                         <td class="text-end fw-bold">
-                                            <?= number_format($transaction['total_amount'], 0) ?>
+                                            <?= number_format($transaction['amount'], 0) ?>
                                         </td>
                                         <td>
                                             <?php

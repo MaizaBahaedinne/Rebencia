@@ -143,25 +143,25 @@ class DashboardModel extends Model
 
         // Total revenue
         $result = $this->db->table('transactions')
-            ->selectSum('total_amount')
+            ->selectSum('amount')
             ->where('status', 'completed')
             ->get()
             ->getRow();
-        $stats['total_revenue'] = $result->total_amount ?? 0;
+        $stats['total_revenue'] = $result->amount ?? 0;
 
         // Revenue this month
         $result = $this->db->table('transactions')
-            ->selectSum('total_amount')
+            ->selectSum('amount')
             ->where('status', 'completed')
-            ->where('MONTH(completed_at)', date('m'))
-            ->where('YEAR(completed_at)', date('Y'))
+            ->where('MONTH(completion_date)', date('m'))
+            ->where('YEAR(completion_date)', date('Y'))
             ->get()
             ->getRow();
-        $stats['revenue_month'] = $result->total_amount ?? 0;
+        $stats['revenue_month'] = $result->amount ?? 0;
 
         // Revenue by agency
         $stats['revenue_by_agency'] = $this->db->table('transactions t')
-            ->select('a.name, SUM(t.total_amount) as revenue, COUNT(t.id) as transactions')
+            ->select('a.name, SUM(t.amount) as revenue, COUNT(t.id) as transactions')
             ->join('agencies a', 'a.id = t.agency_id', 'left')
             ->where('t.status', 'completed')
             ->groupBy('a.id')
@@ -171,7 +171,7 @@ class DashboardModel extends Model
 
         // Top agents
         $stats['top_agents'] = $this->db->table('transactions t')
-            ->select('u.first_name, u.last_name, COUNT(t.id) as deals, SUM(t.total_amount) as revenue')
+            ->select('u.first_name, u.last_name, COUNT(t.id) as deals, SUM(t.amount) as revenue')
             ->join('users u', 'u.id = t.agent_id', 'left')
             ->where('t.status', 'completed')
             ->groupBy('u.id')
@@ -183,13 +183,13 @@ class DashboardModel extends Model
         // Monthly revenue (last 12 months)
         $stats['monthly_revenue'] = $this->db->query("
             SELECT 
-                DATE_FORMAT(completed_at, '%Y-%m') as month,
-                SUM(total_amount) as revenue,
+                DATE_FORMAT(completion_date, '%Y-%m') as month,
+                SUM(amount) as revenue,
                 COUNT(*) as transactions
             FROM transactions
             WHERE status = 'completed'
-                AND completed_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
-            GROUP BY DATE_FORMAT(completed_at, '%Y-%m')
+                AND completion_date >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+            GROUP BY DATE_FORMAT(completion_date, '%Y-%m')
             ORDER BY month ASC
         ")->getResultArray();
 
@@ -251,23 +251,23 @@ class DashboardModel extends Model
 
         // Total revenue
         $result = $this->db->table('transactions')
-            ->selectSum('total_amount')
+            ->selectSum('amount')
             ->where('agency_id', $agencyId)
             ->where('status', 'completed')
             ->get()
             ->getRow();
-        $stats['total_revenue'] = $result->total_amount ?? 0;
+        $stats['total_revenue'] = $result->amount ?? 0;
 
         // Revenue this month
         $result = $this->db->table('transactions')
-            ->selectSum('total_amount')
+            ->selectSum('amount')
             ->where('agency_id', $agencyId)
             ->where('status', 'completed')
-            ->where('MONTH(completed_at)', date('m'))
-            ->where('YEAR(completed_at)', date('Y'))
+            ->where('MONTH(completion_date)', date('m'))
+            ->where('YEAR(completion_date)', date('Y'))
             ->get()
             ->getRow();
-        $stats['revenue_month'] = $result->total_amount ?? 0;
+        $stats['revenue_month'] = $result->amount ?? 0;
 
         // Active agents
         $stats['active_agents'] = $this->db->table('users')
@@ -277,7 +277,7 @@ class DashboardModel extends Model
 
         // Performance by agent
         $stats['agents_performance'] = $this->db->table('users u')
-            ->select('u.first_name, u.last_name, COUNT(t.id) as deals, COALESCE(SUM(t.total_amount), 0) as revenue')
+            ->select('u.first_name, u.last_name, COUNT(t.id) as deals, COALESCE(SUM(t.amount), 0) as revenue')
             ->join('transactions t', 't.agent_id = u.id AND t.status = "completed"', 'left')
             ->where('u.agency_id', $agencyId)
             ->where('u.status', 'active')
@@ -289,14 +289,14 @@ class DashboardModel extends Model
         // Monthly revenue (last 12 months)
         $stats['monthly_revenue'] = $this->db->query("
             SELECT 
-                DATE_FORMAT(completed_at, '%Y-%m') as month,
-                SUM(total_amount) as revenue,
+                DATE_FORMAT(completion_date, '%Y-%m') as month,
+                SUM(amount) as revenue,
                 COUNT(*) as transactions
             FROM transactions
             WHERE agency_id = ?
                 AND status = 'completed'
-                AND completed_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
-            GROUP BY DATE_FORMAT(completed_at, '%Y-%m')
+                AND completion_date >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+            GROUP BY DATE_FORMAT(completion_date, '%Y-%m')
             ORDER BY month ASC
         ", [$agencyId])->getResultArray();
 
@@ -369,12 +369,12 @@ class DashboardModel extends Model
 
         // My clients
         $stats['my_clients'] = $this->db->table('clients')
-            ->where('agent_id', $userId)
+            ->where('assigned_to', $userId)
             ->countAllResults();
 
         // Clients this month
         $stats['clients_month'] = $this->db->table('clients')
-            ->where('agent_id', $userId)
+            ->where('assigned_to', $userId)
             ->where('MONTH(created_at)', date('m'))
             ->where('YEAR(created_at)', date('Y'))
             ->countAllResults();
@@ -398,23 +398,23 @@ class DashboardModel extends Model
 
         // My revenue total
         $result = $this->db->table('transactions')
-            ->selectSum('total_amount')
+            ->selectSum('amount')
             ->where('agent_id', $userId)
             ->where('status', 'completed')
             ->get()
             ->getRow();
-        $stats['my_revenue'] = $result->total_amount ?? 0;
+        $stats['my_revenue'] = $result->amount ?? 0;
 
         // Revenue this month
         $result = $this->db->table('transactions')
-            ->selectSum('total_amount')
+            ->selectSum('amount')
             ->where('agent_id', $userId)
             ->where('status', 'completed')
-            ->where('MONTH(completed_at)', date('m'))
-            ->where('YEAR(completed_at)', date('Y'))
+            ->where('MONTH(completion_date)', date('m'))
+            ->where('YEAR(completion_date)', date('Y'))
             ->get()
             ->getRow();
-        $stats['revenue_month'] = $result->total_amount ?? 0;
+        $stats['revenue_month'] = $result->amount ?? 0;
 
         // My commissions paid
         $result = $this->db->table('commissions')
@@ -459,14 +459,14 @@ class DashboardModel extends Model
         // Monthly revenue (last 12 months)
         $stats['monthly_revenue'] = $this->db->query("
             SELECT 
-                DATE_FORMAT(completed_at, '%Y-%m') as month,
-                SUM(total_amount) as revenue,
+                DATE_FORMAT(completion_date, '%Y-%m') as month,
+                SUM(amount) as revenue,
                 COUNT(*) as transactions
             FROM transactions
             WHERE agent_id = ?
                 AND status = 'completed'
-                AND completed_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
-            GROUP BY DATE_FORMAT(completed_at, '%Y-%m')
+                AND completion_date >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+            GROUP BY DATE_FORMAT(completion_date, '%Y-%m')
             ORDER BY month ASC
         ", [$userId])->getResultArray();
 

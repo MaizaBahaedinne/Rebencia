@@ -215,7 +215,7 @@ class ObjectiveModel extends Model
 
             // New contacts
             $contacts = $db->table('clients')
-                ->where('agent_id', $userId)
+                ->where('assigned_to', $userId)
                 ->where('DATE(created_at) >=', $startDate)
                 ->where('DATE(created_at) <=', $endDate)
                 ->countAllResults();
@@ -243,8 +243,8 @@ class ObjectiveModel extends Model
             $transactions = $db->table('transactions')
                 ->where('agent_id', $userId)
                 ->where('status', 'completed')
-                ->where('DATE(completed_at) >=', $startDate)
-                ->where('DATE(completed_at) <=', $endDate)
+                ->where('DATE(completion_date) >=', $startDate)
+                ->where('DATE(completion_date) <=', $endDate)
                 ->countAllResults();
             $achieved['transactions_achieved'] = $transactions;
 
@@ -254,13 +254,13 @@ class ObjectiveModel extends Model
 
             // Revenue from transactions
             $revenue = $db->table('transactions')
-                ->selectSum('total_amount')
+                ->selectSum('amount')
                 ->where('agency_id', $agencyId)
                 ->where('status', 'completed')
-                ->where('DATE(completed_at) >=', $startDate)
-                ->where('DATE(completed_at) <=', $endDate)
+                ->where('DATE(completion_date) >=', $startDate)
+                ->where('DATE(completion_date) <=', $endDate)
                 ->get()->getRow();
-            $achieved['revenue_achieved'] = $revenue->total_amount ?? 0;
+            $achieved['revenue_achieved'] = $revenue->amount ?? 0;
 
             // New contacts
             $contacts = $db->table('clients')
@@ -292,8 +292,8 @@ class ObjectiveModel extends Model
             $transactions = $db->table('transactions')
                 ->where('agency_id', $agencyId)
                 ->where('status', 'completed')
-                ->where('DATE(completed_at) >=', $startDate)
-                ->where('DATE(completed_at) <=', $endDate)
+                ->where('DATE(completion_date) >=', $startDate)
+                ->where('DATE(completion_date) <=', $endDate)
                 ->countAllResults();
             $achieved['transactions_achieved'] = $transactions;
         }

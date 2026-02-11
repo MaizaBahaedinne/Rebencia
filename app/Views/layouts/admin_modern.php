@@ -915,6 +915,11 @@
                     <span>Prix au m²</span>
                 </a>
                 
+                <a href="<?= base_url('admin/objectives') ?>" class="submenu-item <?= url_is('admin/objectives*') ? 'active' : '' ?>">
+                    <i class="fas fa-bullseye"></i>
+                    <span>Objectifs</span>
+                </a>
+                
                 <a href="<?= base_url('admin/search-alerts') ?>" class="submenu-item <?= url_is('admin/search-alerts*') ? 'active' : '' ?>">
                     <i class="fas fa-bell"></i>
                     <span>Alertes de recherche</span>

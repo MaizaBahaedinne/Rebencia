@@ -233,6 +233,18 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->get('calculate', 'PricePerM2::calculateFromProperties');
     });
     
+    // Objectives
+    $routes->group('objectives', function($routes) {
+        $routes->get('/', 'Objectives::index');
+        $routes->get('create', 'Objectives::create');
+        $routes->post('store', 'Objectives::store');
+        $routes->get('edit/(:num)', 'Objectives::edit/$1');
+        $routes->post('update/(:num)', 'Objectives::update/$1');
+        $routes->get('delete/(:num)', 'Objectives::delete/$1');
+        $routes->get('refresh/(:num)', 'Objectives::refresh/$1');
+        $routes->get('refresh-all', 'Objectives::refreshAll');
+    });
+    
     // Transactions
     $routes->group('transactions', function($routes) {
         $routes->get('/', 'Transactions::index');

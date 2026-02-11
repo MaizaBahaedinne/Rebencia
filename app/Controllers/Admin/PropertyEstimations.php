@@ -97,10 +97,8 @@ class PropertyEstimations extends BaseController
         $estimation = $this->estimationModel->find($id);
 
         if (!$estimation) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Estimation non trouvée'
-            ]);
+            return redirect()->to('/admin/property-estimations')
+                ->with('error', 'Estimation non trouvée');
         }
 
         $updateData = [];
@@ -111,8 +109,8 @@ class PropertyEstimations extends BaseController
         }
 
         // Update assigned agent
-        if ($this->request->getPost('agent_id')) {
-            $updateData['agent_id'] = $this->request->getPost('agent_id');
+        if ($this->request->getPost('agent_id') !== null) {
+            $updateData['agent_id'] = $this->request->getPost('agent_id') ?: null;
         }
 
         // Update estimated price
@@ -121,21 +119,17 @@ class PropertyEstimations extends BaseController
         }
 
         // Update notes
-        if ($this->request->getPost('notes')) {
+        if ($this->request->getPost('notes') !== null) {
             $updateData['notes'] = $this->request->getPost('notes');
         }
 
         if ($this->estimationModel->update($id, $updateData)) {
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => 'Estimation mise à jour avec succès'
-            ]);
+            return redirect()->to('/admin/property-estimations/view/' . $id)
+                ->with('success', 'Estimation mise à jour avec succès');
         }
 
-        return $this->response->setJSON([
-            'success' => false,
-            'message' => 'Erreur lors de la mise à jour'
-        ]);
+        return redirect()->to('/admin/property-estimations/view/' . $id)
+            ->with('error', 'Erreur lors de la mise à jour');
     }
 
     public function delete($id)

@@ -22,6 +22,14 @@
                 <i class="fas fa-file-invoice-dollar"></i> Transactions
             </a>
             
+            <a href="<?= base_url('admin/property-estimations') ?>" class="nav-link text-white <?= strpos(service('router')->controllerName(), 'PropertyEstimations') !== false ? 'active bg-primary' : '' ?>">
+                <i class="fas fa-calculator"></i> Demandes d'estimation
+            </a>
+            
+            <a href="<?= base_url('admin/search-alerts') ?>" class="nav-link text-white <?= strpos(service('router')->controllerName(), 'SearchAlerts') !== false ? 'active bg-primary' : '' ?>">
+                <i class="fas fa-bell"></i> Alertes de recherche
+            </a>
+            
             <a href="<?= base_url('admin/users') ?>" class="nav-link text-white <?= strpos(service('router')->controllerName(), 'Users') !== false ? 'active bg-primary' : '' ?>">
                 <i class="fas fa-user-tie"></i> Utilisateurs
             </a>

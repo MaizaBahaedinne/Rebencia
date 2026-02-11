@@ -51,16 +51,16 @@ class PropertyEstimations extends BaseController
         }
 
         // Check if client exists by email
-        $client = $this->clientModel->where('email', $this->request->getPost('email'))->first();
+        $client = $this->clientModel->where('email', $this->request->getVar('email'))->first();
         $clientId = $client ? $client['id'] : null;
 
         // If client doesn't exist, create one
         if (!$clientId) {
             $clientData = [
-                'first_name' => $this->request->getPost('first_name'),
-                'last_name' => $this->request->getPost('last_name'),
-                'email' => $this->request->getPost('email'),
-                'phone' => $this->request->getPost('phone'),
+                'first_name' => $this->request->getVar('first_name'),
+                'last_name' => $this->request->getVar('last_name'),
+                'email' => $this->request->getVar('email'),
+                'phone' => $this->request->getVar('phone'),
                 'type' => 'seller',
                 'source' => 'estimation_request',
                 'status' => 'lead'
@@ -71,27 +71,27 @@ class PropertyEstimations extends BaseController
 
         $data = [
             'client_id' => $clientId,
-            'first_name' => $this->request->getPost('first_name'),
-            'last_name' => $this->request->getPost('last_name'),
-            'email' => $this->request->getPost('email'),
-            'phone' => $this->request->getPost('phone'),
-            'property_type' => $this->request->getPost('property_type'),
-            'transaction_type' => $this->request->getPost('transaction_type'),
-            'address' => $this->request->getPost('address'),
-            'city' => $this->request->getPost('city'),
-            'governorate' => $this->request->getPost('governorate'),
-            'zone_id' => $this->request->getPost('zone_id') ?: null,
-            'area_total' => $this->request->getPost('area_total') ?: null,
-            'rooms' => $this->request->getPost('rooms') ?: null,
-            'bedrooms' => $this->request->getPost('bedrooms') ?: null,
-            'bathrooms' => $this->request->getPost('bathrooms') ?: null,
-            'floor' => $this->request->getPost('floor') ?: null,
-            'construction_year' => $this->request->getPost('construction_year') ?: null,
-            'condition_state' => $this->request->getPost('condition_state') ?: null,
-            'has_elevator' => $this->request->getPost('has_elevator') ? 1 : 0,
-            'has_parking' => $this->request->getPost('has_parking') ? 1 : 0,
-            'has_garden' => $this->request->getPost('has_garden') ? 1 : 0,
-            'description' => $this->request->getPost('description'),
+            'first_name' => $this->request->getVar('first_name'),
+            'last_name' => $this->request->getVar('last_name'),
+            'email' => $this->request->getVar('email'),
+            'phone' => $this->request->getVar('phone'),
+            'property_type' => $this->request->getVar('property_type'),
+            'transaction_type' => $this->request->getVar('transaction_type'),
+            'address' => $this->request->getVar('address'),
+            'city' => $this->request->getVar('city'),
+            'governorate' => $this->request->getVar('governorate'),
+            'zone_id' => $this->request->getVar('zone_id') ?: null,
+            'area_total' => $this->request->getVar('area_total') ?: null,
+            'rooms' => $this->request->getVar('rooms') ?: null,
+            'bedrooms' => $this->request->getVar('bedrooms') ?: null,
+            'bathrooms' => $this->request->getVar('bathrooms') ?: null,
+            'floor' => $this->request->getVar('floor') ?: null,
+            'construction_year' => $this->request->getVar('construction_year') ?: null,
+            'condition_state' => $this->request->getVar('condition_state') ?: null,
+            'has_elevator' => $this->request->getVar('has_elevator') ? 1 : 0,
+            'has_parking' => $this->request->getVar('has_parking') ? 1 : 0,
+            'has_garden' => $this->request->getVar('has_garden') ? 1 : 0,
+            'description' => $this->request->getVar('description'),
             'status' => 'pending'
         ];
 

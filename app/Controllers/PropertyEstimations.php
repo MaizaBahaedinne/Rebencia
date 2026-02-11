@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Models\PropertyEstimationModel;
+use App\Models\ClientModel;
 use App\Models\PropertyRequestModel;
 use App\Models\ZoneModel;
 

@@ -22,7 +22,7 @@
                 <i class="fas fa-file-invoice-dollar"></i> Transactions
             </a>
             
-            <a href="<?= base_url('admin/estimation-requests') ?>" class="nav-link text-white <?= strpos(service('router')->controllerName(), 'PropertyEstimations') !== false ? 'active bg-primary' : '' ?>">
+            <a href="<?= base_url('admin/property-requests?type=estimation') ?>" class="nav-link text-white <?= strpos(service('router')->controllerName(), 'PropertyRequests') !== false && (isset($_GET['type']) && $_GET['type'] === 'estimation') ? 'active bg-primary' : '' ?>">
                 <i class="fas fa-calculator"></i> Demandes d'estimation
             </a>
             

@@ -15,7 +15,7 @@
 
     <!-- Statistics Cards -->
     <div class="row g-3 mb-4">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
@@ -26,14 +26,14 @@
                         </div>
                         <div class="flex-grow-1 ms-3">
                             <h3 class="mb-0"><?= $stats['total'] ?></h3>
-                            <small class="text-muted">Total demandes</small>
+                            <small class="text-muted">Total</small>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
@@ -51,7 +51,7 @@
             </div>
         </div>
         
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
@@ -62,14 +62,50 @@
                         </div>
                         <div class="flex-grow-1 ms-3">
                             <h3 class="mb-0"><?= $stats['visits'] ?></h3>
-                            <small class="text-muted">Demandes de visite</small>
+                            <small class="text-muted">Visites</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-purple bg-opacity-10 rounded p-3">
+                                <i class="fas fa-info-circle fa-2x text-purple"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h3 class="mb-0"><?= $stats['information'] ?></h3>
+                            <small class="text-muted">Infos</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-secondary bg-opacity-10 rounded p-3">
+                                <i class="fas fa-calculator fa-2x text-secondary"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h3 class="mb-0"><?= $stats['estimation'] ?></h3>
+                            <small class="text-muted">Estimations</small>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="col-md-3">
+        <div class="col-md-2">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex align-items-center">

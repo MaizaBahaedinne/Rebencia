@@ -202,15 +202,6 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->get('view/(:num)', 'Clients::view/$1');
     });
     
-    // Property Estimations (Requests)
-    $routes->group('estimation-requests', function($routes) {
-        $routes->get('/', 'PropertyEstimations::index');
-        $routes->get('view/(:num)', 'PropertyEstimations::view/$1');
-        $routes->post('updateStatus/(:num)', 'PropertyEstimations::updateStatus/$1');
-        $routes->post('assignAgent/(:num)', 'PropertyEstimations::assignAgent/$1');
-        $routes->delete('delete/(:num)', 'PropertyEstimations::delete/$1');
-    });
-    
     // Search Alerts
     $routes->group('search-alerts', function($routes) {
         $routes->get('/', 'SearchAlerts::index');

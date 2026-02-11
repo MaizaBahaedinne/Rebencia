@@ -8,64 +8,67 @@ class AddButtonThemeColumns extends Migration
 {
     public function up()
     {
-        $fields = [
-            'button_bg_color' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 7,
-                'default'    => '#667eea',
-                'after'      => 'border_radius',
-            ],
-            'button_text_color' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 7,
-                'default'    => '#ffffff',
-                'after'      => 'button_bg_color',
-            ],
-            'button_hover_bg_color' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 7,
-                'default'    => '#764ba2',
-                'after'      => 'button_text_color',
-            ],
-            'button_hover_text_color' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 7,
-                'default'    => '#ffffff',
-                'after'      => 'button_hover_bg_color',
-            ],
-            'button_border_width' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 10,
-                'default'    => '0px',
-                'after'      => 'button_hover_text_color',
-            ],
-            'button_border_color' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 7,
-                'default'    => '#667eea',
-                'after'      => 'button_border_width',
-            ],
-            'button_padding' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 20,
-                'default'    => '12px 30px',
-                'after'      => 'button_border_color',
-            ],
-            'button_font_size' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 20,
-                'default'    => '16px',
-                'after'      => 'button_padding',
-            ],
-            'button_font_weight' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 10,
-                'default'    => '500',
-                'after'      => 'button_font_size',
-            ],
-        ];
+        // Vérifier si la colonne existe déjà
+        if (!$this->db->fieldExists('button_bg_color', 'theme_settings')) {
+            $fields = [
+                'button_bg_color' => [
+                    'type'       => 'VARCHAR',
+                    'constraint' => 7,
+                    'default'    => '#667eea',
+                    'after'      => 'border_radius',
+                ],
+                'button_text_color' => [
+                    'type'       => 'VARCHAR',
+                    'constraint' => 7,
+                    'default'    => '#ffffff',
+                    'after'      => 'button_bg_color',
+                ],
+                'button_hover_bg_color' => [
+                    'type'       => 'VARCHAR',
+                    'constraint' => 7,
+                    'default'    => '#764ba2',
+                    'after'      => 'button_text_color',
+                ],
+                'button_hover_text_color' => [
+                    'type'       => 'VARCHAR',
+                    'constraint' => 7,
+                    'default'    => '#ffffff',
+                    'after'      => 'button_hover_bg_color',
+                ],
+                'button_border_width' => [
+                    'type'       => 'VARCHAR',
+                    'constraint' => 10,
+                    'default'    => '0px',
+                    'after'      => 'button_hover_text_color',
+                ],
+                'button_border_color' => [
+                    'type'       => 'VARCHAR',
+                    'constraint' => 7,
+                    'default'    => '#667eea',
+                    'after'      => 'button_border_width',
+                ],
+                'button_padding' => [
+                    'type'       => 'VARCHAR',
+                    'constraint' => 20,
+                    'default'    => '12px 30px',
+                    'after'      => 'button_border_color',
+                ],
+                'button_font_size' => [
+                    'type'       => 'VARCHAR',
+                    'constraint' => 20,
+                    'default'    => '16px',
+                    'after'      => 'button_padding',
+                ],
+                'button_font_weight' => [
+                    'type'       => 'VARCHAR',
+                    'constraint' => 10,
+                    'default'    => '500',
+                    'after'      => 'button_font_size',
+                ],
+            ];
 
-        $this->forge->addColumn('theme_settings', $fields);
+            $this->forge->addColumn('theme_settings', $fields);
+        }
         
         // Mettre à jour la ligne existante avec les valeurs par défaut
         $this->db->table('theme_settings')->update([

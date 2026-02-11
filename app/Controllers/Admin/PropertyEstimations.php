@@ -37,8 +37,8 @@ class PropertyEstimations extends BaseController
         // Get statistics
         $stats = $this->estimationModel->getStats();
 
-        // Get agents for filter
-        $agents = $this->userModel->where('role', 'agent')->orWhere('role', 'admin')->findAll();
+        // Get agents for filter - get all active users
+        $agents = $this->userModel->where('status', 'active')->findAll();
 
         $data = [
             'title' => 'Gestion des Estimations',

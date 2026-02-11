@@ -117,6 +117,25 @@
             font-size: 1.3rem;
         }
 
+        /* Menu Search */
+        #menuSearch {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+            font-size: 0.875rem;
+            border-radius: 8px;
+        }
+
+        #menuSearch::placeholder {
+            color: rgba(255, 255, 255, 0.4) !important;
+        }
+
+        #menuSearch:focus {
+            background: rgba(255, 255, 255, 0.08) !important;
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15) !important;
+        }
+
         .sidebar-menu {
             padding: 1.5rem 1rem;
         }
@@ -724,7 +743,18 @@
             </a>
         </div>
 
-        <nav class="sidebar-menu">
+        <!-- Search Bar -->
+        <div class="px-3 mb-3">
+            <div class="position-relative">
+                <input type="text" id="menuSearch" class="form-control form-control-sm bg-dark text-white border-secondary" 
+                       placeholder="Rechercher..." autocomplete="off"
+                       style="padding-left: 35px;">
+                <i class="fas fa-search position-absolute text-white-50" 
+                   style="left: 12px; top: 50%; transform: translateY(-50%); font-size: 0.875rem;"></i>
+            </div>
+        </div>
+
+        <nav class="sidebar-menu" id="sidebarMenu">
             <div class="menu-section-title">PRINCIPAL</div>
             
             <a href="<?= base_url('admin') ?>" class="menu-item <?= url_is('admin') && !url_is('admin/*') ? 'active' : '' ?>">
@@ -1338,6 +1368,102 @@
             if (hasActiveItem || savedState === 'true') {
                 item.classList.add('open');
                 submenu.classList.add('open');
+            }
+        });
+    });
+
+    // ========== MENU SEARCH ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('menuSearch');
+        const sidebarMenu = document.getElementById('sidebarMenu');
+        
+        if (!searchInput || !sidebarMenu) return;
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            
+            // Get all menu items
+            const menuItems = sidebarMenu.querySelectorAll('.menu-item, .submenu-item');
+            const sections = sidebarMenu.querySelectorAll('.menu-section-title');
+            const submenus = sidebarMenu.querySelectorAll('.submenu');
+            
+            if (searchTerm === '') {
+                // Show all items
+                menuItems.forEach(item => item.style.display = '');
+                sections.forEach(section => section.style.display = '');
+                submenus.forEach(submenu => {
+                    submenu.style.display = '';
+                    // Restore original open state
+                    const parentItem = submenu.previousElementSibling;
+                    if (parentItem && !submenu.querySelector('.submenu-item.active')) {
+                        submenu.classList.remove('open');
+                        parentItem.classList.remove('open');
+                    }
+                });
+                return;
+            }
+            
+            // Hide all sections by default when searching
+            sections.forEach(section => section.style.display = 'none');
+            
+            // Filter menu items
+            menuItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                const matches = text.includes(searchTerm);
+                
+                if (matches) {
+                    item.style.display = '';
+                    
+                    // If it's a submenu item, show and expand its parent
+                    if (item.classList.contains('submenu-item')) {
+                        const submenu = item.closest('.submenu');
+                        if (submenu) {
+                            submenu.style.display = '';
+                            submenu.classList.add('open');
+                            const parentItem = submenu.previousElementSibling;
+                            if (parentItem) {
+                                parentItem.style.display = '';
+                                parentItem.classList.add('open');
+                            }
+                        }
+                    }
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            // Hide empty submenus
+            submenus.forEach(submenu => {
+                const visibleItems = Array.from(submenu.querySelectorAll('.submenu-item'))
+                    .filter(item => item.style.display !== 'none');
+                
+                if (visibleItems.length === 0) {
+                    submenu.style.display = 'none';
+                    const parentItem = submenu.previousElementSibling;
+                    if (parentItem) {
+                        parentItem.style.display = 'none';
+                    }
+                } else {
+                    submenu.style.display = '';
+                    submenu.classList.add('open');
+                }
+            });
+        });
+        
+        // Clear search on Escape
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                this.value = '';
+                this.dispatchEvent(new Event('input'));
+                this.blur();
+            }
+        });
+        
+        // Focus search with Ctrl+K or Cmd+K
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                searchInput.focus();
             }
         });
     });

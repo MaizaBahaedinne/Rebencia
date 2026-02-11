@@ -214,6 +214,14 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->delete('delete/(:num)', 'SearchAlerts::delete/$1');
     });
     
+    // Property Estimations (admin)
+    $routes->group('property-estimations', function($routes) {
+        $routes->get('/', 'PropertyEstimations::index');
+        $routes->get('view/(:num)', 'PropertyEstimations::view/$1');
+        $routes->post('update/(:num)', 'PropertyEstimations::update/$1');
+        $routes->get('delete/(:num)', 'PropertyEstimations::delete/$1');
+    });
+    
     // Price per m2
     $routes->group('price-per-m2', function($routes) {
         $routes->get('/', 'PricePerM2::index');

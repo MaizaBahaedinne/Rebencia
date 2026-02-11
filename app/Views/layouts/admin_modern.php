@@ -787,7 +787,7 @@
                 <?php endif; ?>
                 
                 <?php if (canRead('properties')): ?>
-                <a href="<?= base_url('admin/property-requests') ?>" class="submenu-item <?= url_is('admin/property-requests*') && !isset($_GET['type']) ? 'active' : '' ?>">
+                <a href="<?= base_url('admin/property-requests') ?>" class="submenu-item <?= url_is('admin/property-requests*') ? 'active' : '' ?>">
                     <i class="fas fa-envelope-open-text"></i>
                     <span>Demandes Clients</span>
                     <?php 
@@ -799,11 +799,12 @@
                     <?php endif; ?>
                 </a>
                 
-                <a href="<?= base_url('admin/property-requests?type=estimation') ?>" class="submenu-item <?= url_is('admin/property-requests*') && isset($_GET['type']) && $_GET['type'] === 'estimation' ? 'active' : '' ?>">
+                <a href="<?= base_url('admin/property-estimations') ?>" class="submenu-item <?= url_is('admin/property-estimations*') ? 'active' : '' ?>">
                     <i class="fas fa-calculator"></i>
                     <span>Demandes d'Estimation</span>
                     <?php 
-                    $estimationCount = $requestModel->where('request_type', 'estimation')->where('status', 'pending')->countAllResults();
+                    $estimationModel = model('PropertyEstimationModel');
+                    $estimationCount = $estimationModel->where('status', 'pending')->countAllResults();
                     if ($estimationCount > 0):
                     ?>
                         <span class="badge bg-warning rounded-pill ms-auto"><?= $estimationCount ?></span>

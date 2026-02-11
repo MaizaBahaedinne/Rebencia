@@ -13,81 +13,106 @@ class PropertyEstimationModel extends Model
     protected $useSoftDeletes = false;
     protected $protectFields = true;
     protected $allowedFields = [
-        'client_id', 'first_name', 'last_name', 'email', 'phone',
-        'property_type', 'transaction_type', 'address', 'city', 'governorate', 'zone_id',
-        'area_total', 'rooms', 'bedrooms', 'bathrooms', 'floor',
-        'construction_year', 'condition_state',
-        'has_elevator', 'has_parking', 'has_garden',
-        'description', 'estimated_price', 'agent_id', 'status', 'notes'
+        'client_id',
+        'property_type',
+        'transaction_type',
+        'address',
+        'city',
+        'governorate',
+        'zone_id',
+        'area_total',
+        'rooms',
+        'bedrooms',
+        'bathrooms',
+        'floor',
+        'construction_year',
+        'condition_state',
+        'has_elevator',
+        'has_parking',
+        'has_garden',
+        'description',
+        'estimated_price',
+        'status',
+        'assigned_to',
+        'response',
+        'responded_at'
     ];
 
-    protected bool $allowEmptyInserts = false;
-    protected bool $updateOnlyChanged = true;
-
-    protected array $casts = [
-        'has_elevator' => 'boolean',
-        'has_parking' => 'boolean',
-        'has_garden' => 'boolean',
-    ];
-
-    // Dates
     protected $useTimestamps = true;
     protected $dateFormat = 'datetime';
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
+    protected $deletedField = 'deleted_at';
 
-    // Validation
     protected $validationRules = [
-        'first_name' => 'required|max_length[100]',
-        'last_name' => 'required|max_length[100]',
-        'email' => 'required|valid_email|max_length[255]',
-        'property_type' => 'required|in_list[apartment,villa,studio,office,shop,warehouse,land,other]',
+        'client_id' => 'required|integer',
+        'property_type' => 'required|in_list[apartment,villa,house,land,commercial,industrial,office]',
         'transaction_type' => 'required|in_list[sale,rent]',
     ];
 
-    protected $validationMessages = [
-        'first_name' => [
-            'required' => 'Le prénom est obligatoire',
-        ],
-        'last_name' => [
-            'required' => 'Le nom est obligatoire',
-        ],
-        'email' => [
-            'required' => 'L\'email est obligatoire',
-            'valid_email' => 'L\'email doit être valide',
-        ],
-    ];
-
+    protected $validationMessages = [];
     protected $skipValidation = false;
     protected $cleanValidationRules = true;
 
-    // Get estimations with related data
-    public function getEstimationsWithDetails($limit = null, $offset = null)
+    /**
+     * Get estimations with client and agent information
+     */
+    public function getEstimationsWithDetails($filters = [])
     {
-        $builder = $this->select('property_estimations.*, 
-                                  clients.first_name as client_first_name, 
-                                  clients.last_name as client_last_name,
-                                  users.first_name as agent_first_name,
-                                  users.last_name as agent_last_name,
-                                  zones.name as zone_name')
-                        ->join('clients', 'clients.id = property_estimations.client_id', 'left')
-                        ->join('users', 'users.id = property_estimations.agent_id', 'left')
-                        ->join('zones', 'zones.id = property_estimations.zone_id', 'left')
-                        ->orderBy('property_estimations.created_at', 'DESC');
+        $builder = $this->db->table($this->table);
+        $builder->select('property_estimations.*, 
+                         clients.first_name as client_first_name,
+                         clients.last_name as client_last_name,
+                         clients.email as client_email,
+                         clients.phone as client_phone,
+                         users.first_name as agent_first_name,
+                         users.last_name as agent_last_name,
+                         zones.name_fr as zone_name');
+        $builder->join('clients', 'clients.id = property_estimations.client_id', 'left');
+        $builder->join('users', 'users.id = property_estimations.assigned_to', 'left');
+        $builder->join('zones', 'zones.id = property_estimations.zone_id', 'left');
 
-        if ($limit !== null) {
-            $builder->limit($limit, $offset);
+        // Apply filters
+        if (!empty($filters['status'])) {
+            $builder->where('property_estimations.status', $filters['status']);
         }
+
+        if (!empty($filters['property_type'])) {
+            $builder->where('property_estimations.property_type', $filters['property_type']);
+        }
+
+        if (!empty($filters['transaction_type'])) {
+            $builder->where('property_estimations.transaction_type', $filters['transaction_type']);
+        }
+
+        if (!empty($filters['city'])) {
+            $builder->like('property_estimations.city', $filters['city']);
+        }
+
+        if (!empty($filters['governorate'])) {
+            $builder->like('property_estimations.governorate', $filters['governorate']);
+        }
+
+        if (!empty($filters['assigned_to'])) {
+            $builder->where('property_estimations.assigned_to', $filters['assigned_to']);
+        }
+
+        $builder->orderBy('property_estimations.created_at', 'DESC');
 
         return $builder->get()->getResultArray();
     }
 
-    // Get statistics by status
-    public function getStatsByStatus()
+    /**
+     * Get statistics
+     */
+    public function getStats()
     {
-        return $this->select('status, COUNT(*) as count')
-                    ->groupBy('status')
-                    ->get()
-                    ->getResultArray();
+        return [
+            'total' => $this->countAllResults(false),
+            'pending' => $this->where('status', 'pending')->countAllResults(false),
+            'in_progress' => $this->where('status', 'in_progress')->countAllResults(false),
+            'completed' => $this->where('status', 'completed')->countAllResults(false),
+            'cancelled' => $this->where('status', 'cancelled')->countAllResults(false),
+        ];
     }
 }

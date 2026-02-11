@@ -75,8 +75,11 @@ class PropertyEstimations extends BaseController
             }
         }
 
-        // Prepare estimation data as JSON
-        $estimationData = [
+        // Prepare estimation data
+        $estimationModel = model('PropertyEstimationModel');
+        
+        $data = [
+            'client_id' => $clientId,
             'property_type' => $this->request->getVar('property_type'),
             'transaction_type' => $this->request->getVar('transaction_type'),
             'address' => $this->request->getVar('address'),
@@ -93,23 +96,15 @@ class PropertyEstimations extends BaseController
             'has_elevator' => $this->request->getVar('has_elevator') ? 1 : 0,
             'has_parking' => $this->request->getVar('has_parking') ? 1 : 0,
             'has_garden' => $this->request->getVar('has_garden') ? 1 : 0,
+            'description' => $this->request->getVar('description'),
+            'status' => 'pending'
         ];
 
-        $data = [
-            'property_id' => 0, // Pas de bien existant
-            'client_id' => $clientId,
-            'request_type' => 'estimation',
-            'message' => $this->request->getVar('description') ?: 'Demande d\'estimation de bien',
-            'estimation_data' => json_encode($estimationData),
-            'status' => 'pending',
-            'source' => 'website'
-        ];
-
-        if ($this->requestModel->insert($data)) {
+        if ($estimationModel->insert($data)) {
             return redirect()->to('/estimer-mon-bien/success')
                            ->with('success', 'Votre demande d\'estimation a été envoyée avec succès. Nous vous contacterons bientôt.');
         } else {
-            log_message('error', 'Failed to create estimation request: ' . json_encode($this->requestModel->errors()));
+            log_message('error', 'Failed to create estimation request: ' . json_encode($estimationModel->errors()));
             return redirect()->back()->withInput()
                            ->with('error', 'Une erreur s\'est produite. Veuillez réessayer.');
         }

@@ -39,6 +39,10 @@ $routes->post('creer-une-alerte/submit', 'SearchAlerts::store');
 $routes->get('creer-une-alerte/success', 'SearchAlerts::success');
 $routes->get('alerte/unsubscribe/(:num)/(:segment)', 'SearchAlerts::unsubscribe/$1/$2');
 
+// Price per m2 (public)
+$routes->get('prix-m2', 'PricePerM2::index');
+$routes->get('prix-m2/search', 'PricePerM2::search');
+
 
 // ==========================================
 // ADMIN ROUTES
@@ -208,6 +212,17 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->get('view/(:num)', 'SearchAlerts::view/$1');
         $routes->get('toggleActive/(:num)', 'SearchAlerts::toggleActive/$1');
         $routes->delete('delete/(:num)', 'SearchAlerts::delete/$1');
+    });
+    
+    // Price per m2
+    $routes->group('price-per-m2', function($routes) {
+        $routes->get('/', 'PricePerM2::index');
+        $routes->get('create', 'PricePerM2::create');
+        $routes->post('store', 'PricePerM2::store');
+        $routes->get('edit/(:num)', 'PricePerM2::edit/$1');
+        $routes->post('update/(:num)', 'PricePerM2::update/$1');
+        $routes->get('delete/(:num)', 'PricePerM2::delete/$1');
+        $routes->get('calculate', 'PricePerM2::calculateFromProperties');
     });
     
     // Transactions

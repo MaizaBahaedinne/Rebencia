@@ -43,6 +43,10 @@
             <a href="<?= base_url('admin/zones') ?>" class="nav-link text-white">
                 <i class="fas fa-map-marker-alt"></i> Zones
             </a>
+
+            <a href="<?= base_url('admin/price-per-m2') ?>" class="nav-link text-white <?= strpos(service('router')->controllerName(), 'PricePerM2') !== false ? 'active bg-primary' : '' ?>">
+                <i class="fas fa-chart-line"></i> Prix au m²
+            </a>
             
             <a href="<?= base_url('admin/reports') ?>" class="nav-link text-white">
                 <i class="fas fa-chart-bar"></i> Rapports

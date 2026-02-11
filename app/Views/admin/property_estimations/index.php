@@ -160,7 +160,7 @@
                         <small class="text-muted"><?= date('H:i', strtotime($estimation['created_at'])) ?></small>
                     </td>
                     <td>
-                        <a href="<?= base_url('admin/property-requests/view/' . \$estimation['id']) ?>"
+                        <a href="<?= base_url('admin/property-requests/view/' . $estimation['id']) ?>"
                            class="btn btn-sm btn-primary">
                             <i class="bi bi-eye"></i> Voir
                         </a>

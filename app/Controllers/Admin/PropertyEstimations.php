@@ -39,7 +39,7 @@ class PropertyEstimations extends BaseController
         $estimation = $this->estimationModel->find($id);
 
         if (!$estimation) {
-            return redirect()->to('/admin/property-estimations')->with('error', 'Demande d\'estimation introuvable');
+            return redirect()->to('/admin/property-requests')->with('error', 'Demande d\'estimation introuvable');
         }
 
         // Get client if exists
@@ -74,10 +74,10 @@ class PropertyEstimations extends BaseController
 
     public function updateStatus($id)
     {
-        $status = $this->request->getPost('status');
-        $agentId = $this->request->getPost('agent_id');
-        $estimatedPrice = $this->request->getPost('estimated_price');
-        $notes = $this->request->getPost('notes');
+        $status = $this->request->getVar('status');
+        $agentId = $this->request->getVar('agent_id');
+        $estimatedPrice = $this->request->getVar('estimated_price');
+        $notes = $this->request->getVar('notes');
 
         $data = ['status' => $status];
 
@@ -103,7 +103,7 @@ class PropertyEstimations extends BaseController
 
     public function assignAgent($id)
     {
-        $agentId = $this->request->getPost('agent_id');
+        $agentId = $this->request->getVar('agent_id');
 
         if ($this->estimationModel->update($id, ['agent_id' => $agentId, 'status' => 'in_progress'])) {
             return redirect()->to('/admin/property-estimations/view/' . $id)

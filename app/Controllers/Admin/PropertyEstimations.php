@@ -77,12 +77,16 @@ class PropertyEstimations extends BaseController
             $zone = $this->zoneModel->find($estimation['zone_id']);
         }
 
+        // Get all active agents for assignment dropdown
+        $agents = $this->userModel->where('status', 'active')->findAll();
+
         $data = [
             'title' => 'Détails de l\'Estimation',
             'estimation' => $estimation,
             'client' => $client,
             'agent' => $agent,
-            'zone' => $zone
+            'zone' => $zone,
+            'agents' => $agents
         ];
 
         return view('admin/property_estimations/view', $data);

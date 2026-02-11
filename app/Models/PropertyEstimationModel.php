@@ -67,7 +67,7 @@ class PropertyEstimationModel extends Model
                          clients.phone as client_phone,
                          users.first_name as agent_first_name,
                          users.last_name as agent_last_name,
-                         zones.name_fr as zone_name');
+                         zones.name as zone_name');
         $builder->join('clients', 'clients.id = property_estimations.client_id', 'left');
         $builder->join('users', 'users.id = property_estimations.assigned_to', 'left');
         $builder->join('zones', 'zones.id = property_estimations.zone_id', 'left');

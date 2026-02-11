@@ -184,7 +184,7 @@
                 <h5 class="mb-0"><i class="bi bi-clipboard-check"></i> Gestion</h5>
             </div>
             <div class="card-body">
-                <form method="post" action="<?= base_url('admin/estimation-requests/updateStatus/' . $estimation['id']) ?>">
+                <form method="post" action="<?= base_url('admin/property-estimations/update/' . $estimation['id']) ?>">
                     <?= csrf_field() ?>
                     
                     <div class="mb-3">

@@ -54,11 +54,26 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <p class="text-muted mb-1 small">Terminées</p>
-                        <h3 class="mb-0"><?= $stats['completed'] ?></h3>
+                        <p class="text-muted mb-1 small">Estimées</p>
+                        <h3 class="mb-0"><?= $stats['estimated'] ?></h3>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-check-circle text-primary fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1 small">Converties</p>
+                        <h3 class="mb-0"><?= $stats['converted'] ?></h3>
                     </div>
                     <div class="bg-success bg-opacity-10 p-3 rounded">
-                        <i class="fas fa-check-circle text-success fa-2x"></i>
+                        <i class="fas fa-check-double text-success fa-2x"></i>
                     </div>
                 </div>
             </div>
@@ -99,7 +114,9 @@
                     <option value="">Tous les statuts</option>
                     <option value="pending" <?= $filters['status'] === 'pending' ? 'selected' : '' ?>>En attente</option>
                     <option value="in_progress" <?= $filters['status'] === 'in_progress' ? 'selected' : '' ?>>En cours</option>
-                    <option value="completed" <?= $filters['status'] === 'completed' ? 'selected' : '' ?>>Terminées</option>
+                    <option value="estimated" <?= $filters['status'] === 'estimated' ? 'selected' : '' ?>>Estimées</option>
+                    <option value="contacted" <?= $filters['status'] === 'contacted' ? 'selected' : '' ?>>Contactées</option>
+                    <option value="converted" <?= $filters['status'] === 'converted' ? 'selected' : '' ?>>Converties</option>
                     <option value="cancelled" <?= $filters['status'] === 'cancelled' ? 'selected' : '' ?>>Annulées</option>
                 </select>
             </div>
@@ -224,13 +241,17 @@
                                 $statusClasses = [
                                     'pending' => 'warning',
                                     'in_progress' => 'info',
-                                    'completed' => 'success',
+                                    'estimated' => 'primary',
+                                    'contacted' => 'secondary',
+                                    'converted' => 'success',
                                     'cancelled' => 'danger'
                                 ];
                                 $statusLabels = [
                                     'pending' => 'En attente',
                                     'in_progress' => 'En cours',
-                                    'completed' => 'Terminée',
+                                    'estimated' => 'Estimée',
+                                    'contacted' => 'Contacté',
+                                    'converted' => 'Converti',
                                     'cancelled' => 'Annulée'
                                 ];
                                 ?>

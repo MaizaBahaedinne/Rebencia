@@ -109,7 +109,9 @@ class PropertyEstimationModel extends Model
             'total' => $this->countAllResults(false),
             'pending' => $this->where('status', 'pending')->countAllResults(false),
             'in_progress' => $this->where('status', 'in_progress')->countAllResults(false),
-            'completed' => $this->where('status', 'completed')->countAllResults(false),
+            'estimated' => $this->where('status', 'estimated')->countAllResults(false),
+            'contacted' => $this->where('status', 'contacted')->countAllResults(false),
+            'converted' => $this->where('status', 'converted')->countAllResults(false),
             'cancelled' => $this->where('status', 'cancelled')->countAllResults(false),
         ];
     }

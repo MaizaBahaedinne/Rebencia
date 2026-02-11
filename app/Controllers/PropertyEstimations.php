@@ -61,12 +61,18 @@ class PropertyEstimations extends BaseController
                 'last_name' => $this->request->getVar('last_name'),
                 'email' => $this->request->getVar('email'),
                 'phone' => $this->request->getVar('phone'),
-                'type' => 'seller',
+                'type' => 'individual',
                 'source' => 'estimation_request',
                 'status' => 'lead'
             ];
 
             $clientId = $this->clientModel->insert($clientData);
+            
+            if (!$clientId) {
+                log_message('error', 'Failed to create client: ' . json_encode($this->clientModel->errors()));
+                return redirect()->back()->withInput()
+                               ->with('error', 'Erreur lors de la création du compte client. Veuillez réessayer.');
+            }
         }
 
         $data = [
@@ -99,6 +105,7 @@ class PropertyEstimations extends BaseController
             return redirect()->to('/estimer-mon-bien/success')
                            ->with('success', 'Votre demande d\'estimation a été envoyée avec succès. Nous vous contacterons bientôt.');
         } else {
+            log_message('error', 'Failed to create estimation: ' . json_encode($this->estimationModel->errors()));
             return redirect()->back()->withInput()
                            ->with('error', 'Une erreur s\'est produite. Veuillez réessayer.');
         }

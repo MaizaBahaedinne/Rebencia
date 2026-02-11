@@ -57,12 +57,18 @@ class SearchAlerts extends BaseController
                 'last_name' => $this->request->getVar('last_name'),
                 'email' => $this->request->getVar('email'),
                 'phone' => $this->request->getVar('phone'),
-                'type' => 'buyer',
+                'type' => 'individual',
                 'source' => 'search_alert',
                 'status' => 'lead'
             ];
 
             $clientId = $this->clientModel->insert($clientData);
+            
+            if (!$clientId) {
+                log_message('error', 'Failed to create client for alert: ' . json_encode($this->clientModel->errors()));
+                return redirect()->back()->withInput()
+                               ->with('error', 'Erreur lors de la création du compte client. Veuillez réessayer.');
+            }
         }
 
         // Prepare JSON fields

@@ -39,7 +39,7 @@ class PropertyEstimations extends BaseController
         $estimation = $this->estimationModel->find($id);
 
         if (!$estimation) {
-            return redirect()->to('/admin/property-requests')->with('error', 'Demande d\'estimation introuvable');
+            return redirect()->to('/admin/estimation-requests')->with('error', 'Demande d\'estimation introuvable');
         }
 
         // Get client if exists

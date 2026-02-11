@@ -3,18 +3,18 @@
 namespace App\Controllers;
 
 use App\Models\PropertyEstimationModel;
-use App\Models\ClientModel;
+use App\Models\PropertyRequestModel;
 use App\Models\ZoneModel;
 
 class PropertyEstimations extends BaseController
 {
-    protected $estimationModel;
+    protected $requestModel;
     protected $clientModel;
     protected $zoneModel;
 
     public function __construct()
     {
-        $this->estimationModel = new PropertyEstimationModel();
+        $this->requestModel = new PropertyRequestModel();
         $this->clientModel = new ClientModel();
         $this->zoneModel = new ZoneModel();
     }
@@ -75,12 +75,8 @@ class PropertyEstimations extends BaseController
             }
         }
 
-        $data = [
-            'client_id' => $clientId,
-            'first_name' => $this->request->getVar('first_name'),
-            'last_name' => $this->request->getVar('last_name'),
-            'email' => $this->request->getVar('email'),
-            'phone' => $this->request->getVar('phone'),
+        // Prepare estimation data as JSON
+        $estimationData = [
             'property_type' => $this->request->getVar('property_type'),
             'transaction_type' => $this->request->getVar('transaction_type'),
             'address' => $this->request->getVar('address'),
@@ -97,15 +93,23 @@ class PropertyEstimations extends BaseController
             'has_elevator' => $this->request->getVar('has_elevator') ? 1 : 0,
             'has_parking' => $this->request->getVar('has_parking') ? 1 : 0,
             'has_garden' => $this->request->getVar('has_garden') ? 1 : 0,
-            'description' => $this->request->getVar('description'),
-            'status' => 'pending'
         ];
 
-        if ($this->estimationModel->insert($data)) {
+        $data = [
+            'property_id' => 0, // Pas de bien existant
+            'client_id' => $clientId,
+            'request_type' => 'estimation',
+            'message' => $this->request->getVar('description') ?: 'Demande d\'estimation de bien',
+            'estimation_data' => json_encode($estimationData),
+            'status' => 'pending',
+            'source' => 'website'
+        ];
+
+        if ($this->requestModel->insert($data)) {
             return redirect()->to('/estimer-mon-bien/success')
                            ->with('success', 'Votre demande d\'estimation a été envoyée avec succès. Nous vous contacterons bientôt.');
         } else {
-            log_message('error', 'Failed to create estimation: ' . json_encode($this->estimationModel->errors()));
+            log_message('error', 'Failed to create estimation request: ' . json_encode($this->requestModel->errors()));
             return redirect()->back()->withInput()
                            ->with('error', 'Une erreur s\'est produite. Veuillez réessayer.');
         }

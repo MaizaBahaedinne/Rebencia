@@ -31,7 +31,7 @@ class PropertyRequests extends BaseController
             ->select('property_requests.*, properties.reference, properties.title, properties.price, 
                       clients.first_name, clients.last_name, clients.phone, clients.email,
                       users.first_name as agent_first_name, users.last_name as agent_last_name')
-            ->join('properties', 'properties.id = property_requests.property_id')
+            ->join('properties', 'properties.id = property_requests.property_id', 'left')
             ->join('clients', 'clients.id = property_requests.client_id')
             ->join('users', 'users.id = property_requests.assigned_to', 'left')
             ->orderBy('property_requests.created_at', 'DESC');
@@ -61,6 +61,7 @@ class PropertyRequests extends BaseController
             'completed' => $this->requestModel->where('status', 'completed')->countAllResults(false),
             'visits' => $this->requestModel->where('request_type', 'visit')->countAllResults(false),
             'information' => $this->requestModel->where('request_type', 'information')->countAllResults(false),
+            'estimation' => $this->requestModel->where('request_type', 'estimation')->countAllResults(false),
         ];
 
         // Get agents for assignment

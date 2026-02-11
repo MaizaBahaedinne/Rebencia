@@ -110,6 +110,7 @@
                         <option value="">Tous les types</option>
                         <option value="visit" <?= $filters['type'] === 'visit' ? 'selected' : '' ?>>Visite</option>
                         <option value="information" <?= $filters['type'] === 'information' ? 'selected' : '' ?>>Information</option>
+                        <option value="estimation" <?= $filters['type'] === 'estimation' ? 'selected' : '' ?>>Estimation</option>
                     </select>
                 </div>
                 

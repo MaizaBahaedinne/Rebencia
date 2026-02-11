@@ -7,7 +7,7 @@
         <h2 class="mb-1">Détails de la Demande #<?= $estimation['id'] ?></h2>
         <p class="text-muted">Demande reçue le <?= date('d/m/Y à H:i', strtotime($estimation['created_at'])) ?></p>
     </div>
-    <a href="<?= base_url('admin/property-estimations') ?>" class="btn btn-secondary">
+    <a href="<?= base_url('admin/estimation-requests') ?>" class="btn btn-secondary">
         <i class="bi bi-arrow-left"></i> Retour
     </a>
 </div>
@@ -184,7 +184,7 @@
                 <h5 class="mb-0"><i class="bi bi-clipboard-check"></i> Gestion</h5>
             </div>
             <div class="card-body">
-                <form method="post" action="<?= base_url('admin/property-requests/updateStatus/' . \$estimation['id']) ?>">
+                <form method="post" action="<?= base_url('admin/estimation-requests/updateStatus/' . $estimation['id']) ?>">
                     <?= csrf_field() ?>
                     
                     <div class="mb-3">

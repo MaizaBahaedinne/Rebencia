@@ -28,6 +28,18 @@ $routes->get('properties', 'Properties::index');
 $routes->post('properties/submit-request', 'Properties::submitRequest');
 $routes->get('properties/(:any)', 'Properties::view/$1');
 
+// Property Estimation (public)
+$routes->get('estimer-mon-bien', 'PropertyEstimations::create');
+$routes->post('estimer-mon-bien/submit', 'PropertyEstimations::store');
+$routes->get('estimer-mon-bien/success', 'PropertyEstimations::success');
+
+// Search Alerts (public)
+$routes->get('creer-une-alerte', 'SearchAlerts::create');
+$routes->post('creer-une-alerte/submit', 'SearchAlerts::store');
+$routes->get('creer-une-alerte/success', 'SearchAlerts::success');
+$routes->get('alerte/unsubscribe/(:num)/(:segment)', 'SearchAlerts::unsubscribe/$1/$2');
+
+
 // ==========================================
 // ADMIN ROUTES
 // ==========================================
@@ -188,6 +200,23 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->post('update/(:num)', 'Clients::update/$1');
         $routes->delete('delete/(:num)', 'Clients::delete/$1');
         $routes->get('view/(:num)', 'Clients::view/$1');
+    });
+    
+    // Property Estimations
+    $routes->group('property-estimations', function($routes) {
+        $routes->get('/', 'PropertyEstimations::index');
+        $routes->get('view/(:num)', 'PropertyEstimations::view/$1');
+        $routes->post('updateStatus/(:num)', 'PropertyEstimations::updateStatus/$1');
+        $routes->post('assignAgent/(:num)', 'PropertyEstimations::assignAgent/$1');
+        $routes->delete('delete/(:num)', 'PropertyEstimations::delete/$1');
+    });
+    
+    // Search Alerts
+    $routes->group('search-alerts', function($routes) {
+        $routes->get('/', 'SearchAlerts::index');
+        $routes->get('view/(:num)', 'SearchAlerts::view/$1');
+        $routes->get('toggleActive/(:num)', 'SearchAlerts::toggleActive/$1');
+        $routes->delete('delete/(:num)', 'SearchAlerts::delete/$1');
     });
     
     // Transactions

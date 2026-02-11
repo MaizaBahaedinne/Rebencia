@@ -158,9 +158,9 @@ class CreatePropertyEstimationsTable extends Migration
         $this->forge->addKey('status');
         $this->forge->addKey('created_at');
         
-        $this->forge->addForeignKey('client_id', 'clients', 'id', 'CASCADE', 'SET NULL');
-        $this->forge->addForeignKey('agent_id', 'users', 'id', 'CASCADE', 'SET NULL');
-        $this->forge->addForeignKey('zone_id', 'zones', 'id', 'CASCADE', 'SET NULL');
+        $this->forge->addForeignKey('client_id', 'clients', 'id', 'SET NULL', 'CASCADE');
+        $this->forge->addForeignKey('agent_id', 'users', 'id', 'SET NULL', 'CASCADE');
+        $this->forge->addForeignKey('zone_id', 'zones', 'id', 'SET NULL', 'CASCADE');
         
         $this->forge->createTable('property_estimations');
     }

@@ -436,9 +436,9 @@ class DashboardModel extends Model
 
         // My upcoming appointments
         $stats['upcoming_appointments'] = $this->db->table('appointments')
-            ->where('agent_id', $userId)
-            ->where('appointment_date >=', date('Y-m-d'))
-            ->where('status', 'scheduled')
+            ->where('user_id', $userId)
+            ->where('DATE(scheduled_at) >=', date('Y-m-d'))
+            ->whereIn('status', ['scheduled', 'confirmed'])
             ->countAllResults();
 
         // My tasks

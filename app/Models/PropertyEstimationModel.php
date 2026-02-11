@@ -91,13 +91,13 @@ class PropertyEstimationModel extends Model
             $builder->like('property_estimations.governorate', $filters['governorate']);
         }
 
-        if (!empty($filters['assigned_to'])) {
-            $builder->where('property_estimations.assigned_to', $filters['assigned_to']);
+        if (!empty($filters['agent_id'])) {
+            $builder->where('property_estimations.agent_id', $filters['agent_id']);
         }
 
         $builder->orderBy('property_estimations.created_at', 'DESC');
-gent_id'])) {
-            $builder->where('property_estimations.agent_id', $filters['agent_id
+
+        return $builder->get()->getResultArray();
     }
 
     /**

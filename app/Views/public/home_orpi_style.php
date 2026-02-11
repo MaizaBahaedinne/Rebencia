@@ -190,7 +190,7 @@
                     </div>
                     <h4 class="mb-3">Estimer mon bien</h4>
                     <p class="text-muted">Obtenez une estimation gratuite de votre propriété en quelques clics</p>
-                    <a href="<?= base_url('contact') ?>" class="btn btn-orpi-secondary mt-3">
+                    <a href="<?= base_url('estimer-mon-bien') ?>" class="btn btn-orpi-secondary mt-3">
                         Estimer maintenant <i class="fas fa-arrow-right ms-2"></i>
                     </a>
                 </div>
@@ -216,7 +216,7 @@
                     </div>
                     <h4 class="mb-3">Créer une alerte</h4>
                     <p class="text-muted">Recevez les nouvelles annonces correspondant à vos critères par email</p>
-                    <a href="<?= base_url('contact') ?>" class="btn btn-orpi-secondary mt-3">
+                    <a href="<?= base_url('creer-une-alerte') ?>" class="btn btn-orpi-secondary mt-3">
                         Créer une alerte <i class="fas fa-arrow-right ms-2"></i>
                     </a>
                 </div>

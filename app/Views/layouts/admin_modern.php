@@ -787,7 +787,7 @@
                 <?php endif; ?>
                 
                 <?php if (canRead('properties')): ?>
-                <a href="<?= base_url('admin/property-requests') ?>" class="submenu-item <?= url_is('admin/property-requests*') ? 'active' : '' ?>">
+                <a href="<?= base_url('admin/property-requests') ?>" class="submenu-item <?= url_is('admin/property-requests*') && !isset($_GET['type']) ? 'active' : '' ?>">
                     <i class="fas fa-envelope-open-text"></i>
                     <span>Demandes Clients</span>
                     <?php 
@@ -796,6 +796,17 @@
                     if ($pendingCount > 0):
                     ?>
                         <span class="badge bg-danger rounded-pill ms-auto"><?= $pendingCount ?></span>
+                    <?php endif; ?>
+                </a>
+                
+                <a href="<?= base_url('admin/property-requests?type=estimation') ?>" class="submenu-item <?= url_is('admin/property-requests*') && isset($_GET['type']) && $_GET['type'] === 'estimation' ? 'active' : '' ?>">
+                    <i class="fas fa-calculator"></i>
+                    <span>Demandes d'Estimation</span>
+                    <?php 
+                    $estimationCount = $requestModel->where('request_type', 'estimation')->where('status', 'pending')->countAllResults();
+                    if ($estimationCount > 0):
+                    ?>
+                        <span class="badge bg-warning rounded-pill ms-auto"><?= $estimationCount ?></span>
                     <?php endif; ?>
                 </a>
                 <?php endif; ?>

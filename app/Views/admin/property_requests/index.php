@@ -202,9 +202,11 @@
                                     </td>
                                     <td>
                                         <?php if ($request['request_type'] === 'visit'): ?>
-                                            <span class="badge bg-info">Visite</span>
+                                            <span class="badge bg-info"><i class="fas fa-calendar-check me-1"></i>Visite</span>
+                                        <?php elseif ($request['request_type'] === 'estimation'): ?>
+                                            <span class="badge bg-warning"><i class="fas fa-calculator me-1"></i>Estimation</span>
                                         <?php else: ?>
-                                            <span class="badge bg-primary">Info</span>
+                                            <span class="badge bg-primary"><i class="fas fa-info-circle me-1"></i>Info</span>
                                         <?php endif; ?>
                                     </td>
                                     <td><?= esc($request['first_name'] . ' ' . $request['last_name']) ?></td>

@@ -3,16 +3,145 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
+use App\Models\DashboardModel;
+use App\Models\UserModel;
 
 class Dashboard extends BaseController
 {
+    protected $dashboardModel;
+    protected $userModel;
+
+    public function __construct()
+    {
+        $this->dashboardModel = new DashboardModel();
+        $this->userModel = new UserModel();
+    }
+
     public function index()
     {
-        // Check authentication
+        // Check if user is logged in
         if (!session()->has('user_id')) {
             return redirect()->to('/admin/login');
         }
 
+        $userId = session()->get('user_id');
+        $user = $this->userModel->find($userId);
+
+        if (!$user) {
+            return redirect()->to('/admin/login')->with('error', 'Utilisateur non trouvé');
+        }
+
+        // Get user role
+        $db = \Config\Database::connect();
+        $role = $db->table('roles')
+            ->where('id', $user['role_id'])
+            ->get()
+            ->getRowArray();
+
+        if (!$role) {
+            return redirect()->to('/admin/login')->with('error', 'Rôle non trouvé');
+        }
+
+        $roleName = strtolower($role['name']);
+
+        // Route to appropriate dashboard based on role
+        switch ($roleName) {
+            case 'admin':
+            case 'administrateur':
+                return $this->adminDashboard();
+
+            case 'directeur':
+            case 'director':
+                return $this->directorDashboard();
+
+            case 'chef d\'agence':
+            case 'chef agence':
+            case 'manager':
+                return $this->managerDashboard($user);
+
+            case 'coordinateur':
+            case 'coordinator':
+            case 'collaborateur':
+            case 'agent':
+                return $this->agentDashboard($user);
+
+            default:
+                // Fallback to old dashboard
+                return $this->oldDashboard();
+        }
+    }
+
+    /**
+     * Admin Dashboard - System level
+     */
+    private function adminDashboard()
+    {
+        $data = [
+            'title' => 'Tableau de bord Administrateur',
+            'stats' => $this->dashboardModel->getAdminStats(),
+        ];
+
+        return view('admin/dashboard/admin', $data);
+    }
+
+    /**
+     * Director Dashboard - All group data
+     */
+    private function directorDashboard()
+    {
+        $data = [
+            'title' => 'Tableau de bord Directeur',
+            'stats' => $this->dashboardModel->getDirectorStats(),
+        ];
+
+        return view('admin/dashboard/director', $data);
+    }
+
+    /**
+     * Manager Dashboard - Agency filtered
+     */
+    private function managerDashboard($user)
+    {
+        if (!$user['agency_id']) {
+            return redirect()->to('/admin')->with('error', 'Aucune agence assignée');
+        }
+
+        $data = [
+            'title' => 'Tableau de bord Chef d\'Agence',
+            'stats' => $this->dashboardModel->getManagerStats($user['agency_id']),
+            'user' => $user,
+        ];
+
+        return view('admin/dashboard/manager', $data);
+    }
+
+    /**
+     * Agent Dashboard - User assigned data
+     * Used for both Coordinateur and Collaborateur
+     */
+    private function agentDashboard($user)
+    {
+        $stats = $this->dashboardModel->getAgentStats($user['id']);
+
+        // Calculate objective progress if exists
+        if (!empty($stats['my_objective'])) {
+            $stats['objective_progress'] = $this->dashboardModel->calculateObjectiveProgress($stats['my_objective']);
+        }
+
+        $data = [
+            'title' => 'Mon Tableau de bord',
+            'stats' => $stats,
+            'user' => $user,
+        ];
+
+        return view('admin/dashboard/agent', $data);
+    }
+
+    /**
+     * Old dashboard (fallback)
+     */
+    private function oldDashboard()
+    {
         $data = [
             'title' => 'Dashboard',
             'user' => $this->getCurrentUser(),

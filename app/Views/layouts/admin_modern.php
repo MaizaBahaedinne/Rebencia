@@ -757,9 +757,9 @@
         <nav class="sidebar-menu" id="sidebarMenu">
             <div class="menu-section-title">PRINCIPAL</div>
             
-            <a href="<?= base_url('admin') ?>" class="menu-item <?= url_is('admin') && !url_is('admin/*') ? 'active' : '' ?>">
-                <i class="fas fa-home"></i>
-                <span>Dashboard</span>
+            <a href="<?= base_url('admin/dashboard') ?>" class="menu-item <?= url_is('admin') || url_is('admin/dashboard*') ? 'active' : '' ?>">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Tableau de bord</span>
             </a>
 
             <div class="menu-section-title">MENU</div>

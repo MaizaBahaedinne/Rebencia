@@ -609,139 +609,46 @@
 
 <?= $this->section('scripts') ?>
 <script>
-let currentZoom = 1;
-
-function zoomIn() {
-    if (currentZoom < 2) {
-        currentZoom += 0.1;
-        document.getElementById('orgChart').style.transform = `scale(${currentZoom})`;
-        document.getElementById('zoomLevel').textContent = Math.round(currentZoom * 100) + '%';
-    }
-}
-
-function zoomOut() {
-    if (currentZoom > 0.5) {
-        currentZoom -= 0.1;
-        document.getElementById('orgChart').style.transform = `scale(${currentZoom})`;
-        document.getElementById('zoomLevel').textContent = Math.round(currentZoom * 100) + '%';
-    }
-}
-
-function resetZoom() {
-    currentZoom = 1;
-    document.getElementById('orgChart').style.transform = 'scale(1)';
-    document.getElementById('zoomLevel').textContent = '100%';
-}
-
-function toggleSection(id) {
-    const section = document.getElementById('section-' + id);
-    const btn = document.getElementById('btn-' + id);
-    if (section && btn) {
-        section.classList.toggle('collapsed');
-        btn.classList.toggle('collapsed');
+function toggleChildren(agencyId) {
+    const children = document.querySelectorAll(`tr[data-parent="${agencyId}"]`);
+    const icon = document.querySelector(`#toggle-${agencyId}`);
+    
+    children.forEach(child => {
+        if (child.style.display === 'none') {
+            child.style.display = '';
+        } else {
+            child.style.display = 'none';
+            // Also hide their children
+            const childId = child.dataset.agency;
+            toggleChildren(childId);
+        }
+    });
+    
+    if (icon) {
+        icon.classList.toggle('fa-chevron-down');
+        icon.classList.toggle('fa-chevron-right');
     }
 }
 
 function expandAll() {
-    document.querySelectorAll('.collapsible-section').forEach(el => el.classList.remove('collapsed'));
-    document.querySelectorAll('.toggle-btn').forEach(el => el.classList.remove('collapsed'));
+    document.querySelectorAll('.agency-row').forEach(row => {
+        row.style.display = '';
+    });
+    document.querySelectorAll('.toggle-icon').forEach(icon => {
+        icon.classList.remove('fa-chevron-right');
+        icon.classList.add('fa-chevron-down');
+    });
 }
 
 function collapseAll() {
-    document.querySelectorAll('.collapsible-section').forEach(el => el.classList.add('collapsed'));
-    document.querySelectorAll('.toggle-btn').forEach(el => el.classList.add('collapsed'));
-}
-
-function goToAgency(agencyId) {
-    window.location.href = '<?= base_url("admin/agencies/view/") ?>' + agencyId;
+    document.querySelectorAll('.agency-row[data-parent]').forEach(row => {
+        row.style.display = 'none';
+    });
+    document.querySelectorAll('.toggle-icon').forEach(icon => {
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-right');
+    });
 }
 </script>
 <?= $this->endSection() ?>
-
-<?php
-function renderAgenciesPyramid() {
-    $agencyModel = new \App\Models\AgencyModel();
-    $allAgencies = $agencyModel->getAgenciesWithStats();
-    
-    // Récupérer les sièges (agences sans parent_id)
-    $sieges = array_filter($allAgencies, function($a) { return !$a['parent_id'] && $a['type'] === 'siege'; });
-    
-    $html = '';
-    if (!empty($sieges)) {
-        $html .= '<div class="org-level"><div class="agencies-row">';
-        foreach ($sieges as $siege) {
-            $html .= renderAgencyCard($siege, 'siege');
-            $children = array_filter($allAgencies, function($a) use ($siege) { return $a['parent_id'] == $siege['id']; });
-            if (!empty($children)) {
-                $html .= '<div class="toggle-btn" id="btn-siege-' . $siege['id'] . '" onclick="toggleSection(\'siege-' . $siege['id'] . '\')"><i class="fas fa-minus"></i></div>';
-            }
-        }
-        $html .= '</div></div>';
-        foreach ($sieges as $siege) {
-            $html .= renderChildAgencies($siege['id'], $allAgencies, 'siege-' . $siege['id']);
-        }
-    } else {
-        $html = '<div class="empty-message"><i class="fas fa-sitemap fa-3x mb-3"></i><p>Aucune structure d\'agence trouvée</p></div>';
-    }
-    return $html;
-}
-
-function renderChildAgencies($parentId, $allAgencies, $sectionId) {
-    $children = array_filter($allAgencies, function($a) use ($parentId) { return $a['parent_id'] == $parentId; });
-    if (empty($children)) return '';
-    
-    $html = '<div class="collapsible-section" id="section-' . $sectionId . '"><div class="org-level"><div class="agencies-row">';
-    foreach ($children as $child) {
-        $html .= renderAgencyCard($child, 'agence');
-        $subChildren = array_filter($allAgencies, function($a) use ($child) { return $a['parent_id'] == $child['id']; });
-        if (!empty($subChildren)) {
-            $html .= '<div class="toggle-btn" id="btn-agency-' . $child['id'] . '" onclick="toggleSection(\'agency-' . $child['id'] . '\')"><i class="fas fa-minus"></i></div>';
-        }
-    }
-    $html .= '</div></div>';
-    foreach ($children as $child) {
-        $html .= renderChildAgencies($child['id'], $allAgencies, 'agency-' . $child['id']);
-    }
-    $html .= '</div>';
-    return $html;
-}
-
-function renderAgencyCard($agency, $class = '') {
-    $initials = strtoupper(substr($agency['name'], 0, 2));
-    $statusClass = $agency['status'] === 'active' ? 'active' : 'inactive';
-    $statusText = $agency['status'] === 'active' ? 'Actif' : 'Inactif';
-    
-    $html = '<div class="agency-box ' . $class . '" onclick="goToAgency(' . $agency['id'] . ')">';
-    $html .= '<span class="status-badge ' . $statusClass . '">' . $statusText . '</span>';
-    
-    $html .= '<div class="agency-logo-wrapper">';
-    if (!empty($agency['logo']) && file_exists(FCPATH . 'uploads/agencies/' . $agency['logo'])) {
-        $html .= '<img src="' . base_url('uploads/agencies/' . $agency['logo']) . '" alt="Logo" class="agency-logo">';
-    } else {
-        $html .= '<div class="agency-logo-placeholder">' . $initials . '</div>';
-    }
-    $html .= '</div>';
-    
-    $html .= '<div class="agency-name">' . esc($agency['name']) . '</div>';
-    $html .= '<div class="agency-code">' . esc($agency['code']) . '</div>';
-    $html .= '<div class="agency-location"><i class="fas fa-map-marker-alt"></i> ' . esc($agency['city']) . ', ' . esc($agency['governorate']) . '</div>';
-    
-    $html .= '<div class="agency-stats">';
-    $html .= '<div class="stat-item">';
-    $html .= '<span class="stat-value">' . ($agency['users_count'] ?? 0) . '</span>';
-    $html .= '<span class="stat-label">Utilisateurs</span>';
-    $html .= '</div>';
-    $html .= '<div class="stat-item">';
-    $html .= '<span class="stat-value">' . ($agency['properties_count'] ?? 0) . '</span>';
-    $html .= '<span class="stat-label">Biens</span>';
-    $html .= '</div>';
-    $html .= '<div class="stat-item">';
-    $html .= '<span class="stat-value">' . ($agency['transactions_count'] ?? 0) . '</span>';
-    $html .= '<span class="stat-label">Transactions</span>';
-    $html .= '</div>';
-    $html .= '</div>';
-    
-    $html .= '</div>';
-    return $html;
-}
 ?>

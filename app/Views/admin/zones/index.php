@@ -35,12 +35,26 @@
         </div>
     <?php endif ?>
 
-    <!-- Liste en mode détails (comme Windows Explorer) -->
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
+    <div class="row">
+        <!-- Carte (moitié gauche) -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm" style="height: 650px;">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-map me-2"></i>Carte des Zones</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div id="zonesMap" style="height: 100%; width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Liste en mode détails (moitié droite) -->
+        <div class="col-lg-6 mb-4">
+    <div class="card shadow-sm" style="height: 650px;">
+        <div class="card-body p-0" style="overflow-y: auto;">
             <div class="table-responsive">
                 <table class="table table-hover mb-0 zone-tree-table">
-                    <thead class="table-light">
+                    <thead class="table-light" style="position: sticky; top: 0; z-index: 10;">
                         <tr>
                             <th style="width: 35%;">
                                 <i class="fas fa-folder me-2"></i>Nom

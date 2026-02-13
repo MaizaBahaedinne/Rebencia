@@ -761,6 +761,26 @@
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Tableau de bord</span>
             </a>
+            
+            <a href="<?= base_url('admin/appointments') ?>" class="menu-item <?= url_is('admin/appointments*') ? 'active' : '' ?>">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Agenda</span>
+            </a>
+            
+            <a href="<?= base_url('admin/tasks') ?>" class="menu-item <?= url_is('admin/tasks*') ? 'active' : '' ?>">
+                <i class="fas fa-tasks"></i>
+                <span>Tâches</span>
+            </a>
+            
+            <a href="<?= base_url('admin/chat') ?>" class="menu-item <?= url_is('admin/chat*') ? 'active' : '' ?>">
+                <i class="fas fa-comments"></i>
+                <span>Chat</span>
+            </a>
+            
+            <a href="<?= base_url('admin/objectives') ?>" class="menu-item <?= url_is('admin/objectives*') ? 'active' : '' ?>">
+                <i class="fas fa-bullseye"></i>
+                <span>Objectifs</span>
+            </a>
 
             <div class="menu-section-title">MENU</div>
             
@@ -890,12 +910,12 @@
             <?php endif; ?>
 
             <!-- OUTILS -->
-            <div class="menu-item has-submenu <?= url_is('admin/workflows*') || url_is('admin/zones*') || url_is('admin/estimations*') || url_is('admin/reports*') || url_is('admin/analytics*') || url_is('admin/appointments*') || url_is('admin/tasks*') || url_is('admin/chat*') || url_is('admin/objectives*') || url_is('admin/price-per-m2*') || url_is('admin/search-alerts*') ? 'open' : '' ?>">
+            <div class="menu-item has-submenu <?= url_is('admin/workflows*') || url_is('admin/zones*') || url_is('admin/estimations*') || url_is('admin/reports*') || url_is('admin/analytics*') || url_is('admin/price-per-m2*') || url_is('admin/search-alerts*') ? 'open' : '' ?>">
                 <i class="fas fa-tools"></i>
                 <span>Outils</span>
                 <i class="fas fa-chevron-down submenu-toggle"></i>
             </div>
-            <div class="submenu <?= url_is('admin/workflows*') || url_is('admin/zones*') || url_is('admin/estimations*') || url_is('admin/reports*') || url_is('admin/analytics*') || url_is('admin/appointments*') || url_is('admin/tasks*') || url_is('admin/chat*') || url_is('admin/objectives*') || url_is('admin/price-per-m2*') || url_is('admin/search-alerts*') ? 'open' : '' ?>">
+            <div class="submenu <?= url_is('admin/workflows*') || url_is('admin/zones*') || url_is('admin/estimations*') || url_is('admin/reports*') || url_is('admin/analytics*') || url_is('admin/price-per-m2*') || url_is('admin/search-alerts*') ? 'open' : '' ?>">
                 <?php if (canRead('properties')): ?>
                 <a href="<?= base_url('admin/workflows/pipeline/property') ?>" class="submenu-item <?= url_is('admin/workflows*') ? 'active' : '' ?>">
                     <i class="fas fa-project-diagram"></i>
@@ -913,11 +933,6 @@
                 <a href="<?= base_url('admin/price-per-m2') ?>" class="submenu-item <?= url_is('admin/price-per-m2*') ? 'active' : '' ?>">
                     <i class="fas fa-chart-line"></i>
                     <span>Prix au m²</span>
-                </a>
-                
-                <a href="<?= base_url('admin/objectives') ?>" class="submenu-item <?= url_is('admin/objectives*') ? 'active' : '' ?>">
-                    <i class="fas fa-bullseye"></i>
-                    <span>Objectifs</span>
                 </a>
                 
                 <a href="<?= base_url('admin/search-alerts') ?>" class="submenu-item <?= url_is('admin/search-alerts*') ? 'active' : '' ?>">
@@ -943,28 +958,6 @@
                     <i class="fas fa-analytics"></i>
                     <span>Analytics</span>
                 </a>
-                
-                <a href="<?= base_url('admin/appointments') ?>" class="submenu-item <?= url_is('admin/appointments*') ? 'active' : '' ?>">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Agenda</span>
-                </a>
-                
-                <a href="<?= base_url('admin/tasks') ?>" class="submenu-item <?= url_is('admin/tasks*') ? 'active' : '' ?>">
-                    <i class="fas fa-tasks"></i>
-                    <span>Tâches</span>
-                </a>
-                
-                <a href="<?= base_url('admin/chat') ?>" class="submenu-item <?= url_is('admin/chat*') ? 'active' : '' ?>">
-                    <i class="fas fa-comments"></i>
-                    <span>Chat</span>
-                </a>
-                
-                <?php if (isAdmin()): ?>
-                <a href="<?= base_url('admin/objectives') ?>" class="submenu-item <?= url_is('admin/objectives*') ? 'active' : '' ?>">
-                    <i class="fas fa-bullseye"></i>
-                    <span>Objectifs</span>
-                </a>
-                <?php endif; ?>
             </div>
 
             <!-- SITE WEB -->

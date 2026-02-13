@@ -14,7 +14,7 @@ class ZoneModel extends Model
     protected $protectFields = true;
     protected $allowedFields = [
         'name', 'name_ar', 'name_en', 'type', 'parent_id', 'country',
-        'latitude', 'longitude', 'popularity_score'
+        'latitude', 'longitude', 'popularity_score', 'boundary_coordinates'
     ];
 
     protected bool $allowEmptyInserts = false;

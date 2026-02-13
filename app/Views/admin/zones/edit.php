@@ -408,4 +408,4 @@ function clearDrawing() {
         updateZoneInfo(null);
     }
 }
-</script>
+</script><?= $this->endSection() ?>

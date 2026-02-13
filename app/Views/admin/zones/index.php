@@ -1,217 +1,22 @@
 <?= $this->extend('layouts/admin_modern') ?>
 
-<?= $this->section('styles') ?>
-<style>
-    .tree-container {
-        background: white;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        padding: 20px;
-    }
-    
-    .tree-governorate {
-        margin-bottom: 30px;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        overflow: hidden;
-    }
-    
-    .tree-governorate-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 15px 20px;
-        cursor: pointer;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        transition: all 0.3s;
-    }
-    
-    .tree-governorate-header:hover {
-        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-    }
-    
-    .tree-governorate-header h5 {
-        margin: 0;
-        font-size: 1.1rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .tree-governorate-header .toggle-icon {
-        transition: transform 0.3s;
-    }
-    
-    .tree-governorate-header.collapsed .toggle-icon {
-        transform: rotate(-90deg);
-    }
-    
-    .tree-governorate-info {
-        display: flex;
-        gap: 15px;
-        align-items: center;
-        font-size: 0.9rem;
-    }
-    
-    .tree-governorate-actions {
-        display: flex;
-        gap: 5px;
-    }
-    
-    .tree-governorate-actions .btn {
-        padding: 5px 10px;
-        font-size: 0.85rem;
-    }
-    
-    .tree-cities {
-        background: #f9fafb;
-    }
-    
-    .tree-city {
-        padding: 12px 20px;
-        border-bottom: 1px solid #e5e7eb;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        transition: all 0.2s;
-    }
-    
-    .tree-city:last-child {
-        border-bottom: none;
-    }
-    
-    .tree-city:hover {
-        background: white;
-        padding-left: 30px;
-    }
-    
-    .tree-city-content {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        flex: 1;
-    }
-    
-    .tree-city-icon {
-        color: #6b7280;
-        font-size: 0.9rem;
-    }
-    
-    .tree-city-name {
-        font-weight: 500;
-        color: #1f2937;
-    }
-    
-    .tree-city-meta {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        font-size: 0.85rem;
-        color: #6b7280;
-    }
-    
-    .popularity-badge {
-        padding: 3px 10px;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
-    }
-    
-    .popularity-5 {
-        background: #fef3c7;
-        color: #92400e;
-    }
-    
-    .popularity-4 {
-        background: #dbeafe;
-        color: #1e40af;
-    }
-    
-    .popularity-3 {
-        background: #d1fae5;
-        color: #065f46;
-    }
-    
-    .popularity-2 {
-        background: #e5e7eb;
-        color: #374151;
-    }
-    
-    .tree-city-actions {
-        display: flex;
-        gap: 5px;
-        opacity: 0;
-        transition: opacity 0.2s;
-    }
-    
-    .tree-city:hover .tree-city-actions {
-        opacity: 1;
-    }
-    
-    .tree-city-actions .btn {
-        padding: 4px 8px;
-        font-size: 0.8rem;
-    }
-    
-    .stats-card {
-        background: white;
-        border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        margin-bottom: 20px;
-    }
-    
-    .stats-row {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 15px;
-    }
-    
-    .stat-item {
-        text-align: center;
-        padding: 15px;
-        background: #f9fafb;
-        border-radius: 8px;
-    }
-    
-    .stat-number {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #667eea;
-        display: block;
-    }
-    
-    .stat-label {
-        font-size: 0.85rem;
-        color: #6b7280;
-        margin-top: 5px;
-    }
-    
-    .empty-state {
-        text-align: center;
-        padding: 40px 20px;
-        color: #9ca3af;
-    }
-    
-    .empty-state i {
-        font-size: 3rem;
-        margin-bottom: 15px;
-    }
-</style>
-<?= $this->endSection() ?>
-
 <?= $this->section('content') ?>
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0 text-gray-800">
-            <i class="fas fa-sitemap me-2"></i><?= $page_title ?? 'Gestion des Zones' ?>
+            <i class="fas fa-map-marked-alt me-2"></i>Gestion des Zones
         </h1>
-        <a href="<?= base_url('admin/zones/create') ?>" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>Nouvelle Zone
-        </a>
+        <div>
+            <button class="btn btn-outline-secondary me-2" onclick="expandAll()">
+                <i class="fas fa-chevron-down me-1"></i>Développer tout
+            </button>
+            <button class="btn btn-outline-secondary me-2" onclick="collapseAll()">
+                <i class="fas fa-chevron-right me-1"></i>Réduire tout
+            </button>
+            <a href="<?= base_url('admin/zones/create') ?>" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Nouvelle Zone
+            </a>
+        </div>
     </div>
 
     <?php if (session()->getFlashdata('success')): ?>
@@ -230,163 +35,284 @@
         </div>
     <?php endif ?>
 
-    <!-- Statistics -->
-    <div class="stats-card">
-        <div class="stats-row">
-            <div class="stat-item">
-                <span class="stat-number"><?= count($governorates) ?></span>
-                <span class="stat-label">Gouvernorats</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number"><?= array_sum(array_map('count', $citiesByParent)) ?></span>
-                <span class="stat-label">Villes</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number"><?= count($zones) ?></span>
-                <span class="stat-label">Total Zones</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number">
-                    <?php 
-                    $popular = array_filter($zones, fn($z) => ($z['popularity_score'] ?? 0) >= 80);
-                    echo count($popular);
-                    ?>
-                </span>
-                <span class="stat-label">Zones Populaires</span>
+    <!-- Liste en mode détails (comme Windows Explorer) -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 zone-tree-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 35%;">
+                                <i class="fas fa-folder me-2"></i>Nom
+                            </th>
+                            <th style="width: 15%;">
+                                <i class="fas fa-tag me-2"></i>Type
+                            </th>
+                            <th style="width: 15%;">
+                                <i class="fas fa-globe me-2"></i>Pays
+                            </th>
+                            <th style="width: 12%;" class="text-center">
+                                <i class="fas fa-star me-2"></i>Popularité
+                            </th>
+                            <th style="width: 10%;" class="text-center">
+                                <i class="fas fa-map-pin me-2"></i>Coord.
+                            </th>
+                            <th style="width: 13%;" class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="zonesTableBody">
+                        <!-- Les zones seront rendues ici -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-
-    <!-- Tree View -->
-    <div class="tree-container">
-        <?php if (empty($governorates)): ?>
-            <div class="empty-state">
-                <i class="fas fa-map-marker-alt"></i>
-                <h5>Aucune zone disponible</h5>
-                <p>Commencez par créer un gouvernorat</p>
-                <a href="<?= base_url('admin/zones/create') ?>" class="btn btn-primary mt-3">
-                    <i class="fas fa-plus me-2"></i>Créer une zone
-                </a>
-            </div>
-        <?php else: ?>
-            <?php foreach ($governorates as $gov): ?>
-                <div class="tree-governorate">
-                    <div class="tree-governorate-header" onclick="toggleGovernorate(<?= $gov['id'] ?>)">
-                        <div style="display: flex; align-items: center; gap: 15px; flex: 1;">
-                            <i class="fas fa-chevron-down toggle-icon"></i>
-                            <h5>
-                                <i class="fas fa-map-marked-alt"></i>
-                                <?= esc($gov['name']) ?>
-                                <?php if ($gov['name_ar']): ?>
-                                    <small style="opacity: 0.8;">(<?= esc($gov['name_ar']) ?>)</small>
-                                <?php endif ?>
-                            </h5>
-                            <span class="badge bg-light text-dark">
-                                <?= count($citiesByParent[$gov['id']] ?? []) ?> villes
-                            </span>
-                        </div>
-                        <div class="tree-governorate-actions" onclick="event.stopPropagation();">
-                            <a href="<?= base_url('admin/zones/edit/' . $gov['id']) ?>" 
-                               class="btn btn-sm btn-light" title="Modifier">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <button type="button" class="btn btn-sm btn-light" 
-                                    onclick="confirmDelete(<?= $gov['id'] ?>)" title="Supprimer">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="tree-cities" id="cities-<?= $gov['id'] ?>">
-                        <?php 
-                        $cities = $citiesByParent[$gov['id']] ?? [];
-                        if (empty($cities)): 
-                        ?>
-                            <div class="empty-state" style="padding: 20px;">
-                                <i class="fas fa-city" style="font-size: 2rem;"></i>
-                                <p class="mb-0">Aucune ville dans ce gouvernorat</p>
-                            </div>
-                        <?php else: ?>
-                            <?php foreach ($cities as $city): ?>
-                                <div class="tree-city">
-                                    <div class="tree-city-content">
-                                        <span class="tree-city-icon">├─</span>
-                                        <span class="tree-city-name"><?= esc($city['name']) ?></span>
-                                        <?php if ($city['name_ar']): ?>
-                                            <small class="text-muted"><?= esc($city['name_ar']) ?></small>
-                                        <?php endif ?>
-                                    </div>
-                                    
-                                    <div class="tree-city-meta">
-                                        <?php 
-                                        $score = $city['popularity_score'] ?? 0;
-                                        $badgeClass = 'popularity-2';
-                                        $stars = '⭐';
-                                        if ($score >= 100) { $badgeClass = 'popularity-5'; $stars = '⭐⭐⭐⭐⭐'; }
-                                        elseif ($score >= 90) { $badgeClass = 'popularity-4'; $stars = '⭐⭐⭐⭐'; }
-                                        elseif ($score >= 80) { $badgeClass = 'popularity-3'; $stars = '⭐⭐⭐'; }
-                                        elseif ($score >= 70) { $badgeClass = 'popularity-2'; $stars = '⭐⭐'; }
-                                        ?>
-                                        <span class="popularity-badge <?= $badgeClass ?>">
-                                            <?= $stars ?> <?= $score ?>
-                                        </span>
-                                        
-                                        <span style="color: #9ca3af;">ID: <?= $city['id'] ?></span>
-                                    </div>
-                                    
-                                    <div class="tree-city-actions">
-                                        <a href="<?= base_url('admin/zones/edit/' . $city['id']) ?>" 
-                                           class="btn btn-sm btn-outline-warning" title="Modifier">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <button type="button" class="btn btn-sm btn-outline-danger" 
-                                                onclick="confirmDelete(<?= $city['id'] ?>)" title="Supprimer">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            <?php endforeach ?>
-                        <?php endif ?>
-                    </div>
-                </div>
-            <?php endforeach ?>
-        <?php endif ?>
-    </div>
 </div>
+<?= $this->endSection() ?>
 
+<?= $this->section('styles') ?>
+<style>
+<?= $this->section('styles') ?>
+<style>
+    .zone-tree-table {
+        font-size: 0.9rem;
+    }
+    
+    .zone-tree-table tbody tr {
+        transition: background-color 0.2s;
+    }
+    
+    .zone-tree-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .zone-name-cell {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .toggle-icon {
+        display: inline-block;
+        transition: transform 0.2s;
+        width: 20px;
+        text-align: center;
+    }
+    
+    .toggle-icon.expanded i {
+        transform: rotate(90deg);
+    }
+    
+    .zone-row.collapsed {
+        display: none;
+    }
+    
+    .btn-group-sm .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+</style>
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
 <script>
-function toggleGovernorate(govId) {
-    const citiesDiv = document.getElementById('cities-' + govId);
-    const header = citiesDiv.previousElementSibling;
+// Organize zones hierarchically
+const zones = <?= json_encode($zones) ?>;
+const zonesByParent = {};
+
+zones.forEach(zone => {
+    const parentId = zone.parent_id || 0;
+    if (!zonesByParent[parentId]) {
+        zonesByParent[parentId] = [];
+    }
+    zonesByParent[parentId].push(zone);
+});
+
+// Render zone row
+function renderZoneRow(zone, level = 0, parentPath = '') {
+    const indent = '&nbsp;&nbsp;&nbsp;&nbsp;'.repeat(level);
+    const hasChildren = zonesByParent[zone.id] && zonesByParent[zone.id].length > 0;
+    const zonePath = parentPath + '_' + zone.id;
     
-    if (citiesDiv.style.display === 'none') {
-        citiesDiv.style.display = 'block';
-        header.classList.remove('collapsed');
+    // Type badge
+    let typeBadge = '';
+    let typeIcon = '';
+    let iconColor = '';
+    
+    switch(zone.type) {
+        case 'governorate':
+            typeBadge = '<span class="badge bg-primary">Gouvernorat</span>';
+            typeIcon = 'fa-flag';
+            iconColor = 'text-primary';
+            break;
+        case 'city':
+            typeBadge = '<span class="badge bg-info">Ville</span>';
+            typeIcon = 'fa-city';
+            iconColor = 'text-info';
+            break;
+        case 'district':
+            typeBadge = '<span class="badge bg-success">Quartier</span>';
+            typeIcon = 'fa-map-signs';
+            iconColor = 'text-success';
+            break;
+        case 'area':
+            typeBadge = '<span class="badge bg-secondary">Zone</span>';
+            typeIcon = 'fa-location-dot';
+            iconColor = 'text-secondary';
+            break;
+    }
+    
+    let html = `<tr class="zone-row" data-zone-id="${zone.id}" data-level="${level}" data-path="${zonePath}"`;
+    if (level > 0) {
+        html += ` data-parent="${zone.parent_id}"`;
+    }
+    html += '>';
+    
+    // Nom avec indentation
+    html += '<td class="zone-name-cell">';
+    html += indent;
+    if (hasChildren) {
+        html += `<span class="toggle-icon me-2" onclick="toggleZone('${zonePath}')" style="cursor: pointer;">`;
+        html += '<i class="fas fa-chevron-right"></i>';
+        html += '</span>';
     } else {
-        citiesDiv.style.display = 'none';
-        header.classList.add('collapsed');
+        html += '<span class="me-2" style="width: 20px; display: inline-block;"></span>';
     }
+    html += `<i class="fas ${typeIcon} ${iconColor} me-2"></i>`;
+    html += `<strong>${escapeHtml(zone.name)}</strong>`;
+    if (zone.name_ar) {
+        html += ` <small class="text-muted">(${escapeHtml(zone.name_ar)})</small>`;
+    }
+    html += '</td>';
+    
+    // Type
+    html += `<td>${typeBadge}</td>`;
+    
+    // Pays
+    html += '<td>';
+    html += `<span class="text-muted">${escapeHtml(zone.country || 'Tunisia')}</span>`;
+    html += '</td>';
+    
+    // Popularité
+    html += '<td class="text-center">';
+    const popularity = zone.popularity_score || 0;
+    const stars = Math.min(5, Math.max(0, Math.round(popularity / 20)));
+    for (let i = 0; i < stars; i++) {
+        html += '<i class="fas fa-star text-warning"></i>';
+    }
+    for (let i = stars; i < 5; i++) {
+        html += '<i class="far fa-star text-muted"></i>';
+    }
+    html += ` <small class="text-muted">(${popularity})</small>`;
+    html += '</td>';
+    
+    // Coordonnées
+    html += '<td class="text-center">';
+    if (zone.latitude && zone.longitude) {
+        html += `<span class="badge bg-success" title="Lat: ${zone.latitude}, Lon: ${zone.longitude}">`;
+        html += '<i class="fas fa-check"></i>';
+        html += '</span>';
+    } else {
+        html += '<span class="badge bg-secondary">';
+        html += '<i class="fas fa-times"></i>';
+        html += '</span>';
+    }
+    html += '</td>';
+    
+    // Actions
+    html += '<td class="text-center">';
+    html += '<div class="btn-group btn-group-sm">';
+    html += `<a href="<?= base_url('admin/zones/edit/') ?>${zone.id}" class="btn btn-outline-primary" title="Modifier">`;
+    html += '<i class="fas fa-edit"></i>';
+    html += '</a>';
+    html += `<a href="<?= base_url('admin/zones/delete/') ?>${zone.id}" class="btn btn-outline-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette zone ?')" title="Supprimer">`;
+    html += '<i class="fas fa-trash"></i>';
+    html += '</a>';
+    html += '</div>';
+    html += '</td>';
+    
+    html += '</tr>';
+    
+    return html;
 }
 
-function confirmDelete(id) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette zone ? Cette action est irréversible.')) {
-        window.location.href = '<?= base_url('admin/zones/delete/') ?>' + id;
-    }
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
-// Collapse all by default except first
-document.addEventListener('DOMContentLoaded', function() {
-    const allCities = document.querySelectorAll('.tree-cities');
-    allCities.forEach((cities, index) => {
-        if (index !== 0) {
-            cities.style.display = 'none';
-            cities.previousElementSibling.classList.add('collapsed');
+// Render all zones recursively
+function renderZones() {
+    let html = '';
+    const rootZones = zonesByParent[0] || [];
+    
+    function renderWithChildren(zone, level, parentPath) {
+        html += renderZoneRow(zone, level, parentPath);
+        const zonePath = parentPath + '_' + zone.id;
+        const children = zonesByParent[zone.id] || [];
+        children.forEach(child => {
+            renderWithChildren(child, level + 1, zonePath);
+        });
+    }
+    
+    rootZones.forEach(zone => {
+        renderWithChildren(zone, 0, '');
+    });
+    
+    document.getElementById('zonesTableBody').innerHTML = html;
+    
+    // Collapse all children by default
+    collapseAll();
+}
+
+function toggleZone(zonePath) {
+    const icon = event.currentTarget;
+    const isExpanded = icon.classList.contains('expanded');
+    
+    icon.classList.toggle('expanded');
+    
+    const rows = document.querySelectorAll('tr.zone-row');
+    rows.forEach(row => {
+        const rowPath = row.dataset.path;
+        if (rowPath && rowPath.startsWith(zonePath + '_')) {
+            if (isExpanded) {
+                row.classList.add('collapsed');
+                const nestedIcon = row.querySelector('.toggle-icon');
+                if (nestedIcon) {
+                    nestedIcon.classList.remove('expanded');
+                }
+            } else {
+                const pathParts = rowPath.substring(zonePath.length + 1).split('_');
+                if (pathParts.length === 1) {
+                    row.classList.remove('collapsed');
+                }
+            }
         }
     });
+}
+
+function expandAll() {
+    document.querySelectorAll('.toggle-icon').forEach(icon => {
+        icon.classList.add('expanded');
+    });
+    document.querySelectorAll('.zone-row').forEach(row => {
+        row.classList.remove('collapsed');
+    });
+}
+
+function collapseAll() {
+    document.querySelectorAll('.toggle-icon').forEach(icon => {
+        icon.classList.remove('expanded');
+    });
+    document.querySelectorAll('.zone-row').forEach((row, index) => {
+        if (parseInt(row.dataset.level) > 0) {
+            row.classList.add('collapsed');
+        }
+    });
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    renderZones();
 });
 </script>
-
 <?= $this->endSection() ?>

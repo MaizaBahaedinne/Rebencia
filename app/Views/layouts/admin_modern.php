@@ -910,12 +910,12 @@
             <?php endif; ?>
 
             <!-- OUTILS -->
-            <div class="menu-item has-submenu <?= url_is('admin/workflows*') || url_is('admin/zones*') || url_is('admin/estimations*') || url_is('admin/reports*') || url_is('admin/analytics*') || url_is('admin/price-per-m2*') || url_is('admin/search-alerts*') ? 'open' : '' ?>">
+            <div class="menu-item has-submenu <?= url_is('admin/workflows*') || url_is('admin/zones*') || url_is('admin/agency-zones*') || url_is('admin/estimations*') || url_is('admin/reports*') || url_is('admin/analytics*') || url_is('admin/price-per-m2*') || url_is('admin/search-alerts*') ? 'open' : '' ?>">
                 <i class="fas fa-tools"></i>
                 <span>Outils</span>
                 <i class="fas fa-chevron-down submenu-toggle"></i>
             </div>
-            <div class="submenu <?= url_is('admin/workflows*') || url_is('admin/zones*') || url_is('admin/estimations*') || url_is('admin/reports*') || url_is('admin/analytics*') || url_is('admin/price-per-m2*') || url_is('admin/search-alerts*') ? 'open' : '' ?>">
+            <div class="submenu <?= url_is('admin/workflows*') || url_is('admin/zones*') || url_is('admin/agency-zones*') || url_is('admin/estimations*') || url_is('admin/reports*') || url_is('admin/analytics*') || url_is('admin/price-per-m2*') || url_is('admin/search-alerts*') ? 'open' : '' ?>">
                 <?php if (canRead('properties')): ?>
                 <a href="<?= base_url('admin/workflows/pipeline/property') ?>" class="submenu-item <?= url_is('admin/workflows*') ? 'active' : '' ?>">
                     <i class="fas fa-project-diagram"></i>
@@ -924,9 +924,14 @@
                 <?php endif; ?>
                 
                 <?php if (canRead('zones') || isAdmin()): ?>
-                <a href="<?= base_url('admin/zones') ?>" class="submenu-item <?= url_is('admin/zones*') ? 'active' : '' ?>">
+                <a href="<?= base_url('admin/zones') ?>" class="submenu-item <?= url_is('admin/zones*') && !url_is('admin/agency-zones*') ? 'active' : '' ?>">
                     <i class="fas fa-map-marked-alt"></i>
                     <span>Zones</span>
+                </a>
+                
+                <a href="<?= base_url('admin/agency-zones') ?>" class="submenu-item <?= url_is('admin/agency-zones*') ? 'active' : '' ?>">
+                    <i class="fas fa-map-marked"></i>
+                    <span>Affectation Zones/Agences</span>
                 </a>
                 <?php endif; ?>
                 

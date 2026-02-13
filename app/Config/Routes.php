@@ -131,6 +131,15 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->get('delete/(:num)', 'Zones::delete/$1');
     });
     
+    // Agency Zones (Affectation des zones aux agences)
+    $routes->group('agency-zones', function($routes) {
+        $routes->get('/', 'AgencyZones::index');
+        $routes->get('manage/(:num)', 'AgencyZones::manage/$1');
+        $routes->post('save/(:num)', 'AgencyZones::save/$1');
+        $routes->get('get-agency-zones/(:num)', 'AgencyZones::getAgencyZones/$1');
+        $routes->get('delete/(:num)', 'AgencyZones::delete/$1');
+    });
+    
     // Properties
     $routes->group('properties', function($routes) {
         $routes->get('/', 'Properties::index');

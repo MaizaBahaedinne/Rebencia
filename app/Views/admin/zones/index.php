@@ -85,9 +85,12 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('styles') ?>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-<?= $this->section('styles') ?>
-<style>
+    #zonesMap {
+        z-index: 1;
+    }
+    
     .zone-tree-table {
         font-size: 0.9rem;
     }
@@ -127,7 +130,85 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+// Initialize the map
+let zonesMap;
+const zoneMarkers = {};
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize map centered on Tunisia
+    zonesMap = L.map('zonesMap').setView([36.8065, 10.1815], 7);
+    
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19
+    }).addTo(zonesMap);
+    
+    // Add zone markers
+    zones.forEach(zone => {
+        if (zone.latitude && zone.longitude) {
+            const lat = parseFloat(zone.latitude);
+            const lon = parseFloat(zone.longitude);
+            
+            // Determine marker color based on type
+            let color = '#6c757d';
+            switch(zone.type) {
+                case 'governorate': color = '#0d6efd'; break;
+                case 'city': color = '#0dcaf0'; break;
+                case 'district': color = '#198754'; break;
+                case 'area': color = '#6c757d'; break;
+            }
+            
+            const marker = L.circleMarker([lat, lon], {
+                radius: zone.type === 'governorate' ? 10 : zone.type === 'city' ? 8 : 6,
+                fillColor: color,
+                color: '#fff',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8
+            }).addTo(zonesMap);
+            
+            // Popup
+            const popupContent = `
+                <div class="text-center">
+                    <strong>${zone.name}</strong><br>
+                    ${zone.name_ar ? '<small class="text-muted">' + zone.name_ar + '</small><br>' : ''}
+                    <span class="badge bg-primary">${zone.type}</span><br>
+                    <small>Pop: ${zone.popularity_score || 0}</small>
+                </div>
+            `;
+            marker.bindPopup(popupContent);
+            
+            zoneMarkers[zone.id] = marker;
+            
+            // Click on marker to highlight row
+            marker.on('click', function() {
+                highlightZoneRow(zone.id);
+            });
+        }
+    });
+});
+
+function highlightZoneRow(zoneId) {
+    // Remove previous highlights
+    document.querySelectorAll('.zone-row').forEach(row => {
+        row.style.backgroundColor = '';
+    });
+    
+    // Highlight the selected row
+    const row = document.querySelector(`tr[data-zone-id="${zoneId}"]`);
+    if (row) {
+        row.style.backgroundColor = '#fff3cd';
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        setTimeout(() => {
+            row.style.backgroundColor = '';
+        }, 2000);
+    }
+}
+
 // Organize zones hierarchically
 const zones = <?= json_encode($zones) ?>;
 const zonesByParent = {};

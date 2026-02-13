@@ -80,7 +80,8 @@ class Zones extends BaseController
             'country' => $this->request->getPost('country') ?: 'Tunisia',
             'latitude' => $this->request->getPost('latitude'),
             'longitude' => $this->request->getPost('longitude'),
-            'popularity_score' => $this->request->getPost('popularity_score') ?: 0
+            'popularity_score' => $this->request->getPost('popularity_score') ?: 0,
+            'boundary_coordinates' => $this->request->getPost('boundary_coordinates')
         ];
 
         $this->zoneModel->insert($data);
@@ -133,7 +134,8 @@ class Zones extends BaseController
             'country' => $this->request->getPost('country') ?: 'Tunisia',
             'latitude' => $this->request->getPost('latitude'),
             'longitude' => $this->request->getPost('longitude'),
-            'popularity_score' => $this->request->getPost('popularity_score') ?: 0
+            'popularity_score' => $this->request->getPost('popularity_score') ?: 0,
+            'boundary_coordinates' => $this->request->getPost('boundary_coordinates')
         ];
 
         $this->zoneModel->update($id, $data);

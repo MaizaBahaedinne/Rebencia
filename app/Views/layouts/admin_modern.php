@@ -683,6 +683,24 @@
 
             .admin-sidebar.show {
                 transform: translateX(0);
+                box-shadow: 0 0 50px rgba(0, 0, 0, 0.3);
+            }
+            
+            body.sidebar-open::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 1040;
+                animation: fadeIn 0.3s;
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
             }
 
             .admin-header,
@@ -694,6 +712,20 @@
 
             .header-search {
                 display: none;
+            }
+            
+            .sidebar-toggle-btn {
+                display: flex !important;
+            }
+            
+            .user-info {
+                display: none !important;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .sidebar-toggle-btn {
+                display: flex;
             }
         }
 
@@ -1489,6 +1521,40 @@
             if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
                 e.preventDefault();
                 searchInput.focus();
+            }
+        });
+    });
+    </script>
+    
+    <script>
+    // ========== SIDEBAR TOGGLE ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.querySelector('.admin-sidebar');
+        const body = document.body;
+        
+        // Toggle sidebar on button click
+        sidebarToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            sidebar.classList.toggle('show');
+            body.classList.toggle('sidebar-open');
+        });
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                    sidebar.classList.remove('show');
+                    body.classList.remove('sidebar-open');
+                }
+            }
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('show');
+                body.classList.remove('sidebar-open');
             }
         });
     });

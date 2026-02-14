@@ -1536,8 +1536,17 @@
         // Toggle sidebar on button click
         sidebarToggle.addEventListener('click', function(e) {
             e.stopPropagation();
-            sidebar.classList.toggle('show');
-            body.classList.toggle('sidebar-open');
+            const isOpen = sidebar.classList.contains('show');
+            
+            if (isOpen) {
+                // Fermer le menu
+                sidebar.classList.remove('show');
+                body.classList.remove('sidebar-open');
+            } else {
+                // Ouvrir le menu
+                sidebar.classList.add('show');
+                body.classList.add('sidebar-open');
+            }
         });
         
         // Close sidebar when clicking outside on mobile
@@ -1548,6 +1557,19 @@
                     body.classList.remove('sidebar-open');
                 }
             }
+        });
+        
+        // Close sidebar when clicking on a menu link on mobile
+        const menuLinks = sidebar.querySelectorAll('.menu-item, .submenu-item');
+        menuLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    setTimeout(() => {
+                        sidebar.classList.remove('show');
+                        body.classList.remove('sidebar-open');
+                    }, 200);
+                }
+            });
         });
         
         // Handle window resize

@@ -422,6 +422,17 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.classList.toggle('d-none', step !== totalSteps);
         
         currentStep = step;
+        
+        // Si on arrive à l'étape 2 (localisation), initialiser ou rafraîchir la carte
+        if (step === 2) {
+            setTimeout(() => {
+                if (!map) {
+                    initMap();
+                } else {
+                    map.invalidateSize();
+                }
+            }, 100);
+        }
     }
     
     // Navigation avec les onglets

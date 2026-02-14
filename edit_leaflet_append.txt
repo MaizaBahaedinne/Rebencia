@@ -1,0 +1,52 @@
+
+<?= $this->section('styles') ?>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    #map {
+        z-index: 1;
+    }
+</style>
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const propertyLat = <?= !empty($property['latitude']) ? $property['latitude'] : '36.8065' ?>;
+    const propertyLng = <?= !empty($property['longitude']) ? $property['longitude'] : '10.1815' ?>;
+    const hasCoordinates = <?= !empty($property['latitude']) && !empty($property['longitude']) ? 'true' : 'false' ?>;
+    
+    const map = L.map('map').setView([propertyLat, propertyLng], hasCoordinates ? 15 : 10);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19
+    }).addTo(map);
+    
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 250);
+    
+    let marker = null;
+    if (hasCoordinates) {
+        marker = L.marker([propertyLat, propertyLng]).addTo(map);
+        marker.bindPopup('<b>Position actuelle</b>').openPopup();
+    }
+    
+    map.on('click', function(e) {
+        const lat = e.latlng.lat.toFixed(6);
+        const lng = e.latlng.lng.toFixed(6);
+        
+        if (marker) {
+            map.removeLayer(marker);
+        }
+        
+        marker = L.marker([lat, lng]).addTo(map);
+        marker.bindPopup('<b>Nouvelle position</b>').openPopup();
+        
+        document.getElementById('latitude').value = lat;
+        document.getElementById('longitude').value = lng;
+    });
+});
+</script>
+<?= $this->endSection() ?>

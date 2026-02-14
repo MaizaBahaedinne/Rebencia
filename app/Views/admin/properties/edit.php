@@ -112,6 +112,26 @@
                         <input type="text" class="form-control" id="address" name="address" 
                                value="<?= old('address', $property['address']) ?>">
                     </div>
+                    
+                    <!-- Carte de localisation -->
+                    <div class="mb-3">
+                        <label class="form-label">Position GPS</label>
+                        <div id="map" style="height: 400px; width: 100%; border-radius: 8px; overflow: hidden;"></div>
+                        <small class="text-muted">Cliquez sur la carte pour définir la position exacte du bien</small>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="latitude" class="form-label">Latitude</label>
+                            <input type="text" class="form-control" id="latitude" name="latitude" 
+                                   value="<?= old('latitude', $property['latitude'] ?? '') ?>" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="longitude" class="form-label">Longitude</label>
+                            <input type="text" class="form-control" id="longitude" name="longitude" 
+                                   value="<?= old('longitude', $property['longitude'] ?? '') ?>" readonly>
+                        </div>
+                    </div>
                 </div>
             </div>
 

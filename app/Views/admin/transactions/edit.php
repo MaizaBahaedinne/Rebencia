@@ -47,7 +47,7 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label for="property_id" class="form-label">Bien <span class="text-danger">*</span></label>
-                                <select class="form-select" id="property_id" name="property_id" required>
+                                <select class="form-select" id="property_id" name="property_id" required disabled>
                                     <option value="">-- Sélectionner un bien --</option>
                                     <?php foreach ($properties as $property): ?>
                                         <option value="<?= $property['id'] ?>" 
@@ -56,13 +56,15 @@
                                         </option>
                                     <?php endforeach ?>
                                 </select>
+                                <input type="hidden" name="property_id" value="<?= old('property_id', $transaction['property_id']) ?>">
                             </div>
                             <div class="col-md-6">
                                 <label for="type" class="form-label">Type de Transaction <span class="text-danger">*</span></label>
-                                <select class="form-select" id="type" name="type" required>
+                                <select class="form-select" id="type" name="type" required disabled>
                                     <option value="sale" <?= old('type', $transaction['type']) == 'sale' ? 'selected' : '' ?>>Vente</option>
                                     <option value="rent" <?= old('type', $transaction['type']) == 'rent' ? 'selected' : '' ?>>Location</option>
                                 </select>
+                                <input type="hidden" name="type" value="<?= old('type', $transaction['type']) ?>">
                             </div>
                             <div class="col-md-6">
                                 <label for="buyer_id" class="form-label">Acheteur/Locataire <span class="text-danger">*</span></label>
@@ -77,7 +79,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="seller_id" class="form-label">Vendeur/Bailleur</label>
-                                <select class="form-select" id="seller_id" name="seller_id">
+                                <select class="form-select" id="seller_id" name="seller_id" disabled>
                                     <option value="">-- Sélectionner un client --</option>
                                     <?php foreach ($sellers as $seller): ?>
                                         <option value="<?= $seller['id'] ?>" <?= old('seller_id', $transaction['seller_id']) == $seller['id'] ? 'selected' : '' ?>>
@@ -85,6 +87,7 @@
                                         </option>
                                     <?php endforeach ?>
                                 </select>
+                                <input type="hidden" name="seller_id" value="<?= old('seller_id', $transaction['seller_id'] ?? '') ?>">
                             </div>
                             <div class="col-md-6">
                                 <label for="transaction_date" class="form-label">Date de Transaction <span class="text-danger">*</span></label>

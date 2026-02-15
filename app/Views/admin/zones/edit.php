@@ -241,6 +241,33 @@ document.addEventListener('DOMContentLoaded', function() {
     drawnItems = new L.FeatureGroup();
     zoneMap.addLayer(drawnItems);
     
+    // If zone has boundary_coordinates saved, restore the polygon
+    if (zoneData.boundary_coordinates) {
+        try {
+            const coordinates = JSON.parse(zoneData.boundary_coordinates);
+            if (Array.isArray(coordinates) && coordinates.length > 0) {
+                // Convert coordinates to LatLng format for Leaflet
+                const latLngs = coordinates.map(coord => [coord[0], coord[1]]);
+                
+                // Create and add polygon
+                const polygon = L.polygon(latLngs, {
+                    color: '#0d6efd',
+                    fillOpacity: 0.3
+                }).addTo(drawnItems);
+                
+                currentPolygon = polygon;
+                
+                // Fit map to polygon bounds
+                zoneMap.fitBounds(polygon.getBounds());
+                
+                // Update info display
+                updateZoneInfo(coordinates);
+            }
+        } catch (e) {
+            console.error('Error parsing boundary_coordinates:', e);
+        }
+    }
+    
     // If zone has center coordinates, add a marker
     if (zoneData.latitude && zoneData.longitude) {
         centerMarker = L.marker([initialLat, initialLng], {

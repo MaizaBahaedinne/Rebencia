@@ -28,11 +28,22 @@ class Transactions extends BaseController
 
     public function index()
     {
+        // Get current user
+        $currentUserId = session()->get('user_id');
+        $currentRoleLevel = session()->get('role_level');
+        
+        $query = $this->transactionModel->select('transactions.*, properties.title as property_title, clients.first_name as client_name')
+            ->join('properties', 'properties.id = transactions.property_id')
+            ->join('clients', 'clients.id = transactions.client_id');
+        
+        // If user is not super admin, filter by agent_id (show only transactions assigned to current user)
+        if ($currentRoleLevel && $currentRoleLevel != 100) { // role_level 100 = super admin
+            $query->where('transactions.agent_id', $currentUserId);
+        }
+        
         $data = [
             'title' => 'Gestion des Transactions',
-            'transactions' => $this->transactionModel->select('transactions.*, properties.title as property_title, clients.first_name as client_name')
-                ->join('properties', 'properties.id = transactions.property_id')
-                ->join('clients', 'clients.id = transactions.client_id')
+            'transactions' => $query
                 ->orderBy('transactions.created_at', 'DESC')
                 ->paginate(20)
         ];

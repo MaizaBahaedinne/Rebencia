@@ -21,6 +21,9 @@ class PropertyEstimations extends BaseController
 
     public function index()
     {
+        // Get current user
+        $user = session()->get('user');
+        
         // Get filters
         $filters = [
             'status' => $this->request->getGet('status'),
@@ -30,6 +33,11 @@ class PropertyEstimations extends BaseController
             'governorate' => $this->request->getGet('governorate'),
             'agent_id' => $this->request->getGet('agent_id'),
         ];
+        
+        // If user is not admin, filter by agent_id (show only assigned to current user)
+        if ($user && $user['role_id'] != 1) { // role_id 1 = admin
+            $filters['agent_id'] = $user['id'];
+        }
 
         // Get estimations with details
         $estimations = $this->estimationModel->getEstimationsWithDetails($filters);

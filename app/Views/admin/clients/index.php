@@ -39,14 +39,14 @@
                             <tr>
                                 <td>
                                     <?php if ($client['type'] === 'company'): ?>
-                                        <?= esc($client['company_name']) ?>
+                                        <?= esc($client['company_name'] ?? '') ?>
                                     <?php else: ?>
-                                        <?= esc($client['first_name'] . ' ' . $client['last_name']) ?>
+                                        <?= esc(($client['first_name'] ?? '') . ' ' . ($client['last_name'] ?? '')) ?>
                                     <?php endif; ?>
                                 </td>
                                 <td><?= esc($client['email'] ?? '-') ?></td>
-                                <td><?= esc($client['phone']) ?></td>
-                                <td><?= esc($client['agent_name'] . ' ' . ($client['agent_lastname'] ?? '')) ?></td>
+                                <td><?= esc($client['phone'] ?? '-') ?></td>
+                                <td><?= esc(($client['agent_name'] ?? '-') . (($client['agent_lastname'] ?? '') ? ' ' . $client['agent_lastname'] : '')) ?></td>
                                 <td><?= esc($client['agency_name'] ?? '-') ?></td>
                                 <td>
                                     <?php

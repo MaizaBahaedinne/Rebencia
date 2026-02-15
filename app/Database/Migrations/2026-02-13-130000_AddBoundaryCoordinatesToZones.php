@@ -3,6 +3,7 @@
 namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
+use CodeIgniter\Database\Exceptions\DatabaseException;
 
 class AddBoundaryCoordinatesToZones extends Migration
 {
@@ -13,14 +14,13 @@ class AddBoundaryCoordinatesToZones extends Migration
         try {
             $sql = "ALTER TABLE `zones` ADD COLUMN `boundary_coordinates` LONGTEXT NULL COMMENT 'JSON array of polygon coordinates [[lat, lng], ...]'";
             $this->db->query($sql);
-        } catch (\exception $e) {
+        } catch (DatabaseException $e) {
             // Column probably already exists from migration or table creation
-            // This is fine, we can ignore this error
             if (strpos($e->getMessage(), 'Duplicate column name') !== false) {
-                // Expected error - column already exists
+                // Expected error - column already exists, silently continue
                 return;
             }
-            // For any other error, re-throw it
+            // For any other database error, re-throw it
             throw $e;
         }
     }
@@ -30,8 +30,9 @@ class AddBoundaryCoordinatesToZones extends Migration
         // Try to drop the column - if it doesn't exist, the exception will be caught and ignored
         try {
             $this->forge->dropColumn('zones', 'boundary_coordinates');
-        } catch (\Exception $e) {
-            // Column doesn't exist, which is fine - just ignore the error
+        } catch (DatabaseException $e) {
+            // Column doesn't exist or other error, just ignore
+            return;
         }
     }
 }

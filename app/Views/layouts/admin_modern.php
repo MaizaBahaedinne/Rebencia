@@ -839,7 +839,18 @@
                     <span>Demandes Clients</span>
                     <?php 
                     $requestModel = model('PropertyRequestModel');
-                    $pendingCount = $requestModel->where('status', 'pending')->countAllResults();
+                    $currentUserId = session()->get('user_id');
+                    $currentRoleLevel = session()->get('role_level');
+                    
+                    // Build query
+                    $query = $requestModel->where('status', 'pending');
+                    
+                    // If not super admin, filter by assigned_to
+                    if ($currentRoleLevel != 100) {
+                        $query = $query->where('assigned_to', $currentUserId);
+                    }
+                    
+                    $pendingCount = $query->countAllResults();
                     if ($pendingCount > 0):
                     ?>
                         <span class="badge bg-danger rounded-pill ms-auto"><?= $pendingCount ?></span>
@@ -851,7 +862,18 @@
                     <span>Demandes d'Estimation</span>
                     <?php 
                     $estimationModel = model('PropertyEstimationModel');
-                    $estimationCount = $estimationModel->where('status', 'pending')->countAllResults();
+                    $currentUserId = session()->get('user_id');
+                    $currentRoleLevel = session()->get('role_level');
+                    
+                    // Build query
+                    $query = $estimationModel->where('status', 'pending');
+                    
+                    // If not super admin, filter by agent_id
+                    if ($currentRoleLevel != 100) {
+                        $query = $query->where('agent_id', $currentUserId);
+                    }
+                    
+                    $estimationCount = $query->countAllResults();
                     if ($estimationCount > 0):
                     ?>
                         <span class="badge bg-warning rounded-pill ms-auto"><?= $estimationCount ?></span>

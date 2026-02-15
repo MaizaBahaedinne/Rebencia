@@ -456,10 +456,12 @@ class Transactions extends BaseController
                 session()->get('user_id')
             );
             
-            // Mettre à jour aussi la transaction
-            $this->transactionModel->update($id, [
-                'commission_paid' => 1
-            ]);
+            // Mettre à jour aussi la transaction (si colonne existe)
+            if (in_array('commission_paid', $this->transactionModel->allowedFields ?? [], true)) {
+                $this->transactionModel->update($id, [
+                    'commission_paid' => 1
+                ]);
+            }
             
             return redirect()->back()->with('success', 'Commission marquée comme payée');
         } catch (\Exception $e) {

@@ -415,7 +415,10 @@ class Transactions extends BaseController
         // Récupérer les détails de la transaction
         $property = $this->propertyModel->find($transaction['property_id']);
         $agent = $this->userModel->find($transaction['agent_id']);
-        $client = $this->clientModel->find($transaction['client_id']);
+        $buyer = $this->clientModel->find($transaction['client_id']);
+        $seller = !empty($transaction['seller_id'])
+            ? $this->clientModel->find($transaction['seller_id'])
+            : null;
         
         $data = [
             'title' => 'Détails Commission - Transaction #' . $transaction['reference'],
@@ -423,7 +426,8 @@ class Transactions extends BaseController
             'commission' => $commission,
             'property' => $property,
             'agent' => $agent,
-            'client' => $client
+            'buyer' => $buyer,
+            'seller' => $seller
         ];
         
         return view('admin/transactions/commission_details', $data);

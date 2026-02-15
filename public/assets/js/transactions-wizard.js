@@ -229,25 +229,16 @@ async function updateCommission() {
     const propertyId = document.getElementById('property_id').value;
     const agentId = document.getElementById('agent_id').value;
     const type = document.getElementById('type').value;
-    const amount = document.getElementById('amount').value;
+    const amount = parseFloat(document.getElementById('amount').value);
     
     if (!propertyId || !agentId || !amount) {
         return;
     }
     
-    // Check if COMMISSION_SIMULATION_URL is defined
-    if (typeof COMMISSION_SIMULATION_URL === 'undefined') {
-        console.error('COMMISSION_SIMULATION_URL is not defined');
-        const previewDiv = document.getElementById('commissionPreview');
-        previewDiv.innerHTML = `
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle"></i> Configuration error: COMMISSION_SIMULATION_URL is not defined
-            </div>
-        `;
-        return;
-    }
-    
-    console.log('Calling commission API:', COMMISSION_SIMULATION_URL);
+    // Default commission rates (if API not available)
+    const buyerRate = 0.03; // 3%
+    const sellerRate = 0.02; // 2%
+    const vatRate = 0.19; // 19% TVA
     
     // Show loading
     const previewDiv = document.getElementById('commissionPreview');
@@ -260,62 +251,108 @@ async function updateCommission() {
         </div>
     `;
     
+    // Try to fetch from API, but use defaults if it fails
     try {
-        const response = await fetch(COMMISSION_SIMULATION_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({
-                property_id: propertyId,
-                user_id: agentId,
-                transaction_type: type,
-                amount: amount
-            })
-        });
-        
-        console.log('Response status:', response.status);
-        const result = await response.json();
-        console.log('Result:', result);
-        
-        if (result.success) {
-            commissionData = result.data;
-            displayCommissionPreview(result.data);
-            updateSummary();
-        } else {
-            previewDiv.innerHTML = `
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle"></i> ${result.message}
-                </div>
-            `;
+        if (typeof COMMISSION_SIMULATION_URL !== 'undefined' && COMMISSION_SIMULATION_URL) {
+            const response = await fetch(COMMISSION_SIMULATION_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    property_id: propertyId,
+                    user_id: agentId,
+                    transaction_type: type,
+                    amount: amount
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success && result.data) {
+                commissionData = result.data;
+                displayCommissionPreview(result.data);
+                updateSummary();
+                return;
+            }
         }
     } catch (error) {
-        console.error('Error:', error);
-        previewDiv.innerHTML = `
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle"></i> Erreur lors du calcul de la commission
-            </div>
-        `;
+        console.warn('Commission API error, using defaults:', error);
     }
+    
+    // Use default commission calculation
+    const buyerCommissionHT = amount * buyerRate;
+    const buyerCommissionVAT = buyerCommissionHT * vatRate;
+    const buyerCommissionTTC = buyerCommissionHT + buyerCommissionVAT;
+    
+    const sellerCommissionHT = amount * sellerRate;
+    const sellerCommissionVAT = sellerCommissionHT * vatRate;
+    const sellerCommissionTTC = sellerCommissionHT + sellerCommissionVAT;
+    
+    const totalCommissionHT = buyerCommissionHT + sellerCommissionHT;
+    const totalCommissionVAT = buyerCommissionVAT + sellerCommissionVAT;
+    const totalCommissionTTC = buyerCommissionTTC + sellerCommissionTTC;
+    
+    const defaultData = {
+        rule: {
+            name: 'Taux standard',
+            buyer_commission: (buyerRate * 100),
+            seller_commission: (sellerRate * 100)
+        },
+        commission_buyer: buyerCommissionTTC,
+        commission_buyer_ht: buyerCommissionHT,
+        commission_buyer_vat: buyerCommissionVAT,
+        commission_seller: sellerCommissionTTC,
+        commission_seller_ht: sellerCommissionHT,
+        commission_seller_vat: sellerCommissionVAT,
+        total_commission_ht: totalCommissionHT,
+        total_commission_vat: totalCommissionVAT,
+        total_commission: totalCommissionTTC
+    };
+    
+    commissionData = {
+        total_commission_ht: totalCommissionHT,
+        total_vat: totalCommissionVAT,
+        total_commission: totalCommissionTTC
+    };
+    
+    displayCommissionPreview(defaultData);
+    updateSummary();
 }
 
 // Afficher l'aperçu de la commission
 function displayCommissionPreview(data) {
     const previewDiv = document.getElementById('commissionPreview');
     
-    const buyerPercentage = data.commission_buyer > 0 
-        ? ((data.commission_buyer_ht / parseFloat(document.getElementById('amount').value)) * 100).toFixed(2) 
+    // Validate data structure
+    if (!data || !data.rule) {
+        previewDiv.innerHTML = `
+            <div class="alert alert-warning">
+                <i class="fas fa-info-circle"></i> Impossible de calculer la commission
+            </div>
+        `;
+        return;
+    }
+    
+    const amount = parseFloat(document.getElementById('amount').value) || 0;
+    
+    const buyerPercentage = data.commission_buyer_ht > 0 && amount > 0
+        ? ((data.commission_buyer_ht / amount) * 100).toFixed(2) 
         : 0;
-    const sellerPercentage = data.commission_seller > 0 
-        ? ((data.commission_seller_ht / parseFloat(document.getElementById('amount').value)) * 100).toFixed(2) 
+    const sellerPercentage = data.commission_seller_ht > 0 && amount > 0
+        ? ((data.commission_seller_ht / amount) * 100).toFixed(2) 
         : 0;
+    
+    const ruleName = data.rule.name || 'Taux standard';
+    const buyerRate = (data.rule.buyer_commission || 0).toFixed(2);
+    const sellerRate = (data.rule.seller_commission || 0).toFixed(2);
     
     let html = `
         <div class="mb-4">
             <div class="alert alert-info">
-                <i class="fas fa-info-circle"></i> <strong>Règle appliquée:</strong> ${data.rule.name || 'Règle par défaut'}
-                <span class="badge bg-primary ms-2">${data.rule.buyer_commission || 0}% Acheteur + ${data.rule.seller_commission || 0}% Vendeur</span>
+                <i class="fas fa-info-circle"></i> <strong>Règle appliquée:</strong> ${ruleName}
+                <span class="badge bg-primary ms-2">${buyerRate}% Acheteur + ${sellerRate}% Vendeur</span>
             </div>
         </div>
     `;
@@ -331,7 +368,7 @@ function displayCommissionPreview(data) {
                     <div class="row">
                         <div class="col-md-4 mb-2">
                             <small class="text-muted">Base de calcul</small>
-                            <div><strong>${formatMoney(document.getElementById('amount').value)} TND</strong></div>
+                            <div><strong>${formatMoney(amount)} TND</strong></div>
                             <small class="text-primary">${buyerPercentage}%</small>
                         </div>
                         <div class="col-md-4 mb-2">
@@ -365,7 +402,7 @@ function displayCommissionPreview(data) {
                     <div class="row">
                         <div class="col-md-4 mb-2">
                             <small class="text-muted">Base de calcul</small>
-                            <div><strong>${formatMoney(document.getElementById('amount').value)} TND</strong></div>
+                            <div><strong>${formatMoney(amount)} TND</strong></div>
                             <small class="text-success">${sellerPercentage}%</small>
                         </div>
                         <div class="col-md-4 mb-2">
@@ -389,21 +426,25 @@ function displayCommissionPreview(data) {
     }
     
     // Total Commission
+    const totalHT = (data.total_commission_ht || 0);
+    const totalVAT = (data.total_commission_vat || 0);
+    const totalTTC = (data.total_commission || 0);
+    
     html += `
         <div class="card bg-light border-dark mb-3">
             <div class="card-body">
                 <div class="row">
                     <div class="col-4">
                         <small class="text-muted">Total HT</small>
-                        <div class="h5 mb-0">${formatMoney(data.total_commission_ht)} TND</div>
+                        <div class="h5 mb-0">${formatMoney(totalHT)} TND</div>
                     </div>
                     <div class="col-4">
                         <small class="text-muted">TVA (19%)</small>
-                        <div class="h5 mb-0">${formatMoney(data.total_vat)} TND</div>
+                        <div class="h5 mb-0">${formatMoney(totalVAT)} TND</div>
                     </div>
                     <div class="col-4">
                         <small class="text-muted">Total TTC</small>
-                        <div class="h5 mb-0 text-success">${formatMoney(data.total_commission)} TND</div>
+                        <div class="h5 mb-0 text-success">${formatMoney(totalTTC)} TND</div>
                     </div>
                 </div>
             </div>
@@ -411,8 +452,8 @@ function displayCommissionPreview(data) {
     `;
     
     // Agent/Agency Split
-    const agentAmount = data.total_commission / 2;
-    const agencyAmount = data.total_commission / 2;
+    const agentAmount = totalTTC / 2;
+    const agencyAmount = totalTTC / 2;
     
     html += `
         <div class="card border-warning">

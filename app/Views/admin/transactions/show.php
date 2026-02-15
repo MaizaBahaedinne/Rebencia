@@ -224,8 +224,8 @@
                 </div>
                 <div class="d-flex justify-content-between">
                     <span>Payée:</span>
-                    <span class="badge bg-<?= $transaction['commission_paid'] ? 'success' : 'warning' ?>">
-                        <?= $transaction['commission_paid'] ? 'Oui' : 'Non' ?>
+                    <span class="badge bg-<?= ($transaction['commission_paid'] ?? 0) ? 'success' : 'warning' ?>">
+                        <?= ($transaction['commission_paid'] ?? 0) ? 'Oui' : 'Non' ?>
                     </span>
                 </div>
             </div>

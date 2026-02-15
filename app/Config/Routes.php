@@ -258,6 +258,7 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
     $routes->group('transactions', function($routes) {
         $routes->get('/', 'Transactions::index');
         $routes->get('create', 'Transactions::create');
+        $routes->get('(:num)', 'Transactions::show/$1');
         $routes->post('store', 'Transactions::store');
         $routes->get('edit/(:num)', 'Transactions::edit/$1');
         $routes->post('update/(:num)', 'Transactions::update/$1');

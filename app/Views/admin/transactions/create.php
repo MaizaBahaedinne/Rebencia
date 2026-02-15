@@ -166,6 +166,7 @@
                                      data-property-id="<?= $property['id'] ?>"
                                      data-price="<?= $property['price'] ?>"
                                      data-rental="<?= $property['rental_price'] ?? 0 ?>"
+                                     data-owner-id="<?= $property['owner_id'] ?? '' ?>"
                                      data-owner-name="<?= esc($property['owner_name'] ?? '') ?>"
                                      data-owner-phone="<?= esc($property['owner_phone'] ?? '') ?>"
                                      data-owner-email="<?= esc($property['owner_email'] ?? '') ?>"
@@ -231,18 +232,11 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Vendeur/Propriétaire</label>
-                                <select class="form-select" name="seller_id" id="seller_id">
-                                    <option value="">-- Sélectionner --</option>
-                                    <?php if (!empty($sellers)): ?>
-                                        <?php foreach ($sellers as $seller): ?>
-                                            <option value="<?= $seller['id'] ?>">
-                                                <?= esc($seller['first_name'] . ' ' . $seller['last_name']) ?> - <?= esc($seller['phone']) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <option value="">Aucun vendeur disponible</option>
-                                    <?php endif; ?>
-                                </select>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="seller_name" readonly placeholder="Sera chargé automatiquement">
+                                    <input type="hidden" name="seller_id" id="seller_id">
+                                </div>
+                                <small class="text-muted">Le propriétaire est défini lors de la sélection du bien</small>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Agent Responsable <span class="text-danger">*</span></label>

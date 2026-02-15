@@ -53,18 +53,28 @@ class Transactions extends BaseController
 
     public function create()
     {
+        // Get current user
+        $currentUserId = session()->get('user_id');
+        $currentRoleLevel = session()->get('role_level');
+        
         $userModel = model('UserModel');
         $agencyModel = model('AgencyModel');
         
         // Get properties with agent and agency info
-        $properties = $this->propertyModel
+        $propertiesQuery = $this->propertyModel
             ->select('properties.*, 
                      agents.agency_id as agent_agency_id,
                      CONCAT(agents.first_name, " ", agents.last_name) as agent_name,
                      agencies.name as agency_name')
             ->join('users as agents', 'agents.id = properties.agent_id', 'left')
-            ->join('agencies', 'agencies.id = agents.agency_id', 'left')
-            ->findAll();
+            ->join('agencies', 'agencies.id = agents.agency_id', 'left');
+        
+        // If user is not super admin, filter by agent_id (show only their properties)
+        if ($currentRoleLevel && $currentRoleLevel != 100) { // role_level 100 = super admin
+            $propertiesQuery->where('properties.agent_id', $currentUserId);
+        }
+        
+        $properties = $propertiesQuery->findAll();
         
         $data = [
             'title' => 'Nouvelle Transaction',
@@ -79,6 +89,10 @@ class Transactions extends BaseController
 
     public function store()
     {
+        // Get current user
+        $currentUserId = session()->get('user_id');
+        $currentRoleLevel = session()->get('role_level');
+        
         $validation = \Config\Services::validation();
         
         $rules = [
@@ -106,6 +120,13 @@ class Transactions extends BaseController
         
         if (!$property || !$agent) {
             return redirect()->back()->withInput()->with('error', 'Bien ou agent non trouvé');
+        }
+        
+        // Security check: If user is not super admin, verify they own the property
+        if ($currentRoleLevel && $currentRoleLevel != 100) { // role_level 100 = super admin
+            if ($property['agent_id'] != $currentUserId) {
+                return redirect()->back()->with('error', 'Vous n\'avez pas la permission de créer une transaction pour ce bien');
+            }
         }
 
         // Créer la transaction

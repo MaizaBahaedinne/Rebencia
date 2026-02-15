@@ -831,12 +831,7 @@
                 </a>
                 <?php endif; ?>
                 
-                <?php if (canUpdate('properties') || isAdmin()): ?>
-                <a href="<?= base_url('admin/properties/assignments') ?>" class="submenu-item <?= url_is('admin/properties/assignments*') ? 'active' : '' ?>">
-                    <i class="fas fa-exchange-alt"></i>
-                    <span>Affectation des Biens</span>
-                </a>
-                <?php endif; ?>
+                
                 
                 <?php if (canRead('properties')): ?>
                 <a href="<?= base_url('admin/property-requests') ?>" class="submenu-item <?= url_is('admin/property-requests*') ? 'active' : '' ?>">

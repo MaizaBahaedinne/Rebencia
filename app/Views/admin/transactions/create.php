@@ -243,14 +243,13 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Agent Responsable <span class="text-danger">*</span></label>
-                                <select class="form-select" name="agent_id" id="agent_id" required onchange="updateCommission()">
+                                <select class="form-select" name="agent_id" id="agent_id" required>
                                     <option value="">-- Sélectionner --</option>
                                     <?php if (!empty($agents)): ?>
                                         <?php foreach ($agents as $agent): ?>
                                             <option value="<?= $agent['id'] ?>" 
                                                     data-role="<?= $agent['role_id'] ?? '' ?>"
-                                                    data-agency="<?= $agent['agency_id'] ?? '' ?>"
-                                                    <?= $agent['id'] == session()->get('user_id') ? 'selected' : '' ?>>
+                                                    data-agency="<?= $agent['agency_id'] ?? '' ?>">
                                                 <?= esc($agent['first_name'] . ' ' . $agent['last_name']) ?>
                                             </option>
                                         <?php endforeach; ?>

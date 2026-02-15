@@ -3,6 +3,37 @@ let currentStep = 1;
 let selectedPropertyData = null;
 let commissionData = null;
 
+// Validate form before submit
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('transactionForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const errors = [];
+            
+            // Check all required fields
+            const propertyId = document.getElementById('property_id').value;
+            const buyerId = document.getElementById('buyer_id').value;
+            const agentId = document.getElementById('agent_id').value;
+            const type = document.getElementById('type').value;
+            const amount = document.getElementById('amount').value;
+            const transactionDate = document.getElementById('transaction_date').value;
+            
+            if (!propertyId) errors.push('⚠️ Veuillez sélectionner un bien immobilier');
+            if (!buyerId) errors.push('⚠️ Veuillez sélectionner un acheteur/locataire');
+            if (!agentId) errors.push('⚠️ Veuillez sélectionner un agent responsable');
+            if (!type) errors.push('⚠️ Veuillez sélectionner le type de transaction');
+            if (!amount || parseFloat(amount) <= 0) errors.push('⚠️ Veuillez saisir un montant valide');
+            if (!transactionDate) errors.push('⚠️ Veuillez sélectionner une date de transaction');
+            
+            if (errors.length > 0) {
+                e.preventDefault();
+                alert(errors.join('\n'));
+                return false;
+            }
+        });
+    }
+});
+
 // Navigation Steps
 function nextStep() {
     if (!validateStep(currentStep)) {
@@ -140,36 +171,37 @@ function selectProperty(propertyId, element) {
         document.getElementById('amount').value = rental;
     }
     
-    // Auto-fill agent and agency (seller must be selected manually)
+    // Auto-fill agent and agency
     const agentSelect = document.getElementById('agent_id');
     
-    // Try to set agent from property
-    if (agentId && agentId.trim()) {
-        if (agentSelect) {
-            agentSelect.value = agentId;
-            agentSelect.disabled = true;
-            agentSelect.style.backgroundColor = '#f8f9fa';
-        }
+    // Always try to set agent from property first
+    if (agentId && agentId.trim() !== '') {
+        agentSelect.value = agentId;
+        console.log('Agent ID from property:', agentId);
     } else {
-        // If no agent from property, automatically select the agent (assume first active agent after placeholder)
-        if (agentSelect && !agentSelect.value) {
-            const options = agentSelect.querySelectorAll('option');
-            if (options.length > 1) {
-                // Try to select the second option (first real agent, skipping placeholder)
-                agentSelect.value = options[1].value;
-            }
+        // If no agent from property, auto-select first available agent
+        console.log('No agent on property, trying to auto-select');
+        const options = agentSelect.querySelectorAll('option');
+        if (options.length > 1) {
+            agentSelect.value = options[1].value;
+            console.log('Auto-selected agent:', options[1].value);
         }
     }
     
     // Handle agency
     const agencySelect = document.getElementById('agency_id');
-    if (agencyId && agencyId.trim()) {
-        if (agencySelect) {
-            agencySelect.value = agencyId;
-            agencySelect.disabled = true;
-            agencySelect.style.backgroundColor = '#f8f9fa';
+    if (agencyId && agencyId.trim() !== '') {
+        agencySelect.value = agencyId;
+    } else {
+        // Auto-select agency from selected agent if not from property
+        const selectedAgent = agentSelect.selectedOptions[0];
+        const agencyFromAgent = selectedAgent?.getAttribute('data-agency');
+        if (agencyFromAgent) {
+            agencySelect.value = agencyFromAgent;
         }
     }
+    
+    console.log('Property selected:', propertyId, 'Agent:', agentSelect.value);
     
     // Update summary
     updateSummary();
@@ -551,6 +583,8 @@ document.getElementById('agent_id')?.addEventListener('change', function() {
         document.getElementById('agency_id').value = agencyId;
     }
     
+    console.log('Agent changed:', this.value);
+    updateCommission();
     updateSummary();
 });
 
@@ -562,6 +596,13 @@ document.getElementById('filterTransaction')?.addEventListener('change', filterP
 // Event listeners for summary updates
 document.getElementById('buyer_id')?.addEventListener('change', updateSummary);
 document.getElementById('seller_id')?.addEventListener('change', updateSummary);
-document.getElementById('type')?.addEventListener('change', updateSummary);
-document.getElementById('amount')?.addEventListener('input', updateSummary);
+document.getElementById('type')?.addEventListener('change', function() {
+    updateAmount();
+    updateCommission();
+    updateSummary();
+});
+document.getElementById('amount')?.addEventListener('input', function() {
+    updateCommission();
+    updateSummary();
+});
 document.getElementById('transaction_date')?.addEventListener('change', updateSummary);

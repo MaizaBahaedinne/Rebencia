@@ -31,7 +31,7 @@ class TransactionModel extends Model
     protected $validationRules = [
         'reference' => 'permit_empty|is_unique[transactions.reference,id,{id}]',
         'property_id' => 'required|is_natural_no_zero',
-        'buyer_id' => 'required|is_natural_no_zero',
+        'client_id' => 'required|is_natural_no_zero',
         'agent_id' => 'required|is_natural_no_zero',
         'type' => 'required|in_list[sale,rent]',
         'amount' => 'required|decimal',

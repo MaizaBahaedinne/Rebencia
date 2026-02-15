@@ -263,6 +263,7 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->get('edit/(:num)', 'Transactions::edit/$1');
         $routes->post('update/(:num)', 'Transactions::update/$1');
         $routes->delete('delete/(:num)', 'Transactions::delete/$1');
+        $routes->post('update-commission-split/(:num)', 'Transactions::updateCommissionSplit/$1');
         
         // Commission management
         $routes->get('view-commission/(:num)', 'Transactions::viewCommission/$1');

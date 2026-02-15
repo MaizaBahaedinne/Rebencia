@@ -248,6 +248,24 @@
                     <h5 class="mb-0"><i class="fas fa-percentage"></i> Répartition Agent / Agence</h5>
                 </div>
                 <div class="card-body">
+                    <?php if (canUpdate('transactions')): ?>
+                    <form action="<?= base_url('admin/transactions/update-commission-split/' . $transaction['id']) ?>" method="post" class="mb-3">
+                        <?= csrf_field() ?>
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-6">
+                                <label class="form-label">Part Agent (%)</label>
+                                <input type="number" name="agent_commission_percentage" class="form-control" min="0" max="100" step="0.01"
+                                       value="<?= esc($commission['agent_commission_percentage']) ?>" required>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    Mettre a jour
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <?php endif; ?>
+
                     <div class="row text-center">
                         <div class="col-6">
                             <div class="border-end">

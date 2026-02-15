@@ -466,6 +466,42 @@ class Transactions extends BaseController
             return redirect()->back()->with('error', 'Erreur : ' . $e->getMessage());
         }
     }
+
+    /**
+     * Mettre a jour la repartition agent/agence
+     */
+    public function updateCommissionSplit($id)
+    {
+        if (!canUpdate('transactions')) {
+            return redirect()->back()->with('error', 'Acces refuse');
+        }
+
+        $commission = $this->transactionCommissionModel->where('transaction_id', $id)->first();
+        if (!$commission) {
+            return redirect()->back()->with('error', 'Commission non trouvee');
+        }
+
+        $percentage = (float) $this->request->getPost('agent_commission_percentage');
+        if ($percentage < 0 || $percentage > 100) {
+            return redirect()->back()->with('error', 'Pourcentage invalide');
+        }
+
+        $totalTtc = (float) ($commission['total_commission_ttc'] ?? 0);
+        if ($totalTtc <= 0) {
+            return redirect()->back()->with('error', 'Montant de commission invalide');
+        }
+
+        $agentAmount = round($totalTtc * ($percentage / 100), 2);
+        $agencyAmount = round($totalTtc - $agentAmount, 2);
+
+        $this->transactionCommissionModel->update($commission['id'], [
+            'agent_commission_percentage' => $percentage,
+            'agent_commission_amount' => $agentAmount,
+            'agency_commission_amount' => $agencyAmount
+        ]);
+
+        return redirect()->back()->with('success', 'Repartition mise a jour');
+    }
     
     /**
      * Recalculer la commission d'une transaction

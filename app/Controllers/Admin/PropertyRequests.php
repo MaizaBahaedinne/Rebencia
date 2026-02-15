@@ -22,7 +22,8 @@ class PropertyRequests extends BaseController
     public function index()
     {
         // Get current user
-        $user = session()->get('user');
+        $currentUserId = session()->get('user_id');
+        $currentRoleLevel = session()->get('role_level');
         
         // Get filters
         $status = $this->request->getGet('status');
@@ -39,9 +40,9 @@ class PropertyRequests extends BaseController
             ->join('users', 'users.id = property_requests.assigned_to', 'left')
             ->orderBy('property_requests.created_at', 'DESC');
         
-        // If user is not admin, filter by assigned_to (show only assigned to current user)
-        if ($user && $user['role_id'] != 1) { // role_id 1 = admin
-            $builder->where('property_requests.assigned_to', $user['id']);
+        // If user is not super admin (role_level != 100), filter by assigned_to (show only assigned to current user)
+        if ($currentRoleLevel && $currentRoleLevel != 100) { // role_level 100 = super admin
+            $builder->where('property_requests.assigned_to', $currentUserId);
         }
 
         // Apply filters

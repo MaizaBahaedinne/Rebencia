@@ -22,7 +22,8 @@ class PropertyEstimations extends BaseController
     public function index()
     {
         // Get current user
-        $user = session()->get('user');
+        $currentUserId = session()->get('user_id');
+        $currentRoleLevel = session()->get('role_level');
         
         // Get filters
         $filters = [
@@ -34,9 +35,9 @@ class PropertyEstimations extends BaseController
             'agent_id' => $this->request->getGet('agent_id'),
         ];
         
-        // If user is not admin, filter by agent_id (show only assigned to current user)
-        if ($user && $user['role_id'] != 1) { // role_id 1 = admin
-            $filters['agent_id'] = $user['id'];
+        // If user is not super admin (role_level != 100), filter by agent_id (show only assigned to current user)
+        if ($currentRoleLevel && $currentRoleLevel != 100) { // role_level 100 = super admin
+            $filters['agent_id'] = $currentUserId;
         }
 
         // Get estimations with details

@@ -22,9 +22,10 @@ class SyncObjectivesCA extends BaseCommand
     {
         $objectiveModel = model('ObjectiveModel');
 
-        $period = $this->getOption('period') ?? date('Y-m');
-        $userId = $this->getOption('user-id');
-        $agencyId = $this->getOption('agency-id');
+        // Parse options from command line
+        $period = $this->getPeriodFromParams($params) ?? date('Y-m');
+        $userId = $this->getUserIdFromParams($params);
+        $agencyId = $this->getAgencyIdFromParams($params);
 
         try {
             CLI::write('Synchronisation des objectifs CA pour la période: ' . $period, 'green');
@@ -41,5 +42,44 @@ class SyncObjectivesCA extends BaseCommand
             CLI::error('Erreur: ' . $e->getMessage());
             return 1;
         }
+    }
+
+    /**
+     * Extract period from command line arguments
+     */
+    private function getPeriodFromParams(array $params): ?string
+    {
+        foreach ($params as $param) {
+            if (strpos($param, '--period=') === 0) {
+                return substr($param, 9);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Extract user-id from command line arguments
+     */
+    private function getUserIdFromParams(array $params): ?string
+    {
+        foreach ($params as $param) {
+            if (strpos($param, '--user-id=') === 0) {
+                return substr($param, 10);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Extract agency-id from command line arguments
+     */
+    private function getAgencyIdFromParams(array $params): ?string
+    {
+        foreach ($params as $param) {
+            if (strpos($param, '--agency-id=') === 0) {
+                return substr($param, 12);
+            }
+        }
+        return null;
     }
 }

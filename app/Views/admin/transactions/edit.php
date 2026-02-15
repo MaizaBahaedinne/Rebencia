@@ -192,7 +192,7 @@
 
                         <div class="mb-3">
                             <label for="agency_id" class="form-label">Agence</label>
-                            <select class="form-select" id="agency_id" name="agency_id">
+                            <select class="form-select" id="agency_id" name="agency_id" disabled>
                                 <option value="">-- Non assigné --</option>
                                 <?php foreach ($agencies as $agency): ?>
                                     <option value="<?= $agency['id'] ?>" <?= old('agency_id', $transaction['agency_id']) == $agency['id'] ? 'selected' : '' ?>>
@@ -200,6 +200,7 @@
                                     </option>
                                 <?php endforeach ?>
                             </select>
+                            <input type="hidden" name="agency_id" value="<?= old('agency_id', $transaction['agency_id'] ?? '') ?>">
                         </div>
 
                         <hr>

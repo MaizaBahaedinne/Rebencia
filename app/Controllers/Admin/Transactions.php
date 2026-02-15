@@ -249,12 +249,35 @@ class Transactions extends BaseController
         $userModel = model('UserModel');
         $agencyModel = model('AgencyModel');
 
+        $buyers = $this->clientModel->whereIn('type', ['buyer', 'tenant'])->findAll();
+        $sellers = $this->clientModel->whereIn('type', ['seller', 'landlord'])->findAll();
+
+        if (!empty($transaction['client_id'])) {
+            $buyerIds = array_column($buyers, 'id');
+            if (!in_array($transaction['client_id'], $buyerIds, true)) {
+                $currentBuyer = $this->clientModel->find($transaction['client_id']);
+                if ($currentBuyer) {
+                    array_unshift($buyers, $currentBuyer);
+                }
+            }
+        }
+
+        if (!empty($transaction['seller_id'])) {
+            $sellerIds = array_column($sellers, 'id');
+            if (!in_array($transaction['seller_id'], $sellerIds, true)) {
+                $currentSeller = $this->clientModel->find($transaction['seller_id']);
+                if ($currentSeller) {
+                    array_unshift($sellers, $currentSeller);
+                }
+            }
+        }
+
         $data = [
             'title' => 'Modifier Transaction',
             'transaction' => $transaction,
             'properties' => $this->propertyModel->where('status', 'published')->findAll(),
-            'buyers' => $this->clientModel->whereIn('type', ['buyer', 'tenant'])->findAll(),
-            'sellers' => $this->clientModel->whereIn('type', ['seller', 'landlord'])->findAll(),
+            'buyers' => $buyers,
+            'sellers' => $sellers,
             'agents' => $userModel->where('role_id >=', 6)->findAll(),
             'agencies' => $agencyModel->where('status', 'active')->findAll()
         ];

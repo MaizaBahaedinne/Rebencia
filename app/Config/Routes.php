@@ -15,6 +15,12 @@ $routes->get('api/zones/cities', 'Api\Zones::cities');
 $routes->get('api/zones/governorates', 'Api\Zones::governorates');
 $routes->get('api/zones/cities-by-governorate/(:num)', 'Api\Zones::citiesByGovernorate/$1');
 
+// CA API routes (admin)
+$routes->get('api/ca/summary', 'Api\CAController::summary', ['namespace' => 'App\Controllers']);
+$routes->get('api/ca/by-period', 'Api\CAController::byPeriod', ['namespace' => 'App\Controllers']);
+$routes->get('api/ca/by-agent', 'Api\CAController::byAgent', ['namespace' => 'App\Controllers']);
+$routes->post('api/ca/sync-objectives', 'Api\CAController::syncObjectives', ['namespace' => 'App\Controllers']);
+
 // Public pages
 $routes->get('about', 'Pages::about');
 $routes->get('contact', 'Pages::contact');

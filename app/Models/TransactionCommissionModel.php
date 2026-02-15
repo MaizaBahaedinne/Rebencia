@@ -187,4 +187,76 @@ class TransactionCommissionModel extends Model
             ->get()
             ->getResultArray();
     }
+
+    /**
+     * Calcul du CA réel : somme des commissions HT payées
+     */
+    public function calculateActualCA(?int $agencyId = null, ?string $dateFrom = null, ?string $dateTo = null): float
+    {
+        $builder = $this->selectSum('total_commission_ht', 'ca_ht')
+            ->where('payment_status', 'paid');
+
+        if ($agencyId) {
+            $builder->join('users', 'users.id = transaction_commissions.agent_id')
+                ->where('users.agency_id', $agencyId);
+        }
+
+        if ($dateFrom) {
+            $builder->where('payment_date >=', $dateFrom);
+        }
+
+        if ($dateTo) {
+            $builder->where('payment_date <=', $dateTo);
+        }
+
+        $result = $builder->get()->getRowArray();
+        return (float) ($result['ca_ht'] ?? 0);
+    }
+
+    /**
+     * CA par période (dernier 12 mois)
+     */
+    public function getCARByPeriod(?int $agencyId = null): array
+    {
+        $builder = $this->select("DATE_FORMAT(payment_date, '%Y-%m') as period")
+            ->selectSum('total_commission_ht', 'ca_ht')
+            ->where('payment_status', 'paid');
+
+        if ($agencyId) {
+            $builder->join('users', 'users.id = transaction_commissions.agent_id')
+                ->where('users.agency_id', $agencyId);
+        }
+
+        return $builder->groupBy("DATE_FORMAT(payment_date, '%Y-%m')")
+            ->orderBy('period', 'DESC')
+            ->limit(12)
+            ->get()
+            ->getResultArray();
+    }
+
+    /**
+     * CA par agent (pour la période courante)
+     */
+    public function getCAByAgent(?string $month = null): array
+    {
+        if (!$month) {
+            $month = date('Y-m');
+        }
+
+        $startDate = "$month-01";
+        $endDate = date('Y-m-t', strtotime($startDate));
+
+        return $this->select('users.id, users.first_name, users.last_name, agencies.name as agency_name')
+            ->selectSum('total_commission_ht', 'ca_ht')
+            ->selectCount('transaction_commissions.id', 'deals_count')
+            ->where('payment_status', 'paid')
+            ->where('payment_date >=', $startDate)
+            ->where('payment_date <=', $endDate)
+            ->join('users', 'users.id = transaction_commissions.agent_id')
+            ->join('agencies', 'agencies.id = users.agency_id', 'left')
+            ->groupBy('users.id')
+            ->orderBy('ca_ht', 'DESC')
+            ->get()
+            ->getResultArray();
+    }
 }

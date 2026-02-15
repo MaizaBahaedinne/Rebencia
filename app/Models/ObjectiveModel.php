@@ -300,4 +300,70 @@ class ObjectiveModel extends Model
 
         return $this->update($objectiveId, $achieved);
     }
+
+    /**
+     * Synchroniser le CA réalisé basé sur les commissions HT payées
+     * Réel: somme des commission_ht où payment_status = 'paid'
+     */
+    public function syncCAFromPaidCommissions(?int $userId = null, ?int $agencyId = null, ?string $period = null)
+    {
+        if (!$period) {
+            $period = date('Y-m');
+        }
+
+        list($year, $month) = explode('-', $period);
+        $startDate = "$year-$month-01";
+        $endDate = date('Y-m-t', strtotime($startDate));
+
+        $db = \Config\Database::connect();
+
+        // Trouver les objectifs correspondants
+        $query = $this->where('period', $period);
+        
+        if ($userId) {
+            $query->where('user_id', $userId)->where('type', 'personal');
+        } elseif ($agencyId) {
+            $query->where('agency_id', $agencyId)->where('type', 'agency');
+        }
+
+        $objectives = $query->findAll();
+
+        foreach ($objectives as $objective) {
+            $caRealized = 0;
+
+            if ($objective['type'] === 'personal' && $objective['user_id']) {
+                // CA de l'agent (somme de ses commissions HT payées)
+                $result = $db->table('transaction_commissions')
+                    ->selectSum('total_commission_ht', 'ca')
+                    ->where('agent_id', $objective['user_id'])
+                    ->where('payment_status', 'paid')
+                    ->where('payment_date >=', $startDate)
+                    ->where('payment_date <=', $endDate)
+                    ->get()->getRowArray();
+                
+                $caRealized = (float) ($result['ca'] ?? 0);
+
+            } elseif ($objective['type'] === 'agency' && $objective['agency_id']) {
+                // CA de l'agence (somme des commissions HT payées de tous les agents de l'agence)
+                $result = $db->table('transaction_commissions')
+                    ->select('transaction_commissions.total_commission_ht')
+                    ->selectSum('transaction_commissions.total_commission_ht', 'ca')
+                    ->join('users', 'users.id = transaction_commissions.agent_id')
+                    ->where('users.agency_id', $objective['agency_id'])
+                    ->where('transaction_commissions.payment_status', 'paid')
+                    ->where('transaction_commissions.payment_date >=', $startDate)
+                    ->where('transaction_commissions.payment_date <=', $endDate)
+                    ->get()->getRowArray();
+                
+                $caRealized = (float) ($result['ca'] ?? 0);
+            }
+
+            // Mettre à jour le CA réalisé
+            $this->update($objective['id'], [
+                'revenue_achieved' => $caRealized
+            ]);
+        }
+
+        return true;
+    }
 }

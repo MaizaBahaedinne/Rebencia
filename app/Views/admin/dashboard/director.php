@@ -1,5 +1,9 @@
 <?= $this->extend('layouts/admin_modern') ?>
 
+<?= $this->section('styles') ?>
+<link rel="stylesheet" href="<?= base_url('assets/css/ca-realtime.css') ?>">
+<?= $this->endSection() ?>
+
 <?= $this->section('content') ?>
 
 <div class="container-fluid">
@@ -8,6 +12,9 @@
         <h1 class="h3 mb-0"><i class="fas fa-chart-pie me-2"></i><?= esc($title) ?></h1>
         <div>
             <span class="text-muted me-3"><i class="far fa-calendar"></i> <?= date('F Y') ?></span>
+            <button id="sync-objectives-btn" class="btn btn-sm btn-outline-secondary me-2" title="Synchroniser les objectifs">
+                <i class="fas fa-sync-alt"></i> Sync
+            </button>
             <a href="/admin/objectives" class="btn btn-sm btn-outline-primary">
                 <i class="fas fa-bullseye"></i> Objectifs
             </a>
@@ -76,16 +83,46 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div>
-                            <p class="text-muted mb-1 small">CA Total</p>
-                            <h3 class="mb-0"><?= number_format($stats['total_revenue'], 0) ?> <small>DT</small></h3>
+                            <p class="text-muted mb-1 small">CA Réalisé (HT)</p>
+                            <h3 class="mb-0 text-primary"><?= number_format($stats['total_revenue'], 0) ?> <small>DT</small></h3>
                         </div>
                         <div class="text-warning" style="font-size: 2rem; opacity: 0.3;">
                             <i class="fas fa-coins"></i>
                         </div>
                     </div>
                     <small class="text-success">
-                        <i class="fas fa-arrow-up"></i> <?= number_format($stats['revenue_month'], 0) ?> DT ce mois
+                        <i class="fas fa-sync-alt fa-spin me-1"></i> Mise à jour en temps réel
                     </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CA Realtime Widget -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0"><i class="fas fa-chart-area me-2"></i>CA vs Objectif (Temps Réel)</h5>
+                </div>
+                <div data-ca-widget></div>
+            </div>
+        </div>
+
+        <!-- Performance Stats -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Performance par Agent</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div id="agents-ca-list" class="table-responsive">
+                        <div class="text-center py-4">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                <span class="visually-hidden">Chargement...</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -363,5 +400,111 @@ if (propertyTypeCtx) {
         }
     });
 }
+
+// Load CA by agents
+async function loadAgentsCA() {
+    try {
+        const response = await fetch('/api/ca/by-agent');
+        const result = await response.json();
+        
+        if (result.status === 'success' && result.data) {
+            renderAgentsCAList(result.data);
+        }
+    } catch (error) {
+        console.error('Erreur CA agents:', error);
+        document.getElementById('agents-ca-list').innerHTML = 
+            '<div class="alert alert-warning m-3">Erreur de chargement</div>';
+    }
+}
+
+function renderAgentsCAList(agents) {
+    if (agents.length === 0) {
+        document.getElementById('agents-ca-list').innerHTML = 
+            '<div class="text-center text-muted py-4"><small>Aucun CA pour le mois</small></div>';
+        return;
+    }
+
+    const tableHtml = `
+        <table class="table table-hover mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th>Agent</th>
+                    <th class="text-end">Deals</th>
+                    <th class="text-end">CA (HT)</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${agents.map((agent, idx) => `
+                <tr>
+                    <td>
+                        ${idx < 3 ? `<i class="fas fa-medal text-${idx === 0 ? 'warning' : (idx === 1 ? 'secondary' : 'bronze')} me-2"></i>` : '<i class="fas fa-user text-muted me-2"></i>'}
+                        <strong>${esc(agent.first_name + ' ' + agent.last_name)}</strong>
+                        ${agent.agency_name ? `<br><small class="text-muted">${esc(agent.agency_name)}</small>` : ''}
+                    </td>
+                    <td class="text-end">
+                        <span class="badge bg-primary">${agent.deals_count || 0}</span>
+                    </td>
+                    <td class="text-end fw-bold text-primary">
+                        ${new Intl.NumberFormat('fr-TN', {style: 'currency', currency: 'TND', minimumFractionDigits: 0}).format(agent.ca_ht || 0)}
+                    </td>
+                </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+    
+    document.getElementById('agents-ca-list').innerHTML = tableHtml;
+}
+
+// Charger les données CA
+loadAgentsCA();
+
+// Rafraîchir toutes les 30 secondes
+setInterval(loadAgentsCA, 30000);
+
+// Sync objectives button
+document.getElementById('sync-objectives-btn')?.addEventListener('click', async function() {
+    const btn = this;
+    const originalHTML = btn.innerHTML;
+    
+    try {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sync...';
+        
+        const response = await fetch('/api/ca/sync-objectives', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                period: new Date().toISOString().slice(0, 7)
+            })
+        });
+        
+        const result = await response.json();
+        if (result.status === 'success') {
+            btn.innerHTML = '<i class="fas fa-check text-success"></i> Synchronisé';
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                // Recharger les données
+                loadAgentsCA();
+            }, 2000);
+        } else {
+            throw new Error(result.message || 'Erreur');
+        }
+    } catch (error) {
+        console.error('Sync error:', error);
+        btn.innerHTML = '<i class="fas fa-times text-danger"></i> Erreur';
+        setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+        }, 3000);
+    }
+});
 </script>
+
+<script src="<?= base_url('assets/js/ca-realtime.js') ?>"></script>
+
 <?= $this->endSection() ?>

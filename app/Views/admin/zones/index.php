@@ -146,6 +146,67 @@ document.addEventListener('DOMContentLoaded', function() {
         maxZoom: 19
     }).addTo(zonesMap);
     
+    // Add polygons first (so they appear behind markers)
+    zones.forEach(zone => {
+        if (zone.boundary_coordinates) {
+            try {
+                const coordinates = JSON.parse(zone.boundary_coordinates);
+                if (Array.isArray(coordinates) && coordinates.length > 0) {
+                    // Convert coordinates to LatLng format for Leaflet
+                    const latLngs = coordinates.map(coord => [coord[0], coord[1]]);
+                    
+                    // Determine color based on type
+                    let color = '#6c757d';
+                    let fillOpacity = 0.3;
+                    switch(zone.type) {
+                        case 'governorate': 
+                            color = '#0d6efd';
+                            fillOpacity = 0.2;
+                            break;
+                        case 'city': 
+                            color = '#0dcaf0';
+                            fillOpacity = 0.25;
+                            break;
+                        case 'district': 
+                            color = '#198754';
+                            fillOpacity = 0.25;
+                            break;
+                        case 'area': 
+                            color = '#6c757d';
+                            fillOpacity = 0.2;
+                            break;
+                    }
+                    
+                    const polygon = L.polygon(latLngs, {
+                        color: color,
+                        weight: 2,
+                        opacity: 0.8,
+                        fillColor: color,
+                        fillOpacity: fillOpacity
+                    }).addTo(zonesMap);
+                    
+                    // Popup for polygon
+                    const polygonPopup = `
+                        <div>
+                            <strong>${zone.name}</strong><br>
+                            ${zone.name_ar ? '<small class="text-muted">' + zone.name_ar + '</small><br>' : ''}
+                            <span class="badge bg-primary">${zone.type}</span><br>
+                            <small class="text-muted">Zone tracée</small>
+                        </div>
+                    `;
+                    polygon.bindPopup(polygonPopup);
+                    
+                    // Click on polygon to highlight row
+                    polygon.on('click', function() {
+                        highlightZoneRow(zone.id);
+                    });
+                }
+            } catch (e) {
+                console.warn('Error parsing boundary_coordinates for zone ' + zone.id + ':', e);
+            }
+        }
+    });
+    
     // Add zone markers
     zones.forEach(zone => {
         if (zone.latitude && zone.longitude) {
@@ -177,6 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     ${zone.name_ar ? '<small class="text-muted">' + zone.name_ar + '</small><br>' : ''}
                     <span class="badge bg-primary">${zone.type}</span><br>
                     <small>Pop: ${zone.popularity_score || 0}</small>
+                    ${zone.boundary_coordinates ? '<br><span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Zone tracée</span>' : ''}
                 </div>
             `;
             marker.bindPopup(popupContent);

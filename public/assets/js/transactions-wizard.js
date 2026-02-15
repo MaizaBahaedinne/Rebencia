@@ -3,36 +3,58 @@ let currentStep = 1;
 let selectedPropertyData = null;
 let commissionData = null;
 
+console.log('📋 TransactionWizard Script Loaded');
+
 // Validate form before submit
-document.addEventListener('DOMContentLoaded', function() {
+function setupFormValidation() {
     const form = document.getElementById('transactionForm');
+    console.log('🔍 Looking for form, found:', form ? 'YES' : 'NO');
+    
     if (form) {
         form.addEventListener('submit', function(e) {
+            console.log('📤 Form submitted, validating...');
+            
+            const propertyId = document.getElementById('property_id');
+            const buyerId = document.getElementById('buyer_id');
+            const agentId = document.getElementById('agent_id');
+            const type = document.getElementById('type');
+            const amount = document.getElementById('amount');
+            const transactionDate = document.getElementById('transaction_date');
+            
+            console.log('Validation check - agent_id value:', agentId?.value || 'EMPTY/NOT FOUND');
+            
             const errors = [];
             
-            // Check all required fields
-            const propertyId = document.getElementById('property_id').value;
-            const buyerId = document.getElementById('buyer_id').value;
-            const agentId = document.getElementById('agent_id').value;
-            const type = document.getElementById('type').value;
-            const amount = document.getElementById('amount').value;
-            const transactionDate = document.getElementById('transaction_date').value;
-            
-            if (!propertyId) errors.push('⚠️ Veuillez sélectionner un bien immobilier');
-            if (!buyerId) errors.push('⚠️ Veuillez sélectionner un acheteur/locataire');
-            if (!agentId) errors.push('⚠️ Veuillez sélectionner un agent responsable');
-            if (!type) errors.push('⚠️ Veuillez sélectionner le type de transaction');
-            if (!amount || parseFloat(amount) <= 0) errors.push('⚠️ Veuillez saisir un montant valide');
-            if (!transactionDate) errors.push('⚠️ Veuillez sélectionner une date de transaction');
+            if (!propertyId?.value) errors.push('⚠️ Veuillez sélectionner un bien immobilier');
+            if (!buyerId?.value) errors.push('⚠️ Veuillez sélectionner un acheteur/locataire');
+            if (!agentId?.value) {
+                errors.push('⚠️ Veuillez sélectionner un agent responsable');
+                console.warn('❌ Agent ID is empty!');
+            }
+            if (!type?.value) errors.push('⚠️ Veuillez sélectionner le type de transaction');
+            if (!amount?.value || parseFloat(amount.value) <= 0) errors.push('⚠️ Veuillez saisir un montant valide');
+            if (!transactionDate?.value) errors.push('⚠️ Veuillez sélectionner une date de transaction');
             
             if (errors.length > 0) {
+                console.log('⛔ Validation failed:', errors);
                 e.preventDefault();
                 alert(errors.join('\n'));
                 return false;
             }
+            
+            console.log('✅ Validation passed, submitting form...');
         });
+    } else {
+        console.error('❌ Form with id="transactionForm" not found!');
     }
-});
+}
+
+// Setup form validation when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupFormValidation);
+} else {
+    setupFormValidation();
+}
 
 // Navigation Steps
 function nextStep() {
@@ -188,6 +210,9 @@ function selectProperty(propertyId, element) {
         }
     }
     
+    // Trigger change event to fire updateCommission and updateSummary
+    agentSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    
     // Handle agency
     const agencySelect = document.getElementById('agency_id');
     if (agencyId && agencyId.trim() !== '') {
@@ -202,9 +227,6 @@ function selectProperty(propertyId, element) {
     }
     
     console.log('Property selected:', propertyId, 'Agent:', agentSelect.value);
-    
-    // Update summary
-    updateSummary();
 }
 
 // Filtre des biens

@@ -8,25 +8,8 @@ class AddBoundaryCoordinatesToZones extends Migration
 {
     public function up()
     {
-        // Check if column already exists before adding it
-        // This handles the case where the zones table was created with the column already included
+        // Try to add the column - if it already exists, the exception will be caught and ignored
         try {
-            $result = $this->db->query("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='zones' AND COLUMN_NAME='boundary_coordinates' AND TABLE_SCHEMA=DATABASE()");
-            
-            if ($result->getRowCount() === 0) {
-                // Column doesn't exist, add it
-                $fields = [
-                    'boundary_coordinates' => [
-                        'type' => 'TEXT',
-                        'null' => true,
-                        'comment' => 'JSON array of polygon coordinates [[lat, lng], ...]'
-                    ]
-                ];
-                
-                $this->forge->addColumn('zones', $fields);
-            }
-        } catch (\Exception $e) {
-            // If query fails, try to add the column anyway
             $fields = [
                 'boundary_coordinates' => [
                     'type' => 'TEXT',
@@ -35,30 +18,20 @@ class AddBoundaryCoordinatesToZones extends Migration
                 ]
             ];
             
-            try {
-                $this->forge->addColumn('zones', $fields);
-            } catch (\Exception $e2) {
-                // Column likely already exists, ignore
-            }
+            $this->forge->addColumn('zones', $fields);
+        } catch (\Exception $e) {
+            // Column already exists, which is fine - just ignore the error
+            // This can happen if the zones table was created with the column already included
         }
     }
 
     public function down()
     {
-        // Only drop the column if it exists
+        // Try to drop the column - if it doesn't exist, the exception will be caught and ignored
         try {
-            $result = $this->db->query("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='zones' AND COLUMN_NAME='boundary_coordinates' AND TABLE_SCHEMA=DATABASE()");
-            
-            if ($result->getRowCount() > 0) {
-                $this->forge->dropColumn('zones', 'boundary_coordinates');
-            }
+            $this->forge->dropColumn('zones', 'boundary_coordinates');
         } catch (\Exception $e) {
-            // If query fails, try to drop the column anyway
-            try {
-                $this->forge->dropColumn('zones', 'boundary_coordinates');
-            } catch (\Exception $e2) {
-                // Column doesn't exist, ignore
-            }
+            // Column doesn't exist, which is fine - just ignore the error
         }
     }
 }

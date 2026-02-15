@@ -93,8 +93,8 @@ class CommissionCalculatorService
 
         // Step 5: Calculate agent/agency split
         $agentPercentage = $transactionData['agent_commission_percentage'] ?? 50.00;
-        $agentCommissionAmount = $totalCommissionTTC * ($agentPercentage / 100);
-        $agencyCommissionAmount = $totalCommissionTTC - $agentCommissionAmount;
+        $agentCommissionAmount = $totalCommissionHT * ($agentPercentage / 100);
+        $agencyCommissionAmount = $totalCommissionHT - $agentCommissionAmount;
 
         // Step 6: Build result
         $result = [

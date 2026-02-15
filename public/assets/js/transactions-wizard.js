@@ -141,17 +141,29 @@ function selectProperty(propertyId, element) {
     }
     
     // Auto-fill agent and agency (seller must be selected manually)
-    if (agentId) {
-        const agentSelect = document.getElementById('agent_id');
+    const agentSelect = document.getElementById('agent_id');
+    
+    // Try to set agent from property
+    if (agentId && agentId.trim()) {
         if (agentSelect) {
             agentSelect.value = agentId;
             agentSelect.disabled = true;
             agentSelect.style.backgroundColor = '#f8f9fa';
         }
+    } else {
+        // If no agent from property, automatically select the agent (assume first active agent after placeholder)
+        if (agentSelect && !agentSelect.value) {
+            const options = agentSelect.querySelectorAll('option');
+            if (options.length > 1) {
+                // Try to select the second option (first real agent, skipping placeholder)
+                agentSelect.value = options[1].value;
+            }
+        }
     }
     
-    if (agencyId) {
-        const agencySelect = document.getElementById('agency_id');
+    // Handle agency
+    const agencySelect = document.getElementById('agency_id');
+    if (agencyId && agencyId.trim()) {
         if (agencySelect) {
             agencySelect.value = agencyId;
             agencySelect.disabled = true;

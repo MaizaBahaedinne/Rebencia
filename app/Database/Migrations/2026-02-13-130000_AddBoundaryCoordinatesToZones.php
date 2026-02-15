@@ -8,20 +8,20 @@ class AddBoundaryCoordinatesToZones extends Migration
 {
     public function up()
     {
-        // Try to add the column - if it already exists, the exception will be caught and ignored
+        // Add column using raw SQL with error handling
+        // This approach handles the case where the column already exists
         try {
-            $fields = [
-                'boundary_coordinates' => [
-                    'type' => 'TEXT',
-                    'null' => true,
-                    'comment' => 'JSON array of polygon coordinates [[lat, lng], ...]'
-                ]
-            ];
-            
-            $this->forge->addColumn('zones', $fields);
-        } catch (\Exception $e) {
-            // Column already exists, which is fine - just ignore the error
-            // This can happen if the zones table was created with the column already included
+            $sql = "ALTER TABLE `zones` ADD COLUMN `boundary_coordinates` LONGTEXT NULL COMMENT 'JSON array of polygon coordinates [[lat, lng], ...]'";
+            $this->db->query($sql);
+        } catch (\exception $e) {
+            // Column probably already exists from migration or table creation
+            // This is fine, we can ignore this error
+            if (strpos($e->getMessage(), 'Duplicate column name') !== false) {
+                // Expected error - column already exists
+                return;
+            }
+            // For any other error, re-throw it
+            throw $e;
         }
     }
 

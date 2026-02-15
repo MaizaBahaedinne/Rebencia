@@ -107,10 +107,6 @@ function selectProperty(propertyId, element) {
     const transaction = propertyItem.getAttribute('data-transaction');
     const price = parseFloat(propertyItem.getAttribute('data-price'));
     const rental = parseFloat(propertyItem.getAttribute('data-rental'));
-    const ownerId = propertyItem.getAttribute('data-owner-id');
-    const ownerName = propertyItem.getAttribute('data-owner-name');
-    const ownerPhone = propertyItem.getAttribute('data-owner-phone');
-    const ownerEmail = propertyItem.getAttribute('data-owner-email');
     const agentId = propertyItem.getAttribute('data-agent-id');
     const agentName = propertyItem.getAttribute('data-agent-name');
     const agencyId = propertyItem.getAttribute('data-agency-id');
@@ -125,10 +121,6 @@ function selectProperty(propertyId, element) {
         transaction_type: transaction,
         price: price,
         rental_price: rental,
-        owner_id: ownerId,
-        owner_name: ownerName,
-        owner_phone: ownerPhone,
-        owner_email: ownerEmail,
         agent_id: agentId,
         agent_name: agentName,
         agency_id: agencyId,
@@ -148,19 +140,7 @@ function selectProperty(propertyId, element) {
         document.getElementById('amount').value = rental;
     }
     
-    // Auto-fill seller (owner) - load owner name as read-only
-    if (ownerId && ownerName) {
-        const sellerIdField = document.getElementById('seller_id');
-        const sellerNameField = document.getElementById('seller_name');
-        if (sellerIdField) {
-            sellerIdField.value = ownerId;
-        }
-        if (sellerNameField) {
-            sellerNameField.value = ownerName;
-        }
-    }
-    
-    // Auto-fill agent and agency
+    // Auto-fill agent and agency (seller must be selected manually)
     if (agentId) {
         const agentSelect = document.getElementById('agent_id');
         if (agentSelect) {
@@ -471,13 +451,13 @@ function updateSummary() {
     
     // Parties
     const buyerSelect = document.getElementById('buyer_id');
-    const sellerNameField = document.getElementById('seller_name');
+    const sellerSelect = document.getElementById('seller_id');
     const agentSelect = document.getElementById('agent_id');
     
     document.getElementById('summaryBuyer').textContent = 
         buyerSelect.selectedOptions[0]?.text || '-';
     document.getElementById('summarySeller').textContent = 
-        sellerNameField.value || '-';
+        sellerSelect.selectedOptions[0]?.text || '-';
     document.getElementById('summaryAgent').textContent = 
         agentSelect.selectedOptions[0]?.text || '-';
     
@@ -528,6 +508,7 @@ document.getElementById('filterTransaction')?.addEventListener('change', filterP
 
 // Event listeners for summary updates
 document.getElementById('buyer_id')?.addEventListener('change', updateSummary);
+document.getElementById('seller_id')?.addEventListener('change', updateSummary);
 document.getElementById('type')?.addEventListener('change', updateSummary);
 document.getElementById('amount')?.addEventListener('input', updateSummary);
 document.getElementById('transaction_date')?.addEventListener('change', updateSummary);

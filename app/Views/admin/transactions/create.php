@@ -166,10 +166,6 @@
                                      data-property-id="<?= $property['id'] ?>"
                                      data-price="<?= $property['price'] ?>"
                                      data-rental="<?= $property['rental_price'] ?? 0 ?>"
-                                     data-owner-id="<?= $property['owner_id'] ?? '' ?>"
-                                     data-owner-name="<?= esc($property['owner_name'] ?? '') ?>"
-                                     data-owner-phone="<?= esc($property['owner_phone'] ?? '') ?>"
-                                     data-owner-email="<?= esc($property['owner_email'] ?? '') ?>"
                                      data-agent-id="<?= $property['agent_id'] ?? '' ?>"
                                      data-agent-name="<?= esc($property['agent_name'] ?? '') ?>"
                                      data-agency-id="<?= $property['agent_agency_id'] ?? '' ?>"
@@ -232,11 +228,18 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Vendeur/Propriétaire</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" id="seller_name" readonly placeholder="Sera chargé automatiquement">
-                                    <input type="hidden" name="seller_id" id="seller_id">
-                                </div>
-                                <small class="text-muted">Le propriétaire est défini lors de la sélection du bien</small>
+                                <select class="form-select" name="seller_id" id="seller_id">
+                                    <option value="">-- Sélectionner --</option>
+                                    <?php if (!empty($buyers)): ?>
+                                        <?php foreach ($buyers as $buyer): ?>
+                                            <option value="<?= $buyer['id'] ?>">
+                                                <?= esc($buyer['first_name'] . ' ' . $buyer['last_name']) ?> - <?= esc($buyer['phone'] ?? '') ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <option value="">Aucun vendeur disponible</option>
+                                    <?php endif; ?>
+                                </select>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Agent Responsable <span class="text-danger">*</span></label>

@@ -22,9 +22,9 @@ class SyncObjectivesCA extends BaseCommand
     {
         $objectiveModel = model('ObjectiveModel');
 
-        $period = $this->option('period') ?? date('Y-m');
-        $userId = $this->option('user-id');
-        $agencyId = $this->option('agency-id');
+        $period = $this->getOption('period') ?? date('Y-m');
+        $userId = $this->getOption('user-id');
+        $agencyId = $this->getOption('agency-id');
 
         try {
             CLI::write('Synchronisation des objectifs CA pour la période: ' . $period, 'green');

@@ -55,7 +55,10 @@ class CommissionCalculatorService
         // Extract transaction details
         $transactionType = $transactionData['transaction_type']; // 'sale' or 'rent'
         $propertyType = $transactionData['property_type'];
-        $transactionAmount = (float) $transactionData['amount']; // Sale price or monthly rent
+        $transactionAmount = (float) ($transactionData['amount'] ?? $transactionData['transaction_amount'] ?? 0);
+        if ($transactionAmount <= 0) {
+            throw new \Exception('Montant de transaction manquant ou invalide');
+        }
         $transactionId = $transactionData['transaction_id'] ?? null;
         $propertyId = $transactionData['property_id'];
         $agentId = $transactionData['agent_id'] ?? $userId;

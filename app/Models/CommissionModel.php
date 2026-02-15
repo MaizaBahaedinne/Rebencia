@@ -41,7 +41,12 @@ class CommissionModel extends Model
             return false;
         }
 
-        $amount = ($transaction['amount'] * $percentage) / 100;
+        $transactionAmount = $transaction['amount'] ?? $transaction['transaction_amount'] ?? null;
+        if (!$transactionAmount) {
+            return false;
+        }
+
+        $amount = ($transactionAmount * $percentage) / 100;
 
         return $this->insert([
             'transaction_id' => $transactionId,

@@ -88,6 +88,50 @@ class Transactions extends BaseController
         return view('admin/transactions/create', $data);
     }
 
+    public function show($id)
+    {
+        $transaction = $this->transactionModel
+            ->select('transactions.*, 
+                     properties.title as property_title,
+                     properties.reference as property_reference,
+                     clients.first_name as client_first_name,
+                     clients.last_name as client_last_name,
+                     clients.phone as client_phone,
+                     clients.email as client_email,
+                     agents.first_name as agent_first_name,
+                     agents.last_name as agent_last_name,
+                     agencies.name as agency_name')
+            ->join('properties', 'properties.id = transactions.property_id')
+            ->join('clients', 'clients.id = transactions.client_id')
+            ->join('users as agents', 'agents.id = transactions.agent_id', 'left')
+            ->join('agencies', 'agencies.id = transactions.agency_id', 'left')
+            ->find($id);
+        
+        if (!$transaction) {
+            return redirect()->to('/admin/transactions')->with('error', 'Transaction non trouvée');
+        }
+
+        // Security check
+        $currentUserId = session()->get('user_id');
+        $currentRoleLevel = session()->get('role_level');
+        if ($currentRoleLevel != 100 && $transaction['agent_id'] != $currentUserId) {
+            return redirect()->to('/admin/transactions')->with('error', 'Accès refusé');
+        }
+
+        // Get commission details
+        $commissions = $this->transactionCommissionModel
+            ->where('transaction_id', $id)
+            ->findAll();
+
+        $data = [
+            'title' => 'Détails de la Transaction',
+            'transaction' => $transaction,
+            'commissions' => $commissions
+        ];
+
+        return view('admin/transactions/show', $data);
+    }
+
     public function store()
     {
         // Get current user
@@ -106,6 +150,7 @@ class Transactions extends BaseController
         ];
 
         if (!$this->validate($rules)) {
+            log_message('warning', 'Transaction validation failed: ' . json_encode($validation->getErrors()));
             return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
 
@@ -145,6 +190,8 @@ class Transactions extends BaseController
             'notes' => $this->request->getPost('notes')
         ];
 
+        log_message('info', 'Creating transaction with data: ' . json_encode($transactionData));
+
         if ($transactionId = $this->transactionModel->insert($transactionData)) {
             // Calculer automatiquement la commission avec le nouveau système
             try {
@@ -183,10 +230,11 @@ class Transactions extends BaseController
             $notificationHelper = new \App\Libraries\NotificationHelper();
             $notificationHelper->notifyTransactionCreated($transactionId, $transactionData, session()->get('user_id'));
             
-            return redirect()->to('/admin/transactions');
+            return redirect()->to('/admin/transactions/' . $transactionId);
         }
 
-        return redirect()->back()->withInput()->with('error', 'Erreur lors de la création');
+        log_message('error', 'Transaction insert failed. Errors: ' . json_encode($this->transactionModel->errors()));
+        return redirect()->back()->withInput()->with('error', 'Erreur lors de la création de la transaction. Veuillez vérifier vos données.');
     }
 
     public function edit($id)

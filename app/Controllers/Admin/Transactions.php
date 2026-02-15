@@ -179,6 +179,7 @@ class Transactions extends BaseController
         $transactionData = [
             'property_id' => $propertyId,
             'client_id' => $this->request->getPost('buyer_id'),
+            'seller_id' => $this->request->getPost('seller_id') ?: null,
             'agent_id' => $agentId,
             'agency_id' => $this->request->getPost('agency_id') ?? $agent['agency_id'] ?? session()->get('agency_id'),
             'type' => $type,
@@ -296,6 +297,7 @@ class Transactions extends BaseController
         $data = [
             'property_id' => $propertyId,
             'client_id' => $this->request->getPost('buyer_id'),
+            'seller_id' => $this->request->getPost('seller_id') ?: null,
             'agent_id' => $agentId,
             'agency_id' => $this->request->getPost('agency_id'),
             'type' => $type,

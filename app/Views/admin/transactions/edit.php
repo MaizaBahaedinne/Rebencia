@@ -69,7 +69,7 @@
                                 <select class="form-select" id="buyer_id" name="buyer_id" required>
                                     <option value="">-- Sélectionner un client --</option>
                                     <?php foreach ($buyers as $buyer): ?>
-                                        <option value="<?= $buyer['id'] ?>" <?= old('buyer_id', $transaction['buyer_id']) == $buyer['id'] ? 'selected' : '' ?>>
+                                        <option value="<?= $buyer['id'] ?>" <?= old('buyer_id', $transaction['client_id']) == $buyer['id'] ? 'selected' : '' ?>>
                                             <?= esc($buyer['first_name'] . ' ' . $buyer['last_name']) ?> - <?= esc($buyer['phone']) ?>
                                         </option>
                                     <?php endforeach ?>

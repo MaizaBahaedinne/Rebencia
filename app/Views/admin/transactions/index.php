@@ -47,7 +47,7 @@
                                         <?= $transaction['type'] === 'sale' ? 'Vente' : 'Location' ?>
                                     </span>
                                 </td>
-                                <td><strong><?= number_format($transaction['amount'], 0, ',', ' ') ?> TND</strong></td>
+                                <td><strong><?= number_format($transaction['amount'] ?? $transaction['transaction_amount'] ?? 0, 0, ',', ' ') ?> TND</strong></td>
                                 <td><?= number_format($transaction['commission_amount'], 0, ',', ' ') ?> TND</td>
                                 <td>
                                     <?php

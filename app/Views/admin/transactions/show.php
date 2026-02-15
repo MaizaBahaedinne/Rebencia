@@ -78,7 +78,7 @@
                     </div>
                     <div class="col-md-6">
                         <label class="form-label text-muted">Montant</label>
-                        <p class="mb-0"><strong><?= number_format($transaction['amount'], 2, ',', ' ') ?> TND</strong></p>
+                        <p class="mb-0"><strong><?= number_format($transaction['amount'] ?? $transaction['transaction_amount'] ?? 0, 2, ',', ' ') ?> TND</strong></p>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label text-muted">Date de Transaction</label>

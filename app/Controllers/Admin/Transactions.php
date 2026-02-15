@@ -334,8 +334,9 @@ class Transactions extends BaseController
 
         if ($this->transactionModel->update($id, $data)) {
             // Recalculer la commission si le montant, le type ou l'agent a changé
+            $currentAmount = $transaction['amount'] ?? $transaction['transaction_amount'] ?? null;
             $shouldRecalculate = (
-                $transaction['amount'] != $amount ||
+                $currentAmount != $amount ||
                 $transaction['type'] != $type ||
                 $transaction['agent_id'] != $agentId ||
                 $transaction['property_id'] != $propertyId

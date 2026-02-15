@@ -97,7 +97,7 @@
                             <div class="col-md-6">
                                 <label for="amount" class="form-label">Montant (TND) <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control" id="amount" name="amount" 
-                                       value="<?= old('amount', $transaction['amount'] ?? '') ?>" step="0.01" required onchange="calculateCommission()">
+                                        value="<?= old('amount', $transaction['amount'] ?? $transaction['transaction_amount'] ?? '') ?>" step="0.01" required onchange="calculateCommission()">
                             </div>
                         </div>
                     </div>
@@ -228,7 +228,7 @@
                         <table class="table table-sm">
                             <tr>
                                 <th>Montant Transaction:</th>
-                                <td id="summary_amount" class="text-end"><?= number_format($transaction['amount'], 2) ?> TND</td>
+                                <td id="summary_amount" class="text-end"><?= number_format($transaction['amount'] ?? $transaction['transaction_amount'] ?? 0, 2) ?> TND</td>
                             </tr>
                             <tr>
                                 <th>Commission (%):</th>

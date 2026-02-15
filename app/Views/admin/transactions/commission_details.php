@@ -41,6 +41,8 @@
     </div>
 <?php endif; ?>
 
+<?php $transactionAmount = $transaction['amount'] ?? $transaction['transaction_amount'] ?? 0; ?>
+
 <div class="row">
     <!-- Informations Transaction -->
     <div class="col-md-4">
@@ -64,7 +66,7 @@
                     </tr>
                     <tr>
                         <td><strong>Montant :</strong></td>
-                        <td><strong><?= number_format($transaction['amount'], 2) ?> TND</strong></td>
+                        <td><strong><?= number_format($transactionAmount, 2) ?> TND</strong></td>
                     </tr>
                     <tr>
                         <td><strong>Date :</strong></td>

@@ -483,8 +483,9 @@ class Transactions extends BaseController
         
         $property = $this->propertyModel->find($transaction['property_id']);
         $agent = $this->userModel->find($transaction['agent_id']);
+        $transactionAmount = $transaction['amount'] ?? $transaction['transaction_amount'] ?? null;
         
-        if (!$property || !$agent) {
+        if (!$property || !$agent || !$transactionAmount) {
             return redirect()->back()->with('error', 'Données incomplètes');
         }
         
@@ -498,7 +499,7 @@ class Transactions extends BaseController
                 'property_id' => $transaction['property_id'],
                 'transaction_type' => $transaction['type'],
                 'property_type' => $property['type'],
-                'transaction_amount' => $transaction['amount']
+                'transaction_amount' => $transactionAmount
             ];
             
             $commission = $this->commissionCalculator->calculateCommission(
@@ -511,7 +512,7 @@ class Transactions extends BaseController
             
             // Mettre à jour la transaction
             $this->transactionModel->update($id, [
-                'commission_percentage' => ($commission['total_commission_ht'] / $transaction['amount']) * 100,
+                'commission_percentage' => ($commission['total_commission_ht'] / $transactionAmount) * 100,
                 'commission_amount' => $commission['total_commission_ttc']
             ]);
             

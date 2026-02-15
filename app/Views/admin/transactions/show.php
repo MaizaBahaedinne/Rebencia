@@ -212,7 +212,7 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
                     <span>Montant:</span>
-                    <strong><?= number_format($transaction['amount'], 2, ',', ' ') ?> TND</strong>
+                    <strong><?= number_format($transaction['amount'] ?? $transaction['transaction_amount'] ?? 0, 2, ',', ' ') ?> TND</strong>
                 </div>
                 <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
                     <span>Commission HT:</span>

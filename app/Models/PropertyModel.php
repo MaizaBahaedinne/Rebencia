@@ -50,7 +50,7 @@ class PropertyModel extends Model
 
     // Validation
     protected $validationRules = [
-        'reference' => 'required|is_unique[properties.reference,id,{id}]',
+        'reference' => 'is_unique[properties.reference,id,{id}]',
         'title' => 'required|min_length[3]|max_length[255]',
         'type' => 'required',
         'transaction_type' => 'required',

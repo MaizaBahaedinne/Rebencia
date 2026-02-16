@@ -1137,9 +1137,18 @@
                     ?>
                         <img src="<?= base_url('uploads/avatars/' . $userAvatar) ?>" 
                              alt="Avatar" class="user-avatar" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
-                    <?php else: ?>
-                        <img src="https://ui-avatars.com/api/?name=<?= urlencode(session()->get('user_name') ?? 'Admin') ?>&background=0d6efd&color=fff&size=40" 
-                             alt="Avatar" class="user-avatar">
+                    <?php else: 
+                        // Générer les initiales
+                        $name = session()->get('user_name') ?? 'Admin';
+                        $initials = strtoupper(substr($name, 0, 1));
+                        $colors = ['#0d6efd', '#198754', '#fd7e14', '#dc3545', '#6610f2', '#20c997'];
+                        $colorIndex = ord($name[0]) % count($colors);
+                        $bgColor = $colors[$colorIndex];
+                    ?>
+                        <div class="user-avatar d-flex align-items-center justify-content-center" 
+                             style="width: 40px; height: 40px; border-radius: 50%; background-color: <?= $bgColor ?>; color: white; font-weight: bold; font-size: 18px;">
+                            <?= $initials ?>
+                        </div>
                     <?php endif; ?>
                     <div class="user-info d-none d-md-block">
                         <div class="user-name"><?= esc(session()->get('user_name') ?? 'Admin') ?></div>

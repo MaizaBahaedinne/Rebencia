@@ -185,12 +185,12 @@
                             <div class="col-md-6">
                                 <label for="budget_min" class="form-label">Budget Minimum (TND)</label>
                                 <input type="number" class="form-control" id="budget_min" name="budget_min" 
-                                       value="<?= old('budget_min') ?? 0 ?>" step="1000" min="0">
+                                       value="<?= old('budget_min') ?>" min="0">
                             </div>
                             <div class="col-md-6">
                                 <label for="budget_max" class="form-label">Budget Maximum (TND)</label>
                                 <input type="number" class="form-control" id="budget_max" name="budget_max" 
-                                       value="<?= old('budget_max') ?? 0 ?>" step="1000" min="0">
+                                       value="<?= old('budget_max') ?>" min="0">
                             </div>
                             <div class="col-md-6">
                                 <label for="preferred_zones" class="form-label">Zones Préférées</label>

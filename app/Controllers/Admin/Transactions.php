@@ -119,9 +119,44 @@ class Transactions extends BaseController
         }
 
         // Get commission details
-        $commissions = $this->transactionCommissionModel
+        $commissionRecord = $this->transactionCommissionModel
             ->where('transaction_id', $id)
-            ->findAll();
+            ->first();
+
+        // Transform commission data into format expected by view
+        $commissions = [];
+        if ($commissionRecord) {
+            // Buyer commission
+            if (!empty($commissionRecord['buyer_commission_ht'])) {
+                $commissions[] = [
+                    'commission_type' => 'Acheteur/Locataire',
+                    'commission_ht' => $commissionRecord['buyer_commission_ht'],
+                    'commission_vat' => $commissionRecord['buyer_commission_vat'],
+                    'commission_ttc' => $commissionRecord['buyer_commission_ttc'],
+                    'is_paid' => $commissionRecord['payment_status'] === 'paid' || $commissionRecord['payment_status'] === 'partial'
+                ];
+            }
+            
+            // Seller commission
+            if (!empty($commissionRecord['seller_commission_ht'])) {
+                $commissions[] = [
+                    'commission_type' => 'Vendeur/Propriétaire',
+                    'commission_ht' => $commissionRecord['seller_commission_ht'],
+                    'commission_vat' => $commissionRecord['seller_commission_vat'],
+                    'commission_ttc' => $commissionRecord['seller_commission_ttc'],
+                    'is_paid' => $commissionRecord['payment_status'] === 'paid' || $commissionRecord['payment_status'] === 'partial'
+                ];
+            }
+            
+            // Total commission (always shown)
+            $commissions[] = [
+                'commission_type' => 'Total Commission',
+                'commission_ht' => $commissionRecord['total_commission_ht'],
+                'commission_vat' => $commissionRecord['total_commission_vat'],
+                'commission_ttc' => $commissionRecord['total_commission_ttc'],
+                'is_paid' => $commissionRecord['payment_status'] === 'paid'
+            ];
+        }
 
         $data = [
             'title' => 'Détails de la Transaction',

@@ -53,8 +53,9 @@
         <?= csrf_field() ?>
 
         <div class="row">
-            <!-- Section 1: Informations Personnelles -->
-            <div class="col-lg-8">
+            <!-- COLONNE GAUCHE: Infos Admin (60%) -->
+            <div class="col-lg-7">
+                <!-- Section 1: Informations Personnelles -->
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-primary text-white">
                         <h5 class="mb-0"><i class="fas fa-user me-2"></i>Informations Personnelles</h5>
@@ -116,59 +117,11 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Section 3: Configuration des Commissions -->
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="mb-0"><i class="fas fa-dollar-sign me-2"></i>Configuration des Commissions</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label for="commission_sale_percentage" class="form-label">
-                                    Taux Commission Ventes (%) 
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <input type="number" class="form-control" id="commission_sale_percentage" 
-                                       name="commission_sale_percentage" step="0.01" min="0" max="100"
-                                       value="<?= old('commission_sale_percentage', $user['commission_sale_percentage'] ?? 10.00) ?>" 
-                                       required>
-                                <small class="text-muted">Par défaut: 10%</small>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="commission_rent_percentage" class="form-label">
-                                    Taux Commission Locations (%)
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <input type="number" class="form-control" id="commission_rent_percentage" 
-                                       name="commission_rent_percentage" step="0.01" min="0" max="100"
-                                       value="<?= old('commission_rent_percentage', $user['commission_rent_percentage'] ?? 50.00) ?>" 
-                                       required>
-                                <small class="text-muted">Par défaut: 50%</small>
-                            </div>
-                            <div class="col-12">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="is_commission_exceptional" 
-                                           name="is_commission_exceptional" value="1"
-                                           <?= old('is_commission_exceptional', $user['is_commission_exceptional'] ?? 0) ? 'checked' : '' ?>>
-                                    <label class="form-check-label" for="is_commission_exceptional">
-                                        <strong>Profil Exceptionnel</strong> - Marquer si taux spéciaux appliqués
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <label for="commission_exceptional_note" class="form-label">Note sur le Statut Exceptionnel</label>
-                                <textarea class="form-control" id="commission_exceptional_note" 
-                                          name="commission_exceptional_note" rows="2" 
-                                          placeholder="Ex: Ancien agent, accord spécial depuis 2025..."><?= old('commission_exceptional_note', $user['commission_exceptional_note'] ?? '') ?></textarea>
-                                <small class="text-muted">Raison de l'exception (optionnel)</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            <!-- Sidebar: Rôle et Attribution -->
-            <div class="col-lg-4">
+            <!-- COLONNE DROITE: Config (40%) -->
+            <div class="col-lg-5">
+                <!-- Section: Configuration -->
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-secondary text-white">
                         <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Configuration</h5>
@@ -206,9 +159,116 @@
                                 <option value="suspended" <?= old('status', $user['status']) == 'suspended' ? 'selected' : '' ?>>Suspendu</option>
                             </select>
                         </div>
+                    </div>
+                </div>
 
-                        <hr>
+                <!-- Section: Configuration des Commissions -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-percentage me-2"></i>Taux de Commission</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <label for="commission_sale_percentage" class="form-label">
+                                    Ventes (%)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="commission_sale_percentage" 
+                                           name="commission_sale_percentage" step="0.01" min="0" max="100"
+                                           value="<?= old('commission_sale_percentage', $user['commission_sale_percentage'] ?? 10.00) ?>" 
+                                           required>
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <small class="text-muted">Défaut: 10%</small>
+                            </div>
 
+                            <div class="col-12">
+                                <label for="commission_rent_percentage" class="form-label">
+                                    Locations (%)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="commission_rent_percentage" 
+                                           name="commission_rent_percentage" step="0.01" min="0" max="100"
+                                           value="<?= old('commission_rent_percentage', $user['commission_rent_percentage'] ?? 50.00) ?>" 
+                                           required>
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <small class="text-muted">Défaut: 50%</small>
+                            </div>
+
+                            <div class="col-12 pt-2">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="is_commission_exceptional" 
+                                           name="is_commission_exceptional" value="1"
+                                           <?= old('is_commission_exceptional', $user['is_commission_exceptional'] ?? 0) ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="is_commission_exceptional">
+                                        <strong>Profil Exceptionnel</strong>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="commission_exceptional_note" class="form-label form-label-sm">Note</label>
+                                <textarea class="form-control form-control-sm" id="commission_exceptional_note" 
+                                          name="commission_exceptional_note" rows="2" 
+                                          placeholder="Raison de l'exception..."><?= old('commission_exceptional_note', $user['commission_exceptional_note'] ?? '') ?></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Prévisualisation Commission -->
+                <div class="card shadow-sm mb-4 bg-light">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fas fa-calculator"></i> Exemple de Calcul</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="preview_amount" class="form-label small">Montant test (TND)</label>
+                            <input type="number" class="form-control form-control-sm" id="preview_amount" 
+                                   placeholder="Entrez un montant" value="100000" min="0" step="1000">
+                        </div>
+
+                        <div class="btn-group w-100 mb-3" role="group">
+                            <input type="radio" class="btn-check" name="preview_type" id="preview_sale" value="sale" checked>
+                            <label class="btn btn-outline-primary btn-sm" for="preview_sale">
+                                Vente
+                            </label>
+
+                            <input type="radio" class="btn-check" name="preview_type" id="preview_rent" value="rent">
+                            <label class="btn btn-outline-success btn-sm" for="preview_rent">
+                                Location
+                            </label>
+                        </div>
+
+                        <div id="previewResults" class="small">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="text-muted">Commission HT</div>
+                                    <div class="fw-bold" id="preview_ht">-</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-muted">TVA 19%</div>
+                                    <div class="fw-bold" id="preview_vat">-</div>
+                                </div>
+                                <div class="col-12">
+                                    <hr class="my-2">
+                                </div>
+                                <div class="col-12">
+                                    <div class="text-muted">Total TTC</div>
+                                    <div class="fw-bold text-success fs-5" id="preview_ttc">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Boutons d'Action -->
+                <div class="card shadow-sm">
+                    <div class="card-body">
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save me-2"></i>Enregistrer les Modifications
@@ -225,8 +285,8 @@
                     </div>
                 </div>
 
-                <!-- Statistiques -->
-                <div class="card shadow-sm">
+                <!-- Section: Statistiques -->
+                <div class="card shadow-sm mt-4">
                     <div class="card-header bg-info text-white">
                         <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Statistiques</h5>
                     </div>
@@ -255,20 +315,54 @@
 </div>
 
 <script>
-// Debug form submission
-document.getElementById('userForm').addEventListener('submit', function(e) {
-    console.log('Form submitting...');
-    console.log('Action:', this.action);
-    console.log('Method:', this.method);
+// Calcul automatique de commission
+document.getElementById('preview_amount').addEventListener('input', calculatePreview);
+document.getElementById('commission_sale_percentage').addEventListener('input', calculatePreview);
+document.getElementById('commission_rent_percentage').addEventListener('input', calculatePreview);
+document.querySelectorAll('input[name="preview_type"]').forEach(radio => {
+    radio.addEventListener('change', calculatePreview);
+});
+
+function calculatePreview() {
+    const amount = parseFloat(document.getElementById('preview_amount').value) || 0;
+    const type = document.querySelector('input[name="preview_type"]:checked').value;
     
-    // Validate required fields
+    let percentage;
+    if (type === 'sale') {
+        percentage = parseFloat(document.getElementById('commission_sale_percentage').value) || 10;
+    } else {
+        percentage = parseFloat(document.getElementById('commission_rent_percentage').value) || 50;
+    }
+
+    // Calcul
+    const commissionHT = (amount * percentage) / 100;
+    const vat = commissionHT * 0.19;
+    const commissionTTC = commissionHT + vat;
+
+    // Format et affichage
+    document.getElementById('preview_ht').textContent = formatMoney(commissionHT) + ' TND';
+    document.getElementById('preview_vat').textContent = formatMoney(vat) + ' TND';
+    document.getElementById('preview_ttc').textContent = formatMoney(commissionTTC) + ' TND';
+}
+
+function formatMoney(value) {
+    return new Intl.NumberFormat('fr-TN', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(value);
+}
+
+// Initialiser le calcul
+calculatePreview();
+
+// Validation du formulaire
+document.getElementById('userForm').addEventListener('submit', function(e) {
     const requiredFields = ['first_name', 'last_name', 'username', 'email', 'role_id'];
     let hasErrors = false;
     
     requiredFields.forEach(field => {
         const input = document.getElementById(field);
         if (!input || !input.value.trim()) {
-            console.error('Missing required field:', field);
             hasErrors = true;
         }
     });
@@ -279,7 +373,7 @@ document.getElementById('userForm').addEventListener('submit', function(e) {
         return false;
     }
     
-    // Check password confirmation if password is entered
+    // Vérifier les mots de passe
     const password = document.getElementById('password').value;
     const passwordConfirm = document.getElementById('password_confirm').value;
     
@@ -288,8 +382,6 @@ document.getElementById('userForm').addEventListener('submit', function(e) {
         alert('Les mots de passe ne correspondent pas');
         return false;
     }
-    
-    console.log('Form validation passed, submitting...');
 });
 
 function confirmDelete() {

@@ -30,31 +30,13 @@ class Clients extends BaseController
             return redirect()->to('/login')->with('error', 'Session expirée');
         }
         
-        // Admin voit tous les clients
-        if ($currentRoleLevel == 100) {
-            $clients = $this->clientModel
-                ->select('clients.*, users.first_name as agent_name, users.last_name as agent_lastname, agencies.name as agency_name')
-                ->join('users', 'users.id = clients.assigned_to', 'left')
-                ->join('agencies', 'agencies.id = clients.agency_id', 'left')
-                ->orderBy('clients.created_at', 'DESC')
-                ->findAll();
-        } else {
-            // Récupérer les IDs des utilisateurs accessibles (self + subordonnés récursifs)
-            $accessibleUserIds = $this->hierarchyHelper->getAccessibleUserIds($currentUserId);
-            
-            if (empty($accessibleUserIds)) {
-                $accessibleUserIds = [$currentUserId];
-            }
-            
-            // Filtrer les clients selon la hiérarchie
-            $clients = $this->clientModel
-                ->select('clients.*, users.first_name as agent_name, users.last_name as agent_lastname, agencies.name as agency_name')
-                ->join('users', 'users.id = clients.assigned_to', 'left')
-                ->join('agencies', 'agencies.id = clients.agency_id', 'left')
-                ->whereIn('clients.assigned_to', $accessibleUserIds)
-                ->orderBy('clients.created_at', 'DESC')
-                ->findAll();
-        }
+        // Tous les utilisateurs (admin et agents) voient tous les clients
+        $clients = $this->clientModel
+            ->select('clients.*, users.first_name as agent_name, users.last_name as agent_lastname, agencies.name as agency_name')
+            ->join('users', 'users.id = clients.assigned_to', 'left')
+            ->join('agencies', 'agencies.id = clients.agency_id', 'left')
+            ->orderBy('clients.created_at', 'DESC')
+            ->findAll();
         
         $data = [
             'title' => 'Gestion des Clients',
@@ -125,7 +107,7 @@ class Clients extends BaseController
             $notificationHelper = new \App\Libraries\NotificationHelper();
             $notificationHelper->notifyClientCreated($clientId, $data, session()->get('user_id'));
             
-            return redirect()->to('/admin/clients')->with('success', 'Client créé avec succès');
+            return redirect()->to('/admin/clients/' . $clientId)->with('success', 'Client créé avec succès');
         }
 
         return redirect()->back()->withInput()->with('error', 'Erreur lors de la création');

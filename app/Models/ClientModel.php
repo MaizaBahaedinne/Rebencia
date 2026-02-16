@@ -15,7 +15,9 @@ class ClientModel extends Model
     protected $allowedFields = [
         'type', 'first_name', 'last_name', 'company_name', 'email', 'phone',
         'phone_secondary', 'address', 'city', 'governorate', 'cin', 'tax_id',
-        'source', 'status', 'assigned_to', 'agency_id', 'notes'
+        'source', 'status', 'assigned_to', 'agency_id', 'notes',
+        'property_type_preference', 'transaction_type_preference', 'budget_min', 
+        'budget_max', 'preferred_zones', 'area_preference'
     ];
 
     protected bool $allowEmptyInserts = false;
@@ -27,7 +29,7 @@ class ClientModel extends Model
     protected $updatedField = 'updated_at';
 
     protected $validationRules = [
-        'type' => 'required|in_list[individual,company]',
+        'type' => 'required|in_list[buyer,seller,tenant,landlord]',
         'email' => 'permit_empty|valid_email',
         'phone' => 'permit_empty|max_length[50]',
     ];

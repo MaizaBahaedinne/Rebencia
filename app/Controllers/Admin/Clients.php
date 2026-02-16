@@ -107,7 +107,7 @@ class Clients extends BaseController
             $notificationHelper = new \App\Libraries\NotificationHelper();
             $notificationHelper->notifyClientCreated($clientId, $data, session()->get('user_id'));
             
-            return redirect()->to('/admin/clients/' . $clientId)->with('success', 'Client créé avec succès');
+            return redirect()->to('/admin/clients/view/' . $clientId)->with('success', 'Client créé avec succès');
         }
 
         return redirect()->back()->withInput()->with('error', 'Erreur lors de la création');

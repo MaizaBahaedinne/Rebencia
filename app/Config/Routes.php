@@ -259,6 +259,13 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->get('refresh/(:num)', 'Objectives::refresh/$1');
         $routes->get('refresh-all', 'Objectives::refreshAll');
     });
+
+    // Objectives Sync (1-click interface)
+    $routes->group('objectives-sync', function($routes) {
+        $routes->get('/', 'ObjectivesSync::index');
+        $routes->post('sync-all', 'ObjectivesSync::syncAll');
+        $routes->post('sync-one/(:num)', 'ObjectivesSync::syncOne/$1');
+    });
     
     // Transactions
     $routes->group('transactions', function($routes) {

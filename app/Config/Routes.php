@@ -294,6 +294,14 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
         $routes->post('bulk-pay', 'Commissions::bulkPay');
         $routes->get('agent-report/(:num)', 'Commissions::agentReport/$1');
     });
+
+    // Commission Rates (Taux personnalisés par utilisateur)
+    $routes->group('commission-rates', function($routes) {
+        $routes->get('/', 'CommissionRates::index');
+        $routes->post('update-rate/(:num)', 'CommissionRates::updateRate/$1');
+        $routes->get('export', 'CommissionRates::export');
+        $routes->get('reset-defaults', 'CommissionRates::resetDefaults');
+    });
     
     // Commission Settings (Configuration & Rules)
     $routes->group('commission-settings', function($routes) {

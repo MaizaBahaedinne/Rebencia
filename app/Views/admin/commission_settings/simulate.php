@@ -421,9 +421,9 @@ function displayResults(commission) {
     const agentPercentage = commission.agent_commission_percentage || 50;
     const agencyPercentage = 100 - agentPercentage;
     
-    // Calculer les montants si non fournis
-    const agentAmount = commission.agent_commission_amount || (commission.total_commission_ttc * agentPercentage / 100);
-    const agencyAmount = commission.agency_commission_amount || (commission.total_commission_ttc * agencyPercentage / 100);
+    // Calculer les montants si non fournis (Base HT)
+    const agentAmount = commission.agent_commission_amount || (commission.total_commission_ht * agentPercentage / 100);
+    const agencyAmount = commission.agency_commission_amount || (commission.total_commission_ht * agencyPercentage / 100);
     
     document.getElementById('agentAmount').textContent = formatMoney(agentAmount);
     document.getElementById('agencyAmount').textContent = formatMoney(agencyAmount);

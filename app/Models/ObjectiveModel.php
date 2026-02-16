@@ -362,7 +362,7 @@ class ObjectiveModel extends Model
                 $rentCount = $db->table('properties')
                     ->where('agent_id', $agentId)
                     ->where('type', 'apartment') // ou 'house', 'land', etc selon votre logique
-                    ->where('published', 1)
+                    ->where('status', 'published')
                     ->where('DATE(created_at) >=', $startDate)
                     ->where('DATE(created_at) <=', $endDate)
                     ->countAllResults();
@@ -373,7 +373,7 @@ class ObjectiveModel extends Model
                 $saleCount = $db->table('properties')
                     ->where('agent_id', $agentId)
                     ->where('type', 'apartment')
-                    ->where('published', 1)
+                    ->where('status', 'published')
                     ->where('DATE(created_at) >=', $startDate)
                     ->where('DATE(created_at) <=', $endDate)
                     ->countAllResults();
@@ -420,7 +420,7 @@ class ObjectiveModel extends Model
                     ->join('users', 'users.id = properties.agent_id')
                     ->where('users.agency_id', $agencyId)
                     ->where('properties.type', 'apartment')
-                    ->where('properties.published', 1)
+                    ->where('properties.status', 'published')
                     ->where('DATE(properties.created_at) >=', $startDate)
                     ->where('DATE(properties.created_at) <=', $endDate)
                     ->countAllResults();
@@ -432,7 +432,7 @@ class ObjectiveModel extends Model
                     ->join('users', 'users.id = properties.agent_id')
                     ->where('users.agency_id', $agencyId)
                     ->where('properties.type', 'apartment')
-                    ->where('properties.published', 1)
+                    ->where('properties.status', 'published')
                     ->where('DATE(properties.created_at) >=', $startDate)
                     ->where('DATE(properties.created_at) <=', $endDate)
                     ->countAllResults();

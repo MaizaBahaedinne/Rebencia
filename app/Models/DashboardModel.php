@@ -131,14 +131,14 @@ class DashboardModel extends Model
 
         // Properties for rent published this month
         $stats['properties_rent_month'] = $this->db->table('properties')
-            ->where('published', 1)
+            ->where('status', 'published')
             ->where('MONTH(created_at)', date('m'))
             ->where('YEAR(created_at)', date('Y'))
             ->countAllResults();
 
         // Properties for sale published this month
         $stats['properties_sale_month'] = $this->db->table('properties')
-            ->where('published', 1)
+            ->where('status', 'published')
             ->where('MONTH(created_at)', date('m'))
             ->where('YEAR(created_at)', date('Y'))
             ->countAllResults();

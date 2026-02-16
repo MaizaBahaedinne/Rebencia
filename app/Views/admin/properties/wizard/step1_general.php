@@ -3,15 +3,15 @@
     <!-- Référence -->
     <div class="col-md-4">
         <label for="reference" class="form-label">
-            Référence <span class="text-danger">*</span>
+            Référence
         </label>
         <input type="text" 
                class="form-control" 
                id="reference" 
                name="reference" 
-               value="<?= old('reference', $property['reference'] ?? '') ?>"
-               <?= $isEdit ? 'readonly' : 'required' ?>>
-        <small class="text-muted">Auto-générée si vide</small>
+               value="<?= $isEdit ? ($property['reference'] ?? '') : 'PROP-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -6)) ?>"
+               readonly>
+        <small class="text-muted">Auto-générée</small>
     </div>
 
     <!-- Type de bien -->

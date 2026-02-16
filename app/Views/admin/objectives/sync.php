@@ -151,11 +151,10 @@ document.getElementById('sync-all-btn')?.addEventListener('click', async functio
         const formData = new FormData();
         formData.append('period', period);
         
-        // Ajouter le CSRF token
-        const csrfToken = document.querySelector('[name="<?= csrf_token() ?>"]')?.value 
-                       || document.cookie.split('; ').find(row => row.startsWith('<?= csrf_cookie_name() ?>'))?.split('=')[1];
-        if (csrfToken) {
-            formData.append('<?= csrf_token() ?>', csrfToken);
+        // Récupérer le token CSRF du document
+        const token = document.querySelector('input[name="<?= csrf_token() ?>"]');
+        if (token) {
+            formData.append(token.name, token.value);
         }
         
         const response = await fetch('/admin/objectives-sync/sync-all', {
@@ -196,11 +195,10 @@ document.querySelectorAll('.sync-one-btn').forEach(btn => {
         try {
             const formData = new FormData();
             
-            // Ajouter le CSRF token
-            const csrfToken = document.querySelector('[name="<?= csrf_token() ?>"]')?.value 
-                           || document.cookie.split('; ').find(row => row.startsWith('<?= csrf_cookie_name() ?>'))?.split('=')[1];
-            if (csrfToken) {
-                formData.append('<?= csrf_token() ?>', csrfToken);
+            // Récupérer le token CSRF du document
+            const token = document.querySelector('input[name="<?= csrf_token() ?>"]');
+            if (token) {
+                formData.append(token.name, token.value);
             }
             
             const response = await fetch(`/admin/objectives-sync/sync-one/${objectiveId}`, {

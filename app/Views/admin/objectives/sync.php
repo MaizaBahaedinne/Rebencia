@@ -148,13 +148,22 @@ document.getElementById('sync-all-btn')?.addEventListener('click', async functio
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Synchronisation...';
     
     try {
+        const formData = new FormData();
+        formData.append('period', period);
+        
+        // Ajouter le CSRF token
+        const csrfToken = document.querySelector('[name="<?= csrf_token() ?>"]')?.value 
+                       || document.cookie.split('; ').find(row => row.startsWith('<?= csrf_cookie_name() ?>'))?.split('=')[1];
+        if (csrfToken) {
+            formData.append('<?= csrf_token() ?>', csrfToken);
+        }
+        
         const response = await fetch('/admin/objectives-sync/sync-all', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
             },
-            body: JSON.stringify({ period })
+            body: formData
         });
         
         const result = await response.json();
@@ -185,11 +194,21 @@ document.querySelectorAll('.sync-one-btn').forEach(btn => {
         this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         
         try {
+            const formData = new FormData();
+            
+            // Ajouter le CSRF token
+            const csrfToken = document.querySelector('[name="<?= csrf_token() ?>"]')?.value 
+                           || document.cookie.split('; ').find(row => row.startsWith('<?= csrf_cookie_name() ?>'))?.split('=')[1];
+            if (csrfToken) {
+                formData.append('<?= csrf_token() ?>', csrfToken);
+            }
+            
             const response = await fetch(`/admin/objectives-sync/sync-one/${objectiveId}`, {
                 method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
-                }
+                },
+                body: formData
             });
             
             const result = await response.json();

@@ -127,11 +127,14 @@ class Objectives extends BaseController
 
     public function edit($id)
     {
-        $objective = $this->objectiveModel->find($id);
-
-        if (!$objective) {
+        // Get objective with user and agency details
+        $objectives = $this->objectiveModel->getObjectivesWithDetails(['id' => $id]);
+        
+        if (empty($objectives)) {
             return redirect()->to('/admin/objectives')->with('error', 'Objectif non trouvé');
         }
+
+        $objective = $objectives[0];
 
         $users = $this->userModel->where('status', 'active')->findAll();
         $agencies = $this->agencyModel->where('status', 'active')->findAll();

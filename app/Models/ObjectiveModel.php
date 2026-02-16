@@ -70,6 +70,10 @@ class ObjectiveModel extends Model
         $builder->join('users as creator', 'creator.id = objectives.created_by', 'left');
 
         // Apply filters
+        if (!empty($filters['id'])) {
+            $builder->where('objectives.id', $filters['id']);
+        }
+
         if (!empty($filters['type'])) {
             $builder->where('objectives.type', $filters['type']);
         }

@@ -51,10 +51,10 @@ class PropertyModel extends Model
     // Validation
     protected $validationRules = [
         'reference' => 'is_unique[properties.reference,id,{id}]',
-        'title' => 'required|min_length[3]|max_length[255]',
-        'type' => 'required',
-        'transaction_type' => 'required',
-        'price' => 'required|decimal',
+        'title' => 'permit_empty|min_length[3]|max_length[255]',
+        'type' => 'permit_empty',
+        'transaction_type' => 'permit_empty',
+        'price' => 'permit_empty|decimal',
     ];
 
     public function getPropertyWithDetails($id)

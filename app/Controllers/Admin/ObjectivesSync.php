@@ -20,10 +20,6 @@ class ObjectivesSync extends BaseController
      */
     public function index()
     {
-        if (!canRead('objectives')) {
-            return redirect()->back()->with('error', 'Accès refusé');
-        }
-
         $period = $this->request->getGet('period') ?? date('Y-m');
         
         // Récupérer les objectifs de cette période
@@ -53,13 +49,6 @@ class ObjectivesSync extends BaseController
      */
     public function syncAll()
     {
-        if (!canUpdate('objectives')) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'Accès refusé'
-            ])->setStatusCode(403);
-        }
-
         try {
             $period = $this->request->getPost('period') ?? date('Y-m');
             
@@ -82,13 +71,6 @@ class ObjectivesSync extends BaseController
      */
     public function syncOne($id)
     {
-        if (!canUpdate('objectives')) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'Accès refusé'
-            ])->setStatusCode(403);
-        }
-
         try {
             $objective = $this->objectiveModel->find($id);
             if (!$objective) {

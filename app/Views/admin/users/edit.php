@@ -199,6 +199,21 @@
                                 <small class="text-muted">Défaut: 50%</small>
                             </div>
 
+                            <div class="col-12 pt-2 border-top">
+                                <h6 class="text-muted mb-3">Répartition Commission TTC</h6>
+                                <label for="agent_commission_share" class="form-label">
+                                    Part Agent / Agence
+                                </label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="agent_commission_share" 
+                                           name="agent_commission_share" step="0.01" min="0" max="100"
+                                           value="<?= old('agent_commission_share', $user['agent_commission_share'] ?? 50.00) ?>" 
+                                           required>
+                                    <span class="input-group-text">% Agent</span>
+                                </div>
+                                <small class="text-muted">Exemple: 60% = Agent reçoit 60%, Agence reçoit 40%</small>
+                            </div>
+
                             <div class="col-12 pt-2">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="is_commission_exceptional" 

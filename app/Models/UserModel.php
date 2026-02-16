@@ -17,7 +17,8 @@ class UserModel extends Model
         'phone', 'avatar', 'role_id', 'agency_id', 'manager_id',
         'status', 'last_login', 'email_verified',
         'commission_sale_percentage', 'commission_rent_percentage',
-        'is_commission_exceptional', 'commission_exceptional_note'
+        'is_commission_exceptional', 'commission_exceptional_note',
+        'agent_commission_share'
     ];
 
     protected bool $allowEmptyInserts = false;
@@ -43,7 +44,8 @@ class UserModel extends Model
         'role_id' => 'required|integer',
         'commission_sale_percentage' => 'decimal|greater_than_equal_to[0]|less_than_equal_to[100]',
         'commission_rent_percentage' => 'decimal|greater_than_equal_to[0]|less_than_equal_to[100]',
-        'is_commission_exceptional' => 'integer|in_list[0,1]'
+        'is_commission_exceptional' => 'integer|in_list[0,1]',
+        'agent_commission_share' => 'decimal|greater_than_equal_to[0]|less_than_equal_to[100]'
     ];
     protected $validationMessages = [];
     protected $skipValidation = false;

@@ -306,10 +306,10 @@ class ObjectiveModel extends Model
     }
 
     /**
-     * Synchroniser le CA réalisé basé sur les commissions HT payées
-     * Réel: somme des commission_ht où payment_status = 'paid'
+     * Synchroniser TOUS les KPIs selon les données réelles
+     * Inclut: CA payé + biens location/vente + contacts + transactions
      */
-    public function syncCAFromPaidCommissions(?int $userId = null, ?int $agencyId = null, ?string $period = null)
+    public function syncAllObjectiveMetrics(?int $userId = null, ?int $agencyId = null, ?string $period = null)
     {
         if (!$period) {
             $period = date('Y-m');
@@ -333,41 +333,140 @@ class ObjectiveModel extends Model
         $objectives = $query->findAll();
 
         foreach ($objectives as $objective) {
-            $caRealized = 0;
+            $update = [];
 
             if ($objective['type'] === 'personal' && $objective['user_id']) {
-                // CA de l'agent (somme de ses commissions HT payées)
-                $result = $db->table('transaction_commissions')
+                $agentId = $objective['user_id'];
+
+                // 1. CA réalisé (commissions HT payées)
+                $caResult = $db->table('transaction_commissions')
                     ->selectSum('total_commission_ht', 'ca')
-                    ->where('agent_id', $objective['user_id'])
+                    ->where('agent_id', $agentId)
                     ->where('payment_status', 'paid')
                     ->where('payment_date >=', $startDate)
                     ->where('payment_date <=', $endDate)
                     ->get()->getRowArray();
                 
-                $caRealized = (float) ($result['ca'] ?? 0);
+                $update['revenue_achieved'] = (float) ($caResult['ca'] ?? 0);
+
+                // 2. Nouveaux contacts
+                $contactsCount = $db->table('clients')
+                    ->where('assigned_to', $agentId)
+                    ->where('DATE(created_at) >=', $startDate)
+                    ->where('DATE(created_at) <=', $endDate)
+                    ->countAllResults();
+                
+                $update['new_contacts_achieved'] = $contactsCount;
+
+                // 3. Biens à louer publiés
+                $rentCount = $db->table('properties')
+                    ->where('agent_id', $agentId)
+                    ->where('type', 'apartment') // ou 'house', 'land', etc selon votre logique
+                    ->where('published', 1)
+                    ->where('DATE(created_at) >=', $startDate)
+                    ->where('DATE(created_at) <=', $endDate)
+                    ->countAllResults();
+                
+                $update['properties_rent_achieved'] = $rentCount;
+
+                // 4. Biens à vendre publiés
+                $saleCount = $db->table('properties')
+                    ->where('agent_id', $agentId)
+                    ->where('type', 'apartment')
+                    ->where('published', 1)
+                    ->where('DATE(created_at) >=', $startDate)
+                    ->where('DATE(created_at) <=', $endDate)
+                    ->countAllResults();
+                
+                $update['properties_sale_achieved'] = $saleCount;
+
+                // 5. Transactions complétées
+                $transCount = $db->table('transactions')
+                    ->where('agent_id', $agentId)
+                    ->where('status', 'completed')
+                    ->where('DATE(created_at) >=', $startDate)
+                    ->where('DATE(created_at) <=', $endDate)
+                    ->countAllResults();
+                
+                $update['transactions_achieved'] = $transCount;
 
             } elseif ($objective['type'] === 'agency' && $objective['agency_id']) {
-                // CA de l'agence (somme des commissions HT payées de tous les agents de l'agence)
-                $result = $db->table('transaction_commissions')
+                $agencyId = $objective['agency_id'];
+
+                // 1. CA réalisé (tous les agents de l'agence)
+                $caResult = $db->table('transaction_commissions')
                     ->select('transaction_commissions.total_commission_ht')
                     ->selectSum('transaction_commissions.total_commission_ht', 'ca')
                     ->join('users', 'users.id = transaction_commissions.agent_id')
-                    ->where('users.agency_id', $objective['agency_id'])
+                    ->where('users.agency_id', $agencyId)
                     ->where('transaction_commissions.payment_status', 'paid')
                     ->where('transaction_commissions.payment_date >=', $startDate)
                     ->where('transaction_commissions.payment_date <=', $endDate)
                     ->get()->getRowArray();
                 
-                $caRealized = (float) ($result['ca'] ?? 0);
+                $update['revenue_achieved'] = (float) ($caResult['ca'] ?? 0);
+
+                // 2. Nouveaux contacts (tous les agents)
+                $contactsCount = $db->table('clients')
+                    ->where('agency_id', $agencyId)
+                    ->where('DATE(created_at) >=', $startDate)
+                    ->where('DATE(created_at) <=', $endDate)
+                    ->countAllResults();
+                
+                $update['new_contacts_achieved'] = $contactsCount;
+
+                // 3. Biens à louer publiés (tous les agents)
+                $rentCount = $db->table('properties')
+                    ->join('users', 'users.id = properties.agent_id')
+                    ->where('users.agency_id', $agencyId)
+                    ->where('properties.type', 'apartment')
+                    ->where('properties.published', 1)
+                    ->where('DATE(properties.created_at) >=', $startDate)
+                    ->where('DATE(properties.created_at) <=', $endDate)
+                    ->countAllResults();
+                
+                $update['properties_rent_achieved'] = $rentCount;
+
+                // 4. Biens à vendre publiés (tous les agents)
+                $saleCount = $db->table('properties')
+                    ->join('users', 'users.id = properties.agent_id')
+                    ->where('users.agency_id', $agencyId)
+                    ->where('properties.type', 'apartment')
+                    ->where('properties.published', 1)
+                    ->where('DATE(properties.created_at) >=', $startDate)
+                    ->where('DATE(properties.created_at) <=', $endDate)
+                    ->countAllResults();
+                
+                $update['properties_sale_achieved'] = $saleCount;
+
+                // 5. Transactions complétées (tous les agents)
+                $transCount = $db->table('transactions')
+                    ->join('users', 'users.id = transactions.agent_id')
+                    ->where('users.agency_id', $agencyId)
+                    ->where('transactions.status', 'completed')
+                    ->where('DATE(transactions.created_at) >=', $startDate)
+                    ->where('DATE(transactions.created_at) <=', $endDate)
+                    ->countAllResults();
+                
+                $update['transactions_achieved'] = $transCount;
             }
 
-            // Mettre à jour le CA réalisé
-            $this->update($objective['id'], [
-                'revenue_achieved' => $caRealized
-            ]);
+            // Mettre à jour l'objectif avec tous les KPIs
+            if (!empty($update)) {
+                $this->update($objective['id'], $update);
+            }
         }
 
         return true;
+    }
+
+    /**
+     * Synchroniser le CA réalisé basé sur les commissions HT payées
+     * Réel: somme des commission_ht où payment_status = 'paid'
+     */
+    public function syncCAFromPaidCommissions(?int $userId = null, ?int $agencyId = null, ?string $period = null)
+    {
+        // Appeller la nouvelle méthode complète
+        return $this->syncAllObjectiveMetrics($userId, $agencyId, $period);
     }
 }

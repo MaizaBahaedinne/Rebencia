@@ -129,6 +129,20 @@ class DashboardModel extends Model
             ->where('status', 'available')
             ->countAllResults();
 
+        // Properties for rent published this month
+        $stats['properties_rent_month'] = $this->db->table('properties')
+            ->where('published', 1)
+            ->where('MONTH(created_at)', date('m'))
+            ->where('YEAR(created_at)', date('Y'))
+            ->countAllResults();
+
+        // Properties for sale published this month
+        $stats['properties_sale_month'] = $this->db->table('properties')
+            ->where('published', 1)
+            ->where('MONTH(created_at)', date('m'))
+            ->where('YEAR(created_at)', date('Y'))
+            ->countAllResults();
+
         // Properties by type
         $stats['properties_by_type'] = $this->db->table('properties')
             ->select('property_type, COUNT(*) as count')

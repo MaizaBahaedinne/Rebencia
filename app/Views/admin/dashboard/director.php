@@ -98,6 +98,72 @@
         </div>
     </div>
 
+    <!-- Month KPI Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <p class="text-muted mb-1 small">Biens à Louer (mois)</p>
+                            <h3 class="mb-0 text-info"><?= number_format($stats['properties_rent_month'] ?? 0) ?></h3>
+                        </div>
+                        <div class="text-info" style="font-size: 2rem; opacity: 0.3;">
+                            <i class="fas fa-door-open"></i>
+                        </div>
+                    </div>
+                    <small class="text-muted">Publiés ce mois</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <p class="text-muted mb-1 small">Biens à Vendre (mois)</p>
+                            <h3 class="mb-0 text-success"><?= number_format($stats['properties_sale_month'] ?? 0) ?></h3>
+                        </div>
+                        <div class="text-success" style="font-size: 2rem; opacity: 0.3;">
+                            <i class="fas fa-gavel"></i>
+                        </div>
+                    </div>
+                    <small class="text-muted">Publiés ce mois</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <p class="text-muted mb-1 small">Objectifs Actifs</p>
+                            <h3 class="mb-0 text-warning"><?= number_format($stats['active_objectives'] ?? 0) ?></h3>
+                        </div>
+                        <div class="text-warning" style="font-size: 2rem; opacity: 0.3;">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                    </div>
+                    <small class="text-muted">Période <?= date('m/Y') ?></small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row g-3 mb-4">
+        <!-- Monthly Revenue Chart -->
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Évolution du CA (12 derniers mois)</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- CA Realtime Widget -->
     <div class="row g-3 mb-4">
         <div class="col-md-6">
@@ -128,7 +194,7 @@
         </div>
     </div>
 
-    <!-- Charts Row -->
+    <!-- Charts Row 2 -->
     <div class="row g-3 mb-4">
         <!-- Monthly Revenue Chart -->
         <div class="col-md-8">

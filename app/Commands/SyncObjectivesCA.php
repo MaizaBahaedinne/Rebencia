@@ -28,15 +28,21 @@ class SyncObjectivesCA extends BaseCommand
         $agencyId = $this->getAgencyIdFromParams($params);
 
         try {
-            CLI::write('Synchronisation des objectifs CA pour la période: ' . $period, 'green');
+            CLI::write('Synchronisation des KPIs objectifs pour la période: ' . $period, 'green');
+            CLI::write('', 'green');
 
-            $objectiveModel->syncCAFromPaidCommissions(
+            $objectiveModel->syncAllObjectiveMetrics(
                 $userId ? (int) $userId : null,
                 $agencyId ? (int) $agencyId : null,
                 $period
             );
 
             CLI::write('✓ Synchronisation terminée avec succès!', 'green');
+            CLI::write('  - CA payé (HT)', 'green');
+            CLI::write('  - Biens à louer publiés', 'green');
+            CLI::write('  - Biens à vendre publiés', 'green');
+            CLI::write('  - Nouveaux contacts', 'green');
+            CLI::write('  - Transactions complétées', 'green');
             return 0;
         } catch (\Exception $e) {
             CLI::error('Erreur: ' . $e->getMessage());

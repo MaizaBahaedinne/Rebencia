@@ -463,7 +463,25 @@ class Transactions extends BaseController
                 ]);
             }
             
-            return redirect()->back()->with('success', 'Commission marquée comme payée');
+            // Synchroniser automatiquement l'objectif du mois pour cet agent
+            try {
+                $transaction = $this->transactionModel->find($id);
+                if ($transaction && !empty($transaction['agent_id'])) {
+                    $objectiveModel = model('ObjectiveModel');
+                    $period = date('Y-m', strtotime($transaction['transaction_date'] ?? 'now'));
+                    
+                    $objectiveModel->syncCAFromPaidCommissions(
+                        $transaction['agent_id'],
+                        null,
+                        $period
+                    );
+                }
+            } catch (\Exception $e) {
+                log_message('error', 'Erreur sync objectif: ' . $e->getMessage());
+                // Ne pas bloquer le flux principal
+            }
+            
+            return redirect()->back()->with('success', 'Commission marquée comme payée. Objectif mis à jour.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Erreur : ' . $e->getMessage());
         }

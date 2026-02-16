@@ -531,19 +531,27 @@ class Properties extends BaseController
             if (!empty($data)) {
                 if (empty($propertyId)) {
                     // Création
+                    log_message('info', 'Attempting to insert property at step ' . $step . ' with data: ' . json_encode($data));
                     $propertyId = $this->propertyModel->insert($data);
+                    log_message('info', 'Insert result - Property ID: ' . ($propertyId ?: 'NULL'));
                     if (!$propertyId) {
-                        throw new \Exception('Erreur lors de la création de la propriété');
+                        $errors = $this->propertyModel->errors();
+                        log_message('error', 'Insert failed at step ' . $step . '. Model errors: ' . json_encode($errors));
+                        throw new \Exception('Erreur lors de la création de la propriété: ' . json_encode($errors));
                     }
                 } else {
                     // Mise à jour
+                    log_message('info', 'Attempting to update property ' . $propertyId . ' at step ' . $step . ' with data: ' . json_encode($data));
                     $success = $this->propertyModel->update($propertyId, $data);
                     if (!$success) {
-                        throw new \Exception('Erreur lors de la mise à jour de la propriété');
+                        $errors = $this->propertyModel->errors();
+                        log_message('error', 'Update failed for property ' . $propertyId . '. Model errors: ' . json_encode($errors));
+                        throw new \Exception('Erreur lors de la mise à jour de la propriété: ' . json_encode($errors));
                     }
                 }
             }
             
+            log_message('info', 'Step ' . $step . ' saved successfully for property ' . ($propertyId ?: 'NEW'));
             return $this->response->setJSON([
                 'success' => true,
                 'message' => 'Étape ' . $step . ' enregistrée avec succès',

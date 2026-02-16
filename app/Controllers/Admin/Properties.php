@@ -208,7 +208,10 @@ class Properties extends BaseController
             $propertyId = $this->propertyModel->insert($data);
             
             if (!$propertyId) {
-                throw new \Exception('Erreur lors de la création de la propriété');
+                $errors = $this->propertyModel->errors();
+                log_message('error', 'Property insert failed. Data: ' . json_encode($data));
+                log_message('error', 'Model errors: ' . json_encode($errors));
+                throw new \Exception('Erreur lors de la création de la propriété: ' . json_encode($errors));
             }
             
             // Step 5: Sauvegarder les pièces

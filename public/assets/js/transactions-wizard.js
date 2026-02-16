@@ -505,9 +505,9 @@ function displayCommissionPreview(data) {
         </div>
     `;
     
-    // Agent/Agency Split (Base HT - avant TVA)
-    const agentAmount = totalHT / 2;
-    const agencyAmount = totalHT / 2;
+    // Agent/Agency Split (Base TTC - montant réellement acquis)
+    const agentAmount = totalTTC / 2;
+    const agencyAmount = totalTTC / 2;
     
     html += `
         <div class="card border-warning">

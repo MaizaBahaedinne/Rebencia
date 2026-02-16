@@ -541,13 +541,13 @@ class Transactions extends BaseController
             return redirect()->back()->with('error', 'Pourcentage invalide');
         }
 
-        $totalHt = (float) ($commission['total_commission_ht'] ?? 0);
-        if ($totalHt <= 0) {
+        $totalTTC = (float) ($commission['total_commission_ttc'] ?? 0);
+        if ($totalTTC <= 0) {
             return redirect()->back()->with('error', 'Montant de commission invalide');
         }
 
-        $agentAmount = round($totalHt * ($percentage / 100), 2);
-        $agencyAmount = round($totalHt - $agentAmount, 2);
+        $agentAmount = round($totalTTC * ($percentage / 100), 2);
+        $agencyAmount = round($totalTTC - $agentAmount, 2);
 
         $this->transactionCommissionModel->update($commission['id'], [
             'agent_commission_percentage' => $percentage,

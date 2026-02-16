@@ -100,7 +100,56 @@
                         </div>
                     </div>
                 </div>
-            </div>
+
+                <!-- Section 3: Configuration des Commissions -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-dollar-sign me-2"></i>Configuration des Commissions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="commission_sale_percentage" class="form-label">
+                                    Taux Commission Ventes (%) 
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" class="form-control" id="commission_sale_percentage" 
+                                       name="commission_sale_percentage" step="0.01" min="0" max="100"
+                                       value="<?= old('commission_sale_percentage', 10.00) ?>" 
+                                       required>
+                                <small class="text-muted">Par défaut: 10%</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="commission_rent_percentage" class="form-label">
+                                    Taux Commission Locations (%)
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" class="form-control" id="commission_rent_percentage" 
+                                       name="commission_rent_percentage" step="0.01" min="0" max="100"
+                                       value="<?= old('commission_rent_percentage', 50.00) ?>" 
+                                       required>
+                                <small class="text-muted">Par défaut: 50%</small>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_commission_exceptional" 
+                                           name="is_commission_exceptional" value="1"
+                                           <?= old('is_commission_exceptional') ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="is_commission_exceptional">
+                                        <strong>Profil Exceptionnel</strong> - Marquer si taux spéciaux appliqués
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label for="commission_exceptional_note" class="form-label">Note sur le Statut Exceptionnel</label>
+                                <textarea class="form-control" id="commission_exceptional_note" 
+                                          name="commission_exceptional_note" rows="2" 
+                                          placeholder="Ex: Ancien agent, accord spécial depuis 2025..."><?= old('commission_exceptional_note', '') ?></textarea>
+                                <small class="text-muted">Raison de l'exception (optionnel)</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             <!-- Sidebar: Rôle et Attribution -->
             <div class="col-lg-4">

@@ -245,7 +245,7 @@
             <?php if ($commission['agent_commission_amount'] && $commission['agency_commission_amount']): ?>
             <div class="card">
                 <div class="card-header bg-warning">
-                    <h5 class="mb-0"><i class="fas fa-percentage"></i> Répartition Agent / Agence (Base HT)</h5>
+                    <h5 class="mb-0"><i class="fas fa-percentage"></i> Répartition Agent / Agence (Base TTC)</h5>
                 </div>
                 <div class="card-body">
                     <?php if (canUpdate('transactions')): ?>

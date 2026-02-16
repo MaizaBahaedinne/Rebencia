@@ -95,7 +95,11 @@ class Users extends BaseController
             'role_id' => $this->request->getPost('role_id'),
             'agency_id' => $this->request->getPost('agency_id'),
             'status' => $this->request->getPost('status') ?? 'active',
-            'email_verified' => true
+            'email_verified' => true,
+            'commission_sale_percentage' => (float) ($this->request->getPost('commission_sale_percentage') ?? 10.00),
+            'commission_rent_percentage' => (float) ($this->request->getPost('commission_rent_percentage') ?? 50.00),
+            'is_commission_exceptional' => (int) $this->request->getPost('is_commission_exceptional'),
+            'commission_exceptional_note' => $this->request->getPost('commission_exceptional_note')
         ];
 
         if ($this->userModel->insert($data)) {
@@ -161,7 +165,11 @@ class Users extends BaseController
             'phone' => $this->request->getPost('phone'),
             'role_id' => $this->request->getPost('role_id'),
             'agency_id' => $this->request->getPost('agency_id'),
-            'status' => $this->request->getPost('status')
+            'status' => $this->request->getPost('status'),
+            'commission_sale_percentage' => (float) ($this->request->getPost('commission_sale_percentage') ?? 10.00),
+            'commission_rent_percentage' => (float) ($this->request->getPost('commission_rent_percentage') ?? 50.00),
+            'is_commission_exceptional' => (int) $this->request->getPost('is_commission_exceptional'),
+            'commission_exceptional_note' => $this->request->getPost('commission_exceptional_note')
         ];
 
         // Update password only if provided

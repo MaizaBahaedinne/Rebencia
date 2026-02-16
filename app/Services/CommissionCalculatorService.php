@@ -26,6 +26,7 @@ class CommissionCalculatorService
     protected $overrideModel;
     protected $commissionModel;
     protected $logModel;
+    protected $userModel;
 
     public function __construct()
     {
@@ -33,6 +34,7 @@ class CommissionCalculatorService
         $this->overrideModel = new CommissionOverrideModel();
         $this->commissionModel = new TransactionCommissionModel();
         $this->logModel = new CommissionLogModel();
+        $this->userModel = new \App\Models\UserModel();
     }
 
     /**
@@ -63,8 +65,24 @@ class CommissionCalculatorService
         $propertyId = $transactionData['property_id'];
         $agentId = $transactionData['agent_id'] ?? $userId;
 
-        // Step 1: Get applicable rule (with override hierarchy)
-        $rule = $this->getApplicableRule($userId, $roleId, $agencyId, $transactionType, $propertyType);
+        // Step 1: Check for user-specific custom commission rates first
+        $user = $this->userModel->find($agentId);
+        if ($user) {
+            // Use user's custom rates if they differ from defaults or are explicitly set
+            if ($transactionType === 'sale') {
+                $customRate = (float) ($user['commission_sale_percentage'] ?? 10.00);
+            } else { // rent
+                $customRate = (float) ($user['commission_rent_percentage'] ?? 50.00);
+            }
+            
+            // Build a custom rule using user's personal commission percentage
+            $rule = $this->buildCustomUserRule($transactionType, $propertyType, $customRate);
+            $ruleSource = 'user_custom';
+        } else {
+            // Fallback to standard hierarchy if user not found
+            $rule = $this->getApplicableRule($userId, $roleId, $agencyId, $transactionType, $propertyType);
+            $ruleSource = 'standard';
+        }
 
         if (!$rule) {
             throw new \Exception("No commission rule found for {$transactionType} - {$propertyType}");
@@ -91,10 +109,10 @@ class CommissionCalculatorService
         $totalCommissionVAT = $buyerCommission['vat'] + $sellerCommission['vat'];
         $totalCommissionTTC = $buyerCommission['ttc'] + $sellerCommission['ttc'];
 
-        // Step 5: Calculate agent/agency split
+        // Step 5: Calculate agent/agency split (Base TTC - montant réellement acquis)
         $agentPercentage = $transactionData['agent_commission_percentage'] ?? 50.00;
-        $agentCommissionAmount = $totalCommissionHT * ($agentPercentage / 100);
-        $agencyCommissionAmount = $totalCommissionHT - $agentCommissionAmount;
+        $agentCommissionAmount = $totalCommissionTTC * ($agentPercentage / 100);
+        $agencyCommissionAmount = $totalCommissionTTC - $agentCommissionAmount;
 
         // Step 6: Build result
         $result = [
@@ -162,6 +180,48 @@ class CommissionCalculatorService
         }
 
         return $result;
+    }
+
+    /**
+     * Build a custom rule based on user's personal commission percentage
+     * 
+     * @param string $transactionType 'sale' or 'rent'
+     * @param string $propertyType Property type
+     * @param float $customPercentage User's custom commission percentage
+     * @return array Rule array in standard format
+     */
+    protected function buildCustomUserRule(string $transactionType, string $propertyType, float $customPercentage): array
+    {
+        // Get default rule as template
+        $defaultRule = $this->ruleModel->getDefaultRule($transactionType, $propertyType);
+        
+        if (!$defaultRule) {
+            // Fallback: create minimal rule with custom percentage
+            $defaultRule = [
+                'id' => null,
+                'transaction_type' => $transactionType,
+                'property_type' => $propertyType,
+                'buyer_commission_type' => 'percentage',
+                'buyer_commission_value' => $customPercentage,
+                'buyer_commission_vat' => 19.00,
+                'seller_commission_type' => 'percentage',
+                'seller_commission_value' => $customPercentage,
+                'seller_commission_vat' => 19.00,
+                'is_active' => 1
+            ];
+        }
+
+        // Create a custom rule object using user's percentage
+        $customRule = $defaultRule;
+        $customRule['buyer_commission_type'] = 'percentage';
+        $customRule['buyer_commission_value'] = $customPercentage;
+        $customRule['seller_commission_type'] = 'percentage';
+        $customRule['seller_commission_value'] = $customPercentage;
+        $customRule['override_level'] = 'user';
+        $customRule['rule_id'] = $defaultRule['id'] ?? null;
+        $customRule['override_id'] = null;
+
+        return $customRule;
     }
 
     /**

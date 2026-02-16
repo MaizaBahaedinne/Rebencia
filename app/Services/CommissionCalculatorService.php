@@ -67,6 +67,7 @@ class CommissionCalculatorService
 
         // Step 1: Check for user-specific custom commission rates first
         $user = $this->userModel->find($agentId);
+        
         if ($user) {
             // Use user's custom rates if they differ from defaults or are explicitly set
             if ($transactionType === 'sale') {
@@ -75,10 +76,13 @@ class CommissionCalculatorService
                 $customRate = (float) ($user['commission_rent_percentage'] ?? 50.00);
             }
             
+            log_message('info', "Commission personnalisée pour agent #{$agentId} ({$user['first_name']} {$user['last_name']}): {$customRate}% ({$transactionType})");
+            
             // Build a custom rule using user's personal commission percentage
             $rule = $this->buildCustomUserRule($transactionType, $propertyType, $customRate);
             $ruleSource = 'user_custom';
         } else {
+            log_message('warning', "Agent #{$agentId} non trouvé, utilisation des règles standard");
             // Fallback to standard hierarchy if user not found
             $rule = $this->getApplicableRule($userId, $roleId, $agencyId, $transactionType, $propertyType);
             $ruleSource = 'standard';

@@ -236,7 +236,8 @@ class Transactions extends BaseController
                     'property_id' => $propertyId,
                     'transaction_type' => $type,
                     'property_type' => $property['type'],
-                    'amount' => $amount
+                    'amount' => $amount,
+                    'agent_id' => $agentId
                 ];
                 
                 $commission = $this->commissionCalculator->calculateCommission(
@@ -388,7 +389,8 @@ class Transactions extends BaseController
                         'property_id' => $propertyId,
                         'transaction_type' => $type,
                         'property_type' => $property['type'],
-                        'amount' => $amount
+                        'amount' => $amount,
+                        'agent_id' => $agentId
                     ];
                     
                     $commission = $this->commissionCalculator->calculateCommission(
@@ -591,7 +593,8 @@ class Transactions extends BaseController
                 'property_id' => $transaction['property_id'],
                 'transaction_type' => $transaction['type'],
                 'property_type' => $property['type'],
-                'amount' => $transactionAmount
+                'amount' => $transactionAmount,
+                'agent_id' => $transaction['agent_id']
             ];
             
             $commission = $this->commissionCalculator->calculateCommission(

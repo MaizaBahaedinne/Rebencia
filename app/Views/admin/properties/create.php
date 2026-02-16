@@ -65,6 +65,12 @@
             <div class="tab-content">
                 <!-- Étape 1: Infos générales -->
                 <div class="tab-pane fade show active" id="step1">
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle"></i> <strong>Référence générée automatiquement :</strong> 
+                        <code id="autoReference" style="font-size: 1.1em;">PROP-<?= date('Ymd') ?>-<?= strtoupper(substr(uniqid(), -6)) ?></code>
+                    </div>
+                    <input type="hidden" id="reference" name="reference" value="<?= old('reference', 'PROP-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -6))) ?>">
+                    
                     <div class="mb-3">
                         <label for="title" class="form-label">Titre du bien <span class="text-danger">*</span></label>
                         <input type="text" class="form-control form-control-lg" id="title" name="title" 

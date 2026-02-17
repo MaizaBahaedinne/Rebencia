@@ -19,7 +19,7 @@ class CommissionRates extends BaseController
      */
     public function index()
     {
-        if (!canView('users')) {
+        if (!canRead('users')) {
             return redirect()->to('/admin/dashboard')->with('error', 'Accès refusé');
         }
 
@@ -146,7 +146,7 @@ class CommissionRates extends BaseController
      */
     public function export()
     {
-        if (!canView('users')) {
+        if (!canRead('users')) {
             return redirect()->to('/admin/dashboard')->with('error', 'Accès refusé');
         }
 

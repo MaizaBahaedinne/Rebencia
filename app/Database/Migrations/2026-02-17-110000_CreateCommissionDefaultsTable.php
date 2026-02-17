@@ -8,7 +8,7 @@ class CreateCommissionDefaultsTable extends Migration
 {
     public function up()
     {
-        $this->forge->createTable('commission_defaults', [
+        $this->forge->addField([
             'id' => [
                 'type' => 'INT',
                 'constraint' => 11,
@@ -33,7 +33,8 @@ class CreateCommissionDefaultsTable extends Migration
             ],
         ]);
         
-        $this->forge->addPrimaryKey('id', 'id');
+        $this->forge->addPrimaryKey('id');
+        $this->forge->createTable('commission_defaults');
         
         // Insérer une ligne par défaut
         $this->db->table('commission_defaults')->insert([

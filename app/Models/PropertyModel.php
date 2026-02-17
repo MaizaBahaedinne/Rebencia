@@ -28,7 +28,7 @@ class PropertyModel extends Model
         'energy_class', 'energy_consumption_kwh', 'co2_emission',
         'promo_price', 'promo_start_date', 'promo_end_date',
         'charge_syndic', 'charge_water', 'charge_gas', 'charge_electricity', 'charge_other',
-        'internal_notes', 'created_by'
+        'internal_notes', 'created_by', 'custom_sale_commission_rate'
     ];
 
     protected bool $allowEmptyInserts = false;

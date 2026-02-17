@@ -27,6 +27,7 @@ class CommissionCalculatorService
     protected $commissionModel;
     protected $logModel;
     protected $userModel;
+    protected $propertyModel;
 
     public function __construct()
     {
@@ -35,6 +36,7 @@ class CommissionCalculatorService
         $this->commissionModel = new TransactionCommissionModel();
         $this->logModel = new CommissionLogModel();
         $this->userModel = new \App\Models\UserModel();
+        $this->propertyModel = new \App\Models\PropertyModel();
     }
 
     /**
@@ -65,25 +67,20 @@ class CommissionCalculatorService
         $propertyId = $transactionData['property_id'];
         $agentId = $transactionData['agent_id'] ?? $userId;
 
-        // Step 1: Check for user-specific custom commission rates first
+        // Step 1: Check for property-level custom commission rate (ventes uniquement)
+        $property = $this->propertyModel->find($propertyId);
         $user = $this->userModel->find($agentId);
         
-        if ($user) {
-            // Use user's custom rates if they differ from defaults or are explicitly set
-            if ($transactionType === 'sale') {
-                $customRate = (float) ($user['commission_sale_percentage'] ?? 10.00);
-            } else { // rent
-                $customRate = (float) ($user['commission_rent_percentage'] ?? 50.00);
-            }
+        if ($property && $transactionType === 'sale' && !empty($property['custom_sale_commission_rate'])) {
+            // Utiliser le taux personnalisé du bien pour les ventes
+            $customRate = (float) $property['custom_sale_commission_rate'];
+            log_message('info', "Commission personnalisée pour bien #{$propertyId}: {$customRate}% (vente)");
             
-            log_message('info', "Commission personnalisée pour agent #{$agentId} ({$user['first_name']} {$user['last_name']}): {$customRate}% ({$transactionType})");
-            
-            // Build a custom rule using user's personal commission percentage
             $rule = $this->buildCustomUserRule($transactionType, $propertyType, $customRate);
-            $ruleSource = 'user_custom';
+            $ruleSource = 'property_custom';
         } else {
-            log_message('warning', "Agent #{$agentId} non trouvé, utilisation des règles standard");
-            // Fallback to standard hierarchy if user not found
+            // Utiliser les règles de commission standard
+            log_message('info', "Utilisation des règles de commission standard pour {$transactionType} - {$propertyType}");
             $rule = $this->getApplicableRule($userId, $roleId, $agencyId, $transactionType, $propertyType);
             $ruleSource = 'standard';
         }

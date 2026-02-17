@@ -104,41 +104,16 @@
                 <!-- Section 3: Configuration des Commissions -->
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-success text-white">
-                        <h5 class="mb-0"><i class="fas fa-dollar-sign me-2"></i>Configuration des Commissions</h5>
+                        <h5 class="mb-0"><i class="fas fa-dollar-sign me-2"></i>Répartition Commission Agent/Agence</h5>
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <label for="commission_sale_percentage" class="form-label">
-                                    Taux Ventes (%) 
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" id="commission_sale_percentage" 
-                                           name="commission_sale_percentage" step="0.01" min="0" max="100"
-                                           value="<?= old('commission_sale_percentage', 10.00) ?>" 
-                                           required>
-                                    <span class="input-group-text">%</span>
-                                </div>
-                                <small class="text-muted">Défaut: 10%</small>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="commission_rent_percentage" class="form-label">
-                                    Taux Locations (%)
-                                    <span class="text-danger">*</span>
-                                </label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" id="commission_rent_percentage" 
-                                           name="commission_rent_percentage" step="0.01" min="0" max="100"
-                                           value="<?= old('commission_rent_percentage', 50.00) ?>" 
-                                           required>
-                                    <span class="input-group-text">%</span>
-                                </div>
-                                <small class="text-muted">Défaut: 50%</small>
-                            </div>
-
-                            <div class="col-12 border-top pt-3">
-                                <h6 class="text-muted mb-3">Répartition Commission TTC</h6>
+                            <div class="col-12">
+                                <p class="text-muted">
+                                    <i class="fas fa-info-circle"></i> Les taux de commission sont définis dans 
+                                    <a href="<?= base_url('admin/commission-settings/rules') ?>" target="_blank">les règles de commission</a>.
+                                    Ici, configurez uniquement la répartition entre l'agent et l'agence.
+                                </p>
                             </div>
                             
                             <div class="col-md-6">

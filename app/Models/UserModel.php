@@ -16,7 +16,6 @@ class UserModel extends Model
         'username', 'email', 'password_hash', 'first_name', 'last_name',
         'phone', 'avatar', 'role_id', 'agency_id', 'manager_id',
         'status', 'last_login', 'email_verified',
-        'commission_sale_percentage', 'commission_rent_percentage',
         'is_commission_exceptional', 'commission_exceptional_note',
         'agent_commission_share_sale', 'agent_commission_share_rent'
     ];
@@ -42,8 +41,6 @@ class UserModel extends Model
         'email' => 'required|valid_email|is_unique[users.email,id,{id}]',
         'password_hash' => 'required|min_length[8]',
         'role_id' => 'required|integer',
-        'commission_sale_percentage' => 'decimal|greater_than_equal_to[0]|less_than_equal_to[100]',
-        'commission_rent_percentage' => 'decimal|greater_than_equal_to[0]|less_than_equal_to[100]',
         'is_commission_exceptional' => 'integer|in_list[0,1]',
         'agent_commission_share_sale' => 'decimal|greater_than_equal_to[0]|less_than_equal_to[100]',
         'agent_commission_share_rent' => 'decimal|greater_than_equal_to[0]|less_than_equal_to[100]'

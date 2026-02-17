@@ -27,8 +27,8 @@ class CommissionRates extends BaseController
         $users = $this->userModel
             ->select('users.id, users.first_name, users.last_name, users.email, users.status,
                      users.commission_sale_percentage, users.commission_rent_percentage,
-                     users.agent_commission_share, users.is_commission_exceptional, 
-                     users.commission_exceptional_note,
+                     users.agent_commission_share_sale, users.agent_commission_share_rent,
+                     users.is_commission_exceptional, users.commission_exceptional_note,
                      roles.display_name as role_name, agencies.name as agency_name')
             ->join('roles', 'roles.id = users.role_id', 'left')
             ->join('agencies', 'agencies.id = users.agency_id', 'left')
@@ -104,7 +104,7 @@ class CommissionRates extends BaseController
         $value = $this->request->getPost('value');
 
         // Validation
-        if (!in_array($field, ['commission_sale_percentage', 'commission_rent_percentage', 'agent_commission_share', 'is_commission_exceptional', 'commission_exceptional_note'])) {
+        if (!in_array($field, ['commission_sale_percentage', 'commission_rent_percentage', 'agent_commission_share_sale', 'agent_commission_share_rent', 'is_commission_exceptional', 'commission_exceptional_note'])) {
             return $this->response->setJSON([
                 'success' => false,
                 'message' => 'Champ invalide'
@@ -112,7 +112,7 @@ class CommissionRates extends BaseController
         }
 
         // Validation des valeurs
-        if (in_array($field, ['commission_sale_percentage', 'commission_rent_percentage', 'agent_commission_share'])) {
+        if (in_array($field, ['commission_sale_percentage', 'commission_rent_percentage', 'agent_commission_share_sale', 'agent_commission_share_rent'])) {
             $value = (float) $value;
             if ($value < 0 || $value > 100) {
                 return $this->response->setJSON([
@@ -152,7 +152,8 @@ class CommissionRates extends BaseController
 
         $users = $this->userModel
             ->select('first_name, last_name, email, commission_sale_percentage, 
-                     commission_rent_percentage, agent_commission_share, is_commission_exceptional, 
+                     commission_rent_percentage, agent_commission_share_sale, 
+                     agent_commission_share_rent, is_commission_exceptional, 
                      commission_exceptional_note')
             ->orderBy('first_name', 'ASC')
             ->findAll();
@@ -166,7 +167,7 @@ class CommissionRates extends BaseController
         $output = fopen('php://output', 'w');
         
         // Headers
-        fputcsv($output, ['Prénom', 'Nom', 'Email', 'Taux Ventes (%)', 'Taux Locations (%)', 'Split Agent (%)', 'Profil Exceptionnel', 'Note']);
+        fputcsv($output, ['Prénom', 'Nom', 'Email', 'Taux Ventes (%)', 'Taux Locations (%)', 'Split Ventes Agent (%)', 'Split Locations Agent (%)', 'Profil Exceptionnel', 'Note']);
         
         // Data
         foreach ($users as $user) {
@@ -176,7 +177,8 @@ class CommissionRates extends BaseController
                 $user['email'],
                 $user['commission_sale_percentage'],
                 $user['commission_rent_percentage'],
-                $user['agent_commission_share'],
+                $user['agent_commission_share_sale'],
+                $user['agent_commission_share_rent'],
                 $user['is_commission_exceptional'] ? 'Oui' : 'Non',
                 $user['commission_exceptional_note']
             ]);
@@ -199,7 +201,8 @@ class CommissionRates extends BaseController
             ->update([
                 'commission_sale_percentage' => 10.00,
                 'commission_rent_percentage' => 50.00,
-                'agent_commission_share' => 50.00,
+                'agent_commission_share_sale' => 50.00,
+                'agent_commission_share_rent' => 50.00,
                 'is_commission_exceptional' => 0,
                 'commission_exceptional_note' => null
             ]);

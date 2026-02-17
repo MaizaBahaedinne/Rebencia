@@ -138,17 +138,35 @@
                             </div>
 
                             <div class="col-12 border-top pt-3">
-                                <label for="agent_commission_share" class="form-label">
-                                    Répartition Commission TTC
+                                <h6 class="text-muted mb-3">Répartition Commission TTC</h6>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="agent_commission_share_sale" class="form-label">
+                                    Split Ventes (Agent)
                                 </label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control" id="agent_commission_share" 
-                                           name="agent_commission_share" step="0.01" min="0" max="100"
-                                           value="<?= old('agent_commission_share', 50.00) ?>" 
+                                    <input type="number" class="form-control" id="agent_commission_share_sale" 
+                                           name="agent_commission_share_sale" step="0.01" min="0" max="100"
+                                           value="<?= old('agent_commission_share_sale', 50.00) ?>" 
                                            required>
-                                    <span class="input-group-text">% Agent</span>
+                                    <span class="input-group-text">%</span>
                                 </div>
-                                <small class="text-muted">60% = Agent 60%, Agence 40%</small>
+                                <small class="text-muted">Agent reçoit X%, Agence reçoit (100-X)%</small>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="agent_commission_share_rent" class="form-label">
+                                    Split Locations (Agent)
+                                </label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="agent_commission_share_rent" 
+                                           name="agent_commission_share_rent" step="0.01" min="0" max="100"
+                                           value="<?= old('agent_commission_share_rent', 50.00) ?>" 
+                                           required>
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <small class="text-muted">Agent reçoit X%, Agence reçoit (100-X)%</small>
                             </div>
 
                             <div class="col-12">

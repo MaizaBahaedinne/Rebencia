@@ -107,14 +107,15 @@
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th style="width: 25%">Utilisateur</th>
-                            <th style="width: 12%">Rôle</th>
-                            <th style="width: 12%">Agence</th>
-                            <th style="width: 10%" class="text-center">Ventes (%)</th>
-                            <th style="width: 10%" class="text-center">Locations (%)</th>
-                            <th style="width: 10%" class="text-center">Split Agent (%)</th>
+                            <th style="width: 22%">Utilisateur</th>
+                            <th style="width: 10%">Rôle</th>
+                            <th style="width: 10%">Agence</th>
+                            <th style="width: 9%" class="text-center">Ventes (%)</th>
+                            <th style="width: 9%" class="text-center">Locations (%)</th>
+                            <th style="width: 9%" class="text-center">Split Ventes</th>
+                            <th style="width: 9%" class="text-center">Split Loc.</th>
                             <th style="width: 8%" class="text-center">Excep.</th>
-                            <th style="width: 13%">Actions</th>
+                            <th style="width: 14%">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -138,7 +139,7 @@
                                        data-user-id="<?= $user['id'] ?>" data-field="commission_sale_percentage"
                                        value="<?= number_format($user['commission_sale_percentage'], 2) ?>" 
                                        min="0" max="100" step="0.01"
-                                       style="width: 90px; margin: 0 auto;"
+                                       style="width: 75px; margin: 0 auto;"
                                        title="Taux de commission pour les ventes">
                             </td>
                             <td class="text-center">
@@ -146,16 +147,24 @@
                                        data-user-id="<?= $user['id'] ?>" data-field="commission_rent_percentage"
                                        value="<?= number_format($user['commission_rent_percentage'], 2) ?>" 
                                        min="0" max="100" step="0.01"
-                                       style="width: 90px; margin: 0 auto;"
+                                       style="width: 75px; margin: 0 auto;"
                                        title="Taux de commission pour les locations">
                             </td>
                             <td class="text-center">
                                 <input type="number" class="form-control form-control-sm text-center commission-rate" 
-                                       data-user-id="<?= $user['id'] ?>" data-field="agent_commission_share"
-                                       value="<?= number_format($user['agent_commission_share'] ?? 50, 2) ?>" 
+                                       data-user-id="<?= $user['id'] ?>" data-field="agent_commission_share_sale"
+                                       value="<?= number_format($user['agent_commission_share_sale'] ?? 50, 2) ?>" 
                                        min="0" max="100" step="0.01"
-                                       style="width: 90px; margin: 0 auto;"
-                                       title="% de la commission allant à l'agent">
+                                       style="width: 75px; margin: 0 auto;"
+                                       title="% de la commission ventes allant à l'agent">
+                            </td>
+                            <td class="text-center">
+                                <input type="number" class="form-control form-control-sm text-center commission-rate" 
+                                       data-user-id="<?= $user['id'] ?>" data-field="agent_commission_share_rent"
+                                       value="<?= number_format($user['agent_commission_share_rent'] ?? 50, 2) ?>" 
+                                       min="0" max="100" step="0.01"
+                                       style="width: 75px; margin: 0 auto;"
+                                       title="% de la commission locations allant à l'agent">
                             </td>
                             <td class="text-center">
                                 <div class="form-check form-switch d-flex justify-content-center">
@@ -172,7 +181,7 @@
                         </tr>
                         <?php if ($user['is_commission_exceptional'] && $user['commission_exceptional_note']): ?>
                         <tr class="table-warning">
-                            <td colspan="7">
+                            <td colspan="9">
                                 <small class="text-muted">
                                     <strong><i class="fas fa-star"></i> Exception:</strong> 
                                     <?= esc($user['commission_exceptional_note']) ?>

@@ -23,6 +23,15 @@ class CommissionRates extends BaseController
             return redirect()->to('/admin/dashboard')->with('error', 'Accès refusé');
         }
 
+        // Récupérer les taux par défaut du système
+        $defaults = $this->userModel->db->table('commission_defaults')->limit(1)->get()->getRowArray();
+        if (!$defaults) {
+            $defaults = [
+                'agent_commission_share_sale' => 50.00,
+                'agent_commission_share_rent' => 50.00
+            ];
+        }
+
         // Récupérer tous les utilisateurs avec détails
         $users = $this->userModel
             ->select('users.id, users.first_name, users.last_name, users.email, users.status,
@@ -60,6 +69,7 @@ class CommissionRates extends BaseController
 
         $data = [
             'title' => 'Gestion des Taux de Commission',
+            'defaults' => $defaults,
             'users' => array_values($users), // Réindexer
             'roles' => $roles,
             'agencies' => $agencies,
@@ -70,6 +80,45 @@ class CommissionRates extends BaseController
         ];
 
         return view('admin/commission_rates/index', $data);
+    }
+
+    /**
+     * Mettre à jour les taux par défaut du système
+     */
+    public function saveDefaults()
+    {
+        if (!canUpdate('users') || session()->get('role_level') < 100) {
+            return redirect()->back()->with('error', 'Accès refusé - Admin uniquement');
+        }
+
+        $sale = (float) $this->request->getPost('agent_commission_share_sale');
+        $rent = (float) $this->request->getPost('agent_commission_share_rent');
+
+        // Validation
+        if ($sale < 0 || $sale > 100 || $rent < 0 || $rent > 100) {
+            return redirect()->back()->with('error', 'Les pourcentages doivent être entre 0 et 100');
+        }
+
+        // Mettre à jour ou créer
+        $existing = $this->userModel->db->table('commission_defaults')->limit(1)->get()->getRowArray();
+        
+        if ($existing) {
+            $this->userModel->db->table('commission_defaults')
+                ->update([
+                    'agent_commission_share_sale' => $sale,
+                    'agent_commission_share_rent' => $rent,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+        } else {
+            $this->userModel->db->table('commission_defaults')
+                ->insert([
+                    'agent_commission_share_sale' => $sale,
+                    'agent_commission_share_rent' => $rent,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+        }
+
+        return redirect()->back()->with('success', 'Taux par défaut mis à jour avec succès');
     }
 
     /**
@@ -193,14 +242,24 @@ class CommissionRates extends BaseController
             return redirect()->back()->with('error', 'Accès refusé');
         }
 
+        // Récupérer les taux par défaut du système
+        $defaults = $this->userModel->db->table('commission_defaults')->limit(1)->get()->getRowArray();
+        if (!$defaults) {
+            $defaults = ['agent_commission_share_sale' => 50.00, 'agent_commission_share_rent' => 50.00];
+        }
+
         $affected = $this->userModel->db->table('users')
             ->update([
-                'agent_commission_share_sale' => 50.00,
-                'agent_commission_share_rent' => 50.00,
+                'agent_commission_share_sale' => $defaults['agent_commission_share_sale'],
+                'agent_commission_share_rent' => $defaults['agent_commission_share_rent'],
                 'is_commission_exceptional' => 0,
                 'commission_exceptional_note' => null
             ]);
 
-        return redirect()->back()->with('success', 'Tous les taux ont été réinitialisés aux valeurs par défaut');
+        return redirect()->back()->with('success', sprintf(
+            'Tous les taux ont été réinitialisés aux valeurs par défaut (Ventes: %s%%, Locations: %s%%)',
+            number_format($defaults['agent_commission_share_sale'], 2),
+            number_format($defaults['agent_commission_share_rent'], 2)
+        ));
     }
 }

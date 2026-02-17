@@ -299,6 +299,7 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($rout
     $routes->group('commission-rates', function($routes) {
         $routes->get('/', 'CommissionRates::index');
         $routes->post('update-rate/(:num)', 'CommissionRates::updateRate/$1');
+        $routes->post('save-defaults', 'CommissionRates::saveDefaults');
         $routes->get('export', 'CommissionRates::export');
         $routes->get('reset-defaults', 'CommissionRates::resetDefaults');
     });

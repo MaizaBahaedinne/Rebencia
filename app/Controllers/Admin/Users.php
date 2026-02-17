@@ -85,6 +85,12 @@ class Users extends BaseController
             return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
 
+        // Récupérer les taux par défaut du système
+        $defaults = $this->userModel->db->table('commission_defaults')->limit(1)->get()->getRowArray();
+        if (!$defaults) {
+            $defaults = ['agent_commission_share_sale' => 50.00, 'agent_commission_share_rent' => 50.00];
+        }
+
         $data = [
             'username' => $this->request->getPost('username'),
             'email' => $this->request->getPost('email'),
@@ -96,8 +102,8 @@ class Users extends BaseController
             'agency_id' => $this->request->getPost('agency_id'),
             'status' => $this->request->getPost('status') ?? 'active',
             'email_verified' => true,
-            'agent_commission_share_sale' => (float) ($this->request->getPost('agent_commission_share_sale') ?? 50.00),
-            'agent_commission_share_rent' => (float) ($this->request->getPost('agent_commission_share_rent') ?? 50.00),
+            'agent_commission_share_sale' => (float) ($this->request->getPost('agent_commission_share_sale') ?? $defaults['agent_commission_share_sale']),
+            'agent_commission_share_rent' => (float) ($this->request->getPost('agent_commission_share_rent') ?? $defaults['agent_commission_share_rent']),
             'is_commission_exceptional' => (int) $this->request->getPost('is_commission_exceptional'),
             'commission_exceptional_note' => $this->request->getPost('commission_exceptional_note')
         ];

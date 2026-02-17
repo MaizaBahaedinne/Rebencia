@@ -44,6 +44,54 @@
         </div>
     <?php endif; ?>
 
+    <!-- Taux Par Défaut (Admin) -->
+    <?php if (session()->get('role_level') >= 100): ?>
+    <div class="card shadow-sm mb-4 border-primary">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-gear me-2"></i>Taux Par Défaut du Système</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="<?= base_url('admin/commission-rates/save-defaults') ?>" class="row g-3">
+                <?= csrf_field() ?>
+                
+                <div class="col-md-6">
+                    <label for="agent_commission_share_sale" class="form-label">
+                        Split Ventes (Agent) - Par Défaut
+                    </label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="agent_commission_share_sale" 
+                               name="agent_commission_share_sale" step="0.01" min="0" max="100"
+                               value="<?= number_format($defaults['agent_commission_share_sale'] ?? 50, 2) ?>" 
+                               required>
+                        <span class="input-group-text">%</span>
+                    </div>
+                    <small class="text-muted">Utilisé pour tout nouvel utilisateur (ventes)</small>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="agent_commission_share_rent" class="form-label">
+                        Split Locations (Agent) - Par Défaut
+                    </label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="agent_commission_share_rent" 
+                               name="agent_commission_share_rent" step="0.01" min="0" max="100"
+                               value="<?= number_format($defaults['agent_commission_share_rent'] ?? 50, 2) ?>" 
+                               required>
+                        <span class="input-group-text">%</span>
+                    </div>
+                    <small class="text-muted">Utilisé pour tout nouvel utilisateur (locations)</small>
+                </div>
+
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Sauvegarder Taux Par Défaut
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Filtres -->
     <div class="card shadow-sm mb-4">
         <div class="card-header">

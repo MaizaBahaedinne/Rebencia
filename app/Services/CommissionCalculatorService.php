@@ -114,7 +114,12 @@ class CommissionCalculatorService
         $totalCommissionTTC = $buyerCommission['ttc'] + $sellerCommission['ttc'];
 
         // Step 5: Calculate agent/agency split (Base TTC - montant réellement acquis)
-        $agentPercentage = $transactionData['agent_commission_percentage'] ?? 50.00;
+        // Utilise le ratio personnalisé du profil agent, sinon 50/50
+        $agentPercentage = 50.00;
+        if ($user) {
+            $agentPercentage = (float) ($user['agent_commission_share'] ?? 50.00);
+        }
+        
         $agentCommissionAmount = $totalCommissionTTC * ($agentPercentage / 100);
         $agencyCommissionAmount = $totalCommissionTTC - $agentCommissionAmount;
 

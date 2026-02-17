@@ -98,6 +98,7 @@ class Users extends BaseController
             'email_verified' => true,
             'commission_sale_percentage' => (float) ($this->request->getPost('commission_sale_percentage') ?? 10.00),
             'commission_rent_percentage' => (float) ($this->request->getPost('commission_rent_percentage') ?? 50.00),
+            'agent_commission_share' => (float) ($this->request->getPost('agent_commission_share') ?? 50.00),
             'is_commission_exceptional' => (int) $this->request->getPost('is_commission_exceptional'),
             'commission_exceptional_note' => $this->request->getPost('commission_exceptional_note')
         ];
@@ -168,6 +169,7 @@ class Users extends BaseController
             'status' => $this->request->getPost('status'),
             'commission_sale_percentage' => (float) ($this->request->getPost('commission_sale_percentage') ?? 10.00),
             'commission_rent_percentage' => (float) ($this->request->getPost('commission_rent_percentage') ?? 50.00),
+            'agent_commission_share' => (float) ($this->request->getPost('agent_commission_share') ?? 50.00),
             'is_commission_exceptional' => (int) $this->request->getPost('is_commission_exceptional'),
             'commission_exceptional_note' => $this->request->getPost('commission_exceptional_note')
         ];

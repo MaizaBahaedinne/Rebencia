@@ -110,42 +110,63 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label for="commission_sale_percentage" class="form-label">
-                                    Taux Commission Ventes (%) 
+                                    Taux Ventes (%) 
                                     <span class="text-danger">*</span>
                                 </label>
-                                <input type="number" class="form-control" id="commission_sale_percentage" 
-                                       name="commission_sale_percentage" step="0.01" min="0" max="100"
-                                       value="<?= old('commission_sale_percentage', 10.00) ?>" 
-                                       required>
-                                <small class="text-muted">Par défaut: 10%</small>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="commission_sale_percentage" 
+                                           name="commission_sale_percentage" step="0.01" min="0" max="100"
+                                           value="<?= old('commission_sale_percentage', 10.00) ?>" 
+                                           required>
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <small class="text-muted">Défaut: 10%</small>
                             </div>
                             <div class="col-md-6">
                                 <label for="commission_rent_percentage" class="form-label">
-                                    Taux Commission Locations (%)
+                                    Taux Locations (%)
                                     <span class="text-danger">*</span>
                                 </label>
-                                <input type="number" class="form-control" id="commission_rent_percentage" 
-                                       name="commission_rent_percentage" step="0.01" min="0" max="100"
-                                       value="<?= old('commission_rent_percentage', 50.00) ?>" 
-                                       required>
-                                <small class="text-muted">Par défaut: 50%</small>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="commission_rent_percentage" 
+                                           name="commission_rent_percentage" step="0.01" min="0" max="100"
+                                           value="<?= old('commission_rent_percentage', 50.00) ?>" 
+                                           required>
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <small class="text-muted">Défaut: 50%</small>
                             </div>
+
+                            <div class="col-12 border-top pt-3">
+                                <label for="agent_commission_share" class="form-label">
+                                    Répartition Commission TTC
+                                </label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="agent_commission_share" 
+                                           name="agent_commission_share" step="0.01" min="0" max="100"
+                                           value="<?= old('agent_commission_share', 50.00) ?>" 
+                                           required>
+                                    <span class="input-group-text">% Agent</span>
+                                </div>
+                                <small class="text-muted">60% = Agent 60%, Agence 40%</small>
+                            </div>
+
                             <div class="col-12">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="is_commission_exceptional" 
                                            name="is_commission_exceptional" value="1"
                                            <?= old('is_commission_exceptional') ? 'checked' : '' ?>>
                                     <label class="form-check-label" for="is_commission_exceptional">
-                                        <strong>Profil Exceptionnel</strong> - Marquer si taux spéciaux appliqués
+                                        <strong>Profil Exceptionnel</strong>
                                     </label>
                                 </div>
                             </div>
+
                             <div class="col-12">
-                                <label for="commission_exceptional_note" class="form-label">Note sur le Statut Exceptionnel</label>
+                                <label for="commission_exceptional_note" class="form-label">Note Exception</label>
                                 <textarea class="form-control" id="commission_exceptional_note" 
                                           name="commission_exceptional_note" rows="2" 
-                                          placeholder="Ex: Ancien agent, accord spécial depuis 2025..."><?= old('commission_exceptional_note', '') ?></textarea>
-                                <small class="text-muted">Raison de l'exception (optionnel)</small>
+                                          placeholder="Raison..."><?= old('commission_exceptional_note', '') ?></textarea>
                             </div>
                         </div>
                     </div>

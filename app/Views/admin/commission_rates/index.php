@@ -65,8 +65,8 @@
                     <select class="form-select" id="filterRole" name="role">
                         <option value="">-- Tous --</option>
                         <?php foreach ($roles as $role): ?>
-                            <option value="<?= esc($role['name']) ?>" <?= $filterRole === $role['name'] ? 'selected' : '' ?>>
-                                <?= esc($role['name']) ?>
+                            <option value="<?= esc($role['display_name']) ?>" <?= $filterRole === $role['display_name'] ? 'selected' : '' ?>>
+                                <?= esc($role['display_name']) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>

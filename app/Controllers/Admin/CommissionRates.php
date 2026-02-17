@@ -29,8 +29,8 @@ class CommissionRates extends BaseController
                      users.commission_sale_percentage, users.commission_rent_percentage,
                      users.agent_commission_share, users.is_commission_exceptional, 
                      users.commission_exceptional_note,
-                     roles.name as role_name, agencies.name as agency_name')
-            ->join('user_roles as roles', 'roles.id = users.role_id', 'left')
+                     roles.display_name as role_name, agencies.name as agency_name')
+            ->join('roles', 'roles.id = users.role_id', 'left')
             ->join('agencies', 'agencies.id = users.agency_id', 'left')
             ->orderBy('users.first_name', 'ASC')
             ->orderBy('users.last_name', 'ASC')
@@ -56,7 +56,7 @@ class CommissionRates extends BaseController
         }
 
         // Récupérer les rôles et agences pour les filtres
-        $roles = $this->userModel->db->table('user_roles')->distinct()->get()->getResultArray();
+        $roles = $this->userModel->db->table('roles')->select('id, display_name')->get()->getResultArray();
         $agencies = $this->userModel->db->table('agencies')->where('status', 'active')->get()->getResultArray();
 
         $data = [

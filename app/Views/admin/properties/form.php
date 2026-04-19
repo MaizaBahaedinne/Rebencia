@@ -232,16 +232,30 @@ $characteristics = $characteristics ?? [];
                 <div class="card-body">
 
                     <?php
-                    // Pour l'édition : préparer les données de pré-sélection
-                    $vp        = $ville_preselect ?? null;  // zone ville trouvée
-                    $vpId      = $vp ? $vp['id'] : null;
-                    $vpName    = $vp ? $vp['name'] : null;
-                    // On ne peut pas facilement déterminer région/pays depuis la ville en PHP ici,
-                    // le JS les charge dynamiquement via AJAX après le rendu.
+                    $vp     = $ville_preselect ?? null;
+                    $vpId   = $vp ? $vp['id']   : null;
+                    $vpName = $vp ? $vp['name']  : null;
                     ?>
 
-                    <!-- Sélecteurs en cascade -->
-                    <div class="row g-3 mb-3">
+                    <!-- Recherche rapide ville / code postal -->
+                    <div class="mb-3 position-relative" id="loc-search-wrap">
+                        <label class="form-label fw-semibold small">
+                            <i class="bi bi-search me-1 text-primary"></i>Recherche rapide ville ou code postal
+                        </label>
+                        <input type="text" id="loc_search"
+                               class="form-control form-control-sm"
+                               placeholder="Ex : Tunis, Sfax, 1000, Les Berges du Lac…"
+                               autocomplete="off">
+                        <ul id="loc_suggestions"
+                            class="list-group shadow position-absolute w-100"
+                            style="z-index:1050;display:none;max-height:220px;overflow-y:auto;top:100%"></ul>
+                        <div class="form-text">
+                            Tapez au moins 2 caractères — les sélecteurs ci-dessous se rempliront automatiquement.
+                        </div>
+                    </div>
+
+                    <!-- Sélecteurs en cascade (remplissage manuel OU automatique) -->
+                    <div class="row g-2 mb-3">
                         <div class="col-6 col-md-3">
                             <label class="form-label fw-semibold small">Pays</label>
                             <select id="sel_pays" class="form-select form-select-sm">
@@ -258,7 +272,7 @@ $characteristics = $characteristics ?? [];
                             </select>
                         </div>
                         <div class="col-6 col-md-3">
-                            <label class="form-label fw-semibold small">Ville <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold small">Ville</label>
                             <select id="sel_ville" class="form-select form-select-sm" disabled>
                                 <option value="">— Ville —</option>
                             </select>
@@ -271,8 +285,8 @@ $characteristics = $characteristics ?? [];
                         </div>
                     </div>
 
-                    <!-- Adresse + code postal (champs visibles) -->
-                    <div class="row g-3 mb-3">
+                    <!-- Adresse + code postal -->
+                    <div class="row g-2 mb-3">
                         <div class="col-12 col-md-8">
                             <label class="form-label fw-semibold small">Adresse précise</label>
                             <input type="text" name="address" id="inp_address" class="form-control form-control-sm"
@@ -282,18 +296,17 @@ $characteristics = $characteristics ?? [];
                         <div class="col-12 col-md-4">
                             <label class="form-label fw-semibold small">Code postal</label>
                             <input type="text" id="inp_postal" class="form-control form-control-sm bg-light"
-                                   readonly placeholder="Auto depuis le quartier"
-                                   value="">
+                                   readonly placeholder="Auto (quartier)">
                         </div>
                     </div>
 
-                    <!-- Champs cachés soumis avec le formulaire -->
+                    <!-- Champs cachés soumis -->
                     <input type="hidden" name="city" id="inp_city"
                            value="<?= esc(old('city', $property['city'] ?? '')) ?>">
                     <input type="hidden" name="zone" id="inp_zone"
                            value="<?= esc(old('zone', $property['zone'] ?? '')) ?>">
 
-                    <!-- Carte + coordonnées GPS -->
+                    <!-- Carte + GPS -->
                     <div class="row g-3">
                         <div class="col-12 col-md-5 d-flex flex-column gap-2">
                             <label class="form-label fw-semibold small mb-0">Coordonnées GPS</label>
@@ -333,16 +346,17 @@ $characteristics = $characteristics ?? [];
                 </div>
             </div>
 
-            <!-- Données de pré-sélection pour le JS (édition) -->
+            <!-- Données de pré-sélection pour le JS -->
             <script>
             window.PROP_LOC = {
-                villeId:   <?= json_encode($vpId) ?>,
-                villeName: <?= json_encode($vpName) ?>,
-                city:      <?= json_encode(old('city',  $property['city']  ?? '')) ?>,
-                zone:      <?= json_encode(old('zone',  $property['zone']  ?? '')) ?>,
-                lat:       <?= json_encode(old('latitude',  $property['latitude']  ?? '')) ?>,
-                lng:       <?= json_encode(old('longitude', $property['longitude'] ?? '')) ?>,
-                childrenUrl: <?= json_encode(base_url('admin/zones/')) ?>
+                villeId:    <?= json_encode($vpId) ?>,
+                villeName:  <?= json_encode($vpName) ?>,
+                city:       <?= json_encode(old('city',      $property['city']      ?? '')) ?>,
+                zone:       <?= json_encode(old('zone',      $property['zone']      ?? '')) ?>,
+                lat:        <?= json_encode(old('latitude',  $property['latitude']  ?? '')) ?>,
+                lng:        <?= json_encode(old('longitude', $property['longitude'] ?? '')) ?>,
+                childrenUrl: <?= json_encode(base_url('admin/zones/')) ?>,
+                searchUrl:   <?= json_encode(base_url('admin/zones/search')) ?>
             };
             </script>
 
@@ -414,24 +428,27 @@ $characteristics = $characteristics ?? [];
     'use strict';
 
     const LOC      = window.PROP_LOC;
-    const BASE_URL = LOC.childrenUrl;   // ex: https://…/admin/zones/
+    const BASE_URL = LOC.childrenUrl;   // …/admin/zones/
+    const SEARCH_URL = LOC.searchUrl;   // …/admin/zones/search
 
-    // ── Sélecteurs DOM ──────────────────────────────────────────────
+    // ── DOM ─────────────────────────────────────────────────────────
     const selPays     = document.getElementById('sel_pays');
     const selRegion   = document.getElementById('sel_region');
     const selVille    = document.getElementById('sel_ville');
     const selQuartier = document.getElementById('sel_quartier');
-    const inpCity     = document.getElementById('inp_city');    // hidden
-    const inpZone     = document.getElementById('inp_zone');    // hidden
-    const inpPostal   = document.getElementById('inp_postal');  // lecture seule visible
+    const inpCity     = document.getElementById('inp_city');
+    const inpZone     = document.getElementById('inp_zone');
+    const inpPostal   = document.getElementById('inp_postal');
     const inpAddress  = document.getElementById('inp_address');
     const inpLat      = document.getElementById('inp_lat');
     const inpLng      = document.getElementById('inp_lng');
     const btnGeocode  = document.getElementById('btn_geocode');
     const btnReset    = document.getElementById('btn_reset_map');
+    const locSearch   = document.getElementById('loc_search');
+    const locSugg     = document.getElementById('loc_suggestions');
 
     // ── Carte Leaflet ────────────────────────────────────────────────
-    const DEFAULT = [33.886917, 9.537499];   // centre Tunisie
+    const DEFAULT      = [33.886917, 9.537499];
     const ZOOM_COUNTRY = 6;
     const ZOOM_CITY    = 13;
 
@@ -442,19 +459,16 @@ $characteristics = $characteristics ?? [];
         (initLat && initLng) ? [initLat, initLng] : DEFAULT,
         (initLat && initLng) ? ZOOM_CITY : ZOOM_COUNTRY
     );
-
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         maxZoom: 19
     }).addTo(map);
 
-    // Marqueur draggable
     const markerIcon = L.icon({
         iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
         shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
         iconAnchor: [12, 41], popupAnchor: [1, -34]
     });
-
     let marker = null;
 
     function placeMarker(lat, lng, panTo = true) {
@@ -477,11 +491,7 @@ $characteristics = $characteristics ?? [];
         }
         if (panTo) map.setView([lat, lng], Math.max(map.getZoom(), ZOOM_CITY));
     }
-
-    // Clic sur la carte → placer le marqueur
     map.on('click', (e) => placeMarker(e.latlng.lat, e.latlng.lng));
-
-    // Si coordonnées existantes (mode édition)
     if (initLat && initLng) placeMarker(initLat, initLng, false);
 
     // ── Géocodage Nominatim ─────────────────────────────────────────
@@ -491,57 +501,48 @@ $characteristics = $characteristics ?? [];
         fetch(url, { headers: { 'Accept': 'application/json' } })
             .then(r => r.json())
             .then(data => {
-                if (data && data.length > 0) {
-                    placeMarker(data[0].lat, data[0].lon);
-                } else {
-                    alert('Aucun résultat pour : ' + query);
-                }
+                if (data && data.length > 0) placeMarker(data[0].lat, data[0].lon);
             })
-            .catch(() => alert('Erreur de géocodage.'));
+            .catch(() => {});
     }
 
     btnGeocode.addEventListener('click', () => {
-        const city    = inpCity.value  || selVille.options[selVille.selectedIndex]?.text.split(' (')[0] || '';
+        const city     = inpCity.value || selVille.options[selVille.selectedIndex]?.text.split(' (')[0] || '';
         const quartier = inpZone.value || selQuartier.options[selQuartier.selectedIndex]?.text.split(' (')[0] || '';
-        const parts   = [inpAddress.value, quartier, city].filter(Boolean).join(', ');
+        const parts    = [inpAddress.value, quartier, city].filter(Boolean).join(', ');
         geocode(parts || 'Tunisie');
     });
-
-    btnReset.addEventListener('click', () => {
-        map.setView(DEFAULT, ZOOM_COUNTRY);
-    });
-
-    // Recalibrer la carte quand elle devient visible (layout responsive)
+    btnReset.addEventListener('click', () => map.setView(DEFAULT, ZOOM_COUNTRY));
     setTimeout(() => map.invalidateSize(), 300);
 
-    // ── Chargement enfants via AJAX ─────────────────────────────────
+    // ── Chargement enfants AJAX ─────────────────────────────────────
     function loadChildren(parentId, targetSelect, placeholder) {
-        targetSelect.innerHTML = '<option value="">Chargement…</option>';
-        targetSelect.disabled = true;
-
-        fetch(BASE_URL + parentId + '/children', {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        })
-        .then(r => r.json())
-        .then(data => {
-            targetSelect.innerHTML = '<option value="">' + placeholder + '</option>';
-            data.forEach(z => {
-                const opt = document.createElement('option');
-                opt.value = z.id;
-                opt.textContent = z.name + (z.code ? ' (' + z.code + ')' : '');
-                targetSelect.appendChild(opt);
-            });
-            targetSelect.disabled = data.length === 0;
-        })
-        .catch(() => {
-            targetSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+        return new Promise((resolve) => {
+            targetSelect.innerHTML = '<option value="">Chargement…</option>';
+            targetSelect.disabled  = true;
+            fetch(BASE_URL + parentId + '/children', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(r => r.json())
+                .then(data => {
+                    targetSelect.innerHTML = '<option value="">' + placeholder + '</option>';
+                    data.forEach(z => {
+                        const opt = document.createElement('option');
+                        opt.value       = z.id;
+                        opt.textContent = z.name + (z.code ? ' (' + z.code + ')' : '');
+                        targetSelect.appendChild(opt);
+                    });
+                    targetSelect.disabled = data.length === 0;
+                    resolve(data);
+                })
+                .catch(() => {
+                    targetSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+                    resolve([]);
+                });
         });
     }
 
-    // ── Cascade Pays → Région ───────────────────────────────────────
+    // ── Cascade Pays → Région (manuelle) ────────────────────────────
     selPays.addEventListener('change', () => {
         const id = selPays.value;
-        // Reset en cascade
         selRegion.innerHTML   = '<option value="">— Région —</option>';
         selRegion.disabled    = true;
         selVille.innerHTML    = '<option value="">— Ville —</option>';
@@ -550,11 +551,9 @@ $characteristics = $characteristics ?? [];
         selQuartier.disabled  = true;
         inpCity.value = '';
         inpZone.value = '';
-
         if (id) loadChildren(id, selRegion, '— Région —');
     });
 
-    // ── Cascade Région → Ville ──────────────────────────────────────
     selRegion.addEventListener('change', () => {
         const id = selRegion.value;
         selVille.innerHTML    = '<option value="">— Ville —</option>';
@@ -563,62 +562,156 @@ $characteristics = $characteristics ?? [];
         selQuartier.disabled  = true;
         inpCity.value = '';
         inpZone.value = '';
-
         if (id) loadChildren(id, selVille, '— Ville —');
     });
 
-    // ── Cascade Ville → Quartier + geocode ─────────────────────────
     selVille.addEventListener('change', () => {
         const id   = selVille.value;
         const name = selVille.options[selVille.selectedIndex]?.text.split(' (')[0] || '';
         selQuartier.innerHTML = '<option value="">— Quartier —</option>';
         selQuartier.disabled  = true;
         inpZone.value = '';
-
         if (id) {
             inpCity.value = name;
             loadChildren(id, selQuartier, '— Quartier —');
-            // Géocoder la ville automatiquement
             geocode(name + ', Tunisie');
         } else {
             inpCity.value = '';
         }
     });
 
-    // ── Sélection quartier ──────────────────────────────────────────
     selQuartier.addEventListener('change', () => {
-        const sel  = selQuartier.options[selQuartier.selectedIndex];
         if (! selQuartier.value) {
             inpZone.value   = '';
             inpPostal.value = '';
             return;
         }
-        // Le texte est "Nom (CODE)" — on sépare
-        const fullText = sel.textContent.trim();
+        const fullText = selQuartier.options[selQuartier.selectedIndex].textContent.trim();
         const match    = fullText.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
         const name     = match ? match[1].trim() : fullText;
         const code     = match ? match[2].trim() : '';
         inpZone.value   = name;
         inpPostal.value = code;
-        if (inpCity.value) {
-            geocode(name + ' ' + inpCity.value + ', Tunisie');
-        }
+        if (inpCity.value) geocode(name + ' ' + inpCity.value + ', Tunisie');
     });
 
-    // ── Pré-sélection en mode édition ───────────────────────────────
-    // Les champs city et zone sont déjà dans les inputs hidden via PHP.
-    // On pré-remplit le champ code postal si on a une zone avec code.
-    if (LOC.zone && LOC.zone.includes('(')) {
+    // ── Cascade automatique depuis la recherche rapide ──────────────
+    /**
+     * Sélectionne programmatiquement Pays → Région → Ville (→ Quartier optionnel)
+     * à partir d'un résultat de la barre de recherche.
+     */
+    async function cascadeFromResult(result) {
+        // 1. Pays
+        if (result.pays_id) {
+            selPays.value = result.pays_id;
+            const regions = await loadChildren(result.pays_id, selRegion, '— Région —');
+            if (regions.length === 0) return;
+        }
+
+        // 2. Région
+        if (result.region_id) {
+            selRegion.value   = result.region_id;
+            selRegion.disabled = false;
+            const villes = await loadChildren(result.region_id, selVille, '— Ville —');
+            if (villes.length === 0) return;
+        }
+
+        // 3. Ville
+        const villeId   = (result.type === 'ville')    ? result.id     : null;
+        const quartId   = (result.type === 'quartier') ? result.id     : null;
+        const villeToSet = villeId ?? null;
+
+        if (villeToSet) {
+            selVille.value   = villeToSet;
+            selVille.disabled = false;
+            inpCity.value = result.name;
+            const quartiers = await loadChildren(villeToSet, selQuartier, '— Quartier —');
+
+            // Si résultat = quartier, pré-sélectionner
+            if (quartId) {
+                selQuartier.value   = quartId;
+                selQuartier.disabled = false;
+                inpZone.value   = result.name;
+                inpPostal.value = result.code ?? '';
+                geocode(result.name + ' ' + inpCity.value + ', Tunisie');
+            } else {
+                inpPostal.value = result.code ?? '';
+                geocode(result.name + ', Tunisie');
+            }
+        }
+    }
+
+    // ── Autocomplete de la barre de recherche ───────────────────────
+    let searchTimer = null;
+
+    function hideSuggestions() {
+        locSugg.style.display = 'none';
+        locSugg.innerHTML = '';
+    }
+
+    locSearch.addEventListener('input', () => {
+        clearTimeout(searchTimer);
+        const q = locSearch.value.trim();
+        if (q.length < 2) { hideSuggestions(); return; }
+
+        searchTimer = setTimeout(() => {
+            fetch(SEARCH_URL + '?q=' + encodeURIComponent(q), {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(r => r.json())
+            .then(data => {
+                locSugg.innerHTML = '';
+                if (! data.length) {
+                    locSugg.innerHTML = '<li class="list-group-item list-group-item-sm text-muted">Aucun résultat.</li>';
+                    locSugg.style.display = 'block';
+                    return;
+                }
+                data.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item list-group-item-action py-1 px-3';
+                    li.style.cursor = 'pointer';
+
+                    const typeIcon = item.type === 'ville' ? '🏙️' : '📍';
+                    const code     = item.code ? ' <span class="badge bg-light text-dark border ms-1">' + item.code + '</span>' : '';
+                    const parents  = [item.region_name, item.pays_name].filter(Boolean).join(', ');
+
+                    li.innerHTML = typeIcon + ' <strong>' + item.name + '</strong>' + code
+                        + (parents ? '<br><small class="text-muted ms-4">' + parents + '</small>' : '');
+
+                    li.addEventListener('mousedown', (e) => {
+                        e.preventDefault(); // empêche le blur sur l'input
+                        locSearch.value = item.name + (item.code ? ' (' + item.code + ')' : '');
+                        hideSuggestions();
+                        cascadeFromResult(item);
+                    });
+                    locSugg.appendChild(li);
+                });
+                locSugg.style.display = 'block';
+            })
+            .catch(() => hideSuggestions());
+        }, 300);
+    });
+
+    // Fermer suggestions au clic extérieur
+    document.addEventListener('click', (e) => {
+        if (! document.getElementById('loc-search-wrap').contains(e.target)) {
+            hideSuggestions();
+        }
+    });
+    locSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { hideSuggestions(); locSearch.blur(); }
+    });
+
+    // ── Pré-sélection en mode édition (utilisait villeId depuis PHP) ─
+    if (LOC.zone) {
         const m = LOC.zone.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
         if (m) inpPostal.value = m[2];
     }
 
-    // ── Saisie manuelle des coords ──────────────────────────────────
+    // ── Saisie manuelle coordonnées ─────────────────────────────────
     [inpLat, inpLng].forEach(inp => {
         inp.addEventListener('change', () => {
-            const lat = inpLat.value;
-            const lng = inpLng.value;
-            if (lat && lng) placeMarker(lat, lng);
+            if (inpLat.value && inpLng.value) placeMarker(inpLat.value, inpLng.value);
         });
     });
 

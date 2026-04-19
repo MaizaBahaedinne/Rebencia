@@ -105,6 +105,7 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
     $routes->get('zones/create/(:alpha)',        'Admin\ZonesController::create/$1');
     $routes->post('zones/store',                 'Admin\ZonesController::store');
     $routes->get('zones/(:num)/children',        'Admin\ZonesController::childrenJson/$1');
+    $routes->get('zones/search',                 'Admin\ZonesController::searchJson');
     $routes->get('zones/(:num)/edit',            'Admin\ZonesController::edit/$1');
     $routes->post('zones/(:num)/update',         'Admin\ZonesController::update/$1');
     $routes->post('zones/(:num)/geometry',        'Admin\ZonesController::saveGeometry/$1');

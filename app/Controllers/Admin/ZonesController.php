@@ -251,8 +251,7 @@ class ZonesController extends BaseController
         return $this->json($this->model->getByParent($parentId));
     }
 
-    // ── GÉOMÉTRIE (carte) ─────────────────────────────────────────────
-
+   
     /**
      * Sauvegarde le GeoJSON d'une zone quartier via AJAX.
      * POST /admin/zones/{id}/geometry

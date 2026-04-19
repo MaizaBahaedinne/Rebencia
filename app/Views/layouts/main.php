@@ -145,7 +145,11 @@
         </a>
         <?php endif; ?>
 
-        <?php if (in_array('tasks.view', session()->get('permissions') ?? [])) : ?>
+        <?php
+        $canSeeTasks = in_array('tasks.view', session()->get('permissions') ?? [])
+                    || in_array(session()->get('user_role'), ['super_admin','admin','director']);
+        ?>
+        <?php if ($canSeeTasks) : ?>
         <div class="nav-section">Développement</div>
         <a href="<?= base_url('admin/tasks') ?>" class="nav-link <?= str_starts_with(uri_string(), 'admin/tasks') ? 'active' : '' ?>">
             <i class="bi bi-kanban"></i> Suivi des tâches

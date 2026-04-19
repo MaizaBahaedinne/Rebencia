@@ -96,16 +96,16 @@
                     <span><i class="bi bi-geo-alt me-2 text-muted"></i>Adresse</span>
                     <span class="text-end"><?= esc($property['address'] . ', ' . ($property['city'] ?? '')) ?></span>
                 </li>
-                <?php if (!empty($property['property_type'])): ?>
+                <?php if (!empty($property['type'])): ?>
                 <li class="list-group-item d-flex justify-content-between">
                     <span><i class="bi bi-house me-2 text-muted"></i>Type</span>
-                    <strong><?= esc($property['property_type']) ?></strong>
+                    <strong><?= esc($property['type']) ?></strong>
                 </li>
                 <?php endif; ?>
-                <?php if (!empty($property['surface_area'])): ?>
+                <?php if (!empty($property['surface'])): ?>
                 <li class="list-group-item d-flex justify-content-between">
                     <span><i class="bi bi-rulers me-2 text-muted"></i>Surface</span>
-                    <strong><?= number_format((float)$property['surface_area'], 0) ?> m²</strong>
+                    <strong><?= number_format((float)$property['surface'], 0) ?> m²</strong>
                 </li>
                 <?php endif; ?>
                 <?php if (!empty($property['rooms'])): ?>

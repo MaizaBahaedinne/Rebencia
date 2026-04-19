@@ -17,6 +17,7 @@ class LeadModel extends Model
         'email', 'phone', 'source', 'status',
         'budget_min', 'budget_max', 'notes',
         'property_type', 'transaction_type', 'priority', 'next_follow_up',
+        'desired_surface', 'desired_location',
     ];
 
     // --------------------------------------------------------
@@ -85,7 +86,7 @@ class LeadModel extends Model
         }
 
         $lead['notes'] = $this->db->table('lead_notes ln')
-            ->select('ln.*, CONCAT(u.first_name, " ", u.last_name) AS author')
+            ->select('ln.*, u.first_name AS author_first_name, u.last_name AS author_last_name')
             ->join('users u', 'u.id = ln.user_id', 'left')
             ->where('ln.lead_id', $id)
             ->orderBy('ln.created_at', 'DESC')
@@ -106,7 +107,7 @@ class LeadModel extends Model
      */
     public function getPipeline(?int $agentId = null): array
     {
-        $statuses = ['new', 'contacted', 'visit', 'negotiation', 'sold', 'lost'];
+        $statuses = ['new', 'contacted', 'interested', 'visit_done', 'negotiating', 'won', 'lost'];
         $pipeline = [];
 
         foreach ($statuses as $status) {
@@ -141,7 +142,7 @@ class LeadModel extends Model
         $all = $builder->get()->getResultArray();
 
         $stats = ['total' => count($all), 'new' => 0, 'contacted' => 0,
-                  'visit' => 0, 'negotiation' => 0, 'sold' => 0, 'lost' => 0];
+                  'interested' => 0, 'visit_done' => 0, 'negotiating' => 0, 'won' => 0, 'lost' => 0];
 
         foreach ($all as $row) {
             if (isset($stats[$row['status']])) {
@@ -182,7 +183,7 @@ class LeadModel extends Model
         $this->db->table('lead_notes')->insert([
             'lead_id'    => $leadId,
             'user_id'    => $userId,
-            'content'    => $content,
+            'note'       => $content,
             'created_at' => date('Y-m-d H:i:s'),
         ]);
     }

@@ -129,12 +129,13 @@ class PropertyModel extends Model
     public function logChange(int $propertyId, int $userId, string $field, $old, $new): void
     {
         $this->db->table('property_history')->insert([
-            'property_id' => $propertyId,
-            'user_id'     => $userId,
-            'field_name'  => $field,
-            'old_value'   => $old,
-            'new_value'   => $new,
-            'created_at'  => date('Y-m-d H:i:s'),
+            'property_id'  => $propertyId,
+            'user_id'      => $userId,
+            'action'       => 'update',
+            'field_changed'=> $field,
+            'old_value'    => $old,
+            'new_value'    => $new,
+            'created_at'   => date('Y-m-d H:i:s'),
         ]);
     }
 }

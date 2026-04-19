@@ -146,13 +146,17 @@ class SystemController extends BaseController
             "Git pull : {$status}"
         );
 
-        return $this->json([
-            'success'        => $return === 0,
-            'output'         => $outputStr,
-            'commit_hash'    => $commitHash,
-            'commit_message' => $commitMessage,
-            'status'         => $status,
-        ]);
+        if ($return === 0) {
+            return redirect()->to(base_url('admin/system/deploy'))
+                ->with('success', 'Déploiement réussi — ' . ($commitMessage ?: $outputStr))
+                ->with('deploy_output', $outputStr)
+                ->with('deploy_success', true);
+        } else {
+            return redirect()->to(base_url('admin/system/deploy'))
+                ->with('error', 'Échec du déploiement.')
+                ->with('deploy_output', $outputStr)
+                ->with('deploy_success', false);
+        }
     }
 
     // --------------------------------------------------------

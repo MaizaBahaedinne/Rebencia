@@ -161,7 +161,8 @@ function showOutput(data) {
 document.getElementById('deployForm').addEventListener('submit', function() {
     const btn = document.getElementById('deployBtn');
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Déploiement…';
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Déploiement en cours…';
+    this.submit();
 });
 </script>
 

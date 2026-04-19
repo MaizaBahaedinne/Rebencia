@@ -39,13 +39,6 @@ $breadcrumb = array_filter([
     </div>
 </div>
 
-<!-- ── FLASH ─────────────────────────────────────────────────────────── -->
-<?php if (session()->getFlashdata('success')): ?>
-<div class="alert alert-success alert-dismissible fade show">
-    <?= esc(session()->getFlashdata('success')) ?>
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-</div>
-<?php endif; ?>
 
 <div class="row g-4">
 

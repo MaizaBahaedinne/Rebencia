@@ -18,6 +18,21 @@ class TasksController extends BaseController
     /** GET /admin/tasks */
     public function index(): string
     {
+        // Si la table n'existe pas encore (migration en attente)
+        if (! $this->db->tableExists('tasks')) {
+            return $this->render('admin/tasks/index', [
+                'page_title' => 'Suivi des tâches',
+                'tasks'      => [],
+                'stats'      => [],
+                'filters'    => [],
+                'users'      => [],
+                'types'      => TaskModel::TYPES,
+                'statuses'   => TaskModel::STATUSES,
+                'priorities' => TaskModel::PRIORITIES,
+                'migration_pending' => true,
+            ]);
+        }
+
         $this->requirePermission('tasks.view');
 
         $filters = [

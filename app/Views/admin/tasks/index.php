@@ -7,13 +7,25 @@ $priorityIcons = array_column($priorities, 'icon', 0);
     <div>
         <h4 class="mb-0 fw-bold"><i class="bi bi-kanban text-primary me-2"></i>Suivi des tâches</h4>
         <p class="text-muted mb-0"><?= count($tasks) ?> tâche(s) trouvée(s)</p>
-    </div>
-    <?php if ($auth->hasPermission('tasks.create')) : ?>
+    </div><?php if (!isset($migration_pending) && ($auth->hasPermission('tasks.create') || in_array(session()->get('user_role'), ['super_admin','admin','director']))) : ?>
     <a href="<?= base_url('admin/tasks/create') ?>" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i> Nouvelle tâche
     </a>
     <?php endif; ?>
 </div>
+
+<?php if (!empty($migration_pending)) : ?>
+<div class="alert alert-warning d-flex align-items-start gap-3">
+    <i class="bi bi-hourglass-split fs-4 flex-shrink-0 mt-1"></i>
+    <div>
+        <strong>Migration en attente</strong><br>
+        Les tables nécessaires n'existent pas encore. Lancez un déploiement depuis
+        <a href="<?= base_url('admin/system/deploy') ?>">Système → Déploiement</a>
+        pour appliquer les migrations (<code>php spark migrate</code>).
+    </div>
+</div>
+<?php return; ?>
+<?php endif; ?>
 
 <!-- Statistiques par statut -->
 <div class="row g-3 mb-4">

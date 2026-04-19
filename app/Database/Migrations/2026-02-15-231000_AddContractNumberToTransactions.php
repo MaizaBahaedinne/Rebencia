@@ -8,6 +8,10 @@ class AddContractNumberToTransactions extends Migration
 {
     public function up()
     {
+        if (! $this->db->tableExists('transactions')) {
+            return;
+        }
+
         $fields = [
             'contract_number' => [
                 'type' => 'VARCHAR',

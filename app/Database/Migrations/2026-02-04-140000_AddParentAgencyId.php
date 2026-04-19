@@ -8,6 +8,11 @@ class AddParentAgencyId extends Migration
 {
     public function up()
     {
+        // La table agencies n'existe pas dans tous les environnements — on skip silencieusement
+        if (! $this->db->tableExists('agencies')) {
+            return;
+        }
+
         // Vérifier si les colonnes existent déjà
         $fields = $this->db->getFieldNames('agencies');
         

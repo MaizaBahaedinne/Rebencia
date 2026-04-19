@@ -50,7 +50,7 @@ class CreateTasksTable extends Migration
         $this->forge->addKey('assigned_to');
         $this->forge->addForeignKey('created_by',  'users', 'id', 'RESTRICT', 'CASCADE');
         $this->forge->addForeignKey('assigned_to', 'users', 'id', 'SET NULL',  'CASCADE');
-        $this->forge->createTable('tasks');
+        $this->forge->createTable('tasks', true);
 
         // --------------------------------------------------------
         // Table task_comments
@@ -68,7 +68,7 @@ class CreateTasksTable extends Migration
         $this->forge->addKey('task_id');
         $this->forge->addForeignKey('task_id', 'tasks', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('user_id', 'users', 'id', 'CASCADE', 'CASCADE');
-        $this->forge->createTable('task_comments');
+        $this->forge->createTable('task_comments', true);
     }
 
     public function down(): void

@@ -9,6 +9,10 @@ class AddBoundaryCoordinatesToZones extends Migration
 {
     public function up()
     {
+        if (! $this->db->tableExists('zones')) {
+            return;
+        }
+
         // Add column using raw SQL with error handling
         // This approach handles the case where the column already exists
         try {

@@ -8,6 +8,10 @@ class AddSellerIdToTransactions extends Migration
 {
     public function up()
     {
+        if (! $this->db->tableExists('transactions')) {
+            return;
+        }
+
         $fields = [
             'seller_id' => [
                 'type' => 'INT',

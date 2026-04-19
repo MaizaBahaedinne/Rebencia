@@ -8,6 +8,10 @@ class AddCommissionPaidToTransactions extends Migration
 {
     public function up()
     {
+        if (! $this->db->tableExists('transactions')) {
+            return;
+        }
+
         $fields = [
             'commission_paid' => [
                 'type' => 'TINYINT',

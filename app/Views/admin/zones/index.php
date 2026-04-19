@@ -1,8 +1,11 @@
 <?php
-$perms = session()->get('permissions') ?? [];
-
-// ── En-tête ─────────────────────────────────────────────────────────
+$perms       = session()->get('permissions') ?? [];
+$meta        = $typeMeta[$activeTab];
+$currentList = $active_list;
+$search      = $this->request->getGet('search') ?? '';
 ?>
+
+<!-- ── EN-TÊTE ─────────────────────────────────────────────────────── -->
 <div class="d-flex justify-content-between align-items-start mb-4">
     <div>
         <h4 class="mb-0 fw-bold">
@@ -28,21 +31,21 @@ $perms = session()->get('permissions') ?? [];
 
 <!-- ── COMPTEURS ────────────────────────────────────────────────────── -->
 <div class="row g-3 mb-4">
-    <?php foreach ($typeMeta as $typeKey => $meta): ?>
+    <?php foreach ($typeMeta as $typeKey => $m): ?>
     <div class="col-6 col-xl-3">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body d-flex align-items-center gap-3 py-3">
-                <div class="rounded-3 p-2 bg-<?= $meta['color'] ?> bg-opacity-10 flex-shrink-0">
-                    <i class="bi <?= $meta['icon'] ?> fs-4 text-<?= $meta['color'] ?>"></i>
+                <div class="rounded-3 p-2 bg-<?= $m['color'] ?> bg-opacity-10 flex-shrink-0">
+                    <i class="bi <?= $m['icon'] ?> fs-4 text-<?= $m['color'] ?>"></i>
                 </div>
                 <div class="flex-grow-1">
                     <div class="fs-3 fw-bold lh-1"><?= $counts[$typeKey] ?? 0 ?></div>
-                    <div class="text-muted small"><?= esc($meta['label']) ?></div>
+                    <div class="text-muted small"><?= esc($m['label']) ?></div>
                 </div>
                 <?php if (in_array('zones.create', $perms)): ?>
                 <a href="<?= base_url('admin/zones/create/' . $typeKey) ?>"
-                   class="btn btn-sm btn-outline-<?= $meta['color'] ?> flex-shrink-0"
-                   title="Ajouter <?= esc($meta['label']) ?>">
+                   class="btn btn-sm btn-outline-<?= $m['color'] ?> flex-shrink-0"
+                   title="Ajouter <?= esc($m['label']) ?>">
                     <i class="bi bi-plus-lg"></i>
                 </a>
                 <?php endif; ?>
@@ -57,15 +60,14 @@ $perms = session()->get('permissions') ?? [];
 
     <div class="card-header p-0 border-bottom-0">
         <nav>
-            <ul class="nav nav-tabs px-3 pt-2" id="zonesTabs">
-                <?php foreach ($typeMeta as $typeKey => $meta): ?>
+            <ul class="nav nav-tabs px-3 pt-2">
+                <?php foreach ($typeMeta as $typeKey => $m): ?>
                 <li class="nav-item">
                     <a class="nav-link <?= $activeTab === $typeKey ? 'active' : '' ?>"
                        href="<?= base_url('admin/zones?tab=' . $typeKey) ?>">
-                        <i class="bi <?= $meta['icon'] ?> me-1"></i>
-                        <?= esc($meta['label']) ?>
-                        <span class="badge rounded-pill ms-1
-                            <?= $activeTab === $typeKey ? 'bg-' . $meta['color'] : 'text-bg-light' ?>">
+                        <i class="bi <?= $m['icon'] ?> me-1"></i>
+                        <?= esc($m['label']) ?>
+                        <span class="badge rounded-pill ms-1 <?= $activeTab === $typeKey ? 'bg-' . $m['color'] : 'text-bg-light' ?>">
                             <?= $counts[$typeKey] ?? 0 ?>
                         </span>
                     </a>
@@ -75,28 +77,37 @@ $perms = session()->get('permissions') ?? [];
         </nav>
     </div>
 
-    <?php
-    $currentList = match ($activeTab) {
-        'region'   => $region_list,
-        'ville'    => $ville_list,
-        'quartier' => $quartier_list,
-        default    => $pays_list,
-    };
-    $meta = $typeMeta[$activeTab];
-    ?>
-
-    <!-- Barre d'outils du tab actif -->
+    <!-- Barre d'outils -->
     <div class="card-header bg-light d-flex justify-content-between align-items-center gap-2 flex-wrap py-2">
-        <span class="text-muted small">
-            <i class="bi <?= $meta['icon'] ?> text-<?= $meta['color'] ?> me-1"></i>
-            <strong><?= count($currentList) ?></strong> entrée(s) — <?= esc($meta['label']) ?>
-        </span>
-        <?php if (in_array('zones.create', $perms)): ?>
-        <a href="<?= base_url('admin/zones/create/' . $activeTab) ?>"
-           class="btn btn-sm btn-<?= $meta['color'] ?> <?= $meta['color'] === 'warning' ? 'text-dark' : '' ?>">
-            <i class="bi bi-plus-circle me-1"></i>Ajouter <?= esc($meta['label']) ?>
-        </a>
-        <?php endif; ?>
+        <form method="GET" class="d-flex gap-2 align-items-center" style="min-width:0">
+            <input type="hidden" name="tab" value="<?= esc($activeTab) ?>">
+            <div class="input-group input-group-sm" style="max-width:280px">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="bi bi-search text-muted"></i>
+                </span>
+                <input type="text" class="form-control border-start-0" name="search"
+                       placeholder="Rechercher…"
+                       value="<?= esc($search) ?>">
+                <?php if ($search): ?>
+                <a href="<?= base_url('admin/zones?tab=' . $activeTab) ?>"
+                   class="btn btn-sm btn-outline-secondary" title="Effacer">
+                    <i class="bi bi-x"></i>
+                </a>
+                <?php endif; ?>
+            </div>
+        </form>
+
+        <div class="d-flex align-items-center gap-3">
+            <span class="text-muted small">
+                <strong><?= count($currentList) ?></strong> résultat(s)
+            </span>
+            <?php if (in_array('zones.create', $perms)): ?>
+            <a href="<?= base_url('admin/zones/create/' . $activeTab) ?>"
+               class="btn btn-sm btn-<?= $meta['color'] ?> <?= $meta['color'] === 'warning' ? 'text-dark' : '' ?>">
+                <i class="bi bi-plus-circle me-1"></i>Ajouter <?= esc($meta['label']) ?>
+            </a>
+            <?php endif; ?>
+        </div>
     </div>
 
     <!-- Table -->
@@ -107,8 +118,7 @@ $perms = session()->get('permissions') ?? [];
                     <th class="ps-3">Nom</th>
                     <?php if ($activeTab === 'pays'): ?>
                     <th>Code ISO</th>
-                    <?php endif; ?>
-                    <?php if ($activeTab === 'ville'): ?>
+                    <?php elseif ($activeTab === 'quartier'): ?>
                     <th>Code postal</th>
                     <?php endif; ?>
                     <?php if ($activeTab !== 'pays'): ?>
@@ -123,14 +133,24 @@ $perms = session()->get('permissions') ?? [];
                 <tr>
                     <td colspan="6" class="py-5 text-center text-muted">
                         <i class="bi <?= $meta['icon'] ?> fs-1 d-block mb-2 opacity-25"></i>
-                        Aucun(e) <?= strtolower(esc($meta['label'])) ?> enregistré(e).
-                        <?php if (in_array('zones.create', $perms)): ?>
-                        <div class="mt-2">
-                            <a href="<?= base_url('admin/zones/create/' . $activeTab) ?>"
-                               class="btn btn-sm btn-outline-<?= $meta['color'] ?>">
-                                <i class="bi bi-plus-circle me-1"></i>Ajouter
-                            </a>
-                        </div>
+                        <?php if ($search): ?>
+                            Aucun résultat pour « <?= esc($search) ?> ».
+                            <div class="mt-2">
+                                <a href="<?= base_url('admin/zones?tab=' . $activeTab) ?>"
+                                   class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-x-circle me-1"></i>Effacer la recherche
+                                </a>
+                            </div>
+                        <?php else: ?>
+                            Aucun(e) <?= strtolower(esc($meta['label'])) ?> enregistré(e).
+                            <?php if (in_array('zones.create', $perms)): ?>
+                            <div class="mt-2">
+                                <a href="<?= base_url('admin/zones/create/' . $activeTab) ?>"
+                                   class="btn btn-sm btn-outline-<?= $meta['color'] ?>">
+                                    <i class="bi bi-plus-circle me-1"></i>Ajouter
+                                </a>
+                            </div>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </td>
                 </tr>
@@ -139,13 +159,11 @@ $perms = session()->get('permissions') ?? [];
                 <tr>
                     <td class="ps-3">
                         <div class="d-flex align-items-center gap-2">
-                            <i class="bi <?= $meta['icon'] ?> text-<?= $meta['color'] ?> fs-5"></i>
-                            <div>
-                                <a href="<?= base_url('admin/zones/' . $z['id']) ?>"
-                                   class="fw-semibold text-dark text-decoration-none stretched-link-inner">
-                                    <?= esc($z['name']) ?>
-                                </a>
-                            </div>
+                            <i class="bi <?= $meta['icon'] ?> text-<?= $meta['color'] ?> fs-5 flex-shrink-0"></i>
+                            <a href="<?= base_url('admin/zones/' . $z['id']) ?>"
+                               class="fw-semibold text-dark text-decoration-none">
+                                <?= esc($z['name']) ?>
+                            </a>
                         </div>
                     </td>
 
@@ -157,9 +175,7 @@ $perms = session()->get('permissions') ?? [];
                         <span class="text-muted">—</span>
                         <?php endif; ?>
                     </td>
-                    <?php endif; ?>
-
-                    <?php if ($activeTab === 'ville'): ?>
+                    <?php elseif ($activeTab === 'quartier'): ?>
                     <td>
                         <?php if ($z['code']): ?>
                         <code><?= esc($z['code']) ?></code>
@@ -191,18 +207,15 @@ $perms = session()->get('permissions') ?? [];
 
                     <td class="text-end pe-3">
                         <div class="d-flex justify-content-end gap-1">
-                            <!-- Voir -->
                             <a href="<?= base_url('admin/zones/' . $z['id']) ?>"
-                               class="btn btn-sm btn-light" title="Voir le détail">
+                               class="btn btn-sm btn-light" title="Voir">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <!-- Modifier -->
                             <?php if (in_array('zones.edit', $perms)): ?>
                             <a href="<?= base_url('admin/zones/' . $z['id'] . '/edit') ?>"
                                class="btn btn-sm btn-light" title="Modifier">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <!-- Toggle statut -->
                             <form method="POST"
                                   action="<?= base_url('admin/zones/' . $z['id'] . '/toggle-status') ?>"
                                   class="d-inline">
@@ -213,7 +226,6 @@ $perms = session()->get('permissions') ?? [];
                                 </button>
                             </form>
                             <?php endif; ?>
-                            <!-- Supprimer -->
                             <?php if (in_array('zones.delete', $perms)): ?>
                             <form method="POST"
                                   action="<?= base_url('admin/zones/' . $z['id'] . '/delete') ?>"

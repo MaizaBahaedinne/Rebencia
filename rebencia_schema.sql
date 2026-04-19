@@ -58,6 +58,8 @@ CREATE TABLE `roles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `roles` (`name`, `label`, `description`, `color`, `created_at`, `updated_at`) VALUES
+('super_admin',  'Super Administrateur','Accès absolu au système, gestion technique',         '#6610f2', NOW(), NOW()),
+('admin',        'Administrateur',      'Gestion complète métier hors paramètres système',    '#20c997', NOW(), NOW()),
 ('director',     'Directeur d\'Agence', 'Accès total à la plateforme, gestion stratégique',  '#dc3545', NOW(), NOW()),
 ('expert',       'Expert Immobilier',   'Gestion des biens et suivi des ventes',              '#0d6efd', NOW(), NOW()),
 ('coordinator',  'Coordinateur',        'Gestion des leads, équipe et planning',              '#198754', NOW(), NOW()),
@@ -112,26 +114,41 @@ CREATE TABLE `role_permissions` (
   FOREIGN KEY (`permission_id`) REFERENCES `permissions`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Super Administrateur : toutes les permissions
+INSERT INTO `role_permissions` (`role_id`, `permission_id`, `created_at`)
+SELECT r.id, p.id, NOW() FROM `permissions` p
+CROSS JOIN `roles` r WHERE r.name = 'super_admin';
+
+-- Administrateur : toutes les permissions sauf system.deploy et system.settings
+INSERT INTO `role_permissions` (`role_id`, `permission_id`, `created_at`)
+SELECT r.id, p.id, NOW() FROM `permissions` p
+CROSS JOIN `roles` r WHERE r.name = 'admin'
+AND p.name NOT IN ('system.deploy','system.settings');
+
 -- Directeur : toutes les permissions
 INSERT INTO `role_permissions` (`role_id`, `permission_id`, `created_at`)
-SELECT 1, id, NOW() FROM `permissions`;
+SELECT r.id, p.id, NOW() FROM `permissions` p
+CROSS JOIN `roles` r WHERE r.name = 'director';
 
 -- Expert : biens (sans delete) + leads view/edit + stats
 INSERT INTO `role_permissions` (`role_id`, `permission_id`, `created_at`)
-SELECT 2, id, NOW() FROM `permissions`
-WHERE `name` IN ('properties.view','properties.create','properties.edit','properties.publish',
-                 'leads.view','leads.edit','stats.view');
+SELECT r.id, p.id, NOW() FROM `permissions` p
+CROSS JOIN `roles` r WHERE r.name = 'expert'
+AND p.name IN ('properties.view','properties.create','properties.edit','properties.publish',
+               'leads.view','leads.edit','stats.view');
 
 -- Coordinateur : leads complets + biens view + users view + stats
 INSERT INTO `role_permissions` (`role_id`, `permission_id`, `created_at`)
-SELECT 3, id, NOW() FROM `permissions`
-WHERE `name` IN ('leads.view','leads.create','leads.edit','leads.assign',
-                 'properties.view','users.view','stats.view');
+SELECT r.id, p.id, NOW() FROM `permissions` p
+CROSS JOIN `roles` r WHERE r.name = 'coordinator'
+AND p.name IN ('leads.view','leads.create','leads.edit','leads.assign',
+               'properties.view','users.view','stats.view');
 
 -- Collaborateur : biens view + leads view/edit assignés
 INSERT INTO `role_permissions` (`role_id`, `permission_id`, `created_at`)
-SELECT 4, id, NOW() FROM `permissions`
-WHERE `name` IN ('properties.view','leads.view','leads.edit');
+SELECT r.id, p.id, NOW() FROM `permissions` p
+CROSS JOIN `roles` r WHERE r.name = 'collaborator'
+AND p.name IN ('properties.view','leads.view','leads.edit');
 
 -- ============================================================
 -- 4. UTILISATEURS

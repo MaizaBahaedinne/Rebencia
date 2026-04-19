@@ -75,6 +75,8 @@
         }
 
         /* ---- Badges rôles ---- */
+        .badge-super_admin  { background-color: #6610f2 !important; }
+        .badge-admin        { background-color: #20c997 !important; }
         .badge-director    { background-color: #dc3545 !important; }
         .badge-expert      { background-color: #0d6efd !important; }
         .badge-coordinator { background-color: #198754 !important; }

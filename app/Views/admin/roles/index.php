@@ -52,11 +52,24 @@
                 </thead>
                 <tbody>
                     <?php foreach ($permissions as $module => $perms) : ?>
-                    <tr class="table-light">
-                        <td colspan="<?= count($roles) + 1 ?>" class="fw-bold text-uppercase text-muted py-2"
+                    <tr class="table-secondary">
+                        <td class="fw-bold text-uppercase text-muted py-2"
                             style="font-size:.75rem;letter-spacing:.1em;">
                             <i class="bi bi-folder2 me-1"></i><?= esc($module) ?>
                         </td>
+                        <?php foreach ($roles as $role) : ?>
+                        <td class="text-center align-middle">
+                            <?php if ($role['name'] !== 'director') : ?>
+                            <input type="checkbox"
+                                   class="form-check-input select-all-module"
+                                   data-role="<?= $role['id'] ?>"
+                                   data-module="<?= esc($module) ?>"
+                                   title="Tout sélectionner — <?= esc($role['label']) ?>">
+                            <?php else : ?>
+                            <i class="bi bi-lock-fill text-danger" title="Toutes les permissions"></i>
+                            <?php endif; ?>
+                        </td>
+                        <?php endforeach; ?>
                     </tr>
                     <?php foreach ($perms as $perm) : ?>
                     <tr>
@@ -73,6 +86,7 @@
                                        class="form-check-input perm-checkbox"
                                        data-role="<?= $role['id'] ?>"
                                        data-perm="<?= $perm['id'] ?>"
+                                       data-module="<?= esc($module) ?>"
                                        <?= $hasPermission ? 'checked' : '' ?>
                                        <?= $role['name'] === 'director' ? 'disabled checked' : '' ?>
                                        title="<?= esc($role['label']) ?> – <?= esc($perm['label']) ?>">
@@ -94,36 +108,80 @@
 </div>
 
 <script>
-// Enregistrement automatique à chaque changement de checkbox
+const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+function savePermissions(roleId) {
+    const checked = Array.from(
+        document.querySelectorAll('.perm-checkbox[data-role="' + roleId + '"]:checked')
+    ).map(el => el.dataset.perm);
+
+    fetch('/admin/roles/' + roleId + '/permissions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({ permissions: checked })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Permissions mises à jour', 'success');
+        } else {
+            showToast('Erreur : ' + (data.error || 'inconnue'), 'danger');
+        }
+    })
+    .catch(() => showToast('Erreur réseau', 'danger'));
+}
+
+// Sauvegarde auto à chaque changement de permission
+document.querySelectorAll('.perm-checkbox:not([disabled])').forEach(function(cb) {
+    cb.addEventListener('change', function() {
+        savePermissions(this.dataset.role);
+    });
+});
+
+// Sélectionner / désélectionner tout un module
+document.querySelectorAll('.select-all-module').forEach(function(cb) {
+    cb.addEventListener('change', function() {
+        const roleId  = this.dataset.role;
+        const module  = this.dataset.module;
+        const checked = this.checked;
+
+        document.querySelectorAll(
+            '.perm-checkbox[data-role="' + roleId + '"][data-module="' + module + '"]:not([disabled])'
+        ).forEach(function(perm) {
+            perm.checked = checked;
+        });
+
+        savePermissions(roleId);
+    });
+
+    // Synchroniser l'état initial du select-all
+    updateSelectAll(cb);
+});
+
+// Met à jour l'état du select-all quand une permission individuelle change
 document.querySelectorAll('.perm-checkbox:not([disabled])').forEach(function(cb) {
     cb.addEventListener('change', function() {
         const roleId = this.dataset.role;
-
-        // Collecter toutes les permissions cochées pour ce rôle
-        const checked = Array.from(
-            document.querySelectorAll('.perm-checkbox[data-role="' + roleId + '"]:checked')
-        ).map(el => el.dataset.perm);
-
-        fetch('/admin/roles/' + roleId + '/permissions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-            },
-            body: JSON.stringify({ permissions: checked })
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                showToast('Permissions mises à jour', 'success');
-            } else {
-                showToast('Erreur : ' + (data.error || 'inconnue'), 'danger');
-            }
-        })
-        .catch(() => showToast('Erreur réseau', 'danger'));
+        const module = this.dataset.module;
+        const allCb = document.querySelector(
+            '.select-all-module[data-role="' + roleId + '"][data-module="' + module + '"]'
+        );
+        if (allCb) updateSelectAll(allCb);
     });
 });
+
+function updateSelectAll(allCb) {
+    const roleId = allCb.dataset.role;
+    const module = allCb.dataset.module;
+    const perms  = document.querySelectorAll('.perm-checkbox[data-role="' + roleId + '"][data-module="' + module + '"]');
+    const checked = Array.from(perms).filter(p => p.checked).length;
+    allCb.checked       = checked === perms.length;
+    allCb.indeterminate = checked > 0 && checked < perms.length;
+}
 
 function showToast(msg, type) {
     const toast = document.createElement('div');

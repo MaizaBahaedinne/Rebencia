@@ -57,7 +57,9 @@ class RolesController extends BaseController
             return $this->json(['error' => 'Rôle introuvable'], 404);
         }
 
-        $permissionIds = $this->request->getPost('permissions') ?? [];
+        // Accepte JSON body (fetch) ou form POST classique
+        $json = $this->request->getJSON(true);
+        $permissionIds = $json['permissions'] ?? $this->request->getPost('permissions') ?? [];
         $success = $this->model->syncPermissions($roleId, $permissionIds);
 
         if ($success) {

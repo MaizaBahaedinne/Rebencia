@@ -125,13 +125,17 @@ class ZoneModel extends Model
         $chain   = ['pays' => null, 'region' => null, 'ville' => null];
         $current = $zone;
 
+        // Correspondances anciens types → nouveaux types
+        $aliases = ['governorate' => 'region', 'city' => 'ville', 'district' => 'quartier'];
+
         while (! empty($current['parent_id'])) {
             $parent = $this->find((int) $current['parent_id']);
             if (! $parent) {
                 break;
             }
-            if (array_key_exists($parent['type'], $chain)) {
-                $chain[$parent['type']] = $parent;
+            $pType = $aliases[$parent['type']] ?? $parent['type'];
+            if (array_key_exists($pType, $chain)) {
+                $chain[$pType] = $parent;
             }
             $current = $parent;
         }

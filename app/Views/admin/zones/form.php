@@ -14,6 +14,19 @@
 $isEdit = ! empty($zone['id']);
 $type   = $zoneType;
 
+// Normaliser les anciens types (avant migration NormalizeZoneTypes)
+$typeAliases = [
+    'governorate' => 'region',
+    'city'        => 'ville',
+    'district'    => 'quartier',
+];
+if (isset($typeAliases[$type])) {
+    $type = $typeAliases[$type];
+}
+if (! in_array($type, ['pays', 'region', 'ville', 'quartier'])) {
+    $type = 'quartier'; // fallback sécurisé
+}
+
 // Métadonnées du type
 $allMeta = [
     'pays'     => ['label' => 'Pays',          'icon' => 'bi-globe2',       'color' => 'primary',

@@ -145,6 +145,13 @@ class ZonesController extends BaseController
             throw new \CodeIgniter\Exceptions\PageNotFoundException('Zone introuvable.');
         }
 
+        // Normaliser les anciens types (avant migration NormalizeZoneTypes)
+        $typeAliases = ['governorate' => 'region', 'city' => 'ville', 'district' => 'quartier'];
+        $zoneType    = $typeAliases[$zone['type']] ?? $zone['type'];
+        if (! in_array($zoneType, self::VALID_TYPES)) {
+            $zoneType = 'quartier';
+        }
+
         $chain    = $this->model->getParentChain($zone);
         $paysId   = $chain['pays']   ? (int) $chain['pays']['id']   : null;
         $regionId = $chain['region'] ? (int) $chain['region']['id'] : null;
@@ -153,7 +160,7 @@ class ZonesController extends BaseController
         return $this->render('admin/zones/form', [
             'page_title'   => 'Modifier : ' . $zone['name'],
             'zone'         => $zone,
-            'zoneType'     => $zone['type'],
+            'zoneType'     => $zoneType,
             'pays_list'    => $this->model->getByType('pays'),
             'preselect'    => ['pays_id' => $paysId, 'region_id' => $regionId, 'ville_id' => $villeId],
             'regions_list' => $paysId   ? $this->model->getByParent($paysId)   : [],

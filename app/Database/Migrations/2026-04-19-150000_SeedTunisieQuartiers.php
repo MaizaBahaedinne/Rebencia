@@ -73,6 +73,10 @@ class SeedTunisieQuartiers extends Migration
         // ── 3. Construire les quartiers à insérer ─────────────────────
         $batch = [];
 
+        // CI4 n'autoloade pas les autres fichiers de migration.
+        // On charge explicitement le fichier pour accéder à la constante DATA.
+        require_once APPPATH . 'Database/Migrations/2026-04-19-140000_SeedTunisieZones.php';
+
         foreach (SeedTunisieZones::DATA as $govName => $entries) {
             if (! isset($regionIds[$govName])) {
                 continue; // gouvernorat absent → skip

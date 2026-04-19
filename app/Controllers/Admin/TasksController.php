@@ -19,7 +19,8 @@ class TasksController extends BaseController
     public function index(): string
     {
         // Si la table n'existe pas encore (migration en attente)
-        if (! $this->db->tableExists('tasks')) {
+        $db = \Config\Database::connect();
+        if (! $db->tableExists('tasks')) {
             return $this->render('admin/tasks/index', [
                 'page_title' => 'Suivi des tâches',
                 'tasks'      => [],

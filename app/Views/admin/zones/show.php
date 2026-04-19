@@ -211,7 +211,7 @@ $breadcrumb = array_filter([
 
 </div><!-- /.row -->
 
-<?php if ($zone['type'] === 'quartier'): ?>
+<?php if ($zone['type'] === 'city'): ?>
 <!-- ── CARTE GÉOMÉTRIQUE ─────────────────────────────────────────────── -->
 <div class="card shadow-sm mt-4" id="mapCard">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">

@@ -99,7 +99,7 @@ $search      = $search ?? '';
 
         <div class="d-flex align-items-center gap-3">
             <span class="text-muted small">
-                <strong><?= count($currentList) ?></strong> résultat(s)
+                <strong><?= count($currentList) ?></strong> / <strong><?= $counts[$activeTab] ?? 0 ?></strong> résultat(s)
             </span>
             <?php if (in_array('zones.create', $perms)): ?>
             <a href="<?= base_url('admin/zones/create/' . $activeTab) ?>"
@@ -245,4 +245,43 @@ $search      = $search ?? '';
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination -->
+    <?php
+    $total      = $counts[$activeTab] ?? 0;
+    $totalPages = $limit > 0 ? (int) ceil($total / $limit) : 1;
+    ?>
+    <?php if ($totalPages > 1): ?>
+    <div class="card-footer d-flex justify-content-between align-items-center py-2">
+        <small class="text-muted">
+            Page <?= $page ?> / <?= $totalPages ?>
+            &nbsp;—&nbsp; <?= $total ?> <?= strtolower(esc($meta['label'])) ?>(s) au total
+        </small>
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                <?php if ($page > 1): ?>
+                <li class="page-item">
+                    <a class="page-link" href="<?= base_url('admin/zones?tab=' . $activeTab . '&page=' . ($page - 1) . ($search ? '&search=' . urlencode($search) : '')) ?>">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                <?php endif; ?>
+                <?php foreach (range(max(1, $page - 2), min($totalPages, $page + 2)) as $p): ?>
+                <li class="page-item <?= $p === $page ? 'active' : '' ?>">
+                    <a class="page-link" href="<?= base_url('admin/zones?tab=' . $activeTab . '&page=' . $p . ($search ? '&search=' . urlencode($search) : '')) ?>">
+                        <?= $p ?>
+                    </a>
+                </li>
+                <?php endforeach; ?>
+                <?php if ($page < $totalPages): ?>
+                <li class="page-item">
+                    <a class="page-link" href="<?= base_url('admin/zones?tab=' . $activeTab . '&page=' . ($page + 1) . ($search ? '&search=' . urlencode($search) : '')) ?>">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+                <?php endif; ?>
+            </ul>
+        </nav>
+    </div>
+    <?php endif; ?>
 </div>

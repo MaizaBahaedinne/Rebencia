@@ -33,19 +33,28 @@ class ZonesController extends BaseController
         }
 
         $search = trim((string) $this->request->getGet('search'));
+        $page   = max(1, (int) ($this->request->getGet('page') ?? 1));
+        $limit  = 300;
+        $offset = ($page - 1) * $limit;
 
         // On ne charge que le tab actif pour éviter de rapatrier des milliers
         // de lignes en une seule requête (ex: 4868 quartiers).
+        $filters = [
+            'type'   => $activeTab,
+            'search' => $search ?: null,
+            'limit'  => $limit,
+            'offset' => $offset,
+        ];
+
         return $this->render('admin/zones/index', [
             'page_title'  => 'Zones géographiques',
             'counts'      => $this->model->countByType(),
-            'active_list' => $this->model->getWithParent([
-                'type'   => $activeTab,
-                'search' => $search ?: null,
-            ]),
+            'active_list' => $this->model->getWithParent($filters),
             'activeTab'   => $activeTab,
             'typeMeta'    => ZoneModel::TYPE_META,
             'search'      => $search,
+            'page'        => $page,
+            'limit'       => $limit,
         ]);
     }
 

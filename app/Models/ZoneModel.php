@@ -36,8 +36,8 @@ class ZoneModel extends Model
         $q = $this->db->table('zones z')
             ->select('z.id, z.type, z.name, z.code, z.is_active, z.parent_id, z.created_at,
                       p.name AS parent_name, p.type AS parent_type')
-            ->join('zones p', 'p.id = z.parent_id', 'left')
-            ->where('z.deleted_at', null);
+            ->join('zones p', 'p.id = z.parent_id AND p.deleted_at IS NULL', 'left')
+            ->where('z.deleted_at IS NULL');
 
         if (! empty($filters['type'])) {
             $q->where('z.type', $filters['type']);
@@ -52,7 +52,11 @@ class ZoneModel extends Model
               ->groupEnd();
         }
 
-        return $q->orderBy('z.name', 'ASC')->get()->getResultArray();
+        // Limite pour éviter timeout sur hébergement partagé (quartiers = milliers de lignes)
+        $limit  = (int) ($filters['limit']  ?? 500);
+        $offset = (int) ($filters['offset'] ?? 0);
+
+        return $q->orderBy('z.name', 'ASC')->limit($limit, $offset)->get()->getResultArray();
     }
 
     /**
@@ -98,7 +102,7 @@ class ZoneModel extends Model
     {
         $rows = $this->db->table('zones')
             ->select('type, COUNT(*) AS total')
-            ->where('deleted_at', null)
+            ->where('deleted_at IS NULL')
             ->groupBy('type')
             ->get()
             ->getResultArray();

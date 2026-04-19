@@ -323,7 +323,20 @@ class ZonesController extends BaseController
         // ── Normaliser vers Format A (govName => [[del,loc,cp,cpVille], ...])
         $normalized = $this->normalizeJson($data);
         if ($normalized === null) {
-            return redirect()->back()->with('error', 'Format JSON non reconnu. Consultez la documentation.');
+            // Fournir un aperçu pour aider au diagnostic
+            $preview = is_array($data)
+                ? 'Type : ' . (array_is_list($data) ? 'liste' : 'objet')
+                  . ' — clés détectées : ' . implode(', ', array_slice(array_keys($data[0] ?? $data), 0, 5))
+                : gettype($data);
+            return redirect()->back()->with('error', 'Format JSON non reconnu. ' . $preview);
+        }
+
+        // Vérification rapide : au moins 1 gouvernorat avec des entrées
+        $govCount = count($normalized);
+        $entryCount = array_sum(array_map('count', $normalized));
+        if ($govCount === 0 || $entryCount === 0) {
+            return redirect()->back()->with('error',
+                "JSON parsé mais aucune donnée exploitable ({$govCount} gouvernorat(s), {$entryCount} entrée(s)).");
         }
 
         $paysName = $this->request->getPost('pays_name') ?: 'Tunisie';
@@ -416,10 +429,47 @@ class ZonesController extends BaseController
     private function normalizeJson(mixed $data): ?array
     {
         // Format A : { "GovName": [["del","loc","cp","cpv"], ...] }
+        // Les entrées internes sont des tableaux INDEXÉS (clé 0 = délégation)
         if (is_array($data) && ! array_is_list($data)) {
             $first = reset($data);
-            if (is_array($first) && isset($first[0]) && is_array($first[0])) {
-                return $data; // déjà normalisé
+            if (is_array($first) && ! empty($first)) {
+                $firstEntry = reset($first);
+                if (is_array($firstEntry) && array_is_list($firstEntry) && isset($firstEntry[0]) && is_string($firstEntry[0])) {
+                    return $data; // Format A confirmé
+                }
+            }
+        }
+
+        // Format D : { "GovName": [{"delegation":..,"localite":..,"cp":..}, ...] }
+        // Objets associatifs groupés par gouvernorat
+        if (is_array($data) && ! array_is_list($data)) {
+            $first = reset($data);
+            if (is_array($first) && ! empty($first)) {
+                $firstEntry = reset($first);
+                if (is_array($firstEntry) && ! array_is_list($firstEntry)
+                    && (isset($firstEntry['delegation']) || isset($firstEntry['localite']) || isset($firstEntry['cp']))) {
+                    $out = [];
+                    foreach ($data as $govName => $entries) {
+                        foreach ($entries as $row) {
+                            $del = trim($row['delegation'] ?? $row['ville']    ?? $row['deleg']   ?? '');
+                            $loc = trim($row['localite']   ?? $row['quartier'] ?? $row['locality'] ?? $del);
+                            $cp  = trim((string) ($row['cp'] ?? $row['code_postal'] ?? $row['codepostal'] ?? ''));
+                            if ($del === '') { continue; }
+                            $out[$govName][] = [$del, $loc, $cp, $cp];
+                        }
+                    }
+                    // Calculer cp_ville = cp le plus fréquent de chaque délégation
+                    foreach ($out as &$entries) {
+                        $cpFreq = [];
+                        foreach ($entries as $e) { $cpFreq[$e[0]][$e[2]] = ($cpFreq[$e[0]][$e[2]] ?? 0) + 1; }
+                        foreach ($entries as &$e) {
+                            arsort($cpFreq[$e[0]]);
+                            $e[3] = (string) array_key_first($cpFreq[$e[0]]);
+                        }
+                    }
+                    unset($entries, $e);
+                    return $out ?: null;
+                }
             }
         }
 
@@ -435,7 +485,7 @@ class ZonesController extends BaseController
                 $out[$gov][] = [$del, $loc, $cp, $cp];
             }
             // Calculer cp_ville = cp le plus fréquent de chaque délégation
-            foreach ($out as $gov => &$entries) {
+            foreach ($out as &$entries) {
                 $cpFreq = [];
                 foreach ($entries as $e) { $cpFreq[$e[0]][$e[2]] = ($cpFreq[$e[0]][$e[2]] ?? 0) + 1; }
                 foreach ($entries as &$e) {
@@ -465,6 +515,48 @@ class ZonesController extends BaseController
                 }
             }
             return $out ?: null;
+        }
+
+        // Format E : liste plate sans clé "gouvernorat" explicite
+        // [{"governorate":..,"delegation":..,"locality":..,"postal_code":..}, ...]
+        if (is_array($data) && array_is_list($data) && isset($data[0])) {
+            $govKey = null;
+            $delKey = null;
+            $locKey = null;
+            $cpKey  = null;
+            foreach (['governorate','gouvernorat','gov','region','state'] as $k) {
+                if (isset($data[0][$k])) { $govKey = $k; break; }
+            }
+            foreach (['delegation','deleg','city','ville','district'] as $k) {
+                if (isset($data[0][$k])) { $delKey = $k; break; }
+            }
+            foreach (['locality','localite','quartier','neighborhood','localité'] as $k) {
+                if (isset($data[0][$k])) { $locKey = $k; break; }
+            }
+            foreach (['cp','code_postal','postal_code','zip','codepostal'] as $k) {
+                if (isset($data[0][$k])) { $cpKey = $k; break; }
+            }
+            if ($govKey && $delKey) {
+                $out = [];
+                foreach ($data as $row) {
+                    $gov = trim($row[$govKey] ?? '');
+                    $del = trim($row[$delKey] ?? '');
+                    $loc = $locKey ? trim($row[$locKey] ?? $del) : $del;
+                    $cp  = $cpKey  ? trim((string) ($row[$cpKey] ?? '')) : '';
+                    if ($gov === '' || $del === '') { continue; }
+                    $out[$gov][] = [$del, $loc, $cp, $cp];
+                }
+                foreach ($out as &$entries) {
+                    $cpFreq = [];
+                    foreach ($entries as $e) { $cpFreq[$e[0]][$e[2]] = ($cpFreq[$e[0]][$e[2]] ?? 0) + 1; }
+                    foreach ($entries as &$e) {
+                        arsort($cpFreq[$e[0]]);
+                        $e[3] = (string) array_key_first($cpFreq[$e[0]]);
+                    }
+                }
+                unset($entries, $e);
+                return $out ?: null;
+            }
         }
 
         return null;

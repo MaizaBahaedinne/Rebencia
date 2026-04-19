@@ -28,11 +28,10 @@ class AddCharacteristicsPermissions extends Migration
                 ->countAllResults();
             if ($exists === 0) {
                 $this->db->table('permissions')->insert([
-                    'name'        => $name,
-                    'label'       => $label,
-                    'module'      => 'characteristics',
-                    'created_at'  => $now,
-                    'updated_at'  => $now,
+                    'name'       => $name,
+                    'label'      => $label,
+                    'module'     => 'characteristics',
+                    'created_at' => $now,
                 ]);
             }
         }

@@ -5,6 +5,7 @@ namespace App\Controllers\Admin;
 use App\Controllers\BaseController;
 use App\Models\PropertyModel;
 use App\Models\UserModel;
+use App\Models\ZoneModel;
 
 /**
  * PropertiesController – CRUD Biens Immobiliers.
@@ -51,11 +52,13 @@ class PropertiesController extends BaseController
     public function create(): string
     {
         $this->requirePermission('properties.create');
+        $zoneModel = new ZoneModel();
 
         return $this->render('admin/properties/form', [
             'page_title' => 'Nouveau bien',
             'property'   => [],
             'agents'     => (new UserModel())->getWithRole(['status' => 'active']),
+            'pays_list'  => $zoneModel->getByType('pays'),
         ]);
     }
 
@@ -128,12 +131,22 @@ class PropertiesController extends BaseController
     public function edit(int $id): string
     {
         $this->requirePermission('properties.edit');
-        $property = $this->findOrFail($id);
+        $property  = $this->findOrFail($id);
+        $zoneModel = new ZoneModel();
+
+        // Tenter de retrouver la ville par son nom pour pré-sélectionner la cascade
+        $villePreselect = null;
+        if (! empty($property['city'])) {
+            $found = $zoneModel->where('type', 'ville')->like('name', $property['city'], 'none')->first();
+            $villePreselect = $found ? $found : null;
+        }
 
         return $this->render('admin/properties/form', [
-            'page_title' => 'Modifier – ' . $property['title'],
-            'property'   => $property,
-            'agents'     => (new UserModel())->getWithRole(['status' => 'active']),
+            'page_title'     => 'Modifier – ' . $property['title'],
+            'property'       => $property,
+            'agents'         => (new UserModel())->getWithRole(['status' => 'active']),
+            'pays_list'      => $zoneModel->getByType('pays'),
+            'ville_preselect'=> $villePreselect,
         ]);
     }
 

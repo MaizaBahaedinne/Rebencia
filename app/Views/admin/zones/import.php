@@ -1,7 +1,6 @@
-<?= $this->extend('layouts/main') ?>
-<?= $this->section('content') ?>
 <?php
 $perms = session()->get('permissions') ?? [];
+$typeMeta = \App\Models\ZoneModel::TYPE_META;
 ?>
 
 <!-- EN-TÊTE -->
@@ -33,10 +32,7 @@ $perms = session()->get('permissions') ?? [];
 
 <!-- COMPTEURS ACTUELS -->
 <div class="row g-3 mb-4">
-    <?php
-    $typeMeta = \App\Models\ZoneModel::TYPE_META;
-    foreach ($typeMeta as $typeKey => $m):
-    ?>
+    <?php foreach ($typeMeta as $typeKey => $m): ?>
     <div class="col-6 col-xl-3">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body d-flex align-items-center gap-3 py-3">
@@ -275,5 +271,3 @@ function confirmPurge() {
     }
 }
 </script>
-
-<?= $this->endSection() ?>

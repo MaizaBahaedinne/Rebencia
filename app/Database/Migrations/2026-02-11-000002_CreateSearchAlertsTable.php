@@ -149,9 +149,9 @@ class CreateSearchAlertsTable extends Migration
         $this->forge->addKey('is_active');
         $this->forge->addKey('created_at');
         
-        $this->forge->addForeignKey('client_id', 'clients', 'id', 'CASCADE', 'SET NULL');
-        
-        $this->forge->createTable('search_alerts');
+        // FK vers clients supprimée : table optionnelle non présente dans tous les environnements
+
+        $this->forge->createTable('search_alerts', true);
     }
 
     public function down()

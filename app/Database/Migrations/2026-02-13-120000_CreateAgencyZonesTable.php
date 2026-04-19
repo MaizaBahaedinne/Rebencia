@@ -48,10 +48,10 @@ class CreateAgencyZonesTable extends Migration
 
         $this->forge->addKey('id', true);
         $this->forge->addKey(['agency_id', 'zone_id'], false, true); // Unique constraint
-        $this->forge->addForeignKey('agency_id', 'agencies', 'id', 'CASCADE', 'CASCADE');
+        // FK vers agencies supprimée : table optionnelle non présente dans tous les environnements
         $this->forge->addForeignKey('zone_id', 'zones', 'id', 'CASCADE', 'CASCADE');
         
-        $this->forge->createTable('agency_zones');
+        $this->forge->createTable('agency_zones', true);
     }
 
     public function down()

@@ -8,6 +8,10 @@ class AddTransactionDateToTransactions extends Migration
 {
     public function up()
     {
+        if (! $this->db->tableExists('transactions')) {
+            return;
+        }
+
         $fields = [
             'transaction_date' => [
                 'type' => 'DATE',

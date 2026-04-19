@@ -99,9 +99,9 @@ class CreatePricePerM2Table extends Migration
         $this->forge->addKey('property_type');
         $this->forge->addKey('transaction_type');
         
-        $this->forge->addForeignKey('zone_id', 'zones', 'id', 'SET NULL', 'CASCADE');
-        
-        $this->forge->createTable('price_per_m2');
+        // FK vers zones supprimée : table optionnelle non présente dans tous les environnements
+
+        $this->forge->createTable('price_per_m2', true);
     }
 
     public function down()

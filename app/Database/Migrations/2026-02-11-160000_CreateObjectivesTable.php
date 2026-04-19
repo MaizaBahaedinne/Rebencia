@@ -135,9 +135,9 @@ class CreateObjectivesTable extends Migration
         $this->forge->addKey('user_id');
         $this->forge->addKey('agency_id');
         $this->forge->addForeignKey('user_id', 'users', 'id', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('agency_id', 'agencies', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('created_by', 'users', 'id', 'SET NULL', 'CASCADE');
-        $this->forge->createTable('objectives');
+        // FK vers agencies supprimée : table optionnelle non présente dans tous les environnements
+        $this->forge->createTable('objectives', true);
     }
 
     public function down()

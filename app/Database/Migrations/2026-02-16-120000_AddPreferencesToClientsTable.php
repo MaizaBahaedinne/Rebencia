@@ -8,6 +8,10 @@ class AddPreferencesToClientsTable extends Migration
 {
     public function up()
     {
+        if (! $this->db->tableExists('clients')) {
+            return;
+        }
+
         // Ajouter les colonnes de préférences manquantes à la table clients
         $this->forge->addColumn('clients', [
             'property_type_preference' => [

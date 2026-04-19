@@ -84,10 +84,10 @@ class CreatePropertyRequestsTable extends Migration
         $this->forge->addKey('assigned_to');
         
         $this->forge->addForeignKey('property_id', 'properties', 'id', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('client_id', 'clients', 'id', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('assigned_to', 'users', 'id', 'SET NULL', 'CASCADE');
-        
-        $this->forge->createTable('property_requests');
+        // FK vers clients supprimée : table optionnelle non présente dans tous les environnements
+
+        $this->forge->createTable('property_requests', true);
     }
 
     public function down()

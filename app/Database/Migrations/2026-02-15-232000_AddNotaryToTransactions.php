@@ -8,6 +8,10 @@ class AddNotaryToTransactions extends Migration
 {
     public function up()
     {
+        if (! $this->db->tableExists('transactions')) {
+            return;
+        }
+
         $fields = [
             'notary' => [
                 'type' => 'VARCHAR',

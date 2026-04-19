@@ -13,6 +13,11 @@ $search      = $search ?? '';
         </h4>
         <p class="text-muted mb-0">Pays · Régions · Villes · Quartiers</p>
     </div>
+    <?php if (in_array('zones.create', $perms)): ?>
+    <a href="<?= base_url('admin/zones/import') ?>" class="btn btn-sm btn-outline-primary">
+        <i class="bi bi-upload me-1"></i>Import JSON
+    </a>
+    <?php endif; ?>
 </div>
 
 <!-- ── FLASH MESSAGES ───────────────────────────────────────────────── -->

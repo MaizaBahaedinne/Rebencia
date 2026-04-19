@@ -123,11 +123,24 @@ class SystemController extends BaseController
         $output   = [];
         $return   = 0;
 
-        // Sécurisé : exécution dans le répertoire racine ci4
+        // 1. git pull
         exec("cd " . escapeshellarg($rootPath) . " && git pull 2>&1", $output, $return);
 
-        $outputStr  = implode("\n", $output);
-        $status     = ($return === 0) ? 'success' : 'failed';
+        // 2. php spark migrate (seulement si git pull a réussi)
+        $migrateOutput = [];
+        $migrateReturn = 0;
+        if ($return === 0) {
+            $phpBin = PHP_BINARY;
+            $spark  = escapeshellarg($rootPath . 'spark');
+            exec("cd " . escapeshellarg($rootPath) . " && {$phpBin} {$spark} migrate --no-interaction 2>&1", $migrateOutput, $migrateReturn);
+        }
+
+        $outputStr  = "=== git pull ===\n" . implode("\n", $output);
+        if (!empty($migrateOutput)) {
+            $outputStr .= "\n\n=== php spark migrate ===\n" . implode("\n", $migrateOutput);
+        }
+
+        $status = ($return === 0 && $migrateReturn === 0) ? 'success' : 'failed';
 
         // Récupérer le nouveau commit
         $commitHash    = '';
@@ -146,14 +159,19 @@ class SystemController extends BaseController
             "Git pull : {$status}"
         );
 
-        if ($return === 0) {
+        if ($return === 0 && $migrateReturn === 0) {
             return redirect()->to(base_url('admin/system/deploy'))
-                ->with('success', 'Déploiement réussi — ' . ($commitMessage ?: $outputStr))
+                ->with('success', 'Déploiement réussi — git pull + migrations appliquées')
                 ->with('deploy_output', $outputStr)
                 ->with('deploy_success', true);
+        } elseif ($return !== 0) {
+            return redirect()->to(base_url('admin/system/deploy'))
+                ->with('error', 'Échec du git pull.')
+                ->with('deploy_output', $outputStr)
+                ->with('deploy_success', false);
         } else {
             return redirect()->to(base_url('admin/system/deploy'))
-                ->with('error', 'Échec du déploiement.')
+                ->with('error', 'Git pull réussi mais échec des migrations.')
                 ->with('deploy_output', $outputStr)
                 ->with('deploy_success', false);
         }

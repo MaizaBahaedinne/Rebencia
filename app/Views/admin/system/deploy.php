@@ -42,8 +42,8 @@
                     </div>
                     <div class="d-grid">
                         <button type="submit" class="btn btn-danger" id="deployBtn"
-                                onclick="return confirm('Confirmer le déploiement sur le serveur ?')">
-                            <i class="bi bi-rocket-takeoff me-1"></i> Déployer maintenant
+                                onclick="return confirm('Confirmer le déploiement ?\n\nCela exécutera :\n1. git pull\n2. php spark migrate')">
+                            <i class="bi bi-rocket-takeoff me-1"></i> Déployer (git pull + migrate)
                         </button>
                     </div>
                 </form>

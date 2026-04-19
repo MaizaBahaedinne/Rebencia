@@ -518,8 +518,10 @@ class ZonesController extends BaseController
             $govId = $regionIds[$govName] ?? null;
             if (! $govId) { continue; }
             $seen = [];
-            foreach ($entries as [$del, , , $cpVille]) {
-                if (isset($seen[$del])) { continue; }
+            foreach ($entries as $entry) {
+                $del     = $entry[0] ?? '';
+                $cpVille = $entry[3] ?? $entry[2] ?? '';
+                if ($del === '' || isset($seen[$del])) { continue; }
                 $seen[$del] = true;
                 $villeBatch[] = [
                     'type' => 'ville', 'name' => $del, 'code' => $cpVille ?: null,
@@ -545,7 +547,11 @@ class ZonesController extends BaseController
         foreach ($normalized as $govName => $entries) {
             $govId = $regionIds[$govName] ?? null;
             if (! $govId) { continue; }
-            foreach ($entries as [$del, $loc, $cpLoc]) {
+            foreach ($entries as $entry) {
+                $del    = $entry[0] ?? '';
+                $loc    = $entry[1] ?? $del;
+                $cpLoc  = $entry[2] ?? '';
+                if ($del === '') { continue; }
                 $villeKey = $govId . ':' . $del;
                 $villeId  = $villeIds[$villeKey] ?? null;
                 if (! $villeId) { continue; }

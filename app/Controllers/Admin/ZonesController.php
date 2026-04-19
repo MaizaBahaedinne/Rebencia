@@ -45,6 +45,7 @@ class ZonesController extends BaseController
             ]),
             'activeTab'   => $activeTab,
             'typeMeta'    => ZoneModel::TYPE_META,
+            'search'      => $search,
         ]);
     }
 

@@ -2,7 +2,7 @@
 $perms       = session()->get('permissions') ?? [];
 $meta        = $typeMeta[$activeTab];
 $currentList = $active_list;
-$search      = $this->request->getGet('search') ?? '';
+$search      = $search ?? '';
 ?>
 
 <!-- ── EN-TÊTE ─────────────────────────────────────────────────────── -->

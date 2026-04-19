@@ -144,6 +144,69 @@ class ZoneModel extends Model
     }
 
     /**
+     * Retourne tous les quartiers ayant une géométrie sous une zone parente.
+     *
+     * - type=ville   → quartiers directs (parent_id = $id)
+     * - type=region  → quartiers via les villes de la région
+     * - type=pays    → quartiers via régions → villes du pays
+     *
+     * Retourne : [['id'=>int, 'name'=>string, 'geometry'=>string(JSON)], ...]
+     */
+    public function getQuartiersGeo(int $id, string $type): array
+    {
+        $db = $this->db;
+
+        switch ($type) {
+            case 'ville':
+                $rows = $db->query("
+                    SELECT q.id, q.name, q.geometry
+                    FROM zones q
+                    WHERE q.type      IN ('quartier','district')
+                      AND q.parent_id  = ?
+                      AND q.geometry   IS NOT NULL
+                      AND q.deleted_at IS NULL
+                ", [$id])->getResultArray();
+                break;
+
+            case 'region':
+                $rows = $db->query("
+                    SELECT q.id, q.name, q.geometry
+                    FROM zones q
+                    INNER JOIN zones v ON v.id = q.parent_id
+                        AND v.type      IN ('ville','city')
+                        AND v.parent_id  = ?
+                        AND v.deleted_at IS NULL
+                    WHERE q.type      IN ('quartier','district')
+                      AND q.geometry   IS NOT NULL
+                      AND q.deleted_at IS NULL
+                ", [$id])->getResultArray();
+                break;
+
+            case 'pays':
+                $rows = $db->query("
+                    SELECT q.id, q.name, q.geometry
+                    FROM zones q
+                    INNER JOIN zones v ON v.id = q.parent_id
+                        AND v.type      IN ('ville','city')
+                        AND v.deleted_at IS NULL
+                    INNER JOIN zones r ON r.id = v.parent_id
+                        AND r.type      IN ('region','governorate')
+                        AND r.parent_id  = ?
+                        AND r.deleted_at IS NULL
+                    WHERE q.type      IN ('quartier','district')
+                      AND q.geometry   IS NOT NULL
+                      AND q.deleted_at IS NULL
+                ", [$id])->getResultArray();
+                break;
+
+            default:
+                return [];
+        }
+
+        return $rows;
+    }
+
+    /**
      * Recherche de villes (et quartiers) par nom ou code postal.
      * Retourne jusqu'à $limit résultats avec la chaîne parente complète.
      *

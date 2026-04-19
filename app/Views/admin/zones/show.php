@@ -211,8 +211,118 @@ $breadcrumb = array_filter([
 
 </div><!-- /.row -->
 
+<?php
+// ── CARTE LECTURE SEULE (pays / region / ville) ──────────────────────────────
+$readonlyMapTypes = ['pays', 'region', 'ville'];
+$hasReadonlyMap   = in_array($zone['type'], $readonlyMapTypes) && ! empty($geoZones);
+?>
+
+<?php if ($hasReadonlyMap): ?>
+<!-- Leaflet CSS (partagé avec la carte éditable) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<div class="card shadow-sm mt-4">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">
+            <i class="bi bi-map me-1 text-primary"></i>
+            Quartiers géolocalisés — <?= esc($zone['name']) ?>
+            <span class="badge bg-secondary ms-2"><?= count($geoZones) ?></span>
+        </span>
+        <span class="small text-muted">Passez la souris sur une zone pour voir son nom</span>
+    </div>
+    <div class="card-body p-0">
+        <div id="readonlyMap" style="height:480px; width:100%; border-radius:0 0 .5rem .5rem;"></div>
+    </div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+(function () {
+    'use strict';
+
+    const GEO_ZONES = <?= json_encode(array_map(function($z) {
+        return [
+            'id'       => (int) $z['id'],
+            'name'     => $z['name'],
+            'geometry' => json_decode($z['geometry'], true),
+        ];
+    }, $geoZones), JSON_UNESCAPED_UNICODE) ?>;
+
+    const map = L.map('readonlyMap', { zoomControl: true });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19,
+    }).addTo(map);
+
+    // Vue par défaut : Tunisie
+    map.setView([33.8869, 9.5375], 8);
+
+    const allBounds = [];
+
+    GEO_ZONES.forEach(function (zone) {
+        if (! zone.geometry) return;
+        try {
+            const layer = L.geoJSON(zone.geometry, {
+                style: {
+                    color:       '#3b82f6',
+                    weight:      1.5,
+                    fillColor:   '#3b82f6',
+                    fillOpacity: 0.12,
+                },
+            });
+
+            // Tooltip au survol
+            layer.bindTooltip(zone.name, {
+                sticky:    true,
+                direction: 'top',
+                className: 'leaflet-zone-tooltip',
+            });
+
+            // Highlight au survol
+            layer.on('mouseover', function () {
+                layer.setStyle({ fillOpacity: 0.35, weight: 2.5 });
+            });
+            layer.on('mouseout', function () {
+                layer.setStyle({ fillOpacity: 0.12, weight: 1.5 });
+            });
+
+            // Clic → lien vers la zone
+            layer.on('click', function () {
+                window.location.href = '<?= base_url('admin/zones/') ?>' + zone.id;
+            });
+
+            layer.addTo(map);
+
+            try { allBounds.push(layer.getBounds()); } catch(e) {}
+        } catch (err) {
+            console.warn('GeoJSON invalide pour', zone.name, err);
+        }
+    });
+
+    // Recentrer sur l'ensemble des zones
+    if (allBounds.length > 0) {
+        let combined = allBounds[0];
+        for (let i = 1; i < allBounds.length; i++) {
+            combined = combined.extend(allBounds[i]);
+        }
+        map.fitBounds(combined, { padding: [30, 30] });
+    }
+})();
+</script>
+<style>
+.leaflet-zone-tooltip {
+    background: rgba(0,0,0,.75);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: .8rem;
+    white-space: nowrap;
+}
+.leaflet-zone-tooltip::before { display:none; }
+</style>
+<?php endif; ?>
+
 <?php if ($zone['type'] === 'quartier'): ?>
-<!-- ── CARTE GÉOMÉTRIQUE ─────────────────────────────────────────────── -->
 <div class="card shadow-sm mt-4" id="mapCard">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <span class="fw-semibold">

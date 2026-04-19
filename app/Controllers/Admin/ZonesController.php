@@ -131,6 +131,9 @@ class ZonesController extends BaseController
             'chain'      => $this->model->getParentChain($zone),
             'children'   => $this->model->getChildren($id),
             'typeMeta'   => ZoneModel::TYPE_META,
+            'geoZones'   => in_array($zone['type'], ['pays', 'region', 'ville'])
+                                ? $this->model->getQuartiersGeo($id, $zone['type'])
+                                : [],
         ]);
     }
 

@@ -72,6 +72,22 @@ class ZoneModel extends Model
     }
 
     /**
+     * Enfants directs d'une zone en format allégé pour AJAX.
+     * Retourne uniquement id, name, code.
+     */
+    public function getByParent(int $parentId): array
+    {
+        return $this->db->table('zones')
+            ->select('id, name, code')
+            ->where('parent_id', $parentId)
+            ->where('is_active', 1)
+            ->where('deleted_at IS NULL')
+            ->orderBy('name', 'ASC')
+            ->get()
+            ->getResultArray();
+    }
+
+    /**
      * Comptage par type (pour le tableau de bord du module).
      */
     public function countByType(): array

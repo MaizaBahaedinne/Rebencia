@@ -56,9 +56,12 @@ class ZonesController extends BaseController
         $this->requirePermission('zones.create');
 
         return $this->render('admin/zones/form', [
-            'page_title' => 'Nouvelle zone',
+            'page_title' => 'Nouvelle adresse / zone',
             'zone'       => [],
-            'parents'    => $this->model->getWithParent(),
+            'pays_list'  => $this->model->getByType('pays'),
+            'preselect'  => ['pays_id' => null, 'region_id' => null, 'ville_id' => null],
+            'regions_list' => [],
+            'villes_list'  => [],
         ]);
     }
 
@@ -74,17 +77,21 @@ class ZonesController extends BaseController
         $type     = $this->request->getPost('type');
         $parentId = $this->request->getPost('parent_id') ?: null;
 
+        if ($type === 'code_postal' && ! $this->request->getPost('code')) {
+            return redirect()->back()->withInput()
+                             ->with('error', 'Le code postal est obligatoire.');
+        }
+
+        if ($type === 'pays') {
+            $parentId = null;
+        }
+
         if ($parentId !== null) {
             $parentId = (int) $parentId;
             if (! $this->isParentTypeValid($type, $parentId)) {
                 return redirect()->back()->withInput()
                                  ->with('error', 'Le parent sélectionné est incompatible avec le type de zone.');
             }
-        }
-
-        if ($type === 'pays' && $parentId !== null) {
-            return redirect()->back()->withInput()
-                             ->with('error', 'Un pays ne peut pas avoir de parent.');
         }
 
         $id = $this->model->insert([
@@ -139,10 +146,46 @@ class ZonesController extends BaseController
             throw new \CodeIgniter\Exceptions\PageNotFoundException('Zone introuvable.');
         }
 
+        $preselect     = ['pays_id' => null, 'region_id' => null, 'ville_id' => null];
+        $regions_list  = [];
+        $villes_list   = [];
+
+        if ($zone['type'] === 'region' && $zone['parent_id']) {
+            $preselect['pays_id'] = (int) $zone['parent_id'];
+            $regions_list = $this->model->getByParent((int) $zone['parent_id']);
+        } elseif ($zone['type'] === 'ville' && $zone['parent_id']) {
+            $region = $this->model->find((int) $zone['parent_id']);
+            if ($region) {
+                $preselect['region_id'] = (int) $zone['parent_id'];
+                $preselect['pays_id']   = $region['parent_id'] ? (int) $region['parent_id'] : null;
+                if ($preselect['pays_id']) {
+                    $regions_list = $this->model->getByParent($preselect['pays_id']);
+                }
+                $villes_list = $this->model->getByParent((int) $zone['parent_id']);
+            }
+        } elseif ($zone['type'] === 'code_postal' && $zone['parent_id']) {
+            $ville = $this->model->find((int) $zone['parent_id']);
+            if ($ville) {
+                $preselect['ville_id']  = (int) $zone['parent_id'];
+                $region = $ville['parent_id'] ? $this->model->find((int) $ville['parent_id']) : null;
+                if ($region) {
+                    $preselect['region_id'] = (int) $ville['parent_id'];
+                    $preselect['pays_id']   = $region['parent_id'] ? (int) $region['parent_id'] : null;
+                    if ($preselect['pays_id']) {
+                        $regions_list = $this->model->getByParent($preselect['pays_id']);
+                    }
+                    $villes_list = $this->model->getByParent((int) $ville['parent_id']);
+                }
+            }
+        }
+
         return $this->render('admin/zones/form', [
-            'page_title' => 'Modifier : ' . $zone['name'],
-            'zone'       => $zone,
-            'parents'    => $this->model->getWithParent(),
+            'page_title'   => 'Modifier : ' . $zone['name'],
+            'zone'         => $zone,
+            'pays_list'    => $this->model->getByType('pays'),
+            'preselect'    => $preselect,
+            'regions_list' => $regions_list,
+            'villes_list'  => $villes_list,
         ]);
     }
 
@@ -242,6 +285,16 @@ class ZonesController extends BaseController
 
         return redirect()->to(base_url('admin/zones'))
                          ->with('success', 'Zone supprimée.');
+    }
+
+    // --------------------------------------------------------
+    // AJAX – enfants d'une zone
+    // --------------------------------------------------------
+
+    public function childrenJson(int $parentId)
+    {
+        $this->requirePermission('zones.view');
+        return $this->json($this->model->getByParent($parentId));
     }
 
     // --------------------------------------------------------

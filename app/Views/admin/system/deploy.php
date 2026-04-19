@@ -30,7 +30,7 @@
                     </div>
                 </div>
 
-                <form method="post" action="<?= site_url('admin/system/deploy/run') ?>" id="deployForm">
+                <form method="post" action="<?= site_url('admin/system/deploy/pull') ?>" id="deployForm">
                     <?= csrf_field() ?>
                     <div class="mb-3">
                         <label class="form-label">Branche</label>

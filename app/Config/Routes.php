@@ -87,7 +87,8 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
 
     // Gestion des Zones géographiques
     $routes->get('zones',                        'Admin\ZonesController::index');
-    $routes->get('zones/create',                 'Admin\ZonesController::create');
+    $routes->get('zones/create',                 'Admin\ZonesController::create/pays');
+    $routes->get('zones/create/(:alpha)',        'Admin\ZonesController::create/$1');
     $routes->post('zones/store',                 'Admin\ZonesController::store');
     $routes->get('zones/(:num)/children',        'Admin\ZonesController::childrenJson/$1');
     $routes->get('zones/(:num)/edit',            'Admin\ZonesController::edit/$1');

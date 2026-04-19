@@ -1,111 +1,132 @@
 <?php
-$typeMeta = [
-    'pays'        => ['primary',          'Pays',        'bi-globe2'],
-    'region'      => ['success',          'Région',      'bi-map'],
-    'ville'       => ['info',             'Ville',       'bi-buildings'],
-    'code_postal' => ['warning text-dark','Code postal', 'bi-mailbox'],
-];
+$perms    = session()->get('permissions') ?? [];
+$meta     = $typeMeta[$zone['type']] ?? ['label' => $zone['type'], 'icon' => 'bi-geo-alt', 'color' => 'secondary'];
 
-$childTypeMeta = $typeMeta; // même mapping pour les enfants
-
-[$badgeClass, $typeLabel, $typeIcon] = $typeMeta[$zone['type']] ?? ['secondary', $zone['type'], 'bi-pin-map'];
+// Construire le fil d'Ariane (pays › région › ville ›  actuel)
+$breadcrumb = array_filter([
+    $chain['pays']   ?? null,
+    $chain['region'] ?? null,
+    $chain['ville']  ?? null,
+]);
 ?>
 
-<!-- EN-TÊTE -->
+<!-- ── EN-TÊTE ─────────────────────────────────────────────────────── -->
 <div class="d-flex align-items-center gap-3 mb-4">
-    <a href="<?= base_url('admin/zones') ?>" class="btn btn-sm btn-light">
+    <a href="<?= base_url('admin/zones?tab=' . $zone['type']) ?>" class="btn btn-sm btn-light">
         <i class="bi bi-arrow-left"></i>
     </a>
-    <div class="flex-grow-1">
+    <div>
         <h4 class="mb-0 fw-bold">
-            <i class="bi <?= $typeIcon ?> me-2"></i><?= esc($zone['name']) ?>
+            <i class="bi <?= $meta['icon'] ?> me-2 text-<?= $meta['color'] ?>"></i>
+            <?= esc($zone['name']) ?>
         </h4>
-        <span class="badge bg-<?= $badgeClass ?> mt-1"><?= $typeLabel ?></span>
+        <p class="text-muted mb-0 small"><?= esc($meta['label']) ?></p>
     </div>
-    <?php if (in_array('zones.edit', session()->get('permissions') ?? [])) : ?>
-    <a href="<?= base_url('admin/zones/' . $zone['id'] . '/edit') ?>" class="btn btn-primary btn-sm">
-        <i class="bi bi-pencil me-1"></i>Modifier
-    </a>
-    <?php endif; ?>
+    <!-- Actions rapides -->
+    <div class="ms-auto d-flex gap-2">
+        <?php if (in_array('zones.edit', $perms)): ?>
+        <a href="<?= base_url('admin/zones/' . $zone['id'] . '/edit') ?>"
+           class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-pencil me-1"></i>Modifier
+        </a>
+        <?php endif; ?>
+        <?php if (in_array('zones.create', $perms)): ?>
+        <a href="<?= base_url('admin/zones/create/' . $zone['type']) ?>"
+           class="btn btn-sm btn-primary">
+            <i class="bi bi-plus-circle me-1"></i>Nouveau(elle) <?= esc($meta['label']) ?>
+        </a>
+        <?php endif; ?>
+    </div>
 </div>
+
+<!-- ── FLASH ─────────────────────────────────────────────────────────── -->
+<?php if (session()->getFlashdata('success')): ?>
+<div class="alert alert-success alert-dismissible fade show">
+    <?= esc(session()->getFlashdata('success')) ?>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+<?php endif; ?>
 
 <div class="row g-4">
 
-    <!-- Informations de la zone -->
-    <div class="col-12 col-lg-5">
-        <div class="card shadow-sm">
-            <div class="card-header fw-semibold bg-light">
-                <i class="bi bi-info-circle me-1"></i> Détails
+    <!-- ── INFORMATIONS ────────────────────────────────────────────── -->
+    <div class="col-md-5">
+        <div class="card shadow-sm h-100">
+            <div class="card-header fw-semibold bg-white">
+                <i class="bi bi-info-circle me-1"></i> Informations
             </div>
             <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-5 text-muted">Type</dt>
-                    <dd class="col-7">
-                        <span class="badge bg-<?= $badgeClass ?>"><?= $typeLabel ?></span>
-                    </dd>
 
-                    <dt class="col-5 text-muted">Nom</dt>
+                <!-- Fil d'Ariane hiérarchique -->
+                <?php if (! empty($breadcrumb)): ?>
+                <div class="mb-3 p-2 bg-light rounded small">
+                    <i class="bi bi-diagram-3 me-1 text-muted"></i>
+                    <?php
+                    $parts = [];
+                    foreach ($breadcrumb as $ancestor) {
+                        $aMeta  = $typeMeta[$ancestor['type']] ?? ['color' => 'secondary', 'icon' => 'bi-geo'];
+                        $parts[] = '<span class="text-' . $aMeta['color'] . '">'
+                                 . '<i class="bi ' . $aMeta['icon'] . ' me-1"></i>'
+                                 . esc($ancestor['name']) . '</span>';
+                    }
+                    echo implode(' <i class="bi bi-chevron-right text-muted mx-1 small"></i> ', $parts);
+                    ?>
+                    <i class="bi bi-chevron-right text-muted mx-1 small"></i>
+                    <strong class="text-<?= $meta['color'] ?>"><?= esc($zone['name']) ?></strong>
+                </div>
+                <?php endif; ?>
+
+                <dl class="row mb-0">
+                    <dt class="col-5 text-muted fw-normal small">Nom</dt>
                     <dd class="col-7 fw-semibold"><?= esc($zone['name']) ?></dd>
 
-                    <dt class="col-5 text-muted">Code</dt>
+                    <dt class="col-5 text-muted fw-normal small">Type</dt>
                     <dd class="col-7">
-                        <?= $zone['code'] ? '<code>' . esc($zone['code']) . '</code>' : '<span class="text-muted">–</span>' ?>
+                        <span class="badge text-bg-<?= $meta['color'] ?>">
+                            <i class="bi <?= $meta['icon'] ?> me-1"></i><?= esc($meta['label']) ?>
+                        </span>
                     </dd>
 
-                    <dt class="col-5 text-muted">Parent</dt>
+                    <?php if ($zone['code']): ?>
+                    <dt class="col-5 text-muted fw-normal small">
+                        <?= $zone['type'] === 'pays' ? 'Code ISO' : ($zone['type'] === 'ville' ? 'Code postal' : 'Code') ?>
+                    </dt>
+                    <dd class="col-7"><code><?= esc($zone['code']) ?></code></dd>
+                    <?php endif; ?>
+
+                    <dt class="col-5 text-muted fw-normal small">Statut</dt>
                     <dd class="col-7">
-                        <?php if ($parent) : ?>
-                        <?php [$pBadge, $pLabel] = $typeMeta[$parent['type']] ?? ['secondary', $parent['type']]; ?>
-                        <span class="badge bg-<?= $pBadge ?> me-1"><?= $pLabel ?></span>
-                        <a href="<?= base_url('admin/zones/' . $parent['id']) ?>"
-                           class="text-decoration-none fw-semibold">
-                            <?= esc($parent['name']) ?>
-                        </a>
-                        <?php else : ?>
-                        <span class="text-muted">Aucun (racine)</span>
+                        <?php if ($zone['is_active']): ?>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle">Actif</span>
+                        <?php else: ?>
+                        <span class="badge bg-secondary-subtle text-secondary border">Inactif</span>
                         <?php endif; ?>
                     </dd>
 
-                    <dt class="col-5 text-muted">Statut</dt>
-                    <dd class="col-7">
-                        <?php if ($zone['is_active']) : ?>
-                        <span class="badge bg-success">Actif</span>
-                        <?php else : ?>
-                        <span class="badge bg-secondary">Inactif</span>
-                        <?php endif; ?>
-                    </dd>
-
-                    <dt class="col-5 text-muted">Créé le</dt>
-                    <dd class="col-7 text-muted small">
-                        <?= $zone['created_at'] ? date('d/m/Y à H:i', strtotime($zone['created_at'])) : '–' ?>
-                    </dd>
-
-                    <dt class="col-5 text-muted">Modifié le</dt>
-                    <dd class="col-7 text-muted small">
-                        <?= $zone['updated_at'] ? date('d/m/Y à H:i', strtotime($zone['updated_at'])) : '–' ?>
-                    </dd>
+                    <dt class="col-5 text-muted fw-normal small">Créé le</dt>
+                    <dd class="col-7 small"><?= date('d/m/Y', strtotime($zone['created_at'])) ?></dd>
                 </dl>
             </div>
-            <?php if (in_array('zones.edit', session()->get('permissions') ?? [])
-                   || in_array('zones.delete', session()->get('permissions') ?? [])) : ?>
-            <div class="card-footer d-flex gap-2">
-                <?php if (in_array('zones.edit', session()->get('permissions') ?? [])) : ?>
+
+            <!-- Actions -->
+            <?php if (in_array('zones.edit', $perms) || in_array('zones.delete', $perms)): ?>
+            <div class="card-footer bg-transparent d-flex gap-2 flex-wrap">
+                <?php if (in_array('zones.edit', $perms)): ?>
                 <form method="POST"
                       action="<?= base_url('admin/zones/' . $zone['id'] . '/toggle-status') ?>">
                     <?= csrf_field() ?>
-                    <button type="submit"
-                            class="btn btn-sm btn-outline-<?= $zone['is_active'] ? 'warning' : 'success' ?>">
-                        <i class="bi bi-toggle-<?= $zone['is_active'] ? 'on' : 'off' ?> me-1"></i>
+                    <button class="btn btn-sm btn-outline-<?= $zone['is_active'] ? 'secondary' : 'success' ?>">
+                        <i class="bi <?= $zone['is_active'] ? 'bi-toggle-off' : 'bi-toggle-on' ?> me-1"></i>
                         <?= $zone['is_active'] ? 'Désactiver' : 'Activer' ?>
                     </button>
                 </form>
                 <?php endif; ?>
-                <?php if (in_array('zones.delete', session()->get('permissions') ?? []) && empty($children)) : ?>
+                <?php if (in_array('zones.delete', $perms) && empty($children)): ?>
                 <form method="POST"
                       action="<?= base_url('admin/zones/' . $zone['id'] . '/delete') ?>"
-                      onsubmit="return confirm('Supprimer définitivement « <?= esc($zone['name'], 'js') ?> » ?')">
+                      onsubmit="return confirm('Supprimer « <?= esc($zone['name'], 'js') ?> » définitivement ?')">
                     <?= csrf_field() ?>
-                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                    <button class="btn btn-sm btn-outline-danger">
                         <i class="bi bi-trash me-1"></i>Supprimer
                     </button>
                 </form>
@@ -115,88 +136,84 @@ $childTypeMeta = $typeMeta; // même mapping pour les enfants
         </div>
     </div>
 
-    <!-- Sous-zones (enfants) -->
-    <div class="col-12 col-lg-7">
-        <div class="card shadow-sm">
-            <div class="card-header d-flex justify-content-between align-items-center bg-light fw-semibold">
-                <span><i class="bi bi-diagram-3 me-1"></i> Sous-zones (<?= count($children) ?>)</span>
-                <?php if (in_array('zones.create', session()->get('permissions') ?? []) && $zone['type'] !== 'code_postal') : ?>
-                <?php
-                $childTypeLabels = [
-                    'pays'   => ['region',      'Ajouter une région'],
-                    'region' => ['ville',       'Ajouter une ville'],
-                    'ville'  => ['code_postal', 'Ajouter un code postal'],
-                ];
-                if (isset($childTypeLabels[$zone['type']])) :
-                    [$childType, $childBtnLabel] = $childTypeLabels[$zone['type']];
-                ?>
-                <a href="<?= base_url('admin/zones/create?parent_id=' . $zone['id'] . '&type=' . $childType) ?>"
-                   class="btn btn-sm btn-outline-primary">
-                    <i class="bi bi-plus me-1"></i><?= $childBtnLabel ?>
+    <!-- ── SOUS-ZONES ──────────────────────────────────────────────── -->
+    <div class="col-md-7">
+        <?php
+        $childTypes   = ['pays' => 'region', 'region' => 'ville', 'ville' => 'quartier', 'quartier' => null];
+        $childType    = $childTypes[$zone['type']] ?? null;
+        $childMeta    = $childType ? ($typeMeta[$childType] ?? null) : null;
+        ?>
+        <div class="card shadow-sm h-100">
+            <div class="card-header fw-semibold bg-white d-flex justify-content-between align-items-center">
+                <span>
+                    <i class="bi bi-list-nested me-1"></i>
+                    Sous-zones
+                    <span class="badge bg-secondary ms-1"><?= count($children) ?></span>
+                </span>
+                <?php if ($childMeta && in_array('zones.create', $perms)): ?>
+                <a href="<?= base_url('admin/zones/create/' . $childType) ?>"
+                   class="btn btn-sm btn-outline-<?= $childMeta['color'] ?>">
+                    <i class="bi bi-plus-lg me-1"></i>Ajouter <?= esc($childMeta['label']) ?>
                 </a>
                 <?php endif; ?>
-                <?php endif; ?>
             </div>
-            <div class="card-body p-0">
-                <?php if (empty($children)) : ?>
-                <p class="text-muted text-center py-4 mb-0">
-                    <i class="bi bi-inbox fs-3 d-block mb-2 opacity-25"></i>
-                    Aucune sous-zone.
-                </p>
-                <?php else : ?>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Nom</th>
-                                <th>Type</th>
-                                <th>Code</th>
-                                <th>Statut</th>
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($children as $child) : ?>
-                            <?php [$cBadge, $cLabel, $cIcon] = $childTypeMeta[$child['type']] ?? ['secondary', $child['type'], 'bi-pin-map']; ?>
-                            <tr>
-                                <td>
-                                    <a href="<?= base_url('admin/zones/' . $child['id']) ?>"
-                                       class="fw-semibold text-decoration-none text-dark">
-                                        <i class="bi <?= $cIcon ?> me-1 opacity-50"></i>
-                                        <?= esc($child['name']) ?>
-                                    </a>
-                                </td>
-                                <td><span class="badge bg-<?= $cBadge ?>"><?= $cLabel ?></span></td>
-                                <td class="text-muted small">
-                                    <?= $child['code'] ? '<code>' . esc($child['code']) . '</code>' : '–' ?>
-                                </td>
-                                <td>
-                                    <span class="badge bg-<?= $child['is_active'] ? 'success' : 'secondary' ?>">
-                                        <?= $child['is_active'] ? 'Actif' : 'Inactif' ?>
-                                    </span>
-                                </td>
-                                <td class="text-end">
-                                    <div class="d-flex gap-1 justify-content-end">
-                                        <a href="<?= base_url('admin/zones/' . $child['id']) ?>"
-                                           class="btn btn-sm btn-outline-secondary">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                        <?php if (in_array('zones.edit', session()->get('permissions') ?? [])) : ?>
-                                        <a href="<?= base_url('admin/zones/' . $child['id'] . '/edit') ?>"
-                                           class="btn btn-sm btn-outline-primary">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <?php endif; ?>
-                                    </div>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <?php endif; ?>
+
+            <?php if (empty($children)): ?>
+            <div class="card-body text-center text-muted py-5">
+                <i class="bi bi-inbox fs-1 d-block mb-2 opacity-25"></i>
+                Aucune sous-zone pour le moment.
             </div>
+            <?php else: ?>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 small">
+                    <thead class="table-light text-uppercase text-muted" style="font-size:.7rem">
+                        <tr>
+                            <th class="ps-3">Nom</th>
+                            <th>Type</th>
+                            <?php if ($childType === 'ville'): ?><th>Code postal</th><?php endif; ?>
+                            <th>Statut</th>
+                            <th class="pe-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($children as $child): ?>
+                    <?php $cMeta = $typeMeta[$child['type']] ?? ['label' => $child['type'], 'icon' => 'bi-geo', 'color' => 'secondary']; ?>
+                    <tr>
+                        <td class="ps-3">
+                            <a href="<?= base_url('admin/zones/' . $child['id']) ?>"
+                               class="fw-semibold text-dark text-decoration-none">
+                                <i class="bi <?= $cMeta['icon'] ?> text-<?= $cMeta['color'] ?> me-1"></i>
+                                <?= esc($child['name']) ?>
+                            </a>
+                        </td>
+                        <td>
+                            <span class="badge text-bg-<?= $cMeta['color'] ?> bg-opacity-75">
+                                <?= esc($cMeta['label']) ?>
+                            </span>
+                        </td>
+                        <?php if ($childType === 'ville'): ?>
+                        <td><code><?= $child['code'] ? esc($child['code']) : '—' ?></code></td>
+                        <?php endif; ?>
+                        <td>
+                            <?php if ($child['is_active']): ?>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">Actif</span>
+                            <?php else: ?>
+                            <span class="badge bg-secondary-subtle text-secondary border">Inactif</span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="pe-3 text-end">
+                            <a href="<?= base_url('admin/zones/' . $child['id']) ?>"
+                               class="btn btn-sm btn-light">
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 
-</div>
+</div><!-- /.row -->

@@ -106,7 +106,7 @@ class SeedTunisieZones extends Migration
 
     // Données : [delegation, localite, cp_localite, cp_ville]
     // cp_ville = code postal représentatif de la délégation (le plus fréquent)
-    private const DATA = [
+    public const DATA = [
         'Ariana' => [
             ['Ariana Ville', 'Residence Kortoba', '2058', '2058'],
             ['Ariana Ville', 'Cite El Intissar 1', '2091', '2058'],

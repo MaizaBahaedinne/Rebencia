@@ -111,6 +111,20 @@ class SystemController extends BaseController
         ]);
     }
 
+    /** Vide le cache CI4 (writable/cache/*). */
+    public function clearCache()
+    {
+        $this->requirePermission('system.deploy');
+        $count = 0;
+        foreach (glob(WRITEPATH . 'cache/*') as $file) {
+            if (is_file($file) && @unlink($file)) {
+                $count++;
+            }
+        }
+        return redirect()->to(base_url('admin/system/deploy'))
+            ->with('success', "Cache vidé — {$count} fichier(s) supprimé(s).");
+    }
+
     /** Exécute uniquement les migrations (POST). */
     public function runMigrate()
     {
@@ -119,8 +133,12 @@ class SystemController extends BaseController
         try {
             $runner = \Config\Services::migrations();
             $runner->latest('default');
+            // Vider le cache CI4 (routes, vues, etc.)
+            foreach (glob(WRITEPATH . 'cache/*') as $file) {
+                if (is_file($file)) @unlink($file);
+            }
             return redirect()->to(base_url('admin/system/deploy'))
-                ->with('success', 'Migrations appliquées avec succès.');
+                ->with('success', 'Migrations appliquées + cache vidé.');
         } catch (\Throwable $e) {
             return redirect()->to(base_url('admin/system/deploy'))
                 ->with('error', 'Erreur migration : ' . $e->getMessage());
@@ -149,7 +167,11 @@ class SystemController extends BaseController
             try {
                 $runner = \Config\Services::migrations();
                 $runner->latest('default');
-                $migrateLog = 'Migrations appliquées avec succès.';
+                // Vider le cache CI4 (routes compilées, vues, etc.)
+                foreach (glob(WRITEPATH . 'cache/*') as $file) {
+                    if (is_file($file)) @unlink($file);
+                }
+                $migrateLog = 'Migrations appliquées + cache vidé.';
             } catch (\Throwable $e) {
                 $migrateReturn = 1;
                 $migrateLog    = 'ERREUR migration : ' . $e->getMessage();

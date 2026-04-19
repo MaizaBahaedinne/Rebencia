@@ -59,6 +59,17 @@
                         </button>
                     </div>
                 </form>
+
+                <hr class="my-2">
+
+                <form method="post" action="<?= site_url('admin/system/deploy/cache') ?>">
+                    <?= csrf_field() ?>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-outline-secondary">
+                            <i class="bi bi-trash3 me-1"></i> Vider le cache
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
 

@@ -90,9 +90,10 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
     $routes->get('system/logs/export',  'Admin\SystemController::exportLogs');
 
     // System – Déploiement Git
-    $routes->get('system/deploy',          'Admin\SystemController::deploy');
-    $routes->post('system/deploy/pull',    'Admin\SystemController::gitPull');
-    $routes->post('system/deploy/migrate', 'Admin\SystemController::runMigrate');
+    $routes->get('system/deploy',           'Admin\SystemController::deploy');
+    $routes->post('system/deploy/pull',     'Admin\SystemController::gitPull');
+    $routes->post('system/deploy/migrate',  'Admin\SystemController::runMigrate');
+    $routes->post('system/deploy/cache',    'Admin\SystemController::clearCache');
 });
 
 // --------------------------------------------------------

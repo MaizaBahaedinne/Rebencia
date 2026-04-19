@@ -37,7 +37,7 @@ class UserModel extends Model
     public function findByEmail(string $email): ?array
     {
         return $this->db->table('users u')
-            ->select('u.*, r.name AS role_name, r.label AS role_label, r.color AS role_color')
+            ->select('u.*, r.name AS role_name, COALESCE(r.label, r.name) AS role_label, COALESCE(r.color, \'#6c757d\') AS role_color')
             ->join('roles r', 'r.id = u.role_id')
             ->where('u.email', $email)
             ->where('u.deleted_at IS NULL')
@@ -53,7 +53,7 @@ class UserModel extends Model
         $builder = $this->db->table('users u')
             ->select('u.id, u.first_name, u.last_name, u.email, u.phone,
                       u.status, u.avatar, u.last_login_at, u.created_at,
-                      r.name AS role_name, r.label AS role_label, r.color AS role_color')
+                      r.name AS role_name, COALESCE(r.label, r.name) AS role_label, COALESCE(r.color, \'#6c757d\') AS role_color')
             ->join('roles r', 'r.id = u.role_id')
             ->where('u.deleted_at IS NULL');
 
@@ -80,7 +80,7 @@ class UserModel extends Model
     public function findWithRole(int $id): ?array
     {
         return $this->db->table('users u')
-            ->select('u.*, r.name AS role_name, r.label AS role_label, r.color AS role_color')
+            ->select('u.*, r.name AS role_name, COALESCE(r.label, r.name) AS role_label, COALESCE(r.color, \'#6c757d\') AS role_color')
             ->join('roles r', 'r.id = u.role_id')
             ->where('u.id', $id)
             ->where('u.deleted_at IS NULL')

@@ -69,7 +69,7 @@ class RoleModel extends Model
     public function getAdoptionStats(): array
     {
         $rows = $this->db->table('roles r')
-            ->select('r.id, r.name, r.label, r.color, COUNT(u.id) AS user_count')
+            ->select('r.id, r.name, COALESCE(r.label, r.name) AS label, COALESCE(r.color, \'#6c757d\') AS color, COUNT(u.id) AS user_count')
             ->join('users u', 'u.role_id = r.id AND u.deleted_at IS NULL AND u.status = "active"', 'left')
             ->groupBy('r.id')
             ->get()

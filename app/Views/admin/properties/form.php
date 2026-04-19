@@ -225,6 +225,9 @@ $characteristics = $characteristics ?? [];
             <?php endif; ?>
 
             <!-- Localisation -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-white fw-semibold">
+                    <i class="bi bi-geo-alt text-danger me-2"></i>Localisation
                 </div>
                 <div class="card-body">
 

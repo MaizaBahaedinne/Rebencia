@@ -7,97 +7,86 @@ use App\Models\ZoneModel;
 
 /**
  * ZonesController – Gestion des zones géographiques.
- * Hiérarchie : Pays → Région → Ville → Code postal
+ *
+ * Hiérarchie : Pays → Région / État (optionnel) → Ville (+ code postal) → Quartier
  */
 class ZonesController extends BaseController
 {
     protected ZoneModel $model;
 
-    /** Types valides et le type attendu pour leur parent. */
-    private const PARENT_TYPE_MAP = [
-        'region'      => 'pays',
-        'ville'       => 'region',
-        'code_postal' => 'ville',
-    ];
+    private const VALID_TYPES = ['pays', 'region', 'ville', 'quartier'];
 
     public function __construct()
     {
         $this->model = new ZoneModel();
     }
 
-    // --------------------------------------------------------
-    // LISTE
-    // --------------------------------------------------------
+    // ── LISTE ────────────────────────────────────────────────────────
 
     public function index(): string
     {
         $this->requirePermission('zones.view');
 
-        $filters = [
-            'type'      => $this->request->getGet('type'),
-            'parent_id' => $this->request->getGet('parent_id'),
-            'search'    => $this->request->getGet('search'),
-        ];
+        $activeTab = $this->request->getGet('tab') ?? 'pays';
+        if (! in_array($activeTab, self::VALID_TYPES)) {
+            $activeTab = 'pays';
+        }
 
         return $this->render('admin/zones/index', [
-            'page_title' => 'Gestion des zones',
-            'zones'      => $this->model->getWithParent($filters),
-            'counts'     => $this->model->countByType(),
-            'filters'    => $filters,
+            'page_title'    => 'Zones géographiques',
+            'counts'        => $this->model->countByType(),
+            'pays_list'     => $this->model->getWithParent(['type' => 'pays']),
+            'region_list'   => $this->model->getWithParent(['type' => 'region']),
+            'ville_list'    => $this->model->getWithParent(['type' => 'ville']),
+            'quartier_list' => $this->model->getWithParent(['type' => 'quartier']),
+            'activeTab'     => $activeTab,
+            'typeMeta'      => ZoneModel::TYPE_META,
         ]);
     }
 
-    // --------------------------------------------------------
-    // CRÉATION
-    // --------------------------------------------------------
+    // ── CRÉATION ─────────────────────────────────────────────────────
 
-    public function create(): string
+    public function create(string $type = 'pays'): string
     {
         $this->requirePermission('zones.create');
 
+        if (! in_array($type, self::VALID_TYPES)) {
+            return redirect()->to(base_url('admin/zones'))->with('error', 'Type de zone invalide.');
+        }
+
         return $this->render('admin/zones/form', [
-            'page_title' => 'Nouvelle adresse / zone',
-            'zone'       => [],
-            'pays_list'  => $this->model->getByType('pays'),
-            'preselect'  => ['pays_id' => null, 'region_id' => null, 'ville_id' => null],
+            'page_title'   => 'Ajouter : ' . ZoneModel::TYPE_META[$type]['label'],
+            'zone'         => [],
+            'zoneType'     => $type,
+            'pays_list'    => $this->model->getByType('pays'),
+            'preselect'    => ['pays_id' => null, 'region_id' => null, 'ville_id' => null],
             'regions_list' => [],
             'villes_list'  => [],
         ]);
     }
 
+    // ── STORE ────────────────────────────────────────────────────────
+
     public function store()
     {
         $this->requirePermission('zones.create');
 
-        if (! $this->validate($this->validationRules())) {
+        $type = $this->request->getPost('type');
+        if (! in_array($type, self::VALID_TYPES)) {
+            return redirect()->back()->withInput()->with('error', 'Type de zone invalide.');
+        }
+
+        if (! $this->validate($this->validationRules($type))) {
             return redirect()->back()->withInput()
                              ->with('errors', $this->validator->getErrors());
         }
 
-        $type     = $this->request->getPost('type');
-        $parentId = $this->request->getPost('parent_id') ?: null;
-
-        if ($type === 'code_postal' && ! $this->request->getPost('code')) {
-            return redirect()->back()->withInput()
-                             ->with('error', 'Le code postal est obligatoire.');
-        }
-
-        if ($type === 'pays') {
-            $parentId = null;
-        }
-
-        if ($parentId !== null) {
-            $parentId = (int) $parentId;
-            if (! $this->isParentTypeValid($type, $parentId)) {
-                return redirect()->back()->withInput()
-                                 ->with('error', 'Le parent sélectionné est incompatible avec le type de zone.');
-            }
-        }
+        $parentId = $this->resolveParentId($type);
 
         $id = $this->model->insert([
             'type'      => $type,
-            'name'      => $this->request->getPost('name'),
-            'code'      => $this->request->getPost('code') ?: null,
+            'name'      => trim($this->request->getPost('name')),
+            'code'      => $this->request->getPost('code') ? trim($this->request->getPost('code')) : null,
             'parent_id' => $parentId,
             'is_active' => $this->request->getPost('is_active') ? 1 : 0,
         ]);
@@ -106,12 +95,10 @@ class ZonesController extends BaseController
             'Zone créée : ' . $this->request->getPost('name'));
 
         return redirect()->to(base_url('admin/zones/' . $id))
-                         ->with('success', 'Zone créée avec succès.');
+                         ->with('success', ZoneModel::TYPE_META[$type]['label'] . ' créé(e) avec succès.');
     }
 
-    // --------------------------------------------------------
-    // DÉTAIL
-    // --------------------------------------------------------
+    // ── DÉTAIL ───────────────────────────────────────────────────────
 
     public function show(int $id): string
     {
@@ -122,20 +109,16 @@ class ZonesController extends BaseController
             throw new \CodeIgniter\Exceptions\PageNotFoundException('Zone introuvable.');
         }
 
-        $parent   = $zone['parent_id'] ? $this->model->find((int) $zone['parent_id']) : null;
-        $children = $this->model->getChildren($id);
-
         return $this->render('admin/zones/show', [
-            'page_title' => 'Zone : ' . $zone['name'],
+            'page_title' => $zone['name'],
             'zone'       => $zone,
-            'parent'     => $parent,
-            'children'   => $children,
+            'chain'      => $this->model->getParentChain($zone),
+            'children'   => $this->model->getChildren($id),
+            'typeMeta'   => ZoneModel::TYPE_META,
         ]);
     }
 
-    // --------------------------------------------------------
-    // ÉDITION
-    // --------------------------------------------------------
+    // ── ÉDITION ──────────────────────────────────────────────────────
 
     public function edit(int $id): string
     {
@@ -146,46 +129,19 @@ class ZonesController extends BaseController
             throw new \CodeIgniter\Exceptions\PageNotFoundException('Zone introuvable.');
         }
 
-        $preselect     = ['pays_id' => null, 'region_id' => null, 'ville_id' => null];
-        $regions_list  = [];
-        $villes_list   = [];
-
-        if ($zone['type'] === 'region' && $zone['parent_id']) {
-            $preselect['pays_id'] = (int) $zone['parent_id'];
-            $regions_list = $this->model->getByParent((int) $zone['parent_id']);
-        } elseif ($zone['type'] === 'ville' && $zone['parent_id']) {
-            $region = $this->model->find((int) $zone['parent_id']);
-            if ($region) {
-                $preselect['region_id'] = (int) $zone['parent_id'];
-                $preselect['pays_id']   = $region['parent_id'] ? (int) $region['parent_id'] : null;
-                if ($preselect['pays_id']) {
-                    $regions_list = $this->model->getByParent($preselect['pays_id']);
-                }
-                $villes_list = $this->model->getByParent((int) $zone['parent_id']);
-            }
-        } elseif ($zone['type'] === 'code_postal' && $zone['parent_id']) {
-            $ville = $this->model->find((int) $zone['parent_id']);
-            if ($ville) {
-                $preselect['ville_id']  = (int) $zone['parent_id'];
-                $region = $ville['parent_id'] ? $this->model->find((int) $ville['parent_id']) : null;
-                if ($region) {
-                    $preselect['region_id'] = (int) $ville['parent_id'];
-                    $preselect['pays_id']   = $region['parent_id'] ? (int) $region['parent_id'] : null;
-                    if ($preselect['pays_id']) {
-                        $regions_list = $this->model->getByParent($preselect['pays_id']);
-                    }
-                    $villes_list = $this->model->getByParent((int) $ville['parent_id']);
-                }
-            }
-        }
+        $chain    = $this->model->getParentChain($zone);
+        $paysId   = $chain['pays']   ? (int) $chain['pays']['id']   : null;
+        $regionId = $chain['region'] ? (int) $chain['region']['id'] : null;
+        $villeId  = $chain['ville']  ? (int) $chain['ville']['id']  : null;
 
         return $this->render('admin/zones/form', [
             'page_title'   => 'Modifier : ' . $zone['name'],
             'zone'         => $zone,
+            'zoneType'     => $zone['type'],
             'pays_list'    => $this->model->getByType('pays'),
-            'preselect'    => $preselect,
-            'regions_list' => $regions_list,
-            'villes_list'  => $villes_list,
+            'preselect'    => ['pays_id' => $paysId, 'region_id' => $regionId, 'ville_id' => $villeId],
+            'regions_list' => $paysId   ? $this->model->getByParent($paysId)   : [],
+            'villes_list'  => $regionId ? $this->model->getByParent($regionId) : ($paysId ? $this->model->getByParent($paysId) : []),
         ]);
     }
 
@@ -198,37 +154,26 @@ class ZonesController extends BaseController
             throw new \CodeIgniter\Exceptions\PageNotFoundException('Zone introuvable.');
         }
 
-        if (! $this->validate($this->validationRules())) {
+        $type = $this->request->getPost('type');
+        if (! in_array($type, self::VALID_TYPES)) {
+            return redirect()->back()->withInput()->with('error', 'Type de zone invalide.');
+        }
+
+        if (! $this->validate($this->validationRules($type))) {
             return redirect()->back()->withInput()
                              ->with('errors', $this->validator->getErrors());
         }
 
-        $type     = $this->request->getPost('type');
-        $parentId = $this->request->getPost('parent_id') ?: null;
+        $parentId = $this->resolveParentId($type);
 
-        if ($parentId !== null) {
-            $parentId = (int) $parentId;
-
-            if ($parentId === $id) {
-                return redirect()->back()->withInput()
-                                 ->with('error', 'Une zone ne peut pas être son propre parent.');
-            }
-
-            if (! $this->isParentTypeValid($type, $parentId)) {
-                return redirect()->back()->withInput()
-                                 ->with('error', 'Le parent sélectionné est incompatible avec le type de zone.');
-            }
-        }
-
-        if ($type === 'pays' && $parentId !== null) {
+        if ($parentId === $id) {
             return redirect()->back()->withInput()
-                             ->with('error', 'Un pays ne peut pas avoir de parent.');
+                             ->with('error', 'Une zone ne peut pas être son propre parent.');
         }
 
         $this->model->update($id, [
-            'type'      => $type,
-            'name'      => $this->request->getPost('name'),
-            'code'      => $this->request->getPost('code') ?: null,
+            'name'      => trim($this->request->getPost('name')),
+            'code'      => $this->request->getPost('code') ? trim($this->request->getPost('code')) : null,
             'parent_id' => $parentId,
             'is_active' => $this->request->getPost('is_active') ? 1 : 0,
         ]);
@@ -240,9 +185,7 @@ class ZonesController extends BaseController
                          ->with('success', 'Zone mise à jour.');
     }
 
-    // --------------------------------------------------------
-    // TOGGLE STATUT
-    // --------------------------------------------------------
+    // ── TOGGLE STATUT ────────────────────────────────────────────────
 
     public function toggleStatus(int $id)
     {
@@ -255,13 +198,10 @@ class ZonesController extends BaseController
 
         $this->model->update($id, ['is_active' => $zone['is_active'] ? 0 : 1]);
 
-        return redirect()->to(base_url('admin/zones'))
-                         ->with('success', 'Statut de la zone mis à jour.');
+        return redirect()->back()->with('success', 'Statut mis à jour.');
     }
 
-    // --------------------------------------------------------
-    // SUPPRESSION
-    // --------------------------------------------------------
+    // ── SUPPRESSION ──────────────────────────────────────────────────
 
     public function delete(int $id)
     {
@@ -274,8 +214,8 @@ class ZonesController extends BaseController
 
         $children = $this->model->getChildren($id);
         if (! empty($children)) {
-            return redirect()->to(base_url('admin/zones'))
-                             ->with('error', 'Impossible de supprimer une zone ayant des sous-zones actives.');
+            return redirect()->back()
+                             ->with('error', 'Impossible de supprimer : cette zone possède des sous-zones.');
         }
 
         $this->model->delete($id);
@@ -283,13 +223,11 @@ class ZonesController extends BaseController
         $this->log->activity('delete', 'zones', 'zone', $id,
             'Zone supprimée : ' . $zone['name']);
 
-        return redirect()->to(base_url('admin/zones'))
+        return redirect()->to(base_url('admin/zones?tab=' . $zone['type']))
                          ->with('success', 'Zone supprimée.');
     }
 
-    // --------------------------------------------------------
-    // AJAX – enfants d'une zone
-    // --------------------------------------------------------
+    // ── AJAX ─────────────────────────────────────────────────────────
 
     public function childrenJson(int $parentId)
     {
@@ -297,29 +235,48 @@ class ZonesController extends BaseController
         return $this->json($this->model->getByParent($parentId));
     }
 
-    // --------------------------------------------------------
-    // Méthodes privées
-    // --------------------------------------------------------
-
-    private function validationRules(): array
-    {
-        return [
-            'type' => 'required|in_list[pays,region,ville,code_postal]',
-            'name' => 'required|min_length[1]|max_length[150]',
-            'code' => 'permit_empty|max_length[20]',
-        ];
-    }
+    // ── HELPERS PRIVÉS ───────────────────────────────────────────────
 
     /**
-     * Vérifie que le parent a le bon type selon la hiérarchie définie.
+     * Résout le parent_id selon le type de zone.
+     *   pays     → null
+     *   region   → pays_id
+     *   ville    → region_id si sélectionné, sinon pays_id
+     *   quartier → ville_id
      */
-    private function isParentTypeValid(string $type, int $parentId): bool
+    private function resolveParentId(string $type): ?int
     {
-        if (! isset(self::PARENT_TYPE_MAP[$type])) {
-            return false; // 'pays' n'a pas de parent valide
+        return match ($type) {
+            'pays'     => null,
+            'region'   => $this->request->getPost('pays_id')
+                            ? (int) $this->request->getPost('pays_id')
+                            : null,
+            'ville'    => $this->request->getPost('region_id')
+                            ? (int) $this->request->getPost('region_id')
+                            : ($this->request->getPost('pays_id')
+                                ? (int) $this->request->getPost('pays_id')
+                                : null),
+            'quartier' => $this->request->getPost('ville_id')
+                            ? (int) $this->request->getPost('ville_id')
+                            : null,
+            default    => null,
+        };
+    }
+
+    private function validationRules(string $type): array
+    {
+        $rules = [
+            'type' => 'required|in_list[pays,region,ville,quartier]',
+            'name' => 'required|min_length[1]|max_length[150]',
+        ];
+
+        if (in_array($type, ['region', 'ville', 'quartier'])) {
+            $rules['pays_id'] = 'required|is_natural_no_zero';
+        }
+        if ($type === 'quartier') {
+            $rules['ville_id'] = 'required|is_natural_no_zero';
         }
 
-        $parent = $this->model->find($parentId);
-        return $parent !== null && $parent['type'] === self::PARENT_TYPE_MAP[$type];
+        return $rules;
     }
 }

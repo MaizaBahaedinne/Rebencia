@@ -51,7 +51,7 @@ class AddZonesAdminModule extends Migration
                 ALTER TABLE `zones`
                 MODIFY COLUMN `type` ENUM(
                     'governorate', 'city', 'region', 'district',
-                    'pays', 'ville', 'code_postal'
+                    'pays', 'ville', 'code_postal', 'quartier'
                 ) NOT NULL DEFAULT 'city'
             ");
         } catch (DatabaseException $e) {

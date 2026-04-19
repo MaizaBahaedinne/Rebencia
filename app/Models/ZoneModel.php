@@ -16,13 +16,20 @@ class ZoneModel extends Model
         'type', 'name', 'code', 'parent_id', 'is_active',
     ];
 
-    // --------------------------------------------------------
-    // Requêtes complexes
-    // --------------------------------------------------------
+    /** Métadonnées par type : label, icône Bootstrap Icons, couleur Bootstrap. */
+    public const TYPE_META = [
+        'pays'     => ['label' => 'Pays',         'icon' => 'bi-globe2',       'color' => 'primary'],
+        'region'   => ['label' => 'Région / État', 'icon' => 'bi-map',          'color' => 'success'],
+        'ville'    => ['label' => 'Ville',         'icon' => 'bi-buildings',    'color' => 'info'],
+        'quartier' => ['label' => 'Quartier',      'icon' => 'bi-geo-alt-fill', 'color' => 'warning'],
+    ];
+
+    // ----------------------------------------------------------------
+    // Requêtes
+    // ----------------------------------------------------------------
 
     /**
-     * Retourne les zones avec le nom & type de leur parent.
-     * Bypass soft-delete géré manuellement via z.deleted_at IS NULL.
+     * Zones d'un type donné avec le nom du parent direct.
      */
     public function getWithParent(array $filters = []): array
     {
@@ -35,11 +42,9 @@ class ZoneModel extends Model
         if (! empty($filters['type'])) {
             $q->where('z.type', $filters['type']);
         }
-
         if (! empty($filters['parent_id'])) {
             $q->where('z.parent_id', (int) $filters['parent_id']);
         }
-
         if (! empty($filters['search'])) {
             $q->groupStart()
               ->like('z.name', $filters['search'])
@@ -47,11 +52,11 @@ class ZoneModel extends Model
               ->groupEnd();
         }
 
-        return $q->orderBy('z.type, z.name', 'ASC')->get()->getResultArray();
+        return $q->orderBy('z.name', 'ASC')->get()->getResultArray();
     }
 
     /**
-     * Enfants directs d'une zone (soft-delete géré par le modèle).
+     * Enfants directs d'une zone (soft-delete respecté par le modèle).
      */
     public function getChildren(int $parentId): array
     {
@@ -61,7 +66,7 @@ class ZoneModel extends Model
     }
 
     /**
-     * Liste les zones actives d'un type précis (pour les <select>).
+     * Zones actives d'un type précis (pour les <select> serveur).
      */
     public function getByType(string $type): array
     {
@@ -72,8 +77,7 @@ class ZoneModel extends Model
     }
 
     /**
-     * Enfants directs d'une zone en format allégé pour AJAX.
-     * Retourne uniquement id, name, code.
+     * Enfants directs d'une zone — format allégé pour AJAX (id, name, code).
      */
     public function getByParent(int $parentId): array
     {
@@ -88,22 +92,46 @@ class ZoneModel extends Model
     }
 
     /**
-     * Comptage par type (pour le tableau de bord du module).
+     * Comptage par type (dashboard du module).
      */
     public function countByType(): array
     {
         $rows = $this->db->table('zones')
             ->select('type, COUNT(*) AS total')
             ->where('deleted_at IS NULL')
-            ->where('is_active', 1)
             ->groupBy('type')
             ->get()
             ->getResultArray();
 
-        $totals = ['pays' => 0, 'region' => 0, 'ville' => 0, 'code_postal' => 0];
+        $totals = ['pays' => 0, 'region' => 0, 'ville' => 0, 'quartier' => 0];
         foreach ($rows as $row) {
-            $totals[$row['type']] = (int) $row['total'];
+            if (isset($totals[$row['type']])) {
+                $totals[$row['type']] = (int) $row['total'];
+            }
         }
         return $totals;
+    }
+
+    /**
+     * Remonte la chaîne parente d'une zone.
+     * Retourne ['pays' => zone|null, 'region' => zone|null, 'ville' => zone|null]
+     */
+    public function getParentChain(array $zone): array
+    {
+        $chain   = ['pays' => null, 'region' => null, 'ville' => null];
+        $current = $zone;
+
+        while (! empty($current['parent_id'])) {
+            $parent = $this->find((int) $current['parent_id']);
+            if (! $parent) {
+                break;
+            }
+            if (array_key_exists($parent['type'], $chain)) {
+                $chain[$parent['type']] = $parent;
+            }
+            $current = $parent;
+        }
+
+        return $chain;
     }
 }

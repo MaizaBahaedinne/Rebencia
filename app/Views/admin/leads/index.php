@@ -55,7 +55,7 @@
             <div class="col-sm-2">
                 <select name="status" class="form-select form-select-sm">
                     <option value="">Tous statuts</option>
-                    <?php foreach ($pipelineLabels as $key => [$label, $]): ?>
+                    <?php foreach ($pipelineLabels as $key => [$label, $_color]): ?>
                         <option value="<?= $key ?>" <?= ($filters['status'] ?? '') === $key ? 'selected' : '' ?>><?= $label ?></option>
                     <?php endforeach; ?>
                 </select>

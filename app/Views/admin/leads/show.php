@@ -1,6 +1,4 @@
-<?php $this->extend('layouts/main'); ?>
-<?php $this->section('content'); ?>
-
+﻿
 <?php
 $pipelineSteps = [
     'new'         => ['Nouveau',      'primary'],
@@ -220,4 +218,3 @@ $currentIdx  = array_search($currentStatus, $statusKeys);
     </div>
 </div>
 
-<?php $this->endSection(); ?>

@@ -1,6 +1,4 @@
-<?php $this->extend('layouts/main'); ?>
-<?php $this->section('content'); ?>
-
+﻿
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h2 class="mb-0">Leads / CRM</h2>
@@ -189,4 +187,3 @@
     <?php endif; ?>
 </div>
 
-<?php $this->endSection(); ?>

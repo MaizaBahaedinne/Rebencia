@@ -1,6 +1,4 @@
-<?php $this->extend('layouts/main'); ?>
-<?php $this->section('content'); ?>
-
+﻿
 <?php $isEdit = isset($lead); ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -204,4 +202,3 @@
     </div>
 </form>
 
-<?php $this->endSection(); ?>

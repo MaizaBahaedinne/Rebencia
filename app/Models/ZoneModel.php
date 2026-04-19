@@ -138,4 +138,41 @@ class ZoneModel extends Model
 
         return $chain;
     }
+
+    /**
+     * Recherche de villes (et quartiers) par nom ou code postal.
+     * Retourne jusqu'à $limit résultats avec la chaîne parente complète.
+     *
+     * Chaque résultat :
+     *   id, name, type, code, region_id, region_name, pays_id, pays_name
+     */
+    public function searchCities(string $q, int $limit = 12): array
+    {
+        $q = trim($q);
+        if ($q === '') {
+            return [];
+        }
+
+        // Chercher villes ET quartiers pour permettre la recherche par code postal
+        $rows = $this->db->table('zones z')
+            ->select('z.id, z.name, z.type, z.code,
+                      r.id   AS region_id,   r.name AS region_name,
+                      p.id   AS pays_id,     p.name AS pays_name')
+            ->join('zones r', 'r.id = z.parent_id   AND r.deleted_at IS NULL AND r.type = \'region\'', 'left')
+            ->join('zones p', 'p.id = r.parent_id   AND p.deleted_at IS NULL AND p.type = \'pays\'',   'left')
+            ->where('z.deleted_at IS NULL')
+            ->where('z.is_active', 1)
+            ->whereIn('z.type', ['ville', 'quartier'])
+            ->groupStart()
+                ->like('z.name', $q)
+                ->orLike('z.code', $q)
+            ->groupEnd()
+            ->orderBy('z.type = \'ville\'', 'DESC')   // villes avant quartiers
+            ->orderBy('z.name', 'ASC')
+            ->limit($limit)
+            ->get()
+            ->getResultArray();
+
+        return $rows;
+    }
 }

@@ -251,6 +251,20 @@ class ZonesController extends BaseController
         return $this->json($this->model->getByParent($parentId));
     }
 
+    /**
+     * Recherche AJAX villes/quartiers par nom ou code postal.
+     * GET /admin/zones/search?q=...
+     */
+    public function searchJson()
+    {
+        $this->requirePermission('zones.view');
+        $q = trim($this->request->getGet('q') ?? '');
+        if (strlen($q) < 2) {
+            return $this->json([]);
+        }
+        return $this->json($this->model->searchCities($q, 12));
+    }
+
     // ── IMPORT JSON ──────────────────────────────────────────────────
 
     public function importPage(): string

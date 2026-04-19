@@ -47,6 +47,18 @@
                         </button>
                     </div>
                 </form>
+
+                <hr class="my-3">
+
+                <form method="post" action="<?= site_url('admin/system/deploy/migrate') ?>">
+                    <?= csrf_field() ?>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-outline-warning"
+                                onclick="return confirm('Appliquer les migrations en attente ?')">
+                            <i class="bi bi-database-gear me-1"></i> Appliquer les migrations uniquement
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
 

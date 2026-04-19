@@ -111,6 +111,22 @@ class SystemController extends BaseController
         ]);
     }
 
+    /** Exécute uniquement les migrations (POST). */
+    public function runMigrate()
+    {
+        $this->requirePermission('system.deploy');
+
+        try {
+            $runner = \Config\Services::migrations();
+            $runner->latest('default');
+            return redirect()->to(base_url('admin/system/deploy'))
+                ->with('success', 'Migrations appliquées avec succès.');
+        } catch (\Throwable $e) {
+            return redirect()->to(base_url('admin/system/deploy'))
+                ->with('error', 'Erreur migration : ' . $e->getMessage());
+        }
+    }
+
     /** Exécute un git pull (POST). */
     public function gitPull()
     {
@@ -126,18 +142,23 @@ class SystemController extends BaseController
         // 1. git pull
         exec("cd " . escapeshellarg($rootPath) . " && git pull 2>&1", $output, $return);
 
-        // 2. php spark migrate (seulement si git pull a réussi)
-        $migrateOutput = [];
+        // 2. Migrations via MigrationRunner CI4 (pas d'exec, fonctionne sur tout hébergement)
+        $migrateLog    = '';
         $migrateReturn = 0;
         if ($return === 0) {
-            $phpBin = PHP_BINARY;
-            $spark  = escapeshellarg($rootPath . 'spark');
-            exec("cd " . escapeshellarg($rootPath) . " && {$phpBin} {$spark} migrate --no-interaction 2>&1", $migrateOutput, $migrateReturn);
+            try {
+                $runner = \Config\Services::migrations();
+                $runner->latest('default');
+                $migrateLog = 'Migrations appliquées avec succès.';
+            } catch (\Throwable $e) {
+                $migrateReturn = 1;
+                $migrateLog    = 'ERREUR migration : ' . $e->getMessage();
+            }
         }
 
         $outputStr  = "=== git pull ===\n" . implode("\n", $output);
-        if (!empty($migrateOutput)) {
-            $outputStr .= "\n\n=== php spark migrate ===\n" . implode("\n", $migrateOutput);
+        if ($migrateLog !== '') {
+            $outputStr .= "\n\n=== php spark migrate ===\n" . $migrateLog;
         }
 
         $status = ($return === 0 && $migrateReturn === 0) ? 'success' : 'failed';

@@ -6,133 +6,135 @@ use CodeIgniter\Model;
 
 class PropertyModel extends Model
 {
-    protected $table = 'properties';
-    protected $primaryKey = 'id';
-    protected $useAutoIncrement = true;
-    protected $returnType = 'array';
-    protected $useSoftDeletes = false;
-    protected $protectFields = true;
+    protected $table          = 'properties';
+    protected $primaryKey     = 'id';
+    protected $useTimestamps  = true;
+    protected $useSoftDeletes = true;
+    protected $deletedField   = 'deleted_at';
+
     protected $allowedFields = [
-        'reference', 'title', 'title_ar', 'title_en',
-        'description', 'description_ar', 'description_en',
-        'type', 'transaction_type', 'price', 'rental_price',
-        'internal_estimation', 'area_total', 'area_living', 'area_land',
-        'rooms', 'bedrooms', 'bathrooms', 'floor', 'total_floors',
-        'has_elevator', 'has_parking', 'parking_spaces', 'has_garden', 'has_pool',
-        'construction_year', 'standing', 'condition_state', 'legal_status',
-        'zone_id', 'address', 'city', 'governorate', 'postal_code', 'neighborhood',
-        'latitude', 'longitude', 'agency_id', 'agent_id',
-        'owner_name', 'owner_phone', 'owner_email',
-        'status', 'featured', 'views_count', 'published_at',
-        'disponibilite_date', 'hide_address', 'orientation', 'floor_type', 'gas_type',
-        'energy_class', 'energy_consumption_kwh', 'co2_emission',
-        'promo_price', 'promo_start_date', 'promo_end_date',
-        'charge_syndic', 'charge_water', 'charge_gas', 'charge_electricity', 'charge_other',
-        'internal_notes', 'created_by', 'custom_sale_commission_rate'
+        'reference', 'agent_id', 'title', 'description', 'type', 'transaction_type',
+        'status', 'price', 'surface', 'rooms', 'bedrooms', 'bathrooms',
+        'floor', 'total_floors', 'parking', 'furnished',
+        'address', 'city', 'zone', 'latitude', 'longitude', 'features',
+        'is_published', 'published_at', 'published_by', 'featured', 'views_count',
     ];
 
-    protected bool $allowEmptyInserts = false;
-    protected bool $updateOnlyChanged = true;
+    // --------------------------------------------------------
 
-    protected array $casts = [
-        'has_elevator' => 'boolean',
-        'has_parking' => 'boolean',
-        'has_garden' => 'boolean',
-        'has_pool' => 'boolean',
-        'featured' => 'boolean',
-    ];
-
-    // Dates
-    protected $useTimestamps = true;
-    protected $dateFormat = 'datetime';
-    protected $createdField = 'created_at';
-    protected $updatedField = 'updated_at';
-
-    // Validation
-    protected $validationRules = [
-        'reference' => 'is_unique[properties.reference,id,{id}]',
-        'title' => 'permit_empty|min_length[3]|max_length[255]',
-        'type' => 'permit_empty',
-        'transaction_type' => 'permit_empty',
-        'price' => 'permit_empty|decimal',
-    ];
-
-    public function getPropertyWithDetails($id)
+    /**
+     * Filtre + pagination pour la liste admin.
+     */
+    public function getFiltered(array $filters = [], int $perPage = 20): array
     {
-        $builder = $this->select('properties.*, zones.name as zone_name, agencies.name as agency_name, CONCAT(users.first_name, " ", users.last_name) as agent_name')
-            ->join('zones', 'zones.id = properties.zone_id', 'left')
-            ->join('agencies', 'agencies.id = properties.agency_id', 'left')
-            ->join('users', 'users.id = properties.agent_id', 'left')
-            ->where('properties.id', $id);
-        
-        // Ne pas appliquer le filtre d'agence pour la vue - tout le monde peut voir tous les biens
-        // applyAgencyFilter($builder, 'properties.agency_id');
-        
-        $property = $builder->first();
+        $builder = $this->db->table('properties p')
+            ->select('p.*, u.first_name, u.last_name,
+                      (SELECT path FROM property_images WHERE property_id = p.id AND is_primary = 1 LIMIT 1) AS primary_image')
+            ->join('users u', 'u.id = p.agent_id')
+            ->where('p.deleted_at IS NULL');
 
-        if ($property) {
-            // Récupérer les images
-            $propertyMediaModel = model('PropertyMediaModel');
-            $property['images'] = $propertyMediaModel->where('property_id', $id)->where('type', 'photo')->findAll() ?: [];
+        if (! empty($filters['status'])) {
+            $builder->where('p.status', $filters['status']);
         }
+        if (! empty($filters['type'])) {
+            $builder->where('p.type', $filters['type']);
+        }
+        if (! empty($filters['agent_id'])) {
+            $builder->where('p.agent_id', $filters['agent_id']);
+        }
+        if (! empty($filters['city'])) {
+            $builder->like('p.city', $filters['city']);
+        }
+        if (! empty($filters['search'])) {
+            $builder->groupStart()
+                ->like('p.title', $filters['search'])
+                ->orLike('p.reference', $filters['search'])
+                ->orLike('p.address', $filters['search'])
+                ->groupEnd();
+        }
+
+        $total   = $builder->countAllResults(false);
+        $page    = max(1, (int) ($filters['page'] ?? 1));
+        $offset  = ($page - 1) * $perPage;
+        $results = $builder->orderBy('p.created_at', 'DESC')->limit($perPage, $offset)->get()->getResultArray();
+
+        return [
+            'data'      => $results,
+            'total'     => $total,
+            'per_page'  => $perPage,
+            'page'      => $page,
+            'pages'     => (int) ceil($total / $perPage),
+        ];
+    }
+
+    /**
+     * Trouve un bien avec toutes ses images.
+     */
+    public function findWithImages(int $id): ?array
+    {
+        $property = $this->db->table('properties p')
+            ->select('p.*, u.first_name, u.last_name, u.email AS agent_email')
+            ->join('users u', 'u.id = p.agent_id')
+            ->where('p.id', $id)
+            ->where('p.deleted_at IS NULL')
+            ->get()->getRowArray();
+
+        if (! $property) {
+            return null;
+        }
+
+        $property['images'] = $this->db->table('property_images')
+            ->where('property_id', $id)
+            ->orderBy('sort_order')
+            ->get()
+            ->getResultArray();
 
         return $property;
     }
 
-    public function searchProperties($filters = [])
+    /**
+     * Génère une référence unique (ex: REB-2024-00042).
+     */
+    public function generateReference(): string
     {
-        $builder = $this->builder();
-        
-        // Appliquer le filtre d'agence automatiquement
-        applyAgencyFilter($builder, 'agency_id');
-        
-        if (!empty($filters['type'])) {
-            $builder->where('type', $filters['type']);
-        }
-        
-        if (!empty($filters['transaction_type'])) {
-            $builder->where('transaction_type', $filters['transaction_type']);
-        }
-        
-        if (isset($filters['price_min'])) {
-            $builder->where('price >=', $filters['price_min']);
-        }
-        
-        if (isset($filters['price_max'])) {
-            $builder->where('price <=', $filters['price_max']);
-        }
-        
-        if (!empty($filters['zone_id'])) {
-            $builder->where('zone_id', $filters['zone_id']);
-        }
-        
-        if (isset($filters['rooms_min'])) {
-            $builder->where('rooms >=', $filters['rooms_min']);
-        }
-        
-        if (isset($filters['area_min'])) {
-            $builder->where('area_total >=', $filters['area_min']);
-        }
-        
-        $builder->where('status', 'published');
-        
-        return $builder->get()->getResultArray();
+        $year  = date('Y');
+        $last  = $this->db->table('properties')
+            ->selectMax('id')
+            ->get()
+            ->getRow();
+        $seq   = ($last->id ?? 0) + 1;
+
+        return sprintf('REB-%s-%05d', $year, $seq);
     }
 
     /**
-     * Récupérer toutes les propriétés accessibles avec filtrage automatique par agence
+     * Statistiques pour le dashboard.
      */
-    public function getAllWithAgencyFilter($page = 20)
+    public function getStats(): array
     {
-        // Appliquer le filtre d'agence
-        applyAgencyFilter($this, 'properties.agency_id');
-        
-        $this->select('properties.*, zones.name as zone_name, users.first_name as agent_name, agencies.name as agency_name')
-            ->join('zones', 'zones.id = properties.zone_id', 'left')
-            ->join('users', 'users.id = properties.agent_id', 'left')
-            ->join('agencies', 'agencies.id = properties.agency_id', 'left')
-            ->orderBy('properties.created_at', 'DESC');
-        
-        return $this->paginate($page);
+        $db = $this->db;
+
+        return [
+            'total'     => (int) $db->table('properties')->where('deleted_at IS NULL')->countAllResults(),
+            'available' => (int) $db->table('properties')->where('status', 'available')->where('deleted_at IS NULL')->countAllResults(),
+            'sold'      => (int) $db->table('properties')->where('status', 'sold')->where('deleted_at IS NULL')->countAllResults(),
+            'reserved'  => (int) $db->table('properties')->where('status', 'reserved')->where('deleted_at IS NULL')->countAllResults(),
+            'published' => (int) $db->table('properties')->where('is_published', 1)->where('deleted_at IS NULL')->countAllResults(),
+        ];
+    }
+
+    /**
+     * Enregistre l'historique d'une modification.
+     */
+    public function logChange(int $propertyId, int $userId, string $field, $old, $new): void
+    {
+        $this->db->table('property_history')->insert([
+            'property_id' => $propertyId,
+            'user_id'     => $userId,
+            'field_name'  => $field,
+            'old_value'   => $old,
+            'new_value'   => $new,
+            'created_at'  => date('Y-m-d H:i:s'),
+        ]);
     }
 }

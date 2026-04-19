@@ -1,519 +1,92 @@
-<?php
+﻿<?php
 
 use CodeIgniter\Router\RouteCollection;
 
 /**
  * @var RouteCollection $routes
+ *
+ * REBENCIA – Table de routage complète
  */
 
-// Default routes
-$routes->get('/', 'Home::index');
+// ============================================================
+// Désactiver l'auto-routing (sécurité)
+// ============================================================
+$routes->setAutoRoute(false);
 
-// API routes (public)
-$routes->get('api/cities', 'Home::getCities');
-$routes->get('api/zones/cities', 'Api\Zones::cities');
-$routes->get('api/zones/governorates', 'Api\Zones::governorates');
-$routes->get('api/zones/cities-by-governorate/(:num)', 'Api\Zones::citiesByGovernorate/$1');
+// --------------------------------------------------------
+// AUTH (public)
+// --------------------------------------------------------
+$routes->get('/',      'Auth\LoginController::index');
+$routes->get('login',  'Auth\LoginController::index');
+$routes->post('login', 'Auth\LoginController::authenticate');
+$routes->get('logout', 'Auth\LoginController::logout');
 
-// CA API routes (admin)
-$routes->get('api/ca/summary', 'Api\CAController::summary', ['namespace' => 'App\Controllers']);
-$routes->get('api/ca/by-period', 'Api\CAController::byPeriod', ['namespace' => 'App\Controllers']);
-$routes->get('api/ca/by-agent', 'Api\CAController::byAgent', ['namespace' => 'App\Controllers']);
-$routes->post('api/ca/sync-objectives', 'Api\CAController::syncObjectives', ['namespace' => 'App\Controllers']);
+// --------------------------------------------------------
+// ADMIN – protégé par filtre auth
+// --------------------------------------------------------
+$routes->group('admin', ['filter' => 'auth'], function ($routes) {
 
-// Public pages
-$routes->get('about', 'Pages::about');
-$routes->get('contact', 'Pages::contact');
-$routes->post('contact/send', 'Pages::sendContact');
+    // Dashboard
+    $routes->get('/',           'Admin\DashboardController::index');
+    $routes->get('dashboard',   'Admin\DashboardController::index');
 
-// Search routes
-$routes->get('search', 'Search::index');
+    // Profil personnel
+    $routes->get('profile',             'Admin\UsersController::profile');
+    $routes->post('profile/update',     'Admin\UsersController::updateProfile');
+    $routes->post('profile/password',   'Admin\UsersController::changePassword');
 
-// Properties routes (public)
-$routes->get('properties', 'Properties::index');
-$routes->post('properties/submit-request', 'Properties::submitRequest');
-$routes->get('properties/(:any)', 'Properties::view/$1');
+    // Gestion Utilisateurs
+    $routes->get('users',                       'Admin\UsersController::index');
+    $routes->get('users/create',                'Admin\UsersController::create');
+    $routes->post('users/store',                'Admin\UsersController::store');
+    $routes->get('users/(:num)',                'Admin\UsersController::show/$1');
+    $routes->get('users/(:num)/edit',           'Admin\UsersController::edit/$1');
+    $routes->post('users/(:num)/update',        'Admin\UsersController::update/$1');
+    $routes->post('users/(:num)/toggle-status', 'Admin\UsersController::toggleStatus/$1');
+    $routes->post('users/(:num)/delete',        'Admin\UsersController::delete/$1');
 
-// Property Estimation (public)
-$routes->get('estimer-mon-bien', 'PropertyEstimations::create');
-$routes->post('estimer-mon-bien/submit', 'PropertyEstimations::store');
-$routes->get('estimer-mon-bien/success', 'PropertyEstimations::success');
+    // Matrice des Rôles
+    $routes->get('roles',                           'Admin\RolesController::index');
+    $routes->post('roles/(:num)/permissions',       'Admin\RolesController::updatePermissions/$1');
+    $routes->get('roles/matrix',                    'Admin\RolesController::matrix');
 
-// Search Alerts (public)
-$routes->get('creer-une-alerte', 'SearchAlerts::create');
-$routes->post('creer-une-alerte/submit', 'SearchAlerts::store');
-$routes->get('creer-une-alerte/success', 'SearchAlerts::success');
-$routes->get('alerte/unsubscribe/(:num)/(:segment)', 'SearchAlerts::unsubscribe/$1/$2');
+    // Biens Immobiliers
+    $routes->get('properties',                          'Admin\PropertiesController::index');
+    $routes->get('properties/create',                   'Admin\PropertiesController::create');
+    $routes->post('properties/store',                   'Admin\PropertiesController::store');
+    $routes->get('properties/(:num)',                   'Admin\PropertiesController::show/$1');
+    $routes->get('properties/(:num)/edit',              'Admin\PropertiesController::edit/$1');
+    $routes->post('properties/(:num)/update',           'Admin\PropertiesController::update/$1');
+    $routes->post('properties/(:num)/publish',          'Admin\PropertiesController::publish/$1');
+    $routes->post('properties/(:num)/delete',           'Admin\PropertiesController::delete/$1');
+    $routes->post('properties/(:num)/image',            'Admin\PropertiesController::uploadImage/$1');
+    $routes->post('properties/images/(:num)/delete',    'Admin\PropertiesController::deleteImage/$1');
 
-// Price per m2 (public)
-$routes->get('prix-m2', 'PricePerM2::index');
-$routes->get('prix-m2/search', 'PricePerM2::search');
+    // Leads / CRM
+    $routes->get('leads',                       'Admin\LeadsController::index');
+    $routes->get('leads/create',                'Admin\LeadsController::create');
+    $routes->post('leads/store',                'Admin\LeadsController::store');
+    $routes->get('leads/(:num)',                'Admin\LeadsController::show/$1');
+    $routes->get('leads/(:num)/edit',           'Admin\LeadsController::edit/$1');
+    $routes->post('leads/(:num)/update',        'Admin\LeadsController::update/$1');
+    $routes->post('leads/(:num)/status',        'Admin\LeadsController::updateStatus/$1');
+    $routes->post('leads/(:num)/assign',        'Admin\LeadsController::assign/$1');
+    $routes->post('leads/(:num)/note',          'Admin\LeadsController::addNote/$1');
+    $routes->post('leads/(:num)/delete',        'Admin\LeadsController::delete/$1');
 
+    // System – Logs
+    $routes->get('system/logs',         'Admin\SystemController::logs');
+    $routes->get('system/logs/export',  'Admin\SystemController::exportLogs');
 
-// ==========================================
-// ADMIN ROUTES
-// ==========================================
-$routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function($routes) {
-    
-    // Dashboard (route principale admin)
-    $routes->get('/', 'Dashboard::index');
-    $routes->get('dashboard', 'Dashboard::index');
-    
-    // Authentication
-    $routes->get('login', 'Auth::login');
-    $routes->post('login', 'Auth::attemptLogin');
-    $routes->get('logout', 'Auth::logout');
-    
-    // Profile
-    $routes->get('profile', 'Users::profile');
-    $routes->post('profile/update', 'Users::updateProfile');
-    $routes->post('profile/change-password', 'Users::changePassword');
-    
-    // Users Management
-    $routes->group('users', function($routes) {
-        $routes->get('/', 'Users::index');
-        $routes->get('create', 'Users::create');
-        $routes->post('store', 'Users::store');
-        $routes->get('view/(:num)', 'Users::view/$1');
-        $routes->get('edit/(:num)', 'Users::edit/$1');
-        $routes->post('update/(:num)', 'Users::update/$1');
-        $routes->delete('delete/(:num)', 'Users::delete/$1');
-        $routes->get('manage-roles/(:num)', 'Users::manageRoles/$1');
-        $routes->post('assign-role/(:num)', 'Users::assignRole/$1');
-        $routes->post('set-default-role/(:num)', 'Users::setDefaultRole/$1');
-        $routes->get('remove-role/(:num)/(:num)', 'Users::removeRole/$1/$2');
-        $routes->get('login-as/(:num)', 'Users::loginAs/$1');
-        $routes->get('bulk-manage', 'Users::bulkManage');
-        $routes->post('bulk-action', 'Users::bulkAction');
-    });
-    
-    // Stop impersonation
-    $routes->get('stop-impersonation', 'Users::stopImpersonation');
-
-    // Switch Role
-    $routes->post('switch-role', 'Users::switchRole');
-    
-    // Menus Management (routes directes pour éviter problème de cache)
-    $routes->get('menus', 'Menus::index');
-    $routes->get('menus/create', 'Menus::create');
-    $routes->post('menus/store', 'Menus::store');
-    $routes->get('menus/edit/(:num)', 'Menus::edit/$1');
-    $routes->post('menus/update/(:num)', 'Menus::update/$1');
-    $routes->get('menus/delete/(:num)', 'Menus::delete/$1');
-    $routes->get('menus/role-menus', 'Menus::roleMenus');
-    $routes->get('menus/role-menus/(:num)', 'Menus::roleMenus/$1');
-    $routes->post('menus/update-role-menus', 'Menus::updateRoleMenus');
-    
-    // Roles & Permissions
-    $routes->group('roles', function($routes) {
-        $routes->get('/', 'Roles::index');
-        $routes->get('create', 'Roles::create');
-        $routes->post('store', 'Roles::store');
-        $routes->get('edit/(:num)', 'Roles::edit/$1');
-        $routes->post('update/(:num)', 'Roles::update/$1');
-        $routes->get('delete/(:num)', 'Roles::delete/$1');
-        $routes->get('matrix', 'Roles::matrix');
-        $routes->post('sync-permissions', 'Roles::syncPermissions');
-    });
-    
-    // Agencies
-    $routes->group('agencies', function($routes) {
-        $routes->get('/', 'Agencies::index');
-        $routes->get('create', 'Agencies::create');
-        $routes->post('store', 'Agencies::store');
-        $routes->get('edit/(:num)', 'Agencies::edit/$1');
-        $routes->post('update/(:num)', 'Agencies::update/$1');
-        $routes->get('delete/(:num)', 'Agencies::delete/$1');
-        $routes->get('view/(:num)', 'Agencies::view/$1');
-    });
-    
-    // Zones
-    $routes->group('zones', function($routes) {
-        $routes->get('/', 'Zones::index');
-        $routes->get('create', 'Zones::create');
-        $routes->post('store', 'Zones::store');
-        $routes->get('edit/(:num)', 'Zones::edit/$1');
-        $routes->post('update/(:num)', 'Zones::update/$1');
-        $routes->get('delete/(:num)', 'Zones::delete/$1');
-    });
-    
-    // Agency Zones (Affectation des zones aux agences)
-    $routes->group('agency-zones', function($routes) {
-        $routes->get('/', 'AgencyZones::index');
-        $routes->get('manage/(:num)', 'AgencyZones::manage/$1');
-        $routes->post('save/(:num)', 'AgencyZones::save/$1');
-        $routes->get('get-agency-zones/(:num)', 'AgencyZones::getAgencyZones/$1');
-        $routes->get('delete/(:num)', 'AgencyZones::delete/$1');
-    });
-    
-    // Properties
-    $routes->group('properties', function($routes) {
-        $routes->get('/', 'Properties::index');
-        $routes->get('create', 'Properties::create');
-        $routes->post('store', 'Properties::store');
-        $routes->post('save-step', 'Properties::saveStep');
-        $routes->get('edit/(:num)', 'Properties::edit/$1');
-        $routes->post('update/(:num)', 'Properties::update/$1');
-        $routes->put('update/(:num)', 'Properties::update/$1');
-        $routes->delete('delete/(:num)', 'Properties::delete/$1');
-        $routes->get('view/(:num)', 'Properties::view/$1');
-        $routes->post('deleteImage/(:num)', 'Properties::deleteImage/$1');
-        $routes->post('deleteDocument/(:num)', 'Properties::deleteDocument/$1');
-        $routes->get('bulk-manage', 'Properties::bulkManage');
-        $routes->post('bulk-action', 'Properties::bulkAction');
-        
-        // Owner management
-        $routes->get('search-owners', 'Properties::searchOwners');
-        $routes->post('update-owner/(:num)', 'Properties::updateOwner/$1');
-        
-        // Property Extended Data Routes
-        $routes->post('(:num)/rooms/save', 'PropertyExtendedController::saveRooms/$1');
-        $routes->post('(:num)/options/save', 'PropertyExtendedController::saveOptions/$1');
-        $routes->post('(:num)/location/save', 'PropertyExtendedController::saveLocationScoring/$1');
-        $routes->post('(:num)/financial/save', 'PropertyExtendedController::saveFinancialData/$1');
-        $routes->post('(:num)/costs/save', 'PropertyExtendedController::saveEstimatedCosts/$1');
-        $routes->post('(:num)/orientation/save', 'PropertyExtendedController::saveOrientation/$1');
-        $routes->post('(:num)/media/upload', 'PropertyExtendedController::saveMediaExtension/$1');
-        
-        $routes->delete('rooms/(:num)', 'PropertyExtendedController::deleteRoom/$1');
-        $routes->delete('media/(:num)', 'PropertyExtendedController::deleteMediaFile/$1');
-    });
-    
-    // Property Configuration (Admin)
-    $routes->group('properties/config', function($routes) {
-        $routes->get('/', 'PropertyConfigController::index');
-        $routes->get('(:alpha)', 'PropertyConfigController::edit/$1');
-        $routes->post('(:alpha)', 'PropertyConfigController::update/$1');
-        $routes->post('(:alpha)/toggle/(:alpha)', 'PropertyConfigController::toggleFeature/$1/$2');
-        $routes->get('(:alpha)/sections', 'PropertyConfigController::getSections/$1');
-        $routes->post('validate/(:num)', 'PropertyConfigController::validateProperty/$1');
-        $routes->post('(:alpha)/reset', 'PropertyConfigController::reset/$1');
-    });
-    
-    // Property Analysis & Reports
-    $routes->group('properties', function($routes) {
-        $routes->get('(:num)/analysis', 'PropertyAnalysisController::dashboard/$1');
-        $routes->get('(:num)/financial-report', 'PropertyAnalysisController::financialReport/$1');
-        $routes->get('compare/(:num)/(:num)', 'PropertyAnalysisController::comparison/$1/$2');
-        $routes->get('portfolio', 'PropertyAnalysisController::portfolio');
-        $routes->post('(:num)/export-report', 'PropertyAnalysisController::exportReport/$1');
-        $routes->get('(:num)/metrics', 'PropertyAnalysisController::getMetrics/$1');
-        $routes->get('(:num)/projection/(:num)', 'PropertyAnalysisController::getProjection/$1/$2');
-    });
-    
-    // Property Requests (Demandes clients)
-    $routes->group('property-requests', function($routes) {
-        $routes->get('/', 'PropertyRequests::index');
-        $routes->get('view/(:num)', 'PropertyRequests::view/$1');
-        $routes->post('update-status', 'PropertyRequests::updateStatus');
-        $routes->post('assign', 'PropertyRequests::assign');
-        $routes->get('delete/(:num)', 'PropertyRequests::delete/$1');
-    });
-    
-    // Clients & CRM
-    $routes->group('clients', function($routes) {
-        $routes->get('/', 'Clients::index');
-        $routes->get('create', 'Clients::create');
-        $routes->post('store', 'Clients::store');
-        $routes->get('edit/(:num)', 'Clients::edit/$1');
-        $routes->post('update/(:num)', 'Clients::update/$1');
-        $routes->delete('delete/(:num)', 'Clients::delete/$1');
-        $routes->get('view/(:num)', 'Clients::view/$1');
-    });
-    
-    // Search Alerts
-    $routes->group('search-alerts', function($routes) {
-        $routes->get('/', 'SearchAlerts::index');
-        $routes->get('view/(:num)', 'SearchAlerts::view/$1');
-        $routes->get('toggleActive/(:num)', 'SearchAlerts::toggleActive/$1');
-        $routes->delete('delete/(:num)', 'SearchAlerts::delete/$1');
-    });
-    
-    // Property Estimations (admin)
-    $routes->group('property-estimations', function($routes) {
-        $routes->get('/', 'PropertyEstimations::index');
-        $routes->get('view/(:num)', 'PropertyEstimations::view/$1');
-        $routes->post('update/(:num)', 'PropertyEstimations::update/$1');
-        $routes->get('delete/(:num)', 'PropertyEstimations::delete/$1');
-    });
-    
-    // Price per m2
-    $routes->group('price-per-m2', function($routes) {
-        $routes->get('/', 'PricePerM2::index');
-        $routes->get('create', 'PricePerM2::create');
-        $routes->post('store', 'PricePerM2::store');
-        $routes->get('edit/(:num)', 'PricePerM2::edit/$1');
-        $routes->post('update/(:num)', 'PricePerM2::update/$1');
-        $routes->get('delete/(:num)', 'PricePerM2::delete/$1');
-        $routes->get('calculate', 'PricePerM2::calculateFromProperties');
-    });
-    
-    // Objectives
-    $routes->group('objectives', function($routes) {
-        $routes->get('/', 'Objectives::index');
-        $routes->get('create', 'Objectives::create');
-        $routes->post('store', 'Objectives::store');
-        $routes->get('edit/(:num)', 'Objectives::edit/$1');
-        $routes->post('update/(:num)', 'Objectives::update/$1');
-        $routes->get('delete/(:num)', 'Objectives::delete/$1');
-        $routes->get('refresh/(:num)', 'Objectives::refresh/$1');
-        $routes->get('refresh-all', 'Objectives::refreshAll');
-    });
-
-    // Objectives Sync (1-click interface)
-    $routes->group('objectives-sync', function($routes) {
-        $routes->get('/', 'ObjectivesSync::index');
-        $routes->post('sync-all', 'ObjectivesSync::syncAll');
-        $routes->post('sync-one/(:num)', 'ObjectivesSync::syncOne/$1');
-    });
-    
-    // Transactions
-    $routes->group('transactions', function($routes) {
-        $routes->get('/', 'Transactions::index');
-        $routes->get('create', 'Transactions::create');
-        $routes->get('view/(:num)', 'Transactions::show/$1');
-        $routes->get('(:num)', 'Transactions::show/$1');
-        $routes->post('store', 'Transactions::store');
-        $routes->get('edit/(:num)', 'Transactions::edit/$1');
-        $routes->post('update/(:num)', 'Transactions::update/$1');
-        $routes->delete('delete/(:num)', 'Transactions::delete/$1');
-        $routes->post('update-commission-split/(:num)', 'Transactions::updateCommissionSplit/$1');
-        
-        // Commission management
-        $routes->get('view-commission/(:num)', 'Transactions::viewCommission/$1');
-        $routes->get('mark-commission-paid/(:num)', 'Transactions::markCommissionPaid/$1');
-        $routes->get('recalculate-commission/(:num)', 'Transactions::recalculateCommission/$1');
-    });
-    
-    // Commissions
-    $routes->group('commissions', function($routes) {
-        $routes->get('/', 'Commissions::index');
-        $routes->get('approve/(:num)', 'Commissions::approve/$1');
-        $routes->get('mark-as-paid/(:num)', 'Commissions::markAsPaid/$1');
-        $routes->post('bulk-approve', 'Commissions::bulkApprove');
-        $routes->post('bulk-pay', 'Commissions::bulkPay');
-        $routes->get('agent-report/(:num)', 'Commissions::agentReport/$1');
-    });
-
-    // Commission Rates (Taux personnalisés par utilisateur)
-    $routes->group('commission-rates', function($routes) {
-        $routes->get('/', 'CommissionRates::index');
-        $routes->post('update-rate/(:num)', 'CommissionRates::updateRate/$1');
-        $routes->post('save-defaults', 'CommissionRates::saveDefaults');
-        $routes->get('export', 'CommissionRates::export');
-        $routes->get('reset-defaults', 'CommissionRates::resetDefaults');
-    });
-    
-    // Commission Settings (Configuration & Rules)
-    $routes->group('commission-settings', function($routes) {
-        // Rules Management
-        $routes->get('/', 'CommissionSettings::index');
-        $routes->get('rules', 'CommissionSettings::rules');
-        $routes->get('create-rule', 'CommissionSettings::createRule');
-        $routes->post('store-rule', 'CommissionSettings::storeRule');
-        $routes->get('edit-rule/(:num)', 'CommissionSettings::editRule/$1');
-        $routes->post('update-rule/(:num)', 'CommissionSettings::updateRule/$1');
-        $routes->delete('delete-rule/(:num)', 'CommissionSettings::deleteRule/$1');
-        $routes->post('set-default-rule/(:num)', 'CommissionSettings::setDefaultRule/$1');
-        
-        // Overrides Management
-        $routes->get('overrides', 'CommissionSettings::overrides');
-        $routes->get('create-override', 'CommissionSettings::createOverride');
-        $routes->post('store-override', 'CommissionSettings::storeOverride');
-        $routes->get('edit-override/(:num)', 'CommissionSettings::editOverride/$1');
-        $routes->post('update-override/(:num)', 'CommissionSettings::updateOverride/$1');
-        $routes->delete('delete-override/(:num)', 'CommissionSettings::deleteOverride/$1');
-        
-        // Simulation & Logs
-        $routes->get('simulate', 'CommissionSettings::simulate');
-        $routes->post('process-simulation', 'CommissionSettings::processSimulation');
-        $routes->get('logs', 'CommissionSettings::logs');
-    });
-    
-    // Notifications
-    $routes->group('notifications', function($routes) {
-        $routes->get('/', 'Notifications::index');
-        $routes->post('mark-as-read/(:num)', 'Notifications::markAsRead/$1');
-        $routes->post('mark-all-as-read', 'Notifications::markAllAsRead');
-        $routes->get('unread-count', 'Notifications::getUnreadCount');
-    });
-    
-    // Hierarchy Management
-    $routes->group('hierarchy', function($routes) {
-        $routes->get('/', 'Hierarchy::index');
-        $routes->get('assign-manager', 'Hierarchy::assignManager');
-        $routes->get('assign-manager/(:num)', 'Hierarchy::assignManager/$1');
-        $routes->post('assign-manager', 'Hierarchy::assignManager');
-        $routes->post('assign-manager/(:num)', 'Hierarchy::assignManager/$1');
-        $routes->get('view-user/(:num)', 'Hierarchy::viewUser/$1');
-        $routes->post('update-role/(:num)', 'Hierarchy::updateRole/$1');
-        $routes->post('update-agency/(:num)', 'Hierarchy::updateAgency/$1');
-        $routes->post('update-manager/(:num)', 'Hierarchy::updateManager/$1');
-    });
-    
-    // Reports & Export
-    $routes->group('reports', function($routes) {
-        $routes->get('/', 'Reports::index');
-        $routes->get('export-properties', 'Reports::exportProperties');
-        $routes->get('export-clients', 'Reports::exportClients');
-        $routes->get('export-transactions', 'Reports::exportTransactions');
-        $routes->get('export-commissions', 'Reports::exportCommissions');
-    });
-    
-    // Workflows
-    $routes->group('workflows', function($routes) {
-        $routes->get('/', 'Workflows::index');
-        $routes->get('create', 'Workflows::create');
-        $routes->post('store', 'Workflows::store');
-        $routes->get('edit/(:num)', 'Workflows::edit/$1');
-        $routes->post('update/(:num)', 'Workflows::update/$1');
-        $routes->delete('delete/(:num)', 'Workflows::delete/$1');
-        $routes->get('pipeline/(:alpha)', 'Workflows::pipeline/$1');
-        $routes->post('move-stage', 'Workflows::moveStage');
-    });
-    
-    // Documents
-    $routes->group('documents', function($routes) {
-        $routes->get('(:num)', 'Documents::index/$1');
-        $routes->post('upload/(:num)', 'Documents::upload/$1');
-        $routes->get('download/(:num)', 'Documents::download/$1');
-        $routes->post('delete/(:num)', 'Documents::delete/$1');
-        $routes->get('generate-contract/(:num)', 'Documents::generateContract/$1');
-    });
-    
-    // Settings
-    $routes->group('settings', function($routes) {
-        $routes->get('/', 'Settings::index');
-        $routes->get('general', 'Settings::general');
-        $routes->get('email', 'Settings::email');
-        $routes->get('sms', 'Settings::sms');
-        $routes->get('payment', 'Settings::payment');
-        $routes->get('notifications', 'Settings::notifications');
-        $routes->get('footer', 'Settings::footer');
-        $routes->post('update', 'Settings::update');
-        $routes->post('updateFooter', 'Settings::updateFooter');
-    });
-    
-    // Sliders Management
-    $routes->group('sliders', function($routes) {
-        $routes->get('/', 'Sliders::index');
-        $routes->get('create', 'Sliders::create');
-        $routes->post('store', 'Sliders::store');
-        $routes->get('edit/(:num)', 'Sliders::edit/$1');
-        $routes->post('update/(:num)', 'Sliders::update/$1');
-        $routes->post('delete/(:num)', 'Sliders::delete/$1');
-        $routes->post('toggle-status/(:num)', 'Sliders::toggleStatus/$1');
-    });
-    
-    // Theme Management
-    $routes->group('theme', function($routes) {
-        $routes->get('/', 'Theme::index');
-        $routes->post('update', 'Theme::update');
-        $routes->get('reset', 'Theme::reset');
-        $routes->post('preview', 'Theme::preview');
-    });
-    
-    // Analytics
-    $routes->group('analytics', function($routes) {
-        $routes->get('/', 'Analytics::index');
-        $routes->get('agent/(:num)', 'Analytics::agentReport/$1');
-        $routes->get('commission-evolution', 'Analytics::getCommissionEvolution');
-    });
-    
-    // Appointments
-    $routes->group('appointments', function($routes) {
-        $routes->get('/', 'Appointments::index');
-        $routes->get('list', 'Appointments::list');
-        $routes->get('create', 'Appointments::create');
-        $routes->post('store', 'Appointments::store');
-        $routes->get('edit/(:num)', 'Appointments::edit/$1');
-        $routes->post('update/(:num)', 'Appointments::update/$1');
-        $routes->delete('delete/(:num)', 'Appointments::delete/$1');
-        $routes->get('getEvents', 'Appointments::getEvents');
-        $routes->post('updateStatus', 'Appointments::updateStatus');
-        $routes->get('sendReminders', 'Appointments::sendReminders');
-        $routes->post('check-availability', 'Appointments::checkAvailability');
-        $routes->post('schedule-visit', 'Appointments::scheduleVisit');
-    });
-    
-    // Tasks
-    $routes->group('tasks', function($routes) {
-        $routes->get('/', 'Tasks::index');
-        $routes->get('create', 'Tasks::create');
-        $routes->post('store', 'Tasks::store');
-        $routes->post('updateStatus', 'Tasks::updateStatus');
-        $routes->delete('delete/(:num)', 'Tasks::delete/$1');
-        $routes->get('my-tasks', 'Tasks::myTasks');
-    });
-    
-    // System & Backup
-    $routes->group('system', function($routes) {
-        $routes->get('/', 'System::index');
-        $routes->get('createBackup', 'System::createBackup');
-        $routes->get('downloadBackup/(:segment)', 'System::downloadBackup/$1');
-        $routes->delete('deleteBackup/(:segment)', 'System::deleteBackup/$1');
-        $routes->get('audit-logs', 'System::auditLogs');
-        $routes->get('info', 'System::info');
-    });
-    
-    // Signatures
-    $routes->group('signatures', function($routes) {
-        $routes->get('sign/(:num)', 'Signatures::sign/$1');
-        $routes->post('saveSignature', 'Signatures::saveSignature');
-        $routes->get('view/(:num)', 'Signatures::view/$1');
-        $routes->get('getSignatures/(:num)', 'Signatures::getSignatures/$1');
-        $routes->post('requestSignature', 'Signatures::requestSignature');
-    });
-    
-    // Chat
-    $routes->group('chat', function($routes) {
-        $routes->get('/', 'Chat::index');
-        $routes->get('getMessages', 'Chat::getMessages');
-        $routes->post('sendMessage', 'Chat::sendMessage');
-        $routes->get('getUnreadCount', 'Chat::getUnreadCount');
-    });
-    
-    // Objectives
-    $routes->group('objectives', function($routes) {
-        $routes->get('/', 'Objectives::index');
-        $routes->get('set', 'Objectives::setObjectives');
-        $routes->post('save', 'Objectives::save');
-    });
-    
-    // CMS
-    $routes->group('pages', function($routes) {
-        $routes->get('/', 'Pages::index');
-        $routes->get('create', 'Pages::create');
-        $routes->post('store', 'Pages::store');
-        $routes->get('edit/(:num)', 'Pages::edit/$1');
-        $routes->post('update/(:num)', 'Pages::update/$1');
-        $routes->delete('delete/(:num)', 'Pages::delete/$1');
-    });
+    // System – Déploiement Git
+    $routes->get('system/deploy',       'Admin\SystemController::deploy');
+    $routes->post('system/deploy/pull', 'Admin\SystemController::gitPull');
 });
 
-// ==========================================
-// PUBLIC ROUTES
-// ==========================================
-$routes->get('properties', 'Properties::index');
-$routes->get('properties/(:segment)', 'Properties::view/$1');
-$routes->get('search', 'Properties::search');
-
-// Contact
-$routes->get('contact', 'Contact::index');
-$routes->post('contact/send', 'Contact::send');
-
-// Pages dynamiques
-$routes->get('page/(:segment)', 'Pages::view/$1');
-
-// API Routes (REST)
-$routes->group('api', ['namespace' => 'App\Controllers\Api'], function($routes) {
-    // Auth
-    $routes->post('auth/login', 'Auth::login');
-    $routes->post('auth/me', 'Auth::me');
-    $routes->post('auth/refresh', 'Auth::refresh');
-    
-    // Resources
-    $routes->resource('properties', ['controller' => 'Properties']);
-    $routes->resource('clients', ['controller' => 'Clients']);
-    $routes->resource('transactions', ['controller' => 'Transactions']);
+// --------------------------------------------------------
+// API JSON interne (AJAX – protégé par auth)
+// --------------------------------------------------------
+$routes->group('api', ['filter' => 'auth'], function ($routes) {
+    $routes->get('stats/summary',   'Api\StatsController::summary');
+    $routes->get('leads/pipeline',  'Api\LeadsController::pipeline');
 });

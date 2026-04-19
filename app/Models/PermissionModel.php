@@ -6,45 +6,23 @@ use CodeIgniter\Model;
 
 class PermissionModel extends Model
 {
-    protected $table = 'permissions';
-    protected $primaryKey = 'id';
-    protected $useAutoIncrement = true;
-    protected $returnType = 'array';
-    protected $useSoftDeletes = false;
-    protected $protectFields = true;
-    protected $allowedFields = [
-        'name', 'display_name', 'module', 'description'
-    ];
+    protected $table         = 'permissions';
+    protected $primaryKey    = 'id';
+    protected $useTimestamps = false;
+    protected $allowedFields = ['name', 'label', 'module'];
 
-    protected bool $allowEmptyInserts = false;
-    protected bool $updateOnlyChanged = true;
-
-    protected $useTimestamps = true;
-    protected $dateFormat = 'datetime';
-    protected $createdField = 'created_at';
-    protected $updatedField = 'updated_at';
-
-    public function getPermissionsByModule()
+    /**
+     * Retourne les permissions groupées par module.
+     */
+    public function getAllGrouped(): array
     {
-        return $this->select('module, id, name, display_name')
-            ->orderBy('module', 'ASC')
-            ->orderBy('name', 'ASC')
-            ->findAll();
-    }
-
-    public function getGroupedPermissions()
-    {
-        $permissions = $this->findAll();
+        $rows = $this->orderBy('module')->orderBy('name')->findAll();
         $grouped = [];
-        
-        foreach ($permissions as $permission) {
-            $module = $permission['module'];
-            if (!isset($grouped[$module])) {
-                $grouped[$module] = [];
-            }
-            $grouped[$module][] = $permission;
+
+        foreach ($rows as $perm) {
+            $grouped[$perm['module']][] = $perm;
         }
-        
+
         return $grouped;
     }
 }

@@ -6,295 +6,117 @@ use CodeIgniter\Model;
 
 class UserModel extends Model
 {
-    protected $table = 'users';
-    protected $primaryKey = 'id';
-    protected $useAutoIncrement = true;
-    protected $returnType = 'array';
-    protected $useSoftDeletes = false;
-    protected $protectFields = true;
-    protected $allowedFields = [
-        'username', 'email', 'password_hash', 'first_name', 'last_name',
-        'phone', 'avatar', 'role_id', 'agency_id', 'manager_id',
-        'status', 'last_login', 'email_verified',
-        'is_commission_exceptional', 'commission_exceptional_note',
-        'agent_commission_share_sale', 'agent_commission_share_rent'
-    ];
-
-    protected bool $allowEmptyInserts = false;
-    protected bool $updateOnlyChanged = true;
-
-    protected array $casts = [
-        'email_verified' => 'boolean',
-    ];
-    protected array $castHandlers = [];
-
-    // Dates
+    protected $table         = 'users';
+    protected $primaryKey    = 'id';
     protected $useTimestamps = true;
-    protected $dateFormat = 'datetime';
-    protected $createdField = 'created_at';
-    protected $updatedField = 'updated_at';
-    protected $deletedField = 'deleted_at';
+    protected $useSoftDeletes= true;
+    protected $deletedField  = 'deleted_at';
 
-    // Validation
-    protected $validationRules = [
-        'username' => 'required|min_length[3]|max_length[100]|is_unique[users.username,id,{id}]',
-        'email' => 'required|valid_email|is_unique[users.email,id,{id}]',
-        'password_hash' => 'required|min_length[8]',
-        'role_id' => 'required|integer',
-        'is_commission_exceptional' => 'integer|in_list[0,1]',
-        'agent_commission_share_sale' => 'decimal|greater_than_equal_to[0]|less_than_equal_to[100]',
-        'agent_commission_share_rent' => 'decimal|greater_than_equal_to[0]|less_than_equal_to[100]'
+    protected $allowedFields = [
+        'role_id', 'first_name', 'last_name', 'email', 'phone',
+        'password_hash', 'avatar', 'status',
+        'last_login_at', 'last_login_ip', 'remember_token',
     ];
-    protected $validationMessages = [];
-    protected $skipValidation = false;
-    protected $cleanValidationRules = true;
 
-    // Callbacks
-    protected $allowCallbacks = true;
-    protected $beforeInsert = ['hashPassword'];
-    protected $afterInsert = [];
-    protected $beforeUpdate = ['hashPassword'];
-    protected $afterUpdate = [];
-    protected $beforeFind = [];
-    protected $afterFind = [];
-    protected $beforeDelete = [];
-    protected $afterDelete = [];
+    protected $validationRules = [
+        'email'     => 'required|valid_email',
+        'first_name'=> 'required|min_length[2]|max_length[100]',
+        'last_name' => 'required|min_length[2]|max_length[100]',
+        'role_id'   => 'required|is_natural_no_zero',
+    ];
+
+    protected $hiddenFields = ['password_hash', 'remember_token'];
+
+    // --------------------------------------------------------
+    // Recherches
+    // --------------------------------------------------------
 
     /**
-     * Get team members for a manager
+     * Trouve un utilisateur par email (avec rôle joint).
      */
-    public function getTeamMembers($managerId)
+    public function findByEmail(string $email): ?array
     {
-        return $this->where('manager_id', $managerId)
-            ->where('status', 'active')
-            ->findAll();
+        return $this->db->table('users u')
+            ->select('u.*, r.name AS role_name, r.label AS role_label, r.color AS role_color')
+            ->join('roles r', 'r.id = u.role_id')
+            ->where('u.email', $email)
+            ->where('u.deleted_at IS NULL')
+            ->get()
+            ->getRowArray();
     }
 
     /**
-     * Get all team member IDs for a manager (including the manager)
+     * Retourne tous les utilisateurs avec leur rôle.
      */
-    public function getTeamMemberIds($managerId)
+    public function getWithRole(array $filters = []): array
     {
-        $team = $this->getTeamMembers($managerId);
-        $ids = array_column($team, 'id');
-        $ids[] = $managerId; // Include manager themselves
-        return $ids;
-    }
+        $builder = $this->db->table('users u')
+            ->select('u.id, u.first_name, u.last_name, u.email, u.phone,
+                      u.status, u.avatar, u.last_login_at, u.created_at,
+                      r.name AS role_name, r.label AS role_label, r.color AS role_color')
+            ->join('roles r', 'r.id = u.role_id')
+            ->where('u.deleted_at IS NULL');
 
-    protected function hashPassword(array $data)
-    {
-        // Only hash if password_hash is set AND it's not already hashed
-        if (isset($data['data']['password_hash']) && !empty($data['data']['password_hash'])) {
-            // Check if it's already a bcrypt hash (starts with $2y$ or $2a$ or $2b$)
-            if (!preg_match('/^\$2[ayb]\$.{56}$/', $data['data']['password_hash'])) {
-                $data['data']['password_hash'] = password_hash($data['data']['password_hash'], PASSWORD_DEFAULT);
-            }
+        if (! empty($filters['status'])) {
+            $builder->where('u.status', $filters['status']);
         }
-        return $data;
-    }
+        if (! empty($filters['role_id'])) {
+            $builder->where('u.role_id', $filters['role_id']);
+        }
+        if (! empty($filters['search'])) {
+            $builder->groupStart()
+                ->like('u.first_name', $filters['search'])
+                ->orLike('u.last_name', $filters['search'])
+                ->orLike('u.email', $filters['search'])
+                ->groupEnd();
+        }
 
-    public function getUserWithRole($id)
-    {
-        return $this->select('users.*, roles.name as role_name, roles.display_name as role_display_name')
-            ->join('roles', 'roles.id = users.role_id')
-            ->where('users.id', $id)
-            ->first();
+        return $builder->orderBy('u.created_at', 'DESC')->get()->getResultArray();
     }
 
     /**
-     * Get user with all their roles
+     * Retourne un utilisateur avec rôle par ID.
      */
-    public function getUserWithRoles($userId)
+    public function findWithRole(int $id): ?array
     {
-        $db = \Config\Database::connect();
-        
+        return $this->db->table('users u')
+            ->select('u.*, r.name AS role_name, r.label AS role_label, r.color AS role_color')
+            ->join('roles r', 'r.id = u.role_id')
+            ->where('u.id', $id)
+            ->where('u.deleted_at IS NULL')
+            ->get()
+            ->getRowArray();
+    }
+
+    /**
+     * Retourne les permissions d'un utilisateur sous forme de tableau de noms.
+     */
+    public function getPermissions(int $userId): array
+    {
         $user = $this->find($userId);
-        if (!$user) {
-            return null;
+        if (! $user) {
+            return [];
         }
 
-        // Get all roles for this user
-        $userRoles = $db->table('user_roles')
-            ->select('user_roles.*, roles.name, roles.display_name, roles.level')
-            ->join('roles', 'roles.id = user_roles.role_id')
-            ->where('user_roles.user_id', $userId)
+        $rows = $this->db->table('permissions p')
+            ->select('p.name')
+            ->join('role_permissions rp', 'rp.permission_id = p.id')
+            ->where('rp.role_id', $user['role_id'])
             ->get()
             ->getResultArray();
 
-        $user['roles'] = $userRoles;
-        
-        // Get active role
-        $activeRole = null;
-        foreach ($userRoles as $role) {
-            if ($role['is_active'] == 1) {
-                $activeRole = $role;
-                break;
-            }
-        }
-        
-        $user['active_role'] = $activeRole;
-        
-        return $user;
+        return array_column($rows, 'name');
     }
 
     /**
-     * Get active role for user
+     * Statistiques globales pour le dashboard.
      */
-    public function getActiveRole($userId)
+    public function getStats(): array
     {
-        $db = \Config\Database::connect();
-        
-        return $db->table('user_roles')
-            ->select('user_roles.*, roles.name, roles.display_name, roles.level')
-            ->join('roles', 'roles.id = user_roles.role_id')
-            ->where('user_roles.user_id', $userId)
-            ->where('user_roles.is_active', 1)
-            ->get()
-            ->getRowArray();
-    }
+        $total   = $this->where('deleted_at IS NULL')->countAllResults(false);
+        $active  = $this->where('status', 'active')->where('deleted_at IS NULL')->countAllResults(false);
+        $pending = $this->where('status', 'pending')->where('deleted_at IS NULL')->countAllResults(false);
 
-    /**
-     * Get default role for user
-     */
-    public function getDefaultRole($userId)
-    {
-        $db = \Config\Database::connect();
-        
-        return $db->table('user_roles')
-            ->select('user_roles.*, roles.name, roles.display_name, roles.level')
-            ->join('roles', 'roles.id = user_roles.role_id')
-            ->where('user_roles.user_id', $userId)
-            ->where('user_roles.is_default', 1)
-            ->get()
-            ->getRowArray();
-    }
-
-    /**
-     * Set default role for user
-     */
-    public function setDefaultRole($userId, $roleId)
-    {
-        $db = \Config\Database::connect();
-        
-        // Remove is_default from all roles
-        $db->table('user_roles')
-            ->where('user_id', $userId)
-            ->update(['is_default' => 0]);
-        
-        // Set new default role
-        $db->table('user_roles')
-            ->where('user_id', $userId)
-            ->where('role_id', $roleId)
-            ->update(['is_default' => 1]);
-        
-        return true;
-    }
-
-    /**
-     * Switch active role for user
-     */
-    public function switchRole($userId, $roleId)
-    {
-        $db = \Config\Database::connect();
-        
-        // Deactivate all roles
-        $db->table('user_roles')
-            ->where('user_id', $userId)
-            ->update(['is_active' => 0]);
-        
-        // Activate selected role
-        $db->table('user_roles')
-            ->where('user_id', $userId)
-            ->where('role_id', $roleId)
-            ->update(['is_active' => 1]);
-        
-        return true;
-    }
-
-    /**
-     * Assign role to user
-     */
-    public function assignRole($userId, $roleId, $setActive = false, $setDefault = false)
-    {
-        $db = \Config\Database::connect();
-        
-        // Check if role already assigned
-        $existing = $db->table('user_roles')
-            ->where('user_id', $userId)
-            ->where('role_id', $roleId)
-            ->get()
-            ->getRowArray();
-        
-        if ($existing) {
-            return false; // Already assigned
-        }
-        
-        // Check if this is the first role
-        $roleCount = $db->table('user_roles')
-            ->where('user_id', $userId)
-            ->countAllResults();
-        
-        $isFirstRole = ($roleCount == 0);
-        
-        // If this is the first role, make it default and active
-        if ($isFirstRole) {
-            $setDefault = true;
-            $setActive = true;
-        }
-        
-        // If setDefault is true, remove default from other roles
-        if ($setDefault) {
-            $db->table('user_roles')
-                ->where('user_id', $userId)
-                ->update(['is_default' => 0]);
-        }
-        
-        // If setActive is true, deactivate others
-        if ($setActive) {
-            $db->table('user_roles')
-                ->where('user_id', $userId)
-                ->update(['is_active' => 0]);
-        }
-        
-        // Insert new role
-        $db->table('user_roles')->insert([
-            'user_id' => $userId,
-            'role_id' => $roleId,
-            'is_default' => $setDefault ? 1 : 0,
-            'is_active' => $setActive ? 1 : 0,
-            'assigned_at' => date('Y-m-d H:i:s'),
-            'assigned_by' => session()->get('user_id'),
-        ]);
-        
-        return true;
-    }
-
-    /**
-     * Remove role from user
-     */
-    public function removeRole($userId, $roleId)
-    {
-        $db = \Config\Database::connect();
-        
-        $db->table('user_roles')
-            ->where('user_id', $userId)
-            ->where('role_id', $roleId)
-            ->delete();
-        
-        return true;
-    }
-
-    public function getUsersByAgency($agencyId)
-    {
-        return $this->where('agency_id', $agencyId)
-            ->where('status', 'active')
-            ->findAll();
-    }
-
-    public function getUsersByManager($managerId)
-    {
-        return $this->where('manager_id', $managerId)
-            ->where('status', 'active')
-            ->findAll();
+        return compact('total', 'active', 'pending');
     }
 }

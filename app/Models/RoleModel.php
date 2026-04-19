@@ -6,45 +6,81 @@ use CodeIgniter\Model;
 
 class RoleModel extends Model
 {
-    protected $table = 'roles';
-    protected $primaryKey = 'id';
-    protected $useAutoIncrement = true;
-    protected $returnType = 'array';
-    protected $useSoftDeletes = false;
-    protected $protectFields = true;
-    protected $allowedFields = [
-        'name', 'display_name', 'description', 'level'
-    ];
-
-    protected bool $allowEmptyInserts = false;
-    protected bool $updateOnlyChanged = true;
-
+    protected $table         = 'roles';
+    protected $primaryKey    = 'id';
     protected $useTimestamps = true;
-    protected $dateFormat = 'datetime';
-    protected $createdField = 'created_at';
-    protected $updatedField = 'updated_at';
 
-    protected $validationRules = [
-        'name' => 'required|is_unique[roles.name,id,{id}]',
-        'display_name' => 'required|max_length[150]',
-    ];
+    protected $allowedFields = ['name', 'label', 'description', 'color', 'is_active'];
 
-    public function getRoleWithPermissions($roleId)
+    // --------------------------------------------------------
+
+    /**
+     * Retourne tous les rôles actifs avec leurs permissions.
+     */
+    public function getAllWithPermissions(): array
     {
-        $role = $this->find($roleId);
-        
-        if ($role) {
-            $db = \Config\Database::connect();
-            $permissions = $db->table('role_permissions')
-                ->select('permissions.*, role_permissions.can_create, role_permissions.can_read, role_permissions.can_update, role_permissions.can_delete, role_permissions.can_validate')
-                ->join('permissions', 'permissions.id = role_permissions.permission_id')
-                ->where('role_permissions.role_id', $roleId)
+        $roles = $this->where('is_active', 1)->findAll();
+
+        foreach ($roles as &$role) {
+            $role['permissions'] = $this->db->table('permissions p')
+                ->select('p.id, p.name, p.label, p.module')
+                ->join('role_permissions rp', 'rp.permission_id = p.id')
+                ->where('rp.role_id', $role['id'])
                 ->get()
                 ->getResultArray();
-            
-            $role['permissions'] = $permissions;
         }
-        
-        return $role;
+
+        return $roles;
+    }
+
+    /**
+     * Synchronise les permissions d'un rôle.
+     * $permissionIds : tableau d'IDs à attribuer.
+     */
+    public function syncPermissions(int $roleId, array $permissionIds): bool
+    {
+        $this->db->transStart();
+
+        // Nettoyage
+        $this->db->table('role_permissions')->where('role_id', $roleId)->delete();
+
+        // Ré-insertion
+        if (! empty($permissionIds)) {
+            $rows = [];
+            foreach ($permissionIds as $pid) {
+                $rows[] = [
+                    'role_id'       => $roleId,
+                    'permission_id' => (int) $pid,
+                    'created_at'    => date('Y-m-d H:i:s'),
+                ];
+            }
+            $this->db->table('role_permissions')->insertBatch($rows);
+        }
+
+        $this->db->transComplete();
+
+        return $this->db->transStatus();
+    }
+
+    /**
+     * Statistiques adoption pour la matrice.
+     * Retourne le nombre d'utilisateurs par rôle.
+     */
+    public function getAdoptionStats(): array
+    {
+        $rows = $this->db->table('roles r')
+            ->select('r.id, r.name, r.label, r.color, COUNT(u.id) AS user_count')
+            ->join('users u', 'u.role_id = r.id AND u.deleted_at IS NULL AND u.status = "active"', 'left')
+            ->groupBy('r.id')
+            ->get()
+            ->getResultArray();
+
+        $total = array_sum(array_column($rows, 'user_count')) ?: 1;
+
+        foreach ($rows as &$row) {
+            $row['adoption_pct'] = round(($row['user_count'] / $total) * 100, 1);
+        }
+
+        return $rows;
     }
 }

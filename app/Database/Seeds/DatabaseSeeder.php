@@ -13,13 +13,18 @@ class DatabaseSeeder extends Seeder
         echo " REBENCIA - Génération des données test\n";
         echo "========================================\n\n";
         
-        // 1. Créer les agents
-        echo "1. Création des agents...\n";
+        // 1. Rôles & permissions
+        echo "1. Création des rôles et permissions...\n";
+        $this->call('RolesSeeder');
+        echo "\n";
+
+        // 2. Créer les agents
+        echo "2. Création des agents...\n";
         $this->call('AgentsSeeder');
         echo "\n";
         
-        // 2. Créer les biens
-        echo "2. Création des biens immobiliers...\n";
+        // 3. Créer les biens
+        echo "3. Création des biens immobiliers...\n";
         $this->call('PropertiesSeeder');
         echo "\n";
         

@@ -74,6 +74,17 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
     $routes->post('leads/(:num)/note',          'Admin\LeadsController::addNote/$1');
     $routes->post('leads/(:num)/delete',        'Admin\LeadsController::delete/$1');
 
+    // Tâches / Board
+    $routes->get('tasks',                       'Admin\TasksController::index');
+    $routes->get('tasks/create',                'Admin\TasksController::create');
+    $routes->post('tasks/store',                'Admin\TasksController::store');
+    $routes->get('tasks/(:num)',                'Admin\TasksController::show/$1');
+    $routes->get('tasks/(:num)/edit',           'Admin\TasksController::edit/$1');
+    $routes->post('tasks/(:num)/update',        'Admin\TasksController::update/$1');
+    $routes->post('tasks/(:num)/status',        'Admin\TasksController::updateStatus/$1');
+    $routes->post('tasks/(:num)/comment',       'Admin\TasksController::addComment/$1');
+    $routes->post('tasks/(:num)/delete',        'Admin\TasksController::delete/$1');
+
     // System – Logs
     $routes->get('system/logs',         'Admin\SystemController::logs');
     $routes->get('system/logs/export',  'Admin\SystemController::exportLogs');

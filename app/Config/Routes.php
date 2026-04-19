@@ -85,6 +85,16 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
     $routes->post('tasks/(:num)/comment',       'Admin\TasksController::addComment/$1');
     $routes->post('tasks/(:num)/delete',        'Admin\TasksController::delete/$1');
 
+    // Gestion des Zones géographiques
+    $routes->get('zones',                        'Admin\ZonesController::index');
+    $routes->get('zones/create',                 'Admin\ZonesController::create');
+    $routes->post('zones/store',                 'Admin\ZonesController::store');
+    $routes->get('zones/(:num)',                 'Admin\ZonesController::show/$1');
+    $routes->get('zones/(:num)/edit',            'Admin\ZonesController::edit/$1');
+    $routes->post('zones/(:num)/update',         'Admin\ZonesController::update/$1');
+    $routes->post('zones/(:num)/toggle-status',  'Admin\ZonesController::toggleStatus/$1');
+    $routes->post('zones/(:num)/delete',         'Admin\ZonesController::delete/$1');
+
     // System – Logs
     $routes->get('system/logs',         'Admin\SystemController::logs');
     $routes->get('system/logs/export',  'Admin\SystemController::exportLogs');

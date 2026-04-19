@@ -118,11 +118,18 @@
             <i class="bi bi-speedometer2"></i> Tableau de bord
         </a>
 
-        <?php if (in_array('properties.view', session()->get('permissions') ?? [])) : ?>
+        <?php if (in_array('properties.view', session()->get('permissions') ?? []) || in_array('zones.view', session()->get('permissions') ?? [])) : ?>
         <div class="nav-section">Immobilier</div>
+        <?php if (in_array('properties.view', session()->get('permissions') ?? [])) : ?>
         <a href="<?= base_url('admin/properties') ?>" class="nav-link <?= str_starts_with(uri_string(), 'admin/properties') ? 'active' : '' ?>">
             <i class="bi bi-building"></i> Biens
         </a>
+        <?php endif; ?>
+        <?php if (in_array('zones.view', session()->get('permissions') ?? [])) : ?>
+        <a href="<?= base_url('admin/zones') ?>" class="nav-link <?= str_starts_with(uri_string(), 'admin/zones') ? 'active' : '' ?>">
+            <i class="bi bi-geo-alt"></i> Zones
+        </a>
+        <?php endif; ?>
         <?php endif; ?>
 
         <?php if (in_array('leads.view', session()->get('permissions') ?? [])) : ?>

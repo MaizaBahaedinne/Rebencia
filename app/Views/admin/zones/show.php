@@ -210,3 +210,168 @@ $breadcrumb = array_filter([
     </div>
 
 </div><!-- /.row -->
+
+<?php if ($zone['type'] === 'quartier'): ?>
+<!-- ── CARTE GÉOMÉTRIQUE ─────────────────────────────────────────────── -->
+<div class="card shadow-sm mt-4" id="mapCard">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">
+            <i class="bi bi-map me-1 text-warning"></i>
+            Zone géométrique — <?= esc($zone['name']) ?>
+        </span>
+        <div class="d-flex gap-2 align-items-center">
+            <span id="mapStatus" class="small text-muted"></span>
+            <?php if (in_array('zones.edit', $perms)): ?>
+            <button class="btn btn-sm btn-warning" id="btnSaveGeo" disabled>
+                <i class="bi bi-floppy me-1"></i>Enregistrer la zone
+            </button>
+            <button class="btn btn-sm btn-outline-danger" id="btnClearGeo" title="Effacer le dessin">
+                <i class="bi bi-trash"></i>
+            </button>
+            <?php endif; ?>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div id="zoneMap" style="height:500px; width:100%; border-radius:0 0 .5rem .5rem;"></div>
+    </div>
+</div>
+
+<!-- Leaflet CSS + JS (CDN) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+
+<script>
+(function () {
+    'use strict';
+
+    const SAVE_URL   = '<?= base_url('admin/zones/' . $zone['id'] . '/geometry') ?>';
+    const CSRF_NAME  = '<?= csrf_token() ?>';
+    const CSRF_HASH  = '<?= csrf_hash() ?>';
+    const ZONE_ID    = <?= (int) $zone['id'] ?>;
+    const CAN_EDIT   = <?= in_array('zones.edit', $perms) ? 'true' : 'false' ?>;
+    const SAVED_GEO  = <?= ! empty($zone['geometry']) ? $zone['geometry'] : 'null' ?>;
+
+    // ── Initialisation de la carte ───────────────────────────────────
+    const map = L.map('zoneMap', { zoomControl: true });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19,
+    }).addTo(map);
+
+    // Vue par défaut : Tunisie
+    map.setView([33.8869, 9.5375], 7);
+
+    // ── Couche des formes dessinées ──────────────────────────────────
+    const drawnItems = new L.FeatureGroup().addTo(map);
+
+    // Charger géométrie existante
+    if (SAVED_GEO) {
+        try {
+            const geoLayer = L.geoJSON(SAVED_GEO, {
+                style: { color: '#f59e0b', weight: 2, fillOpacity: 0.15 }
+            }).addTo(drawnItems);
+            map.fitBounds(geoLayer.getBounds(), { padding: [40, 40] });
+            setStatus('Géométrie enregistrée', 'success');
+        } catch (e) {
+            console.warn('GeoJSON existant invalide :', e);
+        }
+    }
+
+    // ── Contrôle Leaflet.draw ────────────────────────────────────────
+    if (CAN_EDIT) {
+        const drawControl = new L.Control.Draw({
+            edit: { featureGroup: drawnItems, edit: true, remove: true },
+            draw: {
+                polygon:   { shapeOptions: { color: '#f59e0b', weight: 2, fillOpacity: 0.15 } },
+                rectangle: { shapeOptions: { color: '#f59e0b', weight: 2, fillOpacity: 0.15 } },
+                circle:    false,
+                circlemarker: false,
+                marker:    false,
+                polyline:  false,
+            },
+        });
+        map.addControl(drawControl);
+
+        // Après avoir dessiné une forme → remplace tout
+        map.on(L.Draw.Event.CREATED, function (e) {
+            drawnItems.clearLayers();
+            drawnItems.addLayer(e.layer);
+            enableSave();
+        });
+
+        map.on(L.Draw.Event.EDITED, enableSave);
+        map.on(L.Draw.Event.DELETED, function () {
+            if (drawnItems.getLayers().length === 0) {
+                document.getElementById('btnSaveGeo').disabled = true;
+                setStatus('Forme supprimée — sauvegardez pour effacer en base', 'warning');
+            }
+        });
+
+        // Bouton Enregistrer
+        document.getElementById('btnSaveGeo').addEventListener('click', saveGeometry);
+
+        // Bouton Effacer
+        document.getElementById('btnClearGeo').addEventListener('click', function () {
+            if (! confirm('Effacer le dessin actuel sans sauvegarder ?')) return;
+            drawnItems.clearLayers();
+            document.getElementById('btnSaveGeo').disabled = true;
+            setStatus('', '');
+        });
+    }
+
+    // ── Fonctions ────────────────────────────────────────────────────
+    function enableSave() {
+        document.getElementById('btnSaveGeo').disabled = false;
+        setStatus('Modifications non sauvegardées', 'warning');
+    }
+
+    function setStatus(msg, type) {
+        const el = document.getElementById('mapStatus');
+        el.className = 'small';
+        if (type === 'success') el.classList.add('text-success');
+        else if (type === 'warning') el.classList.add('text-warning');
+        else if (type === 'danger') el.classList.add('text-danger');
+        else el.classList.add('text-muted');
+        el.textContent = msg;
+    }
+
+    function saveGeometry() {
+        const btn = document.getElementById('btnSaveGeo');
+        btn.disabled = true;
+        setStatus('Enregistrement…', '');
+
+        // Construire le GeoJSON
+        const geojsonData = drawnItems.toGeoJSON(); // FeatureCollection
+        // Si vide → envoie null pour effacer
+        const geometryPayload = geojsonData.features.length > 0 ? geojsonData : null;
+
+        fetch(SAVE_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                [CSRF_NAME]: CSRF_HASH,
+            },
+            body: JSON.stringify({ geometry: geometryPayload }),
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) {
+                setStatus('Géométrie enregistrée ✓', 'success');
+            } else {
+                setStatus('Erreur : ' + (data.error ?? 'inconnue'), 'danger');
+                btn.disabled = false;
+            }
+        })
+        .catch(() => {
+            setStatus('Erreur réseau', 'danger');
+            btn.disabled = false;
+        });
+    }
+
+})();
+</script>
+<?php endif; ?>

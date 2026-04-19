@@ -13,7 +13,7 @@ class ZoneModel extends Model
     protected $deletedField   = 'deleted_at';
 
     protected $allowedFields = [
-        'type', 'name', 'code', 'parent_id', 'is_active',
+        'type', 'name', 'code', 'parent_id', 'is_active', 'geometry',
     ];
 
     /** Métadonnées par type : label, icône Bootstrap Icons, couleur Bootstrap. */

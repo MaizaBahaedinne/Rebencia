@@ -107,9 +107,10 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
     $routes->get('zones/(:num)/children',        'Admin\ZonesController::childrenJson/$1');
     $routes->get('zones/(:num)/edit',            'Admin\ZonesController::edit/$1');
     $routes->post('zones/(:num)/update',         'Admin\ZonesController::update/$1');
-    $routes->post('zones/(:num)/toggle-status',  'Admin\ZonesController::toggleStatus/$1');
-    $routes->post('zones/(:num)/delete',         'Admin\ZonesController::delete/$1');
-    $routes->get('zones/(:num)',                 'Admin\ZonesController::show/$1');
+    $routes->post('zones/(:num)/geometry',        'Admin\ZonesController::saveGeometry/$1');
+    $routes->post('zones/(:num)/toggle-status',   'Admin\ZonesController::toggleStatus/$1');
+    $routes->post('zones/(:num)/delete',          'Admin\ZonesController::delete/$1');
+    $routes->get('zones/(:num)',                  'Admin\ZonesController::show/$1');
 
     // System – Logs
     $routes->get('system/logs',         'Admin\SystemController::logs');

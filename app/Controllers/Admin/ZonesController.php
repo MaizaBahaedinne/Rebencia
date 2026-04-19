@@ -251,6 +251,45 @@ class ZonesController extends BaseController
         return $this->json($this->model->getByParent($parentId));
     }
 
+    // ── GÉOMÉTRIE (carte) ─────────────────────────────────────────────
+
+    /**
+     * Sauvegarde le GeoJSON d'une zone quartier via AJAX.
+     * POST /admin/zones/{id}/geometry
+     * Body JSON : { "geometry": "<GeoJSON string>" }
+     */
+    public function saveGeometry(int $id)
+    {
+        $this->requirePermission('zones.edit');
+
+        $zone = $this->model->find($id);
+        if (! $zone) {
+            return $this->json(['ok' => false, 'error' => 'Zone introuvable.'], 404);
+        }
+
+        $raw = $this->request->getBody();
+        $payload = json_decode($raw, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE || ! isset($payload['geometry'])) {
+            return $this->json(['ok' => false, 'error' => 'Payload JSON invalide.'], 400);
+        }
+
+        // Valider que c'est du GeoJSON valide (type requis)
+        $geo = is_string($payload['geometry']) ? json_decode($payload['geometry'], true) : $payload['geometry'];
+        if (! is_array($geo) || ! isset($geo['type'])) {
+            return $this->json(['ok' => false, 'error' => 'GeoJSON invalide.'], 400);
+        }
+
+        $geometryJson = json_encode($geo, JSON_UNESCAPED_UNICODE);
+
+        $this->model->update($id, ['geometry' => $geometryJson]);
+
+        $this->log->activity('update', 'zones', 'zone', $id,
+            "Géométrie mise à jour : {$zone['name']}");
+
+        return $this->json(['ok' => true]);
+    }
+
     // ── IMPORT JSON ──────────────────────────────────────────────────
 
     public function importPage(): string

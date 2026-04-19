@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^/Applications/MAMP/bin/php/php8\\.2\\.0/bin/php -l /Users/gouiaaepmaizamalak/Rebencia/app/Controllers/Admin/ZonesController\\.php && /Applications/MAMP/bin/php/php8\\.2\\.0/bin/php -l /Users/gouiaaepmaizamalak/Rebencia/app/Views/admin/zones/show\\.php && /Applications/MAMP/bin/php/php8\\.2\\.0/bin/php -l /Users/gouiaaepmaizamalak/Rebencia/app/Database/Migrations/2026-04-20-100000_AddGeometryToZones\\.php$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

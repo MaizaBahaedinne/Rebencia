@@ -1,5 +1,13 @@
 <!-- FORMULAIRE BIEN IMMOBILIER -->
-<?php $isEdit = ! empty($property['id']); ?>
+<?php
+$isEdit      = ! empty($property['id']);
+// Décoder les valeurs features existantes si en édition
+$featValues  = [];
+if ($isEdit && ! empty($property['features'])) {
+    $featValues = json_decode($property['features'], true) ?? [];
+}
+$characteristics = $characteristics ?? [];
+?>
 
 <div class="d-flex align-items-center gap-3 mb-4">
     <a href="<?= base_url('admin/properties') ?>" class="btn btn-sm btn-light">
@@ -125,10 +133,98 @@
                 </div>
             </div>
 
-            <!-- Localisation -->
-            <div class="card shadow-sm mb-3">
+            <!-- Équipements & caractéristiques dynamiques -->
+            <?php if (! empty($characteristics)) : ?>
+            <div class="card shadow-sm mb-3" id="card-features">
                 <div class="card-header bg-white fw-semibold">
-                    <i class="bi bi-geo-alt text-danger me-2"></i>Localisation
+                    <i class="bi bi-tags text-info me-2"></i>Équipements &amp; caractéristiques
+                    <small class="text-muted ms-2 fw-normal">— chargés depuis le catalogue</small>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                    <?php
+                    foreach ($characteristics as $ch) :
+                        $k          = $ch['key'];
+                        $lbl        = esc($ch['label']);
+                        $icon       = esc($ch['icon']);
+                        $unit       = esc($ch['unit'] ?? '');
+                        $currentVal = $featValues[$k] ?? null;
+                        $idAttr     = 'feat_' . $k;
+                        $nameAttr   = 'feat[' . $k . ']';
+                        $isRequired = false;
+                        if ($ch['required_for']) {
+                            $reqTypes = json_decode($ch['required_for'], true) ?? [];
+                            $isRequired = in_array($property['type'] ?? '', $reqTypes, true);
+                        }
+                        $reqAttr = $isRequired ? 'required' : '';
+                    ?>
+                    <?php if ($ch['type'] === 'boolean') : ?>
+                        <div class="col-6 col-md-4 col-xl-3 d-flex align-items-center gap-2 pt-1">
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input" type="checkbox"
+                                       id="<?= $idAttr ?>"
+                                       name="<?= $nameAttr ?>"
+                                       value="1"
+                                       <?= $currentVal == '1' ? 'checked' : '' ?>>
+                                <label class="form-check-label" for="<?= $idAttr ?>">
+                                    <i class="bi <?= $icon ?> me-1 text-muted small"></i><?= $lbl ?>
+                                    <?php if ($isRequired) : ?><span class="text-danger">*</span><?php endif; ?>
+                                </label>
+                            </div>
+                        </div>
+
+                    <?php elseif ($ch['type'] === 'number') : ?>
+                        <div class="col-6 col-md-4 col-xl-3">
+                            <label class="form-label fw-semibold small" for="<?= $idAttr ?>">
+                                <i class="bi <?= $icon ?> me-1 text-muted"></i><?= $lbl ?>
+                                <?php if ($isRequired) : ?><span class="text-danger">*</span><?php endif; ?>
+                            </label>
+                            <div class="input-group input-group-sm">
+                                <input type="number" class="form-control form-control-sm"
+                                       id="<?= $idAttr ?>" name="<?= $nameAttr ?>"
+                                       value="<?= esc($currentVal ?? '') ?>"
+                                       min="0" step="1" <?= $reqAttr ?>>
+                                <?php if ($unit) : ?><span class="input-group-text"><?= $unit ?></span><?php endif; ?>
+                            </div>
+                        </div>
+
+                    <?php elseif ($ch['type'] === 'text') : ?>
+                        <div class="col-6 col-md-4">
+                            <label class="form-label fw-semibold small" for="<?= $idAttr ?>">
+                                <i class="bi <?= $icon ?> me-1 text-muted"></i><?= $lbl ?>
+                                <?php if ($isRequired) : ?><span class="text-danger">*</span><?php endif; ?>
+                            </label>
+                            <input type="text" class="form-control form-control-sm"
+                                   id="<?= $idAttr ?>" name="<?= $nameAttr ?>"
+                                   value="<?= esc($currentVal ?? '') ?>"
+                                   <?= $reqAttr ?>>
+                        </div>
+
+                    <?php elseif ($ch['type'] === 'select') : ?>
+                        <?php $opts = $ch['options'] ? json_decode($ch['options'], true) : []; ?>
+                        <div class="col-6 col-md-4">
+                            <label class="form-label fw-semibold small" for="<?= $idAttr ?>">
+                                <i class="bi <?= $icon ?> me-1 text-muted"></i><?= $lbl ?>
+                                <?php if ($isRequired) : ?><span class="text-danger">*</span><?php endif; ?>
+                            </label>
+                            <select class="form-select form-select-sm"
+                                    id="<?= $idAttr ?>" name="<?= $nameAttr ?>" <?= $reqAttr ?>>
+                                <option value="">— Choisir —</option>
+                                <?php foreach ($opts as $opt) : ?>
+                                <option value="<?= esc($opt) ?>" <?= $currentVal === $opt ? 'selected' : '' ?>>
+                                    <?= esc($opt) ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    <?php endif; ?>
+                    <?php endforeach; ?>
+                    </div><!-- /row -->
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <!-- Localisation -->
                 </div>
                 <div class="card-body">
 

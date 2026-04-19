@@ -85,6 +85,17 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
     $routes->post('tasks/(:num)/comment',       'Admin\TasksController::addComment/$1');
     $routes->post('tasks/(:num)/delete',        'Admin\TasksController::delete/$1');
 
+    // Catalogue des Caractéristiques des biens
+    $routes->get('property-characteristics',                   'Admin\PropertyCharacteristicsController::index');
+    $routes->get('property-characteristics/create',            'Admin\PropertyCharacteristicsController::create');
+    $routes->post('property-characteristics/store',            'Admin\PropertyCharacteristicsController::store');
+    $routes->get('property-characteristics/(:num)/edit',       'Admin\PropertyCharacteristicsController::edit/$1');
+    $routes->post('property-characteristics/(:num)/update',    'Admin\PropertyCharacteristicsController::update/$1');
+    $routes->post('property-characteristics/(:num)/delete',    'Admin\PropertyCharacteristicsController::delete/$1');
+    $routes->post('property-characteristics/(:num)/toggle',    'Admin\PropertyCharacteristicsController::toggle/$1');
+    $routes->post('property-characteristics/reorder',          'Admin\PropertyCharacteristicsController::reorder');
+    $routes->get('property-characteristics/for-type/(:alpha)', 'Admin\PropertyCharacteristicsController::forType/$1');
+
     // Gestion des Zones géographiques
     $routes->get('zones',                        'Admin\ZonesController::index');
     $routes->get('zones/import',                 'Admin\ZonesController::importPage');

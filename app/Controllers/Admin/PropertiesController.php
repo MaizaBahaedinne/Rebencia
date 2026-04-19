@@ -4,6 +4,7 @@ namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 use App\Models\PropertyModel;
+use App\Models\PropertyCharacteristicModel;
 use App\Models\UserModel;
 use App\Models\ZoneModel;
 
@@ -54,11 +55,14 @@ class PropertiesController extends BaseController
         $this->requirePermission('properties.create');
         $zoneModel = new ZoneModel();
 
+        $charModel = new PropertyCharacteristicModel();
+
         return $this->render('admin/properties/form', [
-            'page_title' => 'Nouveau bien',
-            'property'   => [],
-            'agents'     => (new UserModel())->getWithRole(['status' => 'active']),
-            'pays_list'  => $zoneModel->getByType('pays'),
+            'page_title'      => 'Nouveau bien',
+            'property'        => [],
+            'agents'          => (new UserModel())->getWithRole(['status' => 'active']),
+            'pays_list'       => $zoneModel->getByType('pays'),
+            'characteristics' => $charModel->getActive(),
         ]);
     }
 
@@ -102,6 +106,7 @@ class PropertiesController extends BaseController
             'zone'             => $post['zone'] ?? '',
             'latitude'         => $post['latitude'] ?? null,
             'longitude'        => $post['longitude'] ?? null,
+            'features'         => $this->buildFeaturesJson($post),
         ];
 
         $this->model->insert($data);
@@ -141,12 +146,15 @@ class PropertiesController extends BaseController
             $villePreselect = $found ? $found : null;
         }
 
+        $charModel = new PropertyCharacteristicModel();
+
         return $this->render('admin/properties/form', [
-            'page_title'     => 'Modifier – ' . $property['title'],
-            'property'       => $property,
-            'agents'         => (new UserModel())->getWithRole(['status' => 'active']),
-            'pays_list'      => $zoneModel->getByType('pays'),
-            'ville_preselect'=> $villePreselect,
+            'page_title'      => 'Modifier – ' . $property['title'],
+            'property'        => $property,
+            'agents'          => (new UserModel())->getWithRole(['status' => 'active']),
+            'pays_list'       => $zoneModel->getByType('pays'),
+            'ville_preselect' => $villePreselect,
+            'characteristics' => $charModel->getActive($property['type'] ?? null),
         ]);
     }
 
@@ -167,6 +175,7 @@ class PropertiesController extends BaseController
         }
         $data['parking']   = isset($post['parking']) ? 1 : 0;
         $data['furnished'] = isset($post['furnished']) ? 1 : 0;
+        $data['features']  = $this->buildFeaturesJson($post);
 
         // Log changes
         foreach (['status', 'price', 'agent_id'] as $f) {
@@ -260,6 +269,27 @@ class PropertiesController extends BaseController
             throw new \CodeIgniter\Exceptions\PageNotFoundException("Bien #{$id} introuvable");
         }
         return $p;
+    }
+
+    /**
+     * Construit le JSON `features` depuis le formulaire.
+     * Chaque caractéristique poste ses valeurs sous `feat[key]`.
+     */
+    private function buildFeaturesJson(array $post): ?string
+    {
+        $raw = $post['feat'] ?? null;
+        if (empty($raw) || ! is_array($raw)) {
+            return null;
+        }
+        $features = [];
+        foreach ($raw as $key => $value) {
+            // Ignorer les clés vides ou valeurs vides
+            $key = preg_replace('/[^a-z0-9_]/', '', strtolower((string) $key));
+            if ($key === '') continue;
+            // boolean : la valeur est '1' si cochée, absente sinon
+            $features[$key] = $value;
+        }
+        return ! empty($features) ? json_encode($features) : null;
     }
 
     private function handleImageUploads(int $propertyId): void

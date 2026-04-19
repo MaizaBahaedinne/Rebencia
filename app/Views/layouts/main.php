@@ -130,6 +130,11 @@
             <i class="bi bi-geo-alt"></i> Zones
         </a>
         <?php endif; ?>
+        <?php if (in_array('characteristics.view', session()->get('permissions') ?? [])) : ?>
+        <a href="<?= base_url('admin/property-characteristics') ?>" class="nav-link <?= str_starts_with(uri_string(), 'admin/property-characteristics') ? 'active' : '' ?>">
+            <i class="bi bi-tags"></i> Caractéristiques
+        </a>
+        <?php endif; ?>
         <?php endif; ?>
 
         <?php if (in_array('leads.view', session()->get('permissions') ?? [])) : ?>

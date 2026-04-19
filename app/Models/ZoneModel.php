@@ -37,7 +37,7 @@ class ZoneModel extends Model
             ->select('z.id, z.type, z.name, z.code, z.is_active, z.parent_id, z.created_at,
                       p.name AS parent_name, p.type AS parent_type')
             ->join('zones p', 'p.id = z.parent_id', 'left')
-            ->where('z.deleted_at IS NULL');
+            ->where('z.deleted_at', null);
 
         if (! empty($filters['type'])) {
             $q->where('z.type', $filters['type']);
@@ -98,7 +98,7 @@ class ZoneModel extends Model
     {
         $rows = $this->db->table('zones')
             ->select('type, COUNT(*) AS total')
-            ->where('deleted_at IS NULL')
+            ->where('deleted_at', null)
             ->groupBy('type')
             ->get()
             ->getResultArray();

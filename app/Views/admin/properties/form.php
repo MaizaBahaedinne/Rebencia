@@ -172,31 +172,27 @@
                         </div>
                     </div>
 
-                    <!-- Adresse + champs cachés -->
+                    <!-- Adresse + code postal (champs visibles) -->
                     <div class="row g-3 mb-3">
-                        <div class="col-12 col-md-6">
+                        <div class="col-12 col-md-8">
                             <label class="form-label fw-semibold small">Adresse précise</label>
                             <input type="text" name="address" id="inp_address" class="form-control form-control-sm"
                                    placeholder="Ex : 12 Avenue Habib Bourguiba"
                                    value="<?= esc(old('address', $property['address'] ?? '')) ?>">
                         </div>
-                        <div class="col-6 col-md-3">
-                            <label class="form-label fw-semibold small">
-                                Ville <small class="text-muted fw-normal">(auto)</small>
-                            </label>
-                            <input type="text" name="city" id="inp_city" class="form-control form-control-sm bg-light"
-                                   value="<?= esc(old('city', $property['city'] ?? '')) ?>"
-                                   placeholder="Sélectionner une ville…">
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <label class="form-label fw-semibold small">
-                                Zone <small class="text-muted fw-normal">(auto)</small>
-                            </label>
-                            <input type="text" name="zone" id="inp_zone" class="form-control form-control-sm bg-light"
-                                   value="<?= esc(old('zone', $property['zone'] ?? '')) ?>"
-                                   placeholder="Sélectionner un quartier…">
+                        <div class="col-12 col-md-4">
+                            <label class="form-label fw-semibold small">Code postal</label>
+                            <input type="text" id="inp_postal" class="form-control form-control-sm bg-light"
+                                   readonly placeholder="Auto depuis le quartier"
+                                   value="">
                         </div>
                     </div>
+
+                    <!-- Champs cachés soumis avec le formulaire -->
+                    <input type="hidden" name="city" id="inp_city"
+                           value="<?= esc(old('city', $property['city'] ?? '')) ?>">
+                    <input type="hidden" name="zone" id="inp_zone"
+                           value="<?= esc(old('zone', $property['zone'] ?? '')) ?>">
 
                     <!-- Carte + coordonnées GPS -->
                     <div class="row g-3">
@@ -326,8 +322,9 @@
     const selRegion   = document.getElementById('sel_region');
     const selVille    = document.getElementById('sel_ville');
     const selQuartier = document.getElementById('sel_quartier');
-    const inpCity     = document.getElementById('inp_city');
-    const inpZone     = document.getElementById('inp_zone');
+    const inpCity     = document.getElementById('inp_city');    // hidden
+    const inpZone     = document.getElementById('inp_zone');    // hidden
+    const inpPostal   = document.getElementById('inp_postal');  // lecture seule visible
     const inpAddress  = document.getElementById('inp_address');
     const inpLat      = document.getElementById('inp_lat');
     const inpLng      = document.getElementById('inp_lng');
@@ -405,8 +402,9 @@
     }
 
     btnGeocode.addEventListener('click', () => {
-        const parts = [inpAddress.value, inpCity.value, inpZone.value]
-                        .filter(Boolean).join(', ');
+        const city    = inpCity.value  || selVille.options[selVille.selectedIndex]?.text.split(' (')[0] || '';
+        const quartier = inpZone.value || selQuartier.options[selQuartier.selectedIndex]?.text.split(' (')[0] || '';
+        const parts   = [inpAddress.value, quartier, city].filter(Boolean).join(', ');
         geocode(parts || 'Tunisie');
     });
 
@@ -490,26 +488,30 @@
 
     // ── Sélection quartier ──────────────────────────────────────────
     selQuartier.addEventListener('change', () => {
-        const name = selQuartier.options[selQuartier.selectedIndex]?.text.split(' (')[0] || '';
-        inpZone.value = selQuartier.value ? name : '';
-        if (selQuartier.value && inpCity.value) {
+        const sel  = selQuartier.options[selQuartier.selectedIndex];
+        if (! selQuartier.value) {
+            inpZone.value   = '';
+            inpPostal.value = '';
+            return;
+        }
+        // Le texte est "Nom (CODE)" — on sépare
+        const fullText = sel.textContent.trim();
+        const match    = fullText.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+        const name     = match ? match[1].trim() : fullText;
+        const code     = match ? match[2].trim() : '';
+        inpZone.value   = name;
+        inpPostal.value = code;
+        if (inpCity.value) {
             geocode(name + ' ' + inpCity.value + ', Tunisie');
         }
     });
 
     // ── Pré-sélection en mode édition ───────────────────────────────
-    // Si on a une ville sauvegardée, on tente de retrouver son pays
-    // via l'API pour pré-remplir les cascades.
-    if (LOC.villeId) {
-        // On cherche le parent (région) de la ville, puis le parent du parent (pays)
-        // pour reconstruire la cascade de façon AJAX
-        fetch(BASE_URL + LOC.villeId + '/children', {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        }).catch(() => {});   // juste pour forcer le chargement si besoin
-
-        // Approche : récupérer la chaîne parente depuis l'API zone show n'existe pas en JSON
-        // → on fait une recherche dans les selects existants après chargement région/ville
-        // Pour l'instant laisser les champs texte pré-remplis (city, zone)
+    // Les champs city et zone sont déjà dans les inputs hidden via PHP.
+    // On pré-remplit le champ code postal si on a une zone avec code.
+    if (LOC.zone && LOC.zone.includes('(')) {
+        const m = LOC.zone.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+        if (m) inpPostal.value = m[2];
     }
 
     // ── Saisie manuelle des coords ──────────────────────────────────

@@ -39,9 +39,6 @@ class NotificationController extends BaseController
         $userId = $this->auth->id();
         $result = $this->model->getForUser($userId, 20);
 
-        // Tout marquer lu en arrivant sur la page complète
-        $this->model->markAllRead($userId);
-
         return $this->render('admin/notifications/index', [
             'page_title' => 'Notifications',
             'rows'       => $result['rows'],
@@ -59,13 +56,14 @@ class NotificationController extends BaseController
     public function unread()
     {
         $userId = $this->auth->id();
-        $notifs = $this->model->getUnread($userId, 8);
+        // Retourne les 8 dernières (lues + non-lues) pour que le dropdown
+        // ne soit jamais vide, + le compteur pour le badge
+        $notifs = $this->model->getRecent($userId, 8);
         $count  = $this->model->countUnread($userId);
 
         return $this->json([
             'count'         => $count,
             'notifications' => $notifs,
-            'types'         => NotificationModel::TYPES,
         ]);
     }
 

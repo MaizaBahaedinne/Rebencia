@@ -106,6 +106,34 @@ $waReminderLink = 'https://wa.me/' . $cleanPhone . '?text=' . $waMsgReminder;
 
         <!-- Feedback post-visite -->
         <?php if ($visit['status'] === 'effectuee'): ?>
+
+        <!-- Signature client -->
+        <?php if (! empty($visit['client_signature'])): ?>
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <span class="fw-semibold">
+                    <i class="bi bi-pen me-1 text-success"></i> Signature du client
+                </span>
+                <span class="badge text-bg-success">
+                    <i class="bi bi-check2-circle me-1"></i>Signé
+                </span>
+            </div>
+            <div class="card-body text-center">
+                <img src="<?= esc($visit['client_signature']) ?>"
+                     alt="Signature client"
+                     class="img-fluid border rounded"
+                     style="max-height:160px; background:#fff;">
+                <?php if (! empty($visit['signed_at'])): ?>
+                <p class="text-muted small mt-2 mb-0">
+                    <i class="bi bi-clock me-1"></i>
+                    Signé le <?= date('d/m/Y à H:i', strtotime($visit['signed_at'])) ?>
+                </p>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- Feedback post-visite -->
         <div class="card shadow-sm mb-4 <?= ! $fbMeta ? 'border-warning border-2' : '' ?>">
             <div class="card-header bg-white d-flex justify-content-between align-items-center">
                 <span class="fw-semibold">

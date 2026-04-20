@@ -352,15 +352,19 @@ class VisitsController extends BaseController
 
     private function buildData(): array
     {
+        $sig = trim($this->request->getPost('client_signature') ?? '');
+
         return [
-            'client_id'   => (int) $this->request->getPost('client_id'),
-            'property_id' => (int) $this->request->getPost('property_id'),
-            'agent_id'    => (int) $this->request->getPost('agent_id'),
-            'visit_date'  => $this->request->getPost('visit_date'),
-            'visit_time'  => $this->request->getPost('visit_time'),
-            'duration'    => (int) ($this->request->getPost('duration') ?? 60),
-            'status'      => $this->request->getPost('status') ?? 'planifiee',
-            'notes'       => $this->request->getPost('notes') ?? '',
+            'client_id'        => (int) $this->request->getPost('client_id'),
+            'property_id'      => (int) $this->request->getPost('property_id'),
+            'agent_id'         => (int) $this->request->getPost('agent_id'),
+            'visit_date'       => $this->request->getPost('visit_date'),
+            'visit_time'       => $this->request->getPost('visit_time'),
+            'duration'         => (int) ($this->request->getPost('duration') ?? 60),
+            'status'           => $this->request->getPost('status') ?? 'planifiee',
+            'notes'            => $this->request->getPost('notes') ?? '',
+            'client_signature' => $sig ?: null,
+            'signed_at'        => $sig ? date('Y-m-d H:i:s') : null,
         ];
     }
 

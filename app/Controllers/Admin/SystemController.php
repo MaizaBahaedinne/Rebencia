@@ -22,30 +22,59 @@ class SystemController extends BaseController
     {
         $this->requirePermission('system.logs');
 
+        $perPage   = 50;
+        $activeTab = $this->request->getGet('tab') ?? 'activity';
+
         $filters = [
             'level'     => $this->request->getGet('level'),
             'channel'   => $this->request->getGet('channel'),
+            'module'    => $this->request->getGet('module'),
             'user_id'   => $this->request->getGet('user_id'),
             'date_from' => $this->request->getGet('date_from'),
             'date_to'   => $this->request->getGet('date_to'),
             'search'    => $this->request->getGet('search'),
             'page'      => $this->request->getGet('page') ?? 1,
-            'tab'       => $this->request->getGet('tab') ?? 'activity',
+            'tab'       => $activeTab,
         ];
 
         $activityModel = new ActivityLogModel();
         $systemModel   = new SystemLogModel();
 
-        $activityResult = $activityModel->getFiltered($filters);
-        $systemResult   = $systemModel->getFiltered($filters);
+        $activityResult = $activityModel->getFiltered($filters, $perPage);
+        $systemResult   = $systemModel->getFiltered($filters, $perPage);
+
+        // Sélectionner les données et le total selon l'onglet actif
+        if ($activeTab === 'system') {
+            $result = $systemResult;
+        } else {
+            $result = $activityResult;
+        }
+
+        // Pagination manuelle simple
+        $totalPages = max(1, (int) ceil($result['total'] / $perPage));
+        $curPage    = (int) $result['page'];
+
+        // Listes distinctes pour les filtres
+        $db = \Config\Database::connect();
+        $modules  = $db->table('activity_logs')->select('DISTINCT module')->where('module !=', '')->orderBy('module')->get()->getResultArray();
+        $modules  = array_column($modules, 'module');
+        $channels = $db->table('system_logs')->select('DISTINCT channel')->where('channel !=', '')->orderBy('channel')->get()->getResultArray();
+        $channels = array_column($channels, 'channel');
 
         return $this->render('admin/system/logs', [
-            'page_title'     => 'Logs système',
-            'filters'        => $filters,
-            'activity_result'=> $activityResult,
-            'system_result'  => $systemResult,
-            'level_stats'    => $systemModel->getLevelStats(),
-            'users'          => (new UserModel())->getWithRole(),
+            'page_title'      => 'Logs système',
+            'filters'         => $filters,
+            'activeTab'       => $activeTab,
+            'logs'            => $result['data'],
+            'activityStats'   => ['total' => $activityResult['total']],
+            'systemStats'     => ['total' => $systemResult['total']],
+            'systemLevelStats'=> $systemModel->getLevelStats(),
+            'users'           => (new UserModel())->getWithRole(),
+            'modules'         => $modules,
+            'channels'        => $channels,
+            'curPage'         => $curPage,
+            'totalPages'      => $totalPages,
+            'total'           => $result['total'],
         ]);
     }
 

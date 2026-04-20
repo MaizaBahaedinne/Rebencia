@@ -126,7 +126,7 @@ class VisitsController extends BaseController
             'visit'        => [
                 'client_id'   => $this->request->getGet('client_id'),
                 'property_id' => $this->request->getGet('property_id'),
-                'agent_id'    => $this->auth->user()['id'] ?? '',
+                'agent_id'    => $this->auth->id() ?: '',
                 'duration'    => 60,
                 'status'      => 'planifiee',
             ],
@@ -165,7 +165,7 @@ class VisitsController extends BaseController
                 ->with('error', 'Cet agent a déjà une visite prévue à ce créneau. Veuillez choisir un autre horaire ou un autre agent.');
         }
 
-        $data['created_by'] = $this->auth->user()['id'] ?? null;
+        $data['created_by'] = $this->auth->id() ?: null;
         $this->model->insert($data);
 
         $this->log->activity('create', 'visits', 'visit', $this->model->getInsertID(), 'Nouvelle visite planifiée');

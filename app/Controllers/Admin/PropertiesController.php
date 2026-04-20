@@ -15,10 +15,12 @@ use App\Models\ZoneModel;
 class PropertiesController extends BaseController
 {
     protected PropertyModel $model;
+    protected \CodeIgniter\Database\BaseConnection $db;
 
     public function __construct()
     {
         $this->model = new PropertyModel();
+        $this->db    = \Config\Database::connect();
     }
 
     /** Liste des biens. */

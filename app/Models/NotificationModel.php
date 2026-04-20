@@ -27,7 +27,18 @@ class NotificationModel extends Model
     // ── Getters ──────────────────────────────────────────────────────
 
     /**
-     * Notifications non lues d'un utilisateur (pour le badge et dropdown).
+     * Dernières notifications (lues + non-lues) pour le dropdown.
+     */
+    public function getRecent(int $userId, int $limit = 8): array
+    {
+        return $this->where('user_id', $userId)
+                    ->orderBy('created_at', 'DESC')
+                    ->limit($limit)
+                    ->findAll();
+    }
+
+    /**
+     * Notifications non lues uniquement (legacy, utilisé en interne).
      */
     public function getUnread(int $userId, int $limit = 10): array
     {

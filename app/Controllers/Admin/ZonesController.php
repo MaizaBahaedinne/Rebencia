@@ -261,7 +261,37 @@ class ZonesController extends BaseController
         return $this->json($this->model->getByParent($parentId));
     }
 
-   
+    /**
+     * Retourne la chaîne d'ancêtres d'une zone (pour pré-sélection cascade).
+     * GET /admin/zones/{id}/ancestors
+     * Réponse : [{type:'pays', id:x, name:'Tunisie'}, {type:'region',...}, ...]
+     */
+    public function ancestorsJson(int $id)
+    {
+        $this->requirePermission('zones.view');
+
+        $zone = $this->model->find($id);
+        if (! $zone) {
+            return $this->json([], 404);
+        }
+
+        $chain = $this->model->getParentChain($zone);
+
+        $result = [];
+        foreach (['pays', 'region', 'ville'] as $type) {
+            if (! empty($chain[$type])) {
+                $result[] = [
+                    'type' => $type,
+                    'id'   => $chain[$type]['id'],
+                    'name' => $chain[$type]['name'],
+                    'code' => $chain[$type]['code'] ?? null,
+                ];
+            }
+        }
+
+        return $this->json($result);
+    }
+
     /**
      * Sauvegarde le GeoJSON d'une zone quartier via AJAX.
      * POST /admin/zones/{id}/geometry

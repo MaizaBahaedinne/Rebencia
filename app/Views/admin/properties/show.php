@@ -69,11 +69,11 @@
                     </span>
                     <?php
                     $statusMap = [
-                        'draft'     => ['label'=>'Brouillon',  'bg'=>'secondary'],
-                        'published' => ['label'=>'Publié',     'bg'=>'success'],
-                        'sold'      => ['label'=>'Vendu',      'bg'=>'danger'],
-                        'rented'    => ['label'=>'Loué',       'bg'=>'info'],
-                        'suspended' => ['label'=>'Suspendu',   'bg'=>'warning'],
+                        'available' => ['label'=>'Disponible',  'bg'=>'success'],
+                        'reserved'  => ['label'=>'Réservé',    'bg'=>'warning'],
+                        'sold'      => ['label'=>'Vendu',       'bg'=>'danger'],
+                        'rented'    => ['label'=>'Loué',        'bg'=>'info'],
+                        'inactive'  => ['label'=>'Inactif',    'bg'=>'secondary'],
                     ];
                     $s = $statusMap[$property['status']] ?? ['label'=>$property['status'],'bg'=>'dark'];
                     ?>
@@ -126,7 +126,7 @@
                 <?php endif; ?>
                 <li class="list-group-item d-flex justify-content-between">
                     <span><i class="bi bi-person me-2 text-muted"></i>Agent</span>
-                    <strong><?= esc(($property['agent_first_name'] ?? '') . ' ' . ($property['agent_last_name'] ?? '—')) ?></strong>
+                    <strong><?= esc(($property['first_name'] ?? '') . ' ' . ($property['last_name'] ?? '—')) ?></strong>
                 </li>
             </ul>
         </div>

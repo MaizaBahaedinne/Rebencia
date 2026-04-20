@@ -149,6 +149,7 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
 
     // Notifications in-app
     $routes->get('notifications',                   'Admin\NotificationController::index');
+    $routes->get('notifications/seed-test',         'Admin\NotificationController::seedTest'); // DEV uniquement
     $routes->get('notifications/unread',            'Admin\NotificationController::unread');
     $routes->post('notifications/(:num)/read',      'Admin\NotificationController::markRead/$1');
     $routes->post('notifications/read-all',         'Admin\NotificationController::markAllRead');

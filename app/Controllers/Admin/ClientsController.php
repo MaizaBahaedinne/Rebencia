@@ -303,40 +303,40 @@ class ClientsController extends BaseController
             'profession'   => $post['profession'] ?: null,
             'company'      => $post['company'] ?: null,
             'address'      => $post['address'] ?: null,
-            'zone_pays_id'   => $post['zone_pays_id']   ?: null,
-            'zone_region_id' => $post['zone_region_id'] ?: null,
-            'zone_ville_id'  => $post['zone_ville_id']  ?: null,
-            'postal_code'  => $post['postal_code'] ?: null,
-            'property_type_id' => $post['property_type_id'] ?: null,
-            'status'       => $post['status'] ?? 'nouveau',
-            'assigned_to'  => $post['assigned_to'] ?: null,
-            'source'       => $post['source'] ?? 'autre',
-            'notes'        => $post['notes'] ?: null,
+            'zone_pays_id'      => ($post['zone_pays_id']   ?? '') ?: null,
+            'zone_region_id'    => ($post['zone_region_id'] ?? '') ?: null,
+            'zone_ville_id'     => ($post['zone_ville_id']  ?? '') ?: null,
+            'postal_code'       => ($post['postal_code']    ?? '') ?: null,
+            'property_type_id'  => ($post['property_type_id'] ?? '') ?: null,
+            'status'            => $post['status']      ?? 'nouveau',
+            'assigned_to'       => ($post['assigned_to'] ?? '') ?: null,
+            'source'            => $post['source']      ?? 'autre',
+            'notes'             => ($post['notes']       ?? '') ?: null,
             // Profil de demande
-            'demand_type'       => $post['demand_type']       ?: null,
-            'urgency'           => $post['urgency']           ?: null,
-            'budget_flexibility'=> $post['budget_flexibility'] ?: null,
-            'surface_min'       => $post['surface_min']       ?: null,
-            'surface_max'       => $post['surface_max']       ?: null,
-            'rooms_min'         => $post['rooms_min']         ?: null,
-            'bedrooms_min'      => $post['bedrooms_min']      ?: null,
-            'floor_preferred'   => $post['floor_preferred']   ?: null,
-            'has_elevator'      => isset($post['has_elevator']) ? 1 : 0,
-            'orientations'      => ! empty($post['orientations'])
-                                    ? json_encode($post['orientations'])
-                                    : null,
+            'demand_type'        => ($post['demand_type']        ?? '') ?: null,
+            'urgency'            => ($post['urgency']            ?? '') ?: null,
+            'budget_flexibility' => ($post['budget_flexibility'] ?? '') ?: null,
+            'surface_min'        => ($post['surface_min']        ?? '') ?: null,
+            'surface_max'        => ($post['surface_max']        ?? '') ?: null,
+            'rooms_min'          => ($post['rooms_min']          ?? '') ?: null,
+            'bedrooms_min'       => ($post['bedrooms_min']       ?? '') ?: null,
+            'floor_preferred'    => ($post['floor_preferred']    ?? '') ?: null,
+            'has_elevator'       => ! empty($post['has_elevator']) ? 1 : 0,
+            'orientations'       => ! empty($post['orientations'])
+                                     ? json_encode($post['orientations'])
+                                     : null,
         ];
 
         // Champs spécifiques par type
         if (in_array($clientType, ['acheteur', 'locataire', 'investisseur'])) {
-            $data['budget_min']   = $post['budget_min']   ?: null;
-            $data['budget_max']   = $post['budget_max']   ?: null;
-            $data['desired_zone'] = $post['desired_zone'] ?: null;
+            $data['budget_min']   = ($post['budget_min']   ?? '') ?: null;
+            $data['budget_max']   = ($post['budget_max']   ?? '') ?: null;
+            $data['desired_zone'] = ($post['desired_zone'] ?? '') ?: null;
         }
 
         if ($clientType === 'proprietaire') {
-            $data['owner_location'] = $post['owner_location'] ?: null;
-            $data['desired_price']  = $post['desired_price']  ?: null;
+            $data['owner_location'] = ($post['owner_location'] ?? '') ?: null;
+            $data['desired_price']  = ($post['desired_price']  ?? '') ?: null;
         }
 
         return $data;

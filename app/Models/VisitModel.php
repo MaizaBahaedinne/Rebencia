@@ -16,6 +16,7 @@ class VisitModel extends Model
         'client_id', 'property_id', 'agent_id',
         'visit_date', 'visit_time', 'duration',
         'status', 'notes',
+        'client_signature', 'signed_at',
         'feedback', 'feedback_notes',
         'whatsapp_sent', 'reminder_sent',
         'created_by',

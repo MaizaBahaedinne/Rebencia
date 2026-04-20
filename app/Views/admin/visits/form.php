@@ -31,6 +31,8 @@ $errors  = session()->getFlashdata('errors') ?? [];
       novalidate>
     <?= csrf_field() ?>
     <input type="hidden" id="visitId" value="<?= $isEdit ? (int) $visit['id'] : '' ?>">
+    <input type="hidden" name="client_signature" id="clientSignatureData"
+           value="<?= esc($visit['client_signature'] ?? '') ?>">
 
 <div class="row g-4">
 
@@ -210,6 +212,48 @@ $errors  = session()->getFlashdata('errors') ?? [];
 </div><!-- /row -->
 </form>
 
+<!-- ── MODAL SIGNATURE CLIENT ────────────────────────────────────────────── -->
+<div class="modal fade" id="signatureModal" data-bs-backdrop="static" tabindex="-1"
+     aria-labelledby="signatureModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="signatureModalLabel">
+                    <i class="bi bi-pen me-2 text-primary"></i>Signature du client
+                </h5>
+            </div>
+            <div class="modal-body text-center">
+                <p class="text-muted small mb-3">
+                    Faites signer le client sur l'écran tactile pour confirmer la visite.
+                </p>
+                <div class="border rounded bg-white position-relative"
+                     style="touch-action:none; cursor:crosshair;">
+                    <canvas id="sigCanvas" style="width:100%; display:block; height:200px;"></canvas>
+                </div>
+                <div class="d-flex justify-content-between mt-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="sigClearBtn">
+                        <i class="bi bi-eraser me-1"></i>Effacer
+                    </button>
+                    <span class="text-muted small align-self-center" id="sigEmptyMsg" style="display:none;">
+                        Veuillez signer avant de valider.
+                    </span>
+                </div>
+            </div>
+            <div class="modal-footer flex-column gap-2">
+                <button type="button" class="btn btn-success w-100" id="sigValidateBtn">
+                    <i class="bi bi-check2-circle me-1"></i>Valider la signature et enregistrer
+                </button>
+                <button type="button" class="btn btn-link text-muted small w-100" id="sigSkipBtn">
+                    Enregistrer sans signature
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- signature_pad.js -->
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4/dist/signature_pad.umd.min.js"></script>
+
 <script>
 (function () {
     'use strict';
@@ -278,6 +322,70 @@ $errors  = session()->getFlashdata('errors') ?? [];
     <?php if ($isEdit && ! empty($visit['agent_id'])): ?>
     checkAvailability();
     <?php endif; ?>
+
+    // ── Signature pad ─────────────────────────────────────────────────
+    var signaturePad = null;
+    var pendingSubmit = false;
+
+    // Initialise le canvas au ratio DPR pour une écriture nette sur mobile
+    function initSignaturePad() {
+        var canvas = document.getElementById('sigCanvas');
+        var ratio  = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width  = canvas.offsetWidth  * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext('2d').scale(ratio, ratio);
+        if (signaturePad) {
+            signaturePad.clear();
+        } else {
+            signaturePad = new SignaturePad(canvas, {
+                minWidth: 1,
+                maxWidth: 3,
+                penColor: '#000000',
+            });
+        }
+    }
+
+    // Intercept form submit
+    var form = document.querySelector('form[action*="store"], form[action*="update"]');
+    form.addEventListener('submit', function (e) {
+        var statusEl = document.querySelector('input[name="status"]:checked');
+        if (statusEl && statusEl.value === 'effectuee') {
+            e.preventDefault();
+            pendingSubmit = true;
+            var modal = new bootstrap.Modal(document.getElementById('signatureModal'));
+            modal.show();
+            document.getElementById('signatureModal').addEventListener('shown.bs.modal', function () {
+                initSignaturePad();
+            }, { once: true });
+        }
+    });
+
+    // Effacer
+    document.getElementById('sigClearBtn').addEventListener('click', function () {
+        if (signaturePad) signaturePad.clear();
+        document.getElementById('sigEmptyMsg').style.display = 'none';
+    });
+
+    // Valider avec signature
+    document.getElementById('sigValidateBtn').addEventListener('click', function () {
+        if (! signaturePad || signaturePad.isEmpty()) {
+            document.getElementById('sigEmptyMsg').style.display = 'inline';
+            return;
+        }
+        document.getElementById('sigEmptyMsg').style.display = 'none';
+        document.getElementById('clientSignatureData').value = signaturePad.toDataURL('image/png');
+        bootstrap.Modal.getInstance(document.getElementById('signatureModal')).hide();
+        pendingSubmit = false;
+        form.submit();
+    });
+
+    // Passer sans signature
+    document.getElementById('sigSkipBtn').addEventListener('click', function () {
+        document.getElementById('clientSignatureData').value = '';
+        bootstrap.Modal.getInstance(document.getElementById('signatureModal')).hide();
+        pendingSubmit = false;
+        form.submit();
+    });
 
 })();
 </script>

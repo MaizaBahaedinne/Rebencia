@@ -104,7 +104,7 @@
         <?php else: ?>
         <div class="row g-4">
             <?php foreach ($featured as $p): ?>
-            <?= $this->include('vitrine/partials/property_card', ['p' => $p]) ?>
+            <?= view('vitrine/partials/property_card', ['p' => $p, 'currentLang' => $currentLang]) ?>
             <?php endforeach; ?>
         </div>
         <?php endif; ?>

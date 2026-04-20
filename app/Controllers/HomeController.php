@@ -11,8 +11,9 @@ use CodeIgniter\HTTP\RedirectResponse;
  */
 class HomeController extends BaseController
 {
-    protected PropertyModel $propertyModel;
-    protected LeadModel     $leadModel;
+    protected PropertyModel                         $propertyModel;
+    protected LeadModel                             $leadModel;
+    protected \CodeIgniter\Database\BaseConnection  $db;
 
     /** Langues supportées */
     private const SUPPORTED_LANGS = ['fr', 'en', 'ar'];
@@ -22,6 +23,7 @@ class HomeController extends BaseController
     {
         $this->propertyModel = new PropertyModel();
         $this->leadModel     = new LeadModel();
+        $this->db            = \Config\Database::connect();
     }
 
     // =========================================================

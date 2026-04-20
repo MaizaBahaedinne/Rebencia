@@ -40,7 +40,7 @@
                 if (!$mainImg && !empty($images)) $mainImg = $images[0]['path'];
                 ?>
                 <?php if ($mainImg): ?>
-                <img src="<?= base_url('uploads/' . esc($mainImg)) ?>"
+                <img src="<?= base_url(esc($mainImg)) ?>"
                      alt="<?= esc($property['title']) ?>"
                      class="rb-main-photo mb-3" id="mainPhoto">
                 <?php if (count($images) > 1): ?>
@@ -48,8 +48,8 @@
                     <?php foreach ($images as $img): ?>
                 <div class="rb-gallery-thumb <?= $img['path'] === $mainImg ? 'active' : '' ?>"
                      style="width:80px;height:60px;"
-                     onclick="switchPhoto(this, '<?= base_url('uploads/' . esc($img['path'])) ?>')">
-                        <img src="<?= base_url('uploads/' . esc($img['path'])) ?>"
+                     onclick="switchPhoto(this, '<?= base_url(esc($img['path'])) ?>')">
+                        <img src="<?= base_url(esc($img['path'])) ?>"
                              alt="" style="width:100%;height:100%;object-fit:cover;">
                     </div>
                     <?php endforeach; ?>
@@ -148,7 +148,7 @@
                 <div class="rb-agent-card mb-4">
                     <div class="text-center mb-3">
                         <?php if (!empty($agent['avatar'])): ?>
-                        <img src="<?= base_url('uploads/' . esc($agent['avatar'])) ?>"
+                        <img src="<?= base_url(esc($agent['avatar'])) ?>"
                              class="rb-agent-avatar" alt="<?= esc($agent['first_name']) ?>">
                         <?php else: ?>
                         <div class="rb-agent-avatar-placeholder">

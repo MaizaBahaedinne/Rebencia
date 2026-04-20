@@ -93,7 +93,7 @@
             <div class="col-6 col-md-4 col-lg-3">
                 <div class="rb-team-card text-center">
                     <?php if (!empty($member['avatar'])): ?>
-                    <img src="<?= base_url('uploads/' . esc($member['avatar'])) ?>"
+                    <img src="<?= base_url(esc($member['avatar'])) ?>"
                          class="rb-team-avatar" alt="<?= esc($member['first_name']) ?>">
                     <?php else: ?>
                     <div class="rb-team-avatar-placeholder mx-auto">

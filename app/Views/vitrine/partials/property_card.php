@@ -3,7 +3,7 @@
         <!-- Image -->
         <a href="<?= base_url($currentLang . '/properties/' . $p['id']) ?>" class="rb-card-img-link">
             <?php if (!empty($p['main_image'])): ?>
-            <img src="<?= base_url('uploads/' . esc($p['main_image'])) ?>"
+            <img src="<?= base_url(esc($p['main_image'])) ?>"
                  alt="<?= esc($p['title']) ?>" class="rb-card-img" loading="lazy">
             <?php else: ?>
             <div class="rb-card-img-placeholder">

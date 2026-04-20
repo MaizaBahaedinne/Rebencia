@@ -1,0 +1,28 @@
+{
+  "name": "Rebencia",
+  "short_name": "Rebencia",
+  "description": "Plateforme de gestion immobilière Rebencia",
+  "start_url": "/admin/dashboard",
+  "display": "standalone",
+  "background_color": "#f4f6f9",
+  "theme_color": "#1a3c5e",
+  "orientation": "any",
+  "scope": "/",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "screenshots": []
+}

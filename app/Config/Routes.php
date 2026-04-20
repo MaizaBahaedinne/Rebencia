@@ -113,6 +113,13 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
     $routes->post('zones/(:num)/delete',          'Admin\ZonesController::delete/$1');
     $routes->get('zones/(:num)',                  'Admin\ZonesController::show/$1');
 
+    // Notifications in-app
+    $routes->get('notifications',                   'Admin\NotificationController::index');
+    $routes->get('notifications/unread',            'Admin\NotificationController::unread');
+    $routes->post('notifications/(:num)/read',      'Admin\NotificationController::markRead/$1');
+    $routes->post('notifications/read-all',         'Admin\NotificationController::markAllRead');
+    $routes->post('notifications/(:num)/delete',    'Admin\NotificationController::delete/$1');
+
     // System – Logs
     $routes->get('system/logs',         'Admin\SystemController::logs');
     $routes->get('system/logs/export',  'Admin\SystemController::exportLogs');
@@ -130,4 +137,9 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
 $routes->group('api', ['filter' => 'auth'], function ($routes) {
     $routes->get('stats/summary',   'Api\StatsController::summary');
     $routes->get('leads/pipeline',  'Api\LeadsController::pipeline');
+
+    // Web Push – subscriptions navigateur
+    $routes->get('push/vapid-key',   'Api\PushController::vapidKey');
+    $routes->post('push/subscribe',  'Api\PushController::subscribe');
+    $routes->post('push/unsubscribe','Api\PushController::unsubscribe');
 });

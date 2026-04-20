@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?= csrf_hash() ?>">
     <title><?= esc($page_title ?? 'Rebencia') ?> – Rebencia</title>
+    <!-- PWA -->
+    <link rel="manifest" href="<?= base_url('manifest.json') ?>">
+    <meta name="theme-color" content="#1a3c5e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <!-- Bootstrap 5 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <!-- Bootstrap Icons -->
@@ -213,6 +218,46 @@
         </nav>
 
         <div class="d-flex align-items-center gap-3">
+
+            <!-- ── Cloche de notifications ── -->
+            <div class="dropdown" id="rb-notif-wrap">
+                <button class="btn btn-sm btn-light position-relative" id="rb-notif-btn"
+                        data-bs-toggle="dropdown" aria-expanded="false"
+                        data-fetch-url="<?= base_url('admin/notifications/unread') ?>"
+                        title="Notifications">
+                    <i class="bi bi-bell fs-5"></i>
+                    <span id="rb-notif-badge"
+                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                          style="display:none;font-size:.6rem;"></span>
+                </button>
+
+                <div class="dropdown-menu dropdown-menu-end shadow-sm p-0" id="rb-notif-menu"
+                     style="width:360px;max-height:440px;overflow-y:auto;border-radius:.5rem;">
+                    <!-- Header -->
+                    <div class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom bg-light sticky-top">
+                        <span class="fw-semibold" style="font-size:.9rem;">
+                            <i class="bi bi-bell me-1"></i>Notifications
+                        </span>
+                        <button id="rb-notif-readall" class="btn btn-link btn-sm p-0 text-secondary" style="font-size:.8rem;">
+                            Tout marquer lu
+                        </button>
+                    </div>
+                    <!-- Items injectés par JS -->
+                    <div id="rb-notif-list">
+                        <div class="text-center text-muted py-4" style="font-size:.85rem;">
+                            <i class="bi bi-hourglass-split me-1"></i>Chargement…
+                        </div>
+                    </div>
+                    <!-- Footer -->
+                    <div class="text-center border-top py-2">
+                        <a href="<?= base_url('admin/notifications') ?>" class="small text-decoration-none">
+                            Voir toutes les notifications
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- ── Fin cloche ── -->
+
             <span class="badge bg-light text-dark border" style="font-size:.75rem;">
                 <?= esc(session()->get('user_role_label')) ?>
             </span>
@@ -254,7 +299,6 @@
     </div>
 </div>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     // Toggle sidebar mobile
@@ -272,6 +316,122 @@
         }
     });
 </script>
+
+<!-- ── Notifications dropdown JS ── -->
+<script>
+(function () {
+    'use strict';
+
+    const btn       = document.getElementById('rb-notif-btn');
+    const badge     = document.getElementById('rb-notif-badge');
+    const list      = document.getElementById('rb-notif-list');
+    const readAll   = document.getElementById('rb-notif-readall');
+    const fetchUrl  = btn ? btn.dataset.fetchUrl : null;
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+
+    if (!btn || !fetchUrl) return;
+
+    // ── Rendu d'une notification ───────────────────────────────────
+    const icons = {
+        info:     {icon:'bi-info-circle-fill',    cls:'text-primary'},
+        success:  {icon:'bi-check-circle-fill',   cls:'text-success'},
+        warning:  {icon:'bi-exclamation-triangle-fill', cls:'text-warning'},
+        lead:     {icon:'bi-person-lines-fill',   cls:'text-info'},
+        property: {icon:'bi-building-fill',       cls:'text-secondary'},
+        task:     {icon:'bi-kanban-fill',         cls:'text-dark'},
+        system:   {icon:'bi-gear-fill',           cls:'text-dark'},
+    };
+
+    function esc(s) {
+        const d = document.createElement('div');
+        d.textContent = s;
+        return d.innerHTML;
+    }
+
+    function renderItem(n) {
+        const t   = icons[n.type] || icons.info;
+        const url = n.url ? `<?= base_url() ?>` + n.url.replace(/^\//, '') : null;
+        return `
+        <div class="d-flex gap-2 px-3 py-2 border-bottom notif-item ${n.is_read ? '' : 'fw-semibold'}"
+             style="${n.is_read ? '' : 'background:rgba(26,60,94,.04);'}" data-id="${n.id}">
+            <i class="bi ${t.icon} ${t.cls} flex-shrink-0 mt-1"></i>
+            <div class="flex-grow-1" style="min-width:0;">
+                <div class="d-flex justify-content-between">
+                    <span class="text-truncate" style="font-size:.85rem;">${esc(n.title)}</span>
+                    <small class="text-muted text-nowrap ms-1" style="font-size:.72rem;">
+                        ${n.created_at ? n.created_at.substring(5,16).replace('T',' ') : ''}
+                    </small>
+                </div>
+                <p class="mb-1 text-muted fw-normal" style="font-size:.8rem;">${esc(n.message)}</p>
+                ${url ? `<a href="${esc(url)}" class="small" style="font-size:.8rem;">Voir &rarr;</a>` : ''}
+            </div>
+        </div>`;
+    }
+
+    // ── Charger les non-lues via JSON ──────────────────────────────
+    async function fetchUnread() {
+        try {
+            const r    = await fetch(fetchUrl, {credentials: 'same-origin'});
+            const data = await r.json();
+            const count = data.count ?? 0;
+
+            // Badge
+            if (count > 0) {
+                badge.textContent = count > 99 ? '99+' : count;
+                badge.style.display = '';
+            } else {
+                badge.style.display = 'none';
+            }
+
+            // Liste items
+            if (!data.notifications || data.notifications.length === 0) {
+                list.innerHTML = `<div class="text-center text-muted py-4" style="font-size:.85rem;">
+                    <i class="bi bi-bell-slash mb-2 d-block fs-4 opacity-50"></i>Aucune notification non lue</div>`;
+            } else {
+                list.innerHTML = data.notifications.map(renderItem).join('');
+            }
+        } catch (e) {
+            // silencieux — ne pas afficher d'erreur pour ne pas gêner l'UX
+        }
+    }
+
+    // ── Mark-read au clic sur item ─────────────────────────────────
+    list.addEventListener('click', async (e) => {
+        const item = e.target.closest('.notif-item[data-id]');
+        if (!item) return;
+        const id = item.dataset.id;
+        await fetch(`<?= base_url('admin/notifications/') ?>${id}/read`, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {'X-CSRF-TOKEN': csrfToken},
+        });
+        item.classList.remove('fw-semibold');
+        item.style.background = '';
+        fetchUnread();
+    });
+
+    // ── Mark-all-read ──────────────────────────────────────────────
+    readAll?.addEventListener('click', async () => {
+        await fetch(`<?= base_url('admin/notifications/read-all') ?>`, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {'X-CSRF-TOKEN': csrfToken},
+        });
+        fetchUnread();
+    });
+
+    // ── Polling toutes les 60 secondes ─────────────────────────────
+    fetchUnread();
+    setInterval(fetchUnread, 60_000);
+
+    // Refresh aussi à l'ouverture du dropdown
+    document.getElementById('rb-notif-wrap')?.addEventListener('show.bs.dropdown', fetchUnread);
+})();
+</script>
+
+<!-- ── PWA ── -->
+<script src="<?= base_url('js/pwa.js') ?>"></script>
+
 <?= $extra_js ?? '' ?>
 </body>
 </html>

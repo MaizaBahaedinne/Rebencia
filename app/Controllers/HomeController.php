@@ -242,7 +242,7 @@ class HomeController extends BaseController
         $team = $this->db->table('users u')
             ->select('u.id, u.first_name, u.last_name, u.email, u.phone, u.avatar, r.label AS role_label')
             ->join('roles r', 'r.id = u.role_id', 'left')
-            ->where('u.is_active', 1)
+            ->where('u.status', 'active')
             ->where('u.deleted_at IS NULL')
             ->orderBy('u.first_name', 'ASC')
             ->limit(12)

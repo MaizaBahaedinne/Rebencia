@@ -1,0 +1,638 @@
+/* ============================================================
+   REBENCIA — Vitrine CSS
+   Palette : --rb-primary #1a3c5e | --rb-accent #e8a020
+   Bootstrap 5.3 base
+============================================================ */
+
+:root {
+    --rb-primary:   #1a3c5e;
+    --rb-primary-d: #122d47;
+    --rb-accent:    #e8a020;
+    --rb-accent-d:  #c8880f;
+    --rb-light:     #f4f7fb;
+    --rb-text:      #2d3748;
+    --rb-muted:     #718096;
+    --rb-radius:    12px;
+    --rb-shadow:    0 4px 24px rgba(26,60,94,.10);
+    --rb-shadow-lg: 0 12px 40px rgba(26,60,94,.16);
+    --rb-navbar-h:  72px;
+}
+
+/* ============================================================
+   RESET / BASE
+============================================================ */
+*,*::before,*::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    font-family: 'Inter', sans-serif;
+    color: var(--rb-text);
+    background: #fff;
+    padding-top: var(--rb-navbar-h);
+}
+a { color: inherit; }
+img { max-width: 100%; }
+
+/* RTL tweaks */
+[dir="rtl"] .me-1 { margin-right: 0 !important; margin-left: .25rem !important; }
+[dir="rtl"] .me-2 { margin-right: 0 !important; margin-left: .5rem !important; }
+[dir="rtl"] .ms-1 { margin-left: 0  !important; margin-right: .25rem !important; }
+
+/* ============================================================
+   UTILITIES
+============================================================ */
+.rb-text-accent { color: var(--rb-accent) !important; }
+.rb-text-primary { color: var(--rb-primary) !important; }
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+.rb-btn-primary {
+    background: var(--rb-primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background .2s, transform .15s;
+}
+.rb-btn-primary:hover {
+    background: var(--rb-primary-d);
+    color: #fff;
+    transform: translateY(-1px);
+}
+.rb-btn-accent {
+    background: var(--rb-accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background .2s, transform .15s;
+}
+.rb-btn-accent:hover {
+    background: var(--rb-accent-d);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+/* ============================================================
+   NAVBAR
+============================================================ */
+.rb-navbar {
+    background: var(--rb-primary);
+    height: var(--rb-navbar-h);
+    box-shadow: 0 2px 16px rgba(0,0,0,.15);
+    transition: background .3s;
+}
+.rb-navbar.scrolled {
+    background: rgba(26,60,94,.97);
+    backdrop-filter: blur(6px);
+}
+.rb-logo-primary { color: #fff; font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; }
+.rb-logo-accent  { color: var(--rb-accent); font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; }
+.rb-logo small { display: block; color: rgba(255,255,255,.45); font-size: .65rem; letter-spacing: .08em; text-transform: uppercase; margin-top: -4px; }
+.rb-navbar .nav-link {
+    color: rgba(255,255,255,.8) !important;
+    font-size: .9rem;
+    font-weight: 500;
+    padding: .4rem .9rem !important;
+    border-radius: 6px;
+    transition: color .2s, background .2s;
+}
+.rb-navbar .nav-link:hover,
+.rb-navbar .nav-link.active {
+    color: #fff !important;
+    background: rgba(255,255,255,.1);
+}
+.rb-lang-switcher .btn { font-size: .78rem; padding: .3rem .7rem; border-color: rgba(255,255,255,.4); color: rgba(255,255,255,.9); }
+.rb-lang-switcher .btn:hover { border-color: #fff; color: #fff; }
+.rb-lang-switcher .dropdown-item.active { background: var(--rb-primary); }
+
+/* Mobile toggler */
+.navbar-toggler { border-color: rgba(255,255,255,.4); }
+.navbar-toggler-icon { filter: invert(1); }
+
+/* ============================================================
+   HERO
+============================================================ */
+.rb-hero {
+    position: relative;
+    min-height: 620px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+.rb-hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(135deg, rgba(26,60,94,.92) 0%, rgba(26,60,94,.70) 100%),
+        url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1400&q=80') center/cover no-repeat;
+    z-index: 0;
+}
+.rb-hero-content {
+    position: relative;
+    z-index: 1;
+    padding: 6rem 0 4rem;
+}
+.rb-hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: #fff;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+}
+.rb-hero-subtitle {
+    color: rgba(255,255,255,.8);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+/* Search bar */
+.rb-search-bar {
+    background: rgba(255,255,255,.97);
+    border-radius: var(--rb-radius);
+    padding: 1.5rem;
+    box-shadow: var(--rb-shadow-lg);
+}
+.rb-search-input {
+    border-radius: 8px;
+    border: 1.5px solid #e2e8f0;
+    font-size: .92rem;
+    height: 44px;
+    transition: border-color .2s;
+}
+.rb-search-input:focus { border-color: var(--rb-accent); box-shadow: 0 0 0 3px rgba(232,160,32,.15); }
+
+/* ============================================================
+   STATS BAR
+============================================================ */
+.rb-stats-bar {
+    background: var(--rb-primary);
+    padding: 1.5rem 0;
+}
+.rb-stat-item {
+    padding: 1rem;
+    border-right: 1px solid rgba(255,255,255,.12);
+}
+.rb-stat-item:last-child { border-right: none; }
+.rb-stat-number {
+    display: block;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--rb-accent);
+    line-height: 1;
+}
+.rb-stat-label {
+    display: block;
+    color: rgba(255,255,255,.7);
+    font-size: .8rem;
+    margin-top: .25rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+
+/* ============================================================
+   SECTION HEADINGS
+============================================================ */
+.rb-section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 700;
+    color: var(--rb-primary);
+    margin-bottom: .5rem;
+}
+.rb-section-subtitle {
+    color: var(--rb-muted);
+    font-size: 1rem;
+    max-width: 560px;
+    margin: 0 auto;
+}
+
+/* ============================================================
+   PROPERTY CARD
+============================================================ */
+.rb-property-card {
+    background: #fff;
+    border-radius: var(--rb-radius);
+    box-shadow: var(--rb-shadow);
+    overflow: hidden;
+    transition: transform .2s, box-shadow .2s;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.rb-property-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--rb-shadow-lg);
+}
+.rb-card-img-link { display: block; position: relative; overflow: hidden; }
+.rb-card-img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+    transition: transform .4s;
+}
+.rb-property-card:hover .rb-card-img { transform: scale(1.04); }
+.rb-card-img-placeholder {
+    width: 100%;
+    height: 220px;
+    background: var(--rb-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #cbd5e0;
+    font-size: 3rem;
+}
+.rb-card-badges {
+    position: absolute;
+    top: .75rem;
+    left: .75rem;
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+}
+[dir="rtl"] .rb-card-badges { left: auto; right: .75rem; }
+
+.rb-card-body { padding: 1.1rem; flex: 1; display: flex; flex-direction: column; }
+.rb-card-ref { color: var(--rb-muted); font-size: .72rem; text-transform: uppercase; letter-spacing: .07em; margin-bottom: .25rem; }
+.rb-card-title { font-size: 1rem; font-weight: 600; margin-bottom: .4rem; line-height: 1.35; }
+.rb-card-title a { color: var(--rb-text); text-decoration: none; }
+.rb-card-title a:hover { color: var(--rb-primary); }
+.rb-card-location { font-size: .85rem; color: var(--rb-muted); margin-bottom: .75rem; }
+
+.rb-card-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    font-size: .82rem;
+    color: var(--rb-muted);
+    margin-bottom: .75rem;
+}
+.rb-card-features span { display: flex; align-items: center; gap: .3rem; }
+.rb-card-features i { color: var(--rb-accent); }
+
+.rb-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: .75rem;
+    border-top: 1px solid #f0f4f8;
+}
+.rb-card-price { font-size: 1.15rem; font-weight: 700; color: var(--rb-primary); }
+.rb-card-price small { font-size: .7rem; font-weight: 400; color: var(--rb-muted); display: block; }
+
+/* ============================================================
+   BADGES
+============================================================ */
+.rb-badge {
+    display: inline-block;
+    padding: .25em .65em;
+    border-radius: 6px;
+    font-size: .72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+.rb-badge-primary { background: var(--rb-primary); color: #fff; }
+.rb-badge-accent  { background: var(--rb-accent);  color: #fff; }
+.rb-badge-success { background: #38a169; color: #fff; }
+
+/* ============================================================
+   WHY CARDS
+============================================================ */
+.rb-why-card {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    border-radius: var(--rb-radius);
+    background: #fff;
+    box-shadow: var(--rb-shadow);
+    height: 100%;
+    transition: transform .2s;
+}
+.rb-why-card:hover { transform: translateY(-4px); }
+.rb-why-icon {
+    width: 64px; height: 64px;
+    background: rgba(26,60,94,.08);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem; color: var(--rb-primary);
+    margin: 0 auto 1.1rem;
+}
+.rb-why-card h5 { font-weight: 700; color: var(--rb-primary); margin-bottom: .5rem; }
+.rb-why-card p  { color: var(--rb-muted); font-size: .9rem; margin: 0; }
+
+/* ============================================================
+   TESTIMONIALS
+============================================================ */
+.rb-testimonials-section {
+    background: linear-gradient(135deg, var(--rb-primary) 0%, var(--rb-primary-d) 100%);
+    padding: 5rem 0;
+}
+.rb-testimonial-card {
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: var(--rb-radius);
+    padding: 2rem;
+    backdrop-filter: blur(4px);
+    height: 100%;
+}
+.rb-testimonial-stars { margin-bottom: .75rem; font-size: .9rem; }
+.rb-testimonial-text  { color: rgba(255,255,255,.88); font-style: italic; font-size: .95rem; margin-bottom: 1.25rem; }
+.rb-testimonial-author { display: flex; align-items: center; gap: .75rem; }
+.rb-testimonial-avatar {
+    width: 42px; height: 42px;
+    background: var(--rb-accent);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; color: #fff; font-size: 1rem;
+    flex-shrink: 0;
+}
+.rb-testimonial-author strong { color: #fff; font-size: .9rem; }
+.rb-testimonial-author small { color: rgba(255,255,255,.55); }
+
+/* ============================================================
+   CTA SECTION
+============================================================ */
+.rb-cta-section {
+    background: linear-gradient(90deg, var(--rb-accent) 0%, #d4900e 100%);
+    padding: 4.5rem 0;
+    text-align: center;
+}
+.rb-cta-title    { font-family: 'Playfair Display', serif; font-size: 2rem; color: #fff; font-weight: 700; margin-bottom: .75rem; }
+.rb-cta-subtitle { color: rgba(255,255,255,.88); font-size: 1.05rem; margin-bottom: 1.75rem; }
+
+/* ============================================================
+   PAGE HEADER (inner pages)
+============================================================ */
+.rb-page-header {
+    background: linear-gradient(135deg, var(--rb-primary) 0%, var(--rb-primary-d) 100%);
+    padding: 4rem 0 3rem;
+    text-align: center;
+}
+.rb-page-title    { font-family: 'Playfair Display', serif; color: #fff; font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 700; margin-bottom: .5rem; }
+.rb-page-subtitle { color: rgba(255,255,255,.75); font-size: 1rem; margin: 0; }
+
+/* ============================================================
+   CATALOGUE FILTER PANEL
+============================================================ */
+.rb-filter-panel {
+    background: #fff;
+    border-radius: var(--rb-radius);
+    box-shadow: var(--rb-shadow);
+    padding: 1.5rem;
+    position: sticky;
+    top: calc(var(--rb-navbar-h) + 1rem);
+}
+.rb-filter-title { color: var(--rb-primary); font-weight: 700; padding-bottom: .75rem; border-bottom: 2px solid var(--rb-accent); margin-bottom: 1rem; }
+
+/* ============================================================
+   PAGINATION
+============================================================ */
+.rb-pagination .page-link {
+    border-radius: 6px;
+    margin: 0 2px;
+    border: 1px solid #e2e8f0;
+    color: var(--rb-text);
+    font-size: .875rem;
+}
+.rb-pagination .page-item.active .page-link {
+    background: var(--rb-primary);
+    border-color: var(--rb-primary);
+    color: #fff;
+}
+.rb-pagination .page-link:hover { background: var(--rb-light); }
+
+/* No results */
+.rb-no-results {
+    text-align: center;
+    padding: 4rem 1rem;
+    color: var(--rb-muted);
+}
+.rb-no-results i { font-size: 4rem; display: block; margin-bottom: 1rem; opacity: .3; }
+
+/* ============================================================
+   DETAIL PAGE
+============================================================ */
+.rb-detail-price { padding: .75rem 0; border-top: 1px solid #f0f4f8; border-bottom: 1px solid #f0f4f8; }
+.rb-price-main    { font-size: 2rem; font-weight: 700; color: var(--rb-primary); }
+.rb-price-currency{ font-size: 1rem; color: var(--rb-muted); }
+.rb-detail-section { margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #f0f4f8; }
+.rb-detail-section-title { font-size: 1.1rem; font-weight: 700; color: var(--rb-primary); margin-bottom: 1rem; }
+.rb-char-item {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    background: var(--rb-light);
+    border-radius: 8px;
+    padding: .6rem .85rem;
+    font-size: .85rem;
+}
+.rb-char-item i  { font-size: 1.2rem; }
+.rb-char-label   { display: block; color: var(--rb-muted); font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; }
+.rb-char-value   { display: block; font-weight: 600; color: var(--rb-text); }
+
+/* Agent card */
+.rb-agent-card {
+    background: #fff;
+    border-radius: var(--rb-radius);
+    box-shadow: var(--rb-shadow);
+    padding: 1.5rem;
+}
+.rb-agent-avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    object-fit: cover; border: 3px solid var(--rb-accent);
+}
+.rb-agent-avatar-placeholder {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: var(--rb-primary); color: #fff;
+    font-size: 1.5rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto; border: 3px solid var(--rb-accent);
+}
+
+/* Contact widget */
+.rb-contact-widget {
+    background: var(--rb-light);
+    border-radius: var(--rb-radius);
+    padding: 1.5rem;
+    border-left: 4px solid var(--rb-accent);
+}
+[dir="rtl"] .rb-contact-widget { border-left: none; border-right: 4px solid var(--rb-accent); }
+
+/* ============================================================
+   ABOUT
+============================================================ */
+.rb-about-illustration {
+    position: relative;
+    display: inline-block;
+    padding: 3rem;
+}
+.rb-about-badge {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: var(--rb-primary);
+    color: #fff;
+    padding: .5rem 1rem;
+    border-radius: 8px;
+    font-size: .85rem;
+    font-weight: 600;
+}
+.rb-team-card {
+    background: #fff;
+    border-radius: var(--rb-radius);
+    box-shadow: var(--rb-shadow);
+    padding: 1.5rem 1rem;
+    transition: transform .2s;
+}
+.rb-team-card:hover { transform: translateY(-3px); }
+.rb-team-avatar {
+    width: 90px; height: 90px;
+    border-radius: 50%; object-fit: cover;
+    border: 3px solid var(--rb-accent);
+    margin: 0 auto;
+    display: block;
+}
+.rb-team-avatar-placeholder {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: var(--rb-primary);
+    color: #fff; font-size: 1.6rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    border: 3px solid var(--rb-accent);
+}
+
+/* ============================================================
+   CONTACT PAGE
+============================================================ */
+.rb-contact-form .form-control,
+.rb-contact-form .form-select {
+    border-radius: 8px;
+    border: 1.5px solid #e2e8f0;
+    transition: border-color .2s;
+}
+.rb-contact-form .form-control:focus,
+.rb-contact-form .form-select:focus {
+    border-color: var(--rb-accent);
+    box-shadow: 0 0 0 3px rgba(232,160,32,.15);
+}
+.rb-contact-info { padding: 2rem; background: var(--rb-light); border-radius: var(--rb-radius); height: 100%; }
+.rb-contact-icon {
+    width: 44px; height: 44px;
+    background: var(--rb-primary); color: #fff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   ESTIMATION
+============================================================ */
+.rb-estimate-form {
+    background: #fff;
+    border-radius: var(--rb-radius);
+    box-shadow: var(--rb-shadow-lg);
+    padding: 2.5rem;
+}
+.rb-form-step-title {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--rb-primary);
+    margin-bottom: 1.25rem;
+}
+.rb-step-number {
+    width: 30px; height: 30px;
+    background: var(--rb-accent);
+    color: #fff; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .85rem; font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   BLOG
+============================================================ */
+.rb-blog-card {
+    background: #fff;
+    border-radius: var(--rb-radius);
+    box-shadow: var(--rb-shadow);
+    overflow: hidden;
+    transition: transform .2s;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.rb-blog-card:hover { transform: translateY(-4px); }
+.rb-blog-img  { width: 100%; height: 200px; object-fit: cover; }
+.rb-blog-body { padding: 1.25rem; flex: 1; display: flex; flex-direction: column; }
+.rb-blog-title {
+    font-size: 1rem; font-weight: 700; color: var(--rb-text);
+    margin-bottom: .5rem; line-height: 1.4;
+}
+
+/* ============================================================
+   SOCIAL ICONS
+============================================================ */
+.rb-social-icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.25);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,.7);
+    transition: background .2s, color .2s;
+    text-decoration: none;
+}
+.rb-social-icon:hover { background: var(--rb-accent); color: #fff; border-color: var(--rb-accent); }
+
+/* ============================================================
+   FOOTER
+============================================================ */
+.rb-footer {
+    background: var(--rb-primary-d);
+    padding: 4rem 0 2rem;
+    color: #fff;
+}
+.rb-footer-title {
+    color: var(--rb-accent);
+    font-weight: 700;
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    margin-bottom: 1rem;
+}
+.rb-footer-links { padding: 0; }
+.rb-footer-links li { margin-bottom: .5rem; }
+.rb-footer-links a { color: rgba(255,255,255,.6); text-decoration: none; font-size: .875rem; transition: color .2s; }
+.rb-footer-links a:hover { color: var(--rb-accent); }
+.rb-footer-links li:not([class]) { color: rgba(255,255,255,.6); font-size: .875rem; }
+.rb-footer-divider { border-color: rgba(255,255,255,.1); margin: 2rem 0 1.5rem; }
+
+/* ============================================================
+   ANIMATIONS
+============================================================ */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.rb-hero-content { animation: fadeInUp .7s ease both; }
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 991.98px) {
+    .rb-filter-panel { position: static; margin-bottom: 1.5rem; }
+    .rb-hero { min-height: 500px; }
+    .rb-hero-content { padding: 4rem 0 3rem; }
+}
+@media (max-width: 575.98px) {
+    .rb-search-bar { padding: 1rem; }
+    .rb-stat-number { font-size: 1.6rem; }
+    .rb-hero-title  { font-size: 1.8rem; }
+    .rb-estimate-form { padding: 1.5rem 1rem; }
+}

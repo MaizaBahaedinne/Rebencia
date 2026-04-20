@@ -166,66 +166,278 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
                 </div>
             </div>
 
-            <!-- ── Section 4 : Besoin immobilier ──────────────────── -->
+            <!-- ── Section 4 : Profil de demande ──────────────────── -->
             <div class="card shadow-sm" id="needCard">
                 <div class="card-header fw-semibold bg-white">
-                    <i class="bi bi-house-heart me-2 text-warning"></i>Besoin immobilier
+                    <i class="bi bi-currency-dollar me-2 text-warning"></i>Profil de demande
                 </div>
-                <div class="card-body row g-3">
 
-                    <!-- Type de bien (commun) -->
+                <!-- Acheteur / Locataire / Investisseur -->
+                <div id="needBuyer" class="card-body row g-3">
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Type de transaction</label>
+                        <div class="d-flex gap-3">
+                            <?php foreach ($demandTypeLabels as $dKey => $dMeta): ?>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="demand_type"
+                                       id="demand_<?= $dKey ?>" value="<?= $dKey ?>"
+                                       <?= old('demand_type', $client['demand_type'] ?? '') === $dKey ? 'checked' : '' ?>>
+                                <label class="form-check-label" for="demand_<?= $dKey ?>">
+                                    <i class="bi <?= $dMeta['icon'] ?> text-<?= $dMeta['color'] ?> me-1"></i><?= $dMeta['label'] ?>
+                                </label>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
                     <div class="col-sm-6 col-lg-4">
-                        <label class="form-label">Type de bien</label>
-                        <select name="property_type_id" class="form-select">
+                        <label class="form-label">Budget min (TND)</label>
+                        <input type="number" name="budget_min" class="form-control" min="0" step="100"
+                               value="<?= esc(old('budget_min', $client['budget_min'] ?? '')) ?>">
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <label class="form-label">Budget max (TND)</label>
+                        <input type="number" name="budget_max" class="form-control" min="0" step="100"
+                               value="<?= esc(old('budget_max', $client['budget_max'] ?? '')) ?>">
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <label class="form-label">Urgence</label>
+                        <select name="urgency" class="form-select">
                             <option value="">— Sélectionner —</option>
-                            <?php foreach ($propertyTypes as $pt): ?>
-                            <option value="<?= $pt['id'] ?>"
-                                <?= old('property_type_id', $client['property_type_id'] ?? '') == $pt['id'] ? 'selected' : '' ?>>
-                                <?= esc($pt['name']) ?>
+                            <?php foreach ($urgencyLabels as $uKey => $uMeta): ?>
+                            <option value="<?= $uKey ?>"
+                                <?= old('urgency', $client['urgency'] ?? '') === $uKey ? 'selected' : '' ?>>
+                                <?= $uMeta['label'] ?>
                             </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
-
-                    <!-- Acheteur / Locataire / Investisseur -->
-                    <div id="needBuyer" class="col-12 row g-3">
-                        <div class="col-sm-6 col-lg-4">
-                            <label class="form-label">Budget min (TND)</label>
-                            <input type="number" name="budget_min" class="form-control" min="0" step="100"
-                                   value="<?= esc(old('budget_min', $client['budget_min'] ?? '')) ?>">
-                        </div>
-                        <div class="col-sm-6 col-lg-4">
-                            <label class="form-label">Budget max (TND)</label>
-                            <input type="number" name="budget_max" class="form-control" min="0" step="100"
-                                   value="<?= esc(old('budget_max', $client['budget_max'] ?? '')) ?>">
-                        </div>
-                        <div class="col-12 col-lg-4">
-                            <label class="form-label">Zone recherchée</label>
-                            <input type="text" name="desired_zone" class="form-control"
-                                   value="<?= esc(old('desired_zone', $client['desired_zone'] ?? '')) ?>"
-                                   placeholder="Ex : Centre-ville Tunis">
-                        </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <label class="form-label">Flexibilité budget</label>
+                        <select name="budget_flexibility" class="form-select">
+                            <option value="">— Sélectionner —</option>
+                            <?php foreach ($budgetFlexLabels as $bKey => $bMeta): ?>
+                            <option value="<?= $bKey ?>"
+                                <?= old('budget_flexibility', $client['budget_flexibility'] ?? '') === $bKey ? 'selected' : '' ?>>
+                                <?= $bMeta['label'] ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
+                </div>
 
-                    <!-- Propriétaire -->
-                    <div id="needOwner" class="col-12 row g-3" style="display:none;">
-                        <div class="col-sm-6">
-                            <label class="form-label">Localisation du bien</label>
-                            <input type="text" name="owner_location" class="form-control"
-                                   value="<?= esc(old('owner_location', $client['owner_location'] ?? '')) ?>"
-                                   placeholder="Ex : Lac 2, Tunis">
-                        </div>
-                        <div class="col-sm-6">
-                            <label class="form-label">Prix souhaité (TND)</label>
-                            <input type="number" name="desired_price" class="form-control" min="0" step="1000"
-                                   value="<?= esc(old('desired_price', $client['desired_price'] ?? '')) ?>">
-                        </div>
+                <!-- Propriétaire -->
+                <div id="needOwner" class="card-body row g-3" style="display:none;">
+                    <div class="col-sm-6">
+                        <label class="form-label">Localisation du bien</label>
+                        <input type="text" name="owner_location" class="form-control"
+                               value="<?= esc(old('owner_location', $client['owner_location'] ?? '')) ?>"
+                               placeholder="Ex : Lac 2, Tunis">
                     </div>
-
+                    <div class="col-sm-6">
+                        <label class="form-label">Prix souhaité (TND)</label>
+                        <input type="number" name="desired_price" class="form-control" min="0" step="1000"
+                               value="<?= esc(old('desired_price', $client['desired_price'] ?? '')) ?>">
+                    </div>
                 </div>
             </div>
 
-            <!-- ── Section 6 : Notes ───────────────────────────────── -->
+            <!-- ── Section 5 : Types de biens ──────────────────────── -->
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold bg-white">
+                    <i class="bi bi-building me-2 text-primary"></i>Types de biens recherchés
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <?php foreach ($propertyTypes as $pt): ?>
+                        <div class="col-6 col-sm-4 col-lg-3">
+                            <label class="d-flex align-items-center gap-2 p-2 border rounded cursor-pointer
+                                <?= in_array($pt['id'], $selectedPropTypes) ? 'border-primary bg-primary-subtle' : '' ?>
+                                prop-type-card" style="cursor:pointer;">
+                                <input type="checkbox" name="search_prop_types[]"
+                                       class="form-check-input prop-type-check"
+                                       value="<?= $pt['id'] ?>"
+                                       <?= in_array($pt['id'], $selectedPropTypes) ? 'checked' : '' ?>>
+                                <span class="small fw-semibold"><?= esc($pt['name']) ?></span>
+                            </label>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php if (empty($propertyTypes)): ?>
+                    <p class="text-muted small mb-0">Aucun type de bien disponible.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- ── Section 6 : Zones recherchées ───────────────────── -->
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold bg-white">
+                    <i class="bi bi-geo-alt-fill me-2 text-info"></i>Zones de recherche
+                </div>
+                <div class="card-body">
+                    <!-- Champ de recherche -->
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" id="zoneSearchInput" class="form-control"
+                               placeholder="Tapez un nom de ville, gouvernorat…" autocomplete="off">
+                    </div>
+                    <!-- Suggestions -->
+                    <div id="zoneSearchResults" class="list-group mb-3" style="display:none; max-height:200px; overflow-y:auto;"></div>
+
+                    <!-- Zones sélectionnées -->
+                    <div id="selectedZonesTags" class="d-flex flex-wrap gap-2">
+                        <?php foreach ($selectedZones as $sz): ?>
+                        <span class="badge text-bg-info d-inline-flex align-items-center gap-1 zone-tag"
+                              data-zone-id="<?= $sz['zone_id'] ?>">
+                            <i class="bi bi-geo-alt"></i>
+                            <?= esc($sz['name']) ?>
+                            <button type="button" class="btn-close btn-close-white btn-sm zone-remove"
+                                    style="font-size:.6rem;" aria-label="Retirer"></button>
+                            <input type="hidden" name="search_zones[]" value="<?= $sz['zone_id'] ?>">
+                        </span>
+                        <?php endforeach; ?>
+                    </div>
+                    <p id="noZonesHint" class="text-muted small mb-0 <?= ! empty($selectedZones) ? 'd-none' : '' ?>">
+                        Aucune zone sélectionnée.
+                    </p>
+                </div>
+            </div>
+
+            <!-- ── Section 7 : Orientations ────────────────────────── -->
+            <?php
+            $rawOrientations = old('orientations', json_decode($client['orientations'] ?? '[]', true) ?? []);
+            ?>
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold bg-white">
+                    <i class="bi bi-compass me-2 text-secondary"></i>Orientations préférées
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                        <?php foreach ($orientationLabels as $oKey => $oLabel): ?>
+                        <label class="border rounded px-3 py-2 d-flex align-items-center gap-2 orientation-card
+                            <?= in_array($oKey, (array) $rawOrientations) ? 'border-secondary bg-secondary-subtle' : '' ?>"
+                            style="cursor:pointer;">
+                            <input type="checkbox" class="form-check-input orientation-check"
+                                   name="orientations[]" value="<?= $oKey ?>"
+                                   <?= in_array($oKey, (array) $rawOrientations) ? 'checked' : '' ?>>
+                            <span class="small fw-semibold"><?= esc($oLabel) ?></span>
+                        </label>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Section 8 : Caractéristiques ───────────────────── -->
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold bg-white">
+                    <i class="bi bi-star me-2 text-warning"></i>Caractéristiques souhaitées
+                </div>
+                <div class="card-body d-flex flex-column gap-4">
+                    <?php foreach ($featuresCatalog as $catKey => $catData): ?>
+                    <div>
+                        <h6 class="fw-semibold mb-2">
+                            <i class="bi <?= $catData['icon'] ?> me-1"></i><?= esc($catData['label']) ?>
+                        </h6>
+                        <div class="row g-2">
+                            <?php foreach ($catData['items'] as $fKey => $fLabel): ?>
+                            <?php
+                            $isReq = isset($selectedFeatures[$fKey]) && $selectedFeatures[$fKey] === 'obligatoire';
+                            $isOpt = isset($selectedFeatures[$fKey]) && $selectedFeatures[$fKey] === 'optionnel';
+                            $isChecked = $isReq || $isOpt;
+                            ?>
+                            <div class="col-12 col-sm-6 col-lg-4 feature-item" id="feat_<?= $fKey ?>">
+                                <label class="border rounded p-2 d-flex align-items-start gap-2 feature-card
+                                    <?= $isChecked ? 'border-warning bg-warning-subtle' : '' ?>"
+                                    style="cursor:pointer;">
+                                    <input type="checkbox" class="form-check-input feature-checkbox mt-1"
+                                           data-key="<?= $fKey ?>" <?= $isChecked ? 'checked' : '' ?>>
+                                    <div class="flex-grow-1">
+                                        <div class="small fw-semibold"><?= esc($fLabel) ?></div>
+                                        <div class="feature-type-selector mt-1 <?= $isChecked ? '' : 'd-none' ?>">
+                                            <div class="d-flex gap-2">
+                                                <div class="form-check form-check-inline mb-0">
+                                                    <input class="form-check-input" type="radio"
+                                                           name="feat_type[<?= $fKey ?>]"
+                                                           id="feat_req_<?= $fKey ?>"
+                                                           value="obligatoire" <?= $isReq ? 'checked' : '' ?>>
+                                                    <label class="form-check-label small text-danger fw-semibold"
+                                                           for="feat_req_<?= $fKey ?>">Obligatoire</label>
+                                                </div>
+                                                <div class="form-check form-check-inline mb-0">
+                                                    <input class="form-check-input" type="radio"
+                                                           name="feat_type[<?= $fKey ?>]"
+                                                           id="feat_opt_<?= $fKey ?>"
+                                                           value="optionnel" <?= (! $isReq) ? 'checked' : '' ?>>
+                                                    <label class="form-check-label small text-secondary"
+                                                           for="feat_opt_<?= $fKey ?>">Optionnel</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <!-- ── Section 9 : Critères techniques ─────────────────── -->
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold bg-white">
+                    <i class="bi bi-rulers me-2 text-primary"></i>Critères techniques
+                </div>
+                <div class="card-body row g-3">
+                    <div class="col-sm-6 col-lg-3">
+                        <label class="form-label">Surface min (m²)</label>
+                        <input type="number" name="surface_min" class="form-control" min="0" step="5"
+                               value="<?= esc(old('surface_min', $client['surface_min'] ?? '')) ?>">
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <label class="form-label">Surface max (m²)</label>
+                        <input type="number" name="surface_max" class="form-control" min="0" step="5"
+                               value="<?= esc(old('surface_max', $client['surface_max'] ?? '')) ?>">
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <label class="form-label">Pièces (min)</label>
+                        <input type="number" name="rooms_min" class="form-control" min="1" max="20"
+                               value="<?= esc(old('rooms_min', $client['rooms_min'] ?? '')) ?>">
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <label class="form-label">Chambres (min)</label>
+                        <input type="number" name="bedrooms_min" class="form-control" min="0" max="20"
+                               value="<?= esc(old('bedrooms_min', $client['bedrooms_min'] ?? '')) ?>">
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <label class="form-label">Étage préféré</label>
+                        <select name="floor_preferred" class="form-select">
+                            <option value="">— Indifférent —</option>
+                            <?php foreach ([
+                                'rdc'     => 'Rez-de-chaussée',
+                                'bas'     => 'Étages bas (1-3)',
+                                'moyen'   => 'Étages moyens (4-6)',
+                                'haut'    => 'Étages hauts (7+)',
+                                'dernier' => 'Dernier étage',
+                            ] as $fv => $fl): ?>
+                            <option value="<?= $fv ?>"
+                                <?= old('floor_preferred', $client['floor_preferred'] ?? '') === $fv ? 'selected' : '' ?>>
+                                <?= $fl ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-sm-6 col-lg-4 d-flex align-items-end">
+                        <div class="form-check form-switch ms-1 mb-1">
+                            <input class="form-check-input" type="checkbox" name="has_elevator"
+                                   id="hasElevator" role="switch"
+                                   <?= old('has_elevator', $client['has_elevator'] ?? 0) ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="hasElevator">Ascenseur requis</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Section 10 : Notes ──────────────────────────────── -->
             <div class="card shadow-sm">
                 <div class="card-header fw-semibold bg-white">
                     <i class="bi bi-chat-text me-2 text-muted"></i>Notes
@@ -241,7 +453,7 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
         <!-- ── Colonne latérale ────────────────────────────────────── -->
         <div class="col-lg-4 d-flex flex-column gap-4">
 
-            <!-- ── Section 5 : CRM ────────────────────────────────── -->
+            <!-- ── Section CRM ────────────────────────────────────── -->
             <div class="card shadow-sm">
                 <div class="card-header fw-semibold bg-white">
                     <i class="bi bi-diagram-3 me-2 text-success"></i>CRM
@@ -307,9 +519,13 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
 
         </div>
     </div>
+
+    <!-- Champs cachés features (construits par JS avant submit) -->
+    <div id="featuresHiddenContainer"></div>
+
 </form>
 
-<!-- ── JS : type sélecteur + besoin dynamique + cascade zones ─────── -->
+<!-- ── JS ──────────────────────────────────────────────────────────── -->
 <script>
 (function () {
     'use strict';
@@ -349,7 +565,6 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
         }
     }
 
-    // Init
     applyTypeSelection('<?= esc($currentType, 'js') ?>');
 
     typeCards.forEach(function (card) {
@@ -360,26 +575,227 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
         });
     });
 
-    // ── Cascade zones (AJAX) ─────────────────────────────────────────
+    // ── Types de biens visuels ───────────────────────────────────────
+    document.querySelectorAll('.prop-type-card').forEach(function (card) {
+        card.addEventListener('click', function () {
+            const cb = card.querySelector('.prop-type-check');
+            // Le click toggle la checkbox nativement, on update juste le style
+            setTimeout(function () {
+                if (cb.checked) {
+                    card.classList.add('border-primary', 'bg-primary-subtle');
+                } else {
+                    card.classList.remove('border-primary', 'bg-primary-subtle');
+                }
+            }, 0);
+        });
+    });
+
+    // ── Orientations visuelles ───────────────────────────────────────
+    document.querySelectorAll('.orientation-card').forEach(function (card) {
+        card.addEventListener('click', function () {
+            const cb = card.querySelector('.orientation-check');
+            setTimeout(function () {
+                if (cb.checked) {
+                    card.classList.add('border-secondary', 'bg-secondary-subtle');
+                } else {
+                    card.classList.remove('border-secondary', 'bg-secondary-subtle');
+                }
+            }, 0);
+        });
+    });
+
+    // ── Caractéristiques : toggle radio ─────────────────────────────
+    document.querySelectorAll('.feature-checkbox').forEach(function (cb) {
+        function updateFeatureCard() {
+            const card     = cb.closest('.feature-card');
+            const selector = cb.closest('.feature-item').querySelector('.feature-type-selector');
+            if (cb.checked) {
+                card.classList.add('border-warning', 'bg-warning-subtle');
+                selector.classList.remove('d-none');
+                // Set "optionnel" by default if neither is checked
+                const radios = selector.querySelectorAll('input[type=radio]');
+                const hasChecked = Array.from(radios).some(r => r.checked);
+                if (!hasChecked) {
+                    const optRadio = selector.querySelector('input[value=optionnel]');
+                    if (optRadio) optRadio.checked = true;
+                }
+            } else {
+                card.classList.remove('border-warning', 'bg-warning-subtle');
+                selector.classList.add('d-none');
+            }
+        }
+        updateFeatureCard();
+        cb.addEventListener('change', updateFeatureCard);
+    });
+
+    // Avant submit : transformer feat_type[] en features_obligatoire[] et features_optionnel[]
+    document.getElementById('clientForm').addEventListener('submit', function () {
+        const container = document.getElementById('featuresHiddenContainer');
+        container.innerHTML = '';
+
+        document.querySelectorAll('.feature-checkbox:checked').forEach(function (cb) {
+            const key      = cb.dataset.key;
+            const radios   = document.querySelectorAll('input[name="feat_type[' + key + ']"]:checked');
+            const typeVal  = radios.length > 0 ? radios[0].value : 'optionnel';
+            const fieldName = typeVal === 'obligatoire' ? 'features_obligatoire[]' : 'features_optionnel[]';
+            const input     = document.createElement('input');
+            input.type  = 'hidden';
+            input.name  = fieldName;
+            input.value = key;
+            container.appendChild(input);
+        });
+    });
+
+    // ── Zones recherchées (AJAX autocomplete) ───────────────────────
+    const zoneInput   = document.getElementById('zoneSearchInput');
+    const zoneResults = document.getElementById('zoneSearchResults');
+    const zoneTags    = document.getElementById('selectedZonesTags');
+    const noZonesHint = document.getElementById('noZonesHint');
+
+    // Ensemble des IDs déjà sélectionnés
+    const selectedZoneIds = new Set(
+        Array.from(zoneTags.querySelectorAll('.zone-tag')).map(t => String(t.dataset.zoneId))
+    );
+
+    function updateNoHint() {
+        if (zoneTags.querySelectorAll('.zone-tag').length > 0) {
+            noZonesHint.classList.add('d-none');
+        } else {
+            noZonesHint.classList.remove('d-none');
+        }
+    }
+
+    function addZoneTag(zone) {
+        if (selectedZoneIds.has(String(zone.id))) return;
+        selectedZoneIds.add(String(zone.id));
+
+        const span = document.createElement('span');
+        span.className = 'badge text-bg-info d-inline-flex align-items-center gap-1 zone-tag';
+        span.dataset.zoneId = zone.id;
+        span.innerHTML =
+            '<i class="bi bi-geo-alt"></i>' +
+            document.createTextNode(zone.name).textContent +
+            ' <small class="opacity-75">(' + zone.type_label + ')</small>' +
+            '<button type="button" class="btn-close btn-close-white btn-sm zone-remove" style="font-size:.6rem;" aria-label="Retirer"></button>' +
+            '<input type="hidden" name="search_zones[]" value="' + zone.id + '">';
+
+        // Réécrire proprement pour éviter XSS
+        span.innerHTML = '';
+        const icon = document.createElement('i');
+        icon.className = 'bi bi-geo-alt';
+        span.appendChild(icon);
+
+        const nameText = document.createElement('span');
+        nameText.textContent = zone.name;
+        span.appendChild(nameText);
+
+        const typeBadge = document.createElement('small');
+        typeBadge.className = 'opacity-75';
+        typeBadge.textContent = '(' + zone.type_label + ')';
+        span.appendChild(typeBadge);
+
+        const rmBtn = document.createElement('button');
+        rmBtn.type = 'button';
+        rmBtn.className = 'btn-close btn-close-white btn-sm zone-remove';
+        rmBtn.style.fontSize = '.6rem';
+        rmBtn.setAttribute('aria-label', 'Retirer');
+        span.appendChild(rmBtn);
+
+        const hidden = document.createElement('input');
+        hidden.type  = 'hidden';
+        hidden.name  = 'search_zones[]';
+        hidden.value = zone.id;
+        span.appendChild(hidden);
+
+        zoneTags.appendChild(span);
+        updateNoHint();
+    }
+
+    // Suppression d'un badge
+    zoneTags.addEventListener('click', function (e) {
+        const rmBtn = e.target.closest('.zone-remove');
+        if (!rmBtn) return;
+        const tag = rmBtn.closest('.zone-tag');
+        selectedZoneIds.delete(String(tag.dataset.zoneId));
+        tag.remove();
+        updateNoHint();
+    });
+
+    // Debounce helper
+    let debounceTimer;
+    zoneInput.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        const q = this.value.trim();
+        if (q.length < 2) {
+            zoneResults.innerHTML = '';
+            zoneResults.style.display = 'none';
+            return;
+        }
+        debounceTimer = setTimeout(function () {
+            fetch('<?= base_url('admin/clients/zones-search') ?>?q=' + encodeURIComponent(q), {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            })
+            .then(r => r.json())
+            .then(function (data) {
+                zoneResults.innerHTML = '';
+                if (data.length === 0) {
+                    zoneResults.style.display = 'none';
+                    return;
+                }
+                data.forEach(function (z) {
+                    const item = document.createElement('button');
+                    item.type = 'button';
+                    item.className = 'list-group-item list-group-item-action py-2';
+                    if (selectedZoneIds.has(String(z.id))) {
+                        item.classList.add('disabled');
+                    }
+
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = 'fw-semibold small';
+                    nameSpan.textContent = z.name;
+
+                    const typeBadge = document.createElement('span');
+                    typeBadge.className = 'badge text-bg-secondary ms-2 small';
+                    typeBadge.textContent = z.type_label;
+
+                    item.appendChild(nameSpan);
+                    item.appendChild(typeBadge);
+
+                    item.addEventListener('click', function () {
+                        addZoneTag(z);
+                        zoneInput.value = '';
+                        zoneResults.innerHTML = '';
+                        zoneResults.style.display = 'none';
+                    });
+                    zoneResults.appendChild(item);
+                });
+                zoneResults.style.display = '';
+            })
+            .catch(function () {
+                zoneResults.style.display = 'none';
+            });
+        }, 300);
+    });
+
+    // Fermer les suggestions au clic en dehors
+    document.addEventListener('click', function (e) {
+        if (!zoneResults.contains(e.target) && e.target !== zoneInput) {
+            zoneResults.style.display = 'none';
+        }
+    });
+
+    // ── Cascade zones adresse (AJAX) ─────────────────────────────────
     const selPays   = document.getElementById('selPays');
     const selRegion = document.getElementById('selRegion');
     const selVille  = document.getElementById('selVille');
 
-    const CSRF_NAME = '<?= csrf_token() ?>';
-    const CSRF_HASH = '<?= csrf_hash() ?>';
-
-    // Valeurs pré-sélectionnées (édition)
     const preRegion = '<?= (int) ($client['zone_region_id'] ?? 0) ?>';
     const preVille  = '<?= (int) ($client['zone_ville_id'] ?? 0) ?>';
 
     function loadSelect(sel, url, preselect) {
         sel.innerHTML = '<option value="">Chargement…</option>';
         sel.disabled  = true;
-
-        fetch(url, {
-            method: 'GET',
-            headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        })
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
         .then(r => r.json())
         .then(function (data) {
             sel.innerHTML = '<option value="">— Sélectionner —</option>';
@@ -391,6 +807,10 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
                 sel.appendChild(opt);
             });
             sel.disabled = data.length === 0;
+            // Si présélectionné → déclencher le chargement du niveau suivant
+            if (preselect && sel === selRegion && sel.value === String(preselect)) {
+                loadSelect(selVille, '<?= base_url('admin/clients/villes/') ?>' + preselect, preVille);
+            }
         })
         .catch(function () {
             sel.innerHTML = '<option value="">Erreur chargement</option>';
@@ -402,7 +822,6 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
         selRegion.disabled  = true;
         selVille.innerHTML  = '<option value="">— Ville —</option>';
         selVille.disabled   = true;
-
         if (! this.value) return;
         loadSelect(selRegion, '<?= base_url('admin/clients/regions/') ?>' + this.value, '');
     });
@@ -410,24 +829,16 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
     selRegion.addEventListener('change', function () {
         selVille.innerHTML = '<option value="">— Ville —</option>';
         selVille.disabled  = true;
-
         if (! this.value) return;
         loadSelect(selVille, '<?= base_url('admin/clients/villes/') ?>' + this.value, '');
     });
 
-    // Pré-charger si édition
+    // Pré-charger depuis la BDD en édition
     <?php if (! empty($client['zone_pays_id'])): ?>
     loadSelect(selRegion, '<?= base_url('admin/clients/regions/') ?>' + selPays.value, preRegion);
-    <?php endif; ?>
-    <?php if (! empty($client['zone_region_id'])): ?>
-    // Attendre que selRegion soit chargé avant de charger les villes
-    selRegion.addEventListener('change', function onFirstChange() {
-        if (selRegion.value === preRegion) {
-            loadSelect(selVille, '<?= base_url('admin/clients/villes/') ?>' + preRegion, preVille);
-            selRegion.removeEventListener('change', onFirstChange);
-        }
-    });
     <?php endif; ?>
 
 })();
 </script>
+
+

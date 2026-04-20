@@ -78,6 +78,7 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
     $routes->get('clients',                     'Admin\ClientsController::index');
     $routes->get('clients/create',              'Admin\ClientsController::create');
     $routes->post('clients/store',              'Admin\ClientsController::store');
+    $routes->get('clients/zones-search',        'Admin\ClientsController::zonesSearch');
     $routes->get('clients/regions/(:num)',      'Admin\ClientsController::regionsByPays/$1');
     $routes->get('clients/villes/(:num)',       'Admin\ClientsController::villesByRegion/$1');
     $routes->get('clients/(:num)',              'Admin\ClientsController::show/$1');

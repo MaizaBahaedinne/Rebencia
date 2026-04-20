@@ -13,11 +13,15 @@ class ClientModel extends Model
     protected $deletedField   = 'deleted_at';
 
     protected $allowedFields = [
-        'client_type', 'first_name', 'last_name', 'phone', 'email',
+        'client_type', 'demand_type', 'first_name', 'last_name', 'phone', 'email',
         'profession', 'company',
         'address', 'zone_pays_id', 'zone_region_id', 'zone_ville_id', 'postal_code',
         'property_type_id', 'budget_min', 'budget_max', 'desired_zone',
         'owner_location', 'desired_price',
+        'orientations',
+        'surface_min', 'surface_max', 'rooms_min', 'bedrooms_min',
+        'floor_preferred', 'has_elevator',
+        'urgency', 'budget_flexibility',
         'status', 'assigned_to', 'source',
         'notes',
     ];
@@ -50,9 +54,195 @@ class ClientModel extends Model
         'autre'     => 'Autre',
     ];
 
-    /**
-     * Liste filtrée + paginée avec jointures (agent, zones, type bien).
-     */
+    public const DEMAND_TYPE_LABELS = [
+        'achat'    => ['label' => 'Achat',    'color' => 'primary', 'icon' => 'bi-house-check'],
+        'location' => ['label' => 'Location', 'color' => 'info',    'icon' => 'bi-key'],
+    ];
+
+    public const URGENCY_LABELS = [
+        'faible'  => ['label' => 'Faible',  'color' => 'success'],
+        'moyenne' => ['label' => 'Moyenne', 'color' => 'warning'],
+        'elevee'  => ['label' => 'Élevée',  'color' => 'danger'],
+    ];
+
+    public const BUDGET_FLEXIBILITY_LABELS = [
+        'strict'         => ['label' => 'Strict',         'color' => 'danger'],
+        'flexible'       => ['label' => 'Flexible',       'color' => 'warning'],
+        'tres_flexible'  => ['label' => 'Très flexible',  'color' => 'success'],
+    ];
+
+    public const ORIENTATION_LABELS = [
+        'nord'      => 'Nord',
+        'sud'       => 'Sud',
+        'est'       => 'Est',
+        'ouest'     => 'Ouest',
+        'nord_est'  => 'Nord-Est',
+        'nord_ouest'=> 'Nord-Ouest',
+        'sud_est'   => 'Sud-Est',
+        'sud_ouest' => 'Sud-Ouest',
+    ];
+
+    public const FEATURES_CATALOG = [
+        'equipements' => [
+            'label' => 'Équipements',
+            'icon'  => 'bi-tools',
+            'items' => [
+                'piscine'            => 'Piscine',
+                'garage'             => 'Garage',
+                'ascenseur'          => 'Ascenseur',
+                'chauffage_central'  => 'Chauffage central',
+                'climatisation'      => 'Climatisation',
+            ],
+        ],
+        'confort' => [
+            'label' => 'Confort',
+            'icon'  => 'bi-house-heart',
+            'items' => [
+                'terrasse' => 'Terrasse',
+                'balcon'   => 'Balcon',
+                'jardin'   => 'Jardin',
+                'vue_mer'  => 'Vue mer',
+            ],
+        ],
+        'securite' => [
+            'label' => 'Sécurité',
+            'icon'  => 'bi-shield-check',
+            'items' => [
+                'residence_securisee' => 'Résidence sécurisée',
+                'camera'              => 'Caméra',
+                'gardien'             => 'Gardien',
+            ],
+        ],
+    ];
+
+    // ── Méthodes pivot ────────────────────────────────────────────────────────
+
+    public function getPivotPropertyTypes(int $clientId): array
+    {
+        $db = \Config\Database::connect();
+        if (! $db->tableExists('client_property_types')) {
+            return [];
+        }
+        return array_column(
+            $db->table('client_property_types')
+                ->select('property_type_id')
+                ->where('client_id', $clientId)
+                ->get()->getResultArray(),
+            'property_type_id'
+        );
+    }
+
+    public function getPivotZones(int $clientId): array
+    {
+        $db = \Config\Database::connect();
+        if (! $db->tableExists('client_search_zones')) {
+            return [];
+        }
+        return $db->table('client_search_zones csz')
+            ->select('csz.zone_id, z.name, z.type')
+            ->join('zones z', 'z.id = csz.zone_id AND z.deleted_at IS NULL', 'left')
+            ->where('csz.client_id', $clientId)
+            ->get()->getResultArray();
+    }
+
+    public function getPivotFeatures(int $clientId): array
+    {
+        $db = \Config\Database::connect();
+        if (! $db->tableExists('client_features')) {
+            return [];
+        }
+        $rows = $db->table('client_features')
+            ->where('client_id', $clientId)
+            ->get()->getResultArray();
+        // Retourner map: feature_key => requirement_type
+        $map = [];
+        foreach ($rows as $r) {
+            $map[$r['feature_key']] = $r['requirement_type'];
+        }
+        return $map;
+    }
+
+    public function savePivotPropertyTypes(int $clientId, array $typeIds): void
+    {
+        $db = \Config\Database::connect();
+        if (! $db->tableExists('client_property_types')) {
+            return;
+        }
+        $db->table('client_property_types')->where('client_id', $clientId)->delete();
+        $now = date('Y-m-d H:i:s');
+        foreach (array_unique(array_filter($typeIds)) as $tid) {
+            $db->table('client_property_types')->insert([
+                'client_id'        => $clientId,
+                'property_type_id' => (int) $tid,
+                'created_at'       => $now,
+            ]);
+        }
+    }
+
+    public function savePivotZones(int $clientId, array $zoneIds): void
+    {
+        $db = \Config\Database::connect();
+        if (! $db->tableExists('client_search_zones')) {
+            return;
+        }
+        $db->table('client_search_zones')->where('client_id', $clientId)->delete();
+        $now = date('Y-m-d H:i:s');
+        foreach (array_unique(array_filter($zoneIds)) as $zid) {
+            $db->table('client_search_zones')->insert([
+                'client_id'  => $clientId,
+                'zone_id'    => (int) $zid,
+                'created_at' => $now,
+            ]);
+        }
+    }
+
+    public function savePivotFeatures(int $clientId, array $featuresRequired, array $featuresOptional): void
+    {
+        $db = \Config\Database::connect();
+        if (! $db->tableExists('client_features')) {
+            return;
+        }
+        $db->table('client_features')->where('client_id', $clientId)->delete();
+        $now = date('Y-m-d H:i:s');
+        foreach ($featuresRequired as $key) {
+            if (! $key) continue;
+            $db->table('client_features')->insert([
+                'client_id'        => $clientId,
+                'feature_key'      => $key,
+                'requirement_type' => 'obligatoire',
+                'weight'           => 2,
+                'created_at'       => $now,
+            ]);
+        }
+        foreach ($featuresOptional as $key) {
+            if (! $key) continue;
+            $db->table('client_features')->insert([
+                'client_id'        => $clientId,
+                'feature_key'      => $key,
+                'requirement_type' => 'optionnel',
+                'weight'           => 1,
+                'created_at'       => $now,
+            ]);
+        }
+    }
+
+    public function countByType(): array
+    {
+        $db = \Config\Database::connect();
+        $rows = $db->table('clients')
+            ->select('client_type, COUNT(*) AS total')
+            ->where('deleted_at', null)
+            ->groupBy('client_type')
+            ->get()
+            ->getResultArray();
+
+        $counts = [];
+        foreach ($rows as $r) {
+            $counts[$r['client_type']] = (int) $r['total'];
+        }
+        return $counts;
+    }
+
     public function getFiltered(array $filters): array
     {
         $db      = \Config\Database::connect();
@@ -126,24 +316,5 @@ class ClientModel extends Model
             ->where('c.deleted_at', null)
             ->get()
             ->getRowArray() ?: null;
-    }
-
-    /**
-     * Comptage par type pour le tableau de bord.
-     */
-    public function countByType(): array
-    {
-        $rows = $this->db->table('clients')
-            ->select('client_type, COUNT(*) AS total')
-            ->where('deleted_at', null)
-            ->groupBy('client_type')
-            ->get()
-            ->getResultArray();
-
-        $counts = [];
-        foreach ($rows as $r) {
-            $counts[$r['client_type']] = (int) $r['total'];
-        }
-        return $counts;
     }
 }

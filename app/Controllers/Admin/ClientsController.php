@@ -53,14 +53,22 @@ class ClientsController extends BaseController
         $this->requirePermission('clients.create');
 
         return $this->render('admin/clients/form', [
-            'page_title'    => 'Nouveau client',
-            'client'        => [],
-            'agents'        => (new UserModel())->getWithRole(['status' => 'active']),
-            'pays_list'     => (new ZoneModel())->getByType('pays'),
-            'propertyTypes' => (new PropertyTypeModel())->getActive(),
-            'typeLabels'    => ClientModel::TYPE_LABELS,
-            'statusLabels'  => ClientModel::STATUS_LABELS,
-            'sourceLabels'  => ClientModel::SOURCE_LABELS,
+            'page_title'       => 'Nouveau client',
+            'client'           => [],
+            'agents'           => (new UserModel())->getWithRole(['status' => 'active']),
+            'pays_list'        => (new ZoneModel())->getByType('pays'),
+            'propertyTypes'    => (new PropertyTypeModel())->getActive(),
+            'typeLabels'       => ClientModel::TYPE_LABELS,
+            'statusLabels'     => ClientModel::STATUS_LABELS,
+            'sourceLabels'     => ClientModel::SOURCE_LABELS,
+            'demandTypeLabels' => ClientModel::DEMAND_TYPE_LABELS,
+            'urgencyLabels'    => ClientModel::URGENCY_LABELS,
+            'budgetFlexLabels' => ClientModel::BUDGET_FLEXIBILITY_LABELS,
+            'orientationLabels'=> ClientModel::ORIENTATION_LABELS,
+            'featuresCatalog'  => ClientModel::FEATURES_CATALOG,
+            'selectedPropTypes'=> [],
+            'selectedZones'    => [],
+            'selectedFeatures' => [],
         ]);
     }
 
@@ -79,11 +87,25 @@ class ClientsController extends BaseController
         }
 
         $id = $this->model->insert($this->buildData());
+        $newId = (int) $this->model->getInsertID();
 
-        $this->log->activity('create', 'clients', 'client', $this->model->getInsertID(),
+        // Pivot : types de biens
+        $propTypes = $this->request->getPost('search_prop_types') ?? [];
+        $this->model->savePivotPropertyTypes($newId, array_map('intval', (array) $propTypes));
+
+        // Pivot : zones recherchées
+        $zoneIds = $this->request->getPost('search_zones') ?? [];
+        $this->model->savePivotZones($newId, array_map('intval', (array) $zoneIds));
+
+        // Pivot : caractéristiques
+        $featReq = $this->request->getPost('features_obligatoire') ?? [];
+        $featOpt = $this->request->getPost('features_optionnel')   ?? [];
+        $this->model->savePivotFeatures($newId, (array) $featReq, (array) $featOpt);
+
+        $this->log->activity('create', 'clients', 'client', $newId,
             'Création client : ' . $this->request->getPost('first_name') . ' ' . $this->request->getPost('last_name'));
 
-        return redirect()->to(base_url('admin/clients/' . $this->model->getInsertID()))
+        return redirect()->to(base_url('admin/clients/' . $newId))
             ->with('success', 'Client créé avec succès.');
     }
 
@@ -123,14 +145,22 @@ class ClientsController extends BaseController
         }
 
         return $this->render('admin/clients/form', [
-            'page_title'    => 'Modifier – ' . $client['first_name'] . ' ' . $client['last_name'],
-            'client'        => $client,
-            'agents'        => (new UserModel())->getWithRole(['status' => 'active']),
-            'pays_list'     => (new ZoneModel())->getByType('pays'),
-            'propertyTypes' => (new PropertyTypeModel())->getActive(),
-            'typeLabels'    => ClientModel::TYPE_LABELS,
-            'statusLabels'  => ClientModel::STATUS_LABELS,
-            'sourceLabels'  => ClientModel::SOURCE_LABELS,
+            'page_title'       => 'Modifier – ' . $client['first_name'] . ' ' . $client['last_name'],
+            'client'           => $client,
+            'agents'           => (new UserModel())->getWithRole(['status' => 'active']),
+            'pays_list'        => (new ZoneModel())->getByType('pays'),
+            'propertyTypes'    => (new PropertyTypeModel())->getActive(),
+            'typeLabels'       => ClientModel::TYPE_LABELS,
+            'statusLabels'     => ClientModel::STATUS_LABELS,
+            'sourceLabels'     => ClientModel::SOURCE_LABELS,
+            'demandTypeLabels' => ClientModel::DEMAND_TYPE_LABELS,
+            'urgencyLabels'    => ClientModel::URGENCY_LABELS,
+            'budgetFlexLabels' => ClientModel::BUDGET_FLEXIBILITY_LABELS,
+            'orientationLabels'=> ClientModel::ORIENTATION_LABELS,
+            'featuresCatalog'  => ClientModel::FEATURES_CATALOG,
+            'selectedPropTypes'=> $this->model->getPivotPropertyTypes($id),
+            'selectedZones'    => $this->model->getPivotZones($id),
+            'selectedFeatures' => $this->model->getPivotFeatures($id),
         ]);
     }
 
@@ -154,6 +184,19 @@ class ClientsController extends BaseController
         }
 
         $this->model->update($id, $this->buildData());
+
+        // Pivot : types de biens
+        $propTypes = $this->request->getPost('search_prop_types') ?? [];
+        $this->model->savePivotPropertyTypes($id, array_map('intval', (array) $propTypes));
+
+        // Pivot : zones recherchées
+        $zoneIds = $this->request->getPost('search_zones') ?? [];
+        $this->model->savePivotZones($id, array_map('intval', (array) $zoneIds));
+
+        // Pivot : caractéristiques
+        $featReq = $this->request->getPost('features_obligatoire') ?? [];
+        $featOpt = $this->request->getPost('features_optionnel')   ?? [];
+        $this->model->savePivotFeatures($id, (array) $featReq, (array) $featOpt);
 
         $this->log->activity('update', 'clients', 'client', $id, 'Modification client');
 
@@ -201,6 +244,48 @@ class ClientsController extends BaseController
     }
 
     // ----------------------------------------------------------------
+    // AJAX : zones search autocomplete
+    // ----------------------------------------------------------------
+
+    public function zonesSearch()
+    {
+        $q      = trim($this->request->getGet('q') ?? '');
+        $type   = $this->request->getGet('type');
+        $result = [];
+
+        if (strlen($q) >= 2) {
+            $db      = \Config\Database::connect();
+            $builder = $db->table('zones')
+                ->select('id, name, type')
+                ->where('deleted_at', null)
+                ->like('name', $q)
+                ->limit(20);
+
+            if ($type) {
+                $builder->where('type', $type);
+            }
+
+            $typeLabels = [
+                'pays'      => 'Pays',
+                'region'    => 'Gouvernorat',
+                'ville'     => 'Ville / Délégation',
+                'quartier'  => 'Quartier',
+            ];
+
+            foreach ($builder->get()->getResultArray() as $row) {
+                $result[] = [
+                    'id'         => (int) $row['id'],
+                    'name'       => $row['name'],
+                    'type'       => $row['type'],
+                    'type_label' => $typeLabels[$row['type']] ?? $row['type'],
+                ];
+            }
+        }
+
+        return $this->json($result);
+    }
+
+    // ----------------------------------------------------------------
     // Helper privé
     // ----------------------------------------------------------------
 
@@ -227,6 +312,19 @@ class ClientsController extends BaseController
             'assigned_to'  => $post['assigned_to'] ?: null,
             'source'       => $post['source'] ?? 'autre',
             'notes'        => $post['notes'] ?: null,
+            // Profil de demande
+            'demand_type'       => $post['demand_type']       ?: null,
+            'urgency'           => $post['urgency']           ?: null,
+            'budget_flexibility'=> $post['budget_flexibility'] ?: null,
+            'surface_min'       => $post['surface_min']       ?: null,
+            'surface_max'       => $post['surface_max']       ?: null,
+            'rooms_min'         => $post['rooms_min']         ?: null,
+            'bedrooms_min'      => $post['bedrooms_min']      ?: null,
+            'floor_preferred'   => $post['floor_preferred']   ?: null,
+            'has_elevator'      => isset($post['has_elevator']) ? 1 : 0,
+            'orientations'      => ! empty($post['orientations'])
+                                    ? json_encode($post['orientations'])
+                                    : null,
         ];
 
         // Champs spécifiques par type

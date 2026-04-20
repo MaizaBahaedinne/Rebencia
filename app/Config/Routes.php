@@ -85,6 +85,20 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
     $routes->post('clients/(:num)/update',      'Admin\ClientsController::update/$1');
     $routes->post('clients/(:num)/delete',      'Admin\ClientsController::delete/$1');
 
+    // Visites
+    $routes->get('visits',                      'Admin\VisitsController::index');
+    $routes->get('visits/calendar',             'Admin\VisitsController::calendar');
+    $routes->get('visits/calendar-events',      'Admin\VisitsController::calendarEvents');
+    $routes->get('visits/check-availability',   'Admin\VisitsController::checkAvailability');
+    $routes->get('visits/create',               'Admin\VisitsController::create');
+    $routes->post('visits/store',               'Admin\VisitsController::store');
+    $routes->get('visits/(:num)',               'Admin\VisitsController::show/$1');
+    $routes->get('visits/(:num)/edit',          'Admin\VisitsController::edit/$1');
+    $routes->post('visits/(:num)/update',       'Admin\VisitsController::update/$1');
+    $routes->post('visits/(:num)/status',       'Admin\VisitsController::updateStatus/$1');
+    $routes->post('visits/(:num)/feedback',     'Admin\VisitsController::feedback/$1');
+    $routes->post('visits/(:num)/delete',       'Admin\VisitsController::delete/$1');
+
     // Tâches / Board
     $routes->get('tasks',                       'Admin\TasksController::index');
     $routes->get('tasks/create',                'Admin\TasksController::create');

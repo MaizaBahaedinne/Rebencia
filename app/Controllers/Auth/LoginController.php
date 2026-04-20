@@ -10,7 +10,7 @@ use App\Controllers\BaseController;
 class LoginController extends BaseController
 {
     /** Formulaire de connexion. */
-    public function index(): string
+    public function index(): string|\CodeIgniter\HTTP\RedirectResponse
     {
         if ($this->auth->check()) {
             return redirect()->to('/admin/dashboard');

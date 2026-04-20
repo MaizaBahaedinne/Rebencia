@@ -1,6 +1,3 @@
-<?= $this->extend('layouts/main') ?>
-<?= $this->section('content') ?>
-
 <?php
 $isEdit  = ! empty($visit['id']);
 $perms   = session()->get('permissions') ?? [];
@@ -285,4 +282,4 @@ $errors  = session()->getFlashdata('errors') ?? [];
 })();
 </script>
 
-<?= $this->endSection() ?>
+

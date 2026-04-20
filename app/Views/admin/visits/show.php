@@ -1,6 +1,3 @@
-<?= $this->extend('layouts/main') ?>
-<?= $this->section('content') ?>
-
 <?php
 $perms   = session()->get('permissions') ?? [];
 $sMeta   = $statusLabels[$visit['status']] ?? ['label' => $visit['status'], 'color' => 'secondary', 'icon' => 'bi-circle'];
@@ -336,4 +333,4 @@ $waReminderLink = 'https://wa.me/' . $cleanPhone . '?text=' . $waMsgReminder;
 })();
 </script>
 
-<?= $this->endSection() ?>
+

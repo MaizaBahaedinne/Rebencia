@@ -1,6 +1,3 @@
-<?= $this->extend('layouts/main') ?>
-<?= $this->section('content') ?>
-
 <?php
 $perms = session()->get('permissions') ?? [];
 ?>
@@ -230,4 +227,4 @@ $perms = session()->get('permissions') ?? [];
     <?php endif; ?>
 </div>
 
-<?= $this->endSection() ?>
+

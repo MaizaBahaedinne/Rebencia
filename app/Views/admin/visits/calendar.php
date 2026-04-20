@@ -1,6 +1,3 @@
-<?= $this->extend('layouts/main') ?>
-<?= $this->section('content') ?>
-
 <!-- ── EN-TÊTE ───────────────────────────────────────────────────────────── -->
 <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
     <div>
@@ -148,4 +145,4 @@
 .fc-daygrid-event             { border-radius: 4px; padding: 1px 4px; }
 </style>
 
-<?= $this->endSection() ?>
+

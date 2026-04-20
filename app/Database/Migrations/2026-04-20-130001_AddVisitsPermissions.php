@@ -29,13 +29,17 @@ class AddVisitsPermissions extends Migration
                 $this->db->table('permissions')->insert([
                     'name'       => $name,
                     'label'      => $label,
+                    'module'     => 'visits',
                     'created_at' => $now,
-                    'updated_at' => $now,
                 ]);
             }
         }
 
         // Assigner aux rôles super_admin et admin
+        if (! $this->db->tableExists('roles') || ! $this->db->tableExists('role_permissions')) {
+            return;
+        }
+
         $adminRoles = $this->db->table('roles')
             ->whereIn('name', ['super_admin', 'admin'])
             ->get()->getResultArray();
@@ -55,7 +59,6 @@ class AddVisitsPermissions extends Migration
                         'role_id'       => $role['id'],
                         'permission_id' => $perm['id'],
                         'created_at'    => $now,
-                        'updated_at'    => $now,
                     ]);
                 }
             }

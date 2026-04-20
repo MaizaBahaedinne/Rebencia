@@ -114,9 +114,11 @@ class LeadsController extends BaseController
         $lead = $this->findOrFail($id);
 
         return $this->render('admin/leads/show', [
-            'page_title' => $lead['first_name'] . ' ' . $lead['last_name'],
-            'lead'       => $lead,
-            'agents'     => (new UserModel())->getWithRole(['status' => 'active']),
+            'page_title'    => $lead['first_name'] . ' ' . $lead['last_name'],
+            'lead'          => $lead,
+            'agents'        => (new UserModel())->getWithRole(['status' => 'active']),
+            'notes'         => $lead['lead_notes'],
+            'statusHistory' => $lead['status_history'],
         ]);
     }
 

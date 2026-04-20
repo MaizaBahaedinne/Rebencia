@@ -29,7 +29,7 @@
         'lost'        => ['Perdu',          'danger'],
     ];
     foreach ($pipelineLabels as $key => [$label, $color]):
-        $count = $pipeline[$key] ?? 0;
+        $count = is_array($pipeline[$key] ?? 0) ? count($pipeline[$key]) : ($pipeline[$key] ?? 0);
     ?>
     <div class="col-6 col-sm-4 col-lg">
         <div class="card border-0 shadow-sm text-center py-3">

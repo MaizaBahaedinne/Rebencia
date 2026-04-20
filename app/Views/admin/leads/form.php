@@ -1,5 +1,5 @@
 ﻿
-<?php $isEdit = isset($lead); ?>
+<?php $isEdit = !empty($lead['id']); ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>

@@ -96,6 +96,15 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
     $routes->post('property-characteristics/reorder',          'Admin\PropertyCharacteristicsController::reorder');
     $routes->get('property-characteristics/for-type/(:alpha)', 'Admin\PropertyCharacteristicsController::forType/$1');
 
+    // Types de bien
+    $routes->get('property-types',                   'Admin\PropertyTypesController::index');
+    $routes->get('property-types/create',            'Admin\PropertyTypesController::create');
+    $routes->post('property-types/store',            'Admin\PropertyTypesController::store');
+    $routes->get('property-types/(:num)/edit',       'Admin\PropertyTypesController::edit/$1');
+    $routes->post('property-types/(:num)/update',    'Admin\PropertyTypesController::update/$1');
+    $routes->post('property-types/(:num)/delete',    'Admin\PropertyTypesController::delete/$1');
+    $routes->post('property-types/(:num)/toggle',    'Admin\PropertyTypesController::toggle/$1');
+
     // Gestion des Zones géographiques
     $routes->get('zones',                        'Admin\ZonesController::index');
     $routes->get('zones/import',                 'Admin\ZonesController::importPage');

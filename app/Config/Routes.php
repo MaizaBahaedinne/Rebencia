@@ -74,6 +74,17 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
     $routes->post('leads/(:num)/note',          'Admin\LeadsController::addNote/$1');
     $routes->post('leads/(:num)/delete',        'Admin\LeadsController::delete/$1');
 
+    // Clients
+    $routes->get('clients',                     'Admin\ClientsController::index');
+    $routes->get('clients/create',              'Admin\ClientsController::create');
+    $routes->post('clients/store',              'Admin\ClientsController::store');
+    $routes->get('clients/regions/(:num)',      'Admin\ClientsController::regionsByPays/$1');
+    $routes->get('clients/villes/(:num)',       'Admin\ClientsController::villesByRegion/$1');
+    $routes->get('clients/(:num)',              'Admin\ClientsController::show/$1');
+    $routes->get('clients/(:num)/edit',         'Admin\ClientsController::edit/$1');
+    $routes->post('clients/(:num)/update',      'Admin\ClientsController::update/$1');
+    $routes->post('clients/(:num)/delete',      'Admin\ClientsController::delete/$1');
+
     // Tâches / Board
     $routes->get('tasks',                       'Admin\TasksController::index');
     $routes->get('tasks/create',                'Admin\TasksController::create');

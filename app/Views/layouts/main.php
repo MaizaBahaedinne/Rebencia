@@ -166,6 +166,11 @@
         <a href="<?= base_url('admin/tasks') ?>" class="nav-link <?= str_starts_with(uri_string(), 'admin/tasks') ? 'active' : '' ?>">
             <i class="bi bi-kanban"></i> Suivi des tâches
         </a>
+        <a href="<?= base_url('admin/notifications') ?>" class="nav-link <?= str_starts_with(uri_string(), 'admin/notifications') ? 'active' : '' ?>"
+           id="sb-notif-link" title="Notifications">
+            <i class="bi bi-bell"></i> Notifications
+            <span id="sb-notif-badge" class="badge bg-danger ms-1" style="display:none;font-size:.65rem;"></span>
+        </a>
 
         <?php if (in_array('system.logs', session()->get('permissions') ?? []) || in_array('system.deploy', session()->get('permissions') ?? [])) : ?>
         <div class="nav-section">Système</div>
@@ -379,8 +384,13 @@
             if (count > 0) {
                 badge.textContent = count > 99 ? '99+' : count;
                 badge.style.display = '';
+                // Badge sidebar
+                const sbBadge = document.getElementById('sb-notif-badge');
+                if (sbBadge) { sbBadge.textContent = count > 99 ? '99+' : count; sbBadge.style.display = ''; }
             } else {
                 badge.style.display = 'none';
+                const sbBadge = document.getElementById('sb-notif-badge');
+                if (sbBadge) sbBadge.style.display = 'none';
             }
 
             // Liste items

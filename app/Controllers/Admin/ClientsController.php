@@ -122,12 +122,26 @@ class ClientsController extends BaseController
             throw new \CodeIgniter\Exceptions\PageNotFoundException('Client introuvable.');
         }
 
+        $pivotPropTypeIds = $this->model->getPivotPropertyTypes($id);
+        $allPropTypes     = (new PropertyTypeModel())->getActive();
+        $pivotPropTypes   = array_values(array_filter(
+            $allPropTypes, fn($pt) => in_array($pt['id'], $pivotPropTypeIds)
+        ));
+
         return $this->render('admin/clients/show', [
-            'page_title'  => $client['first_name'] . ' ' . $client['last_name'],
-            'client'      => $client,
-            'typeLabels'  => ClientModel::TYPE_LABELS,
-            'statusLabels'=> ClientModel::STATUS_LABELS,
-            'sourceLabels'=> ClientModel::SOURCE_LABELS,
+            'page_title'       => $client['first_name'] . ' ' . $client['last_name'],
+            'client'           => $client,
+            'typeLabels'       => ClientModel::TYPE_LABELS,
+            'statusLabels'     => ClientModel::STATUS_LABELS,
+            'sourceLabels'     => ClientModel::SOURCE_LABELS,
+            'demandTypeLabels' => ClientModel::DEMAND_TYPE_LABELS,
+            'urgencyLabels'    => ClientModel::URGENCY_LABELS,
+            'budgetFlexLabels' => ClientModel::BUDGET_FLEXIBILITY_LABELS,
+            'orientationLabels'=> ClientModel::ORIENTATION_LABELS,
+            'featuresCatalog'  => ClientModel::FEATURES_CATALOG,
+            'pivotPropTypes'   => $pivotPropTypes,
+            'pivotZones'       => $this->model->getPivotZones($id),
+            'pivotFeatures'    => $this->model->getPivotFeatures($id),
         ]);
     }
 

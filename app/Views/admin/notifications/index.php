@@ -1,6 +1,3 @@
-<?= $this->extend('layouts/main') ?>
-<?= $this->section('content') ?>
-
 <div class="d-flex align-items-center justify-content-between mb-4">
     <h4 class="mb-0"><i class="bi bi-bell me-2"></i>Notifications</h4>
     <?php if (!empty($rows)) : ?>
@@ -82,5 +79,3 @@
 <?php endif; ?>
 
 <?php endif; ?>
-
-<?= $this->endSection() ?>

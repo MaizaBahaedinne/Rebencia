@@ -24,7 +24,7 @@
                 <div class="carousel-inner">
                     <?php foreach ($images as $i => $img): ?>
                     <div class="carousel-item <?= $i === 0 ? 'active' : '' ?>">
-                        <img src="<?= site_url('uploads/properties/' . $img['filename']) ?>"
+                        <img src="<?= base_url(esc($img['path'])) ?>"
                              class="d-block w-100" style="height:320px;object-fit:cover"
                              alt="<?= esc($img['alt_text'] ?? '') ?>">
                     </div>

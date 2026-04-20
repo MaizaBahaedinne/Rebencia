@@ -35,9 +35,9 @@
                 <?php
                 $mainImg = '';
                 foreach ($images as $img) {
-                    if ($img['is_main']) { $mainImg = $img['file_path']; break; }
+                    if ($img['is_primary']) { $mainImg = $img['path']; break; }
                 }
-                if (!$mainImg && !empty($images)) $mainImg = $images[0]['file_path'];
+                if (!$mainImg && !empty($images)) $mainImg = $images[0]['path'];
                 ?>
                 <?php if ($mainImg): ?>
                 <img src="<?= base_url('uploads/' . esc($mainImg)) ?>"
@@ -46,10 +46,10 @@
                 <?php if (count($images) > 1): ?>
                 <div class="d-flex gap-2 flex-wrap mb-3" id="galleryThumbs">
                     <?php foreach ($images as $img): ?>
-                    <div class="rb-gallery-thumb <?= $img['file_path'] === $mainImg ? 'active' : '' ?>"
-                         style="width:80px;height:60px;"
-                         onclick="switchPhoto(this, '<?= base_url('uploads/' . esc($img['file_path'])) ?>')">
-                        <img src="<?= base_url('uploads/' . esc($img['file_path'])) ?>"
+                <div class="rb-gallery-thumb <?= $img['path'] === $mainImg ? 'active' : '' ?>"
+                     style="width:80px;height:60px;"
+                     onclick="switchPhoto(this, '<?= base_url('uploads/' . esc($img['path'])) ?>')">
+                        <img src="<?= base_url('uploads/' . esc($img['path'])) ?>"
                              alt="" style="width:100%;height:100%;object-fit:cover;">
                     </div>
                     <?php endforeach; ?>
@@ -80,7 +80,7 @@
                 <!-- Prix -->
                 <div class="rb-detail-price mb-4">
                     <span class="rb-price-main"><?= number_format((float)$property['price'], 0, ',', ' ') ?></span>
-                    <span class="rb-price-currency"> DH<?= $property['transaction_type'] === 'location' ? '/mois' : '' ?></span>
+                    <span class="rb-price-currency"> DT<?= $property['transaction_type'] === 'location' ? '/mois' : '' ?></span>
                 </div>
 
                 <!-- Description -->

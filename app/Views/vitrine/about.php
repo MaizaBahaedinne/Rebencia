@@ -18,7 +18,7 @@
                 <h2 class="rb-section-title text-start"><?= lang('Vitrine.about_story_title') ?></h2>
                 <p class="text-secondary lh-lg">
                     Fondée il y a plus de 10 ans, <strong>Rebencia</strong> est née de la passion de deux associés
-                    pour l'immobilier marocain. Partis d'une modeste agence à Casablanca, nous sommes aujourd'hui
+                    pour l'immobilier tunisien. Partis d'une modeste agence à Tunis, nous sommes aujourd'hui
                     présents dans les principales villes du royaume, forts d'une équipe de professionnels dévoués.
                 </p>
                 <p class="text-secondary lh-lg">

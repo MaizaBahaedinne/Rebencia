@@ -170,9 +170,9 @@
         <div class="row g-4 justify-content-center">
             <?php
             $testimonials = [
-                ['name' => 'Karim B.', 'city' => 'Casablanca', 'text' => 'Service impeccable, j\'ai trouvé mon appartement en moins de 2 semaines. Équipe très professionnelle !', 'rating' => 5],
-                ['name' => 'Sara M.', 'city' => 'Rabat', 'text' => 'L\'agence Rebencia nous a accompagnés du début à la fin. Je recommande vivement !', 'rating' => 5],
-                ['name' => 'Ahmed K.', 'city' => 'Marrakech', 'text' => 'Excellente expérience, des agents à l\'écoute et des biens de qualité. Merci Rebencia !', 'rating' => 5],
+                ['name' => 'Karim B.', 'city' => 'Tunis', 'text' => 'Service impeccable, j\'ai trouvé mon appartement en moins de 2 semaines. Équipe très professionnelle !', 'rating' => 5],
+                ['name' => 'Sara M.', 'city' => 'Sfax', 'text' => 'L\'agence Rebencia nous a accompagnés du début à la fin. Je recommande vivement !', 'rating' => 5],
+                ['name' => 'Ahmed K.', 'city' => 'Sousse', 'text' => 'Excellente expérience, des agents à l\'ecoute et des biens de qualité. Merci Rebencia !', 'rating' => 5],
             ];
             foreach ($testimonials as $t): ?>
             <div class="col-md-4">

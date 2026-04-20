@@ -51,7 +51,7 @@
 
                         <!-- Budget -->
                         <div class="mb-3">
-                            <label class="form-label small fw-semibold">Budget (DH)</label>
+                            <label class="form-label small fw-semibold">Budget (DT)</label>
                             <div class="row g-1">
                                 <div class="col-6">
                                     <input type="number" name="min_price" class="form-control form-control-sm"

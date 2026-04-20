@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= esc($page_title ?? 'Rebencia') ?> — Rebencia Immobilier</title>
-    <meta name="description" content="<?= esc($meta_description ?? 'Rebencia — Votre agence immobilière de confiance au Maroc. Achat, vente et location de biens immobiliers.') ?>">
+    <meta name="description" content="<?= esc($meta_description ?? 'Rebencia — Votre agence immobilière de confiance en Tunisie. Achat, vente et location de biens immobiliers.') ?>">
 
     <!-- Bootstrap 5 -->
     <?php if (($lang ?? 'fr') === 'ar'): ?>
@@ -159,8 +159,8 @@
             <div class="col-lg-4 col-md-6">
                 <h6 class="rb-footer-title"><?= lang('Vitrine.footer_contact') ?></h6>
                 <ul class="list-unstyled rb-footer-links">
-                    <li><i class="bi bi-geo-alt me-2 text-warning"></i>123 Boulevard Mohammed V, Casablanca</li>
-                    <li><a href="tel:+212522000000"><i class="bi bi-telephone me-2 text-warning"></i>+212 5 22 00 00 00</a></li>
+                    <li><i class="bi bi-geo-alt me-2 text-warning"></i>Av. Habib Bourguiba, 1001 Tunis, Tunisie</li>
+                    <li><a href="tel:+21671000000"><i class="bi bi-telephone me-2 text-warning"></i>+216 71 00 00 00</a></li>
                     <li><a href="mailto:contact@rebencia.com"><i class="bi bi-envelope me-2 text-warning"></i>contact@rebencia.com</a></li>
                     <li><i class="bi bi-clock me-2 text-warning"></i><?= lang('Vitrine.contact_hours_val') ?></li>
                 </ul>

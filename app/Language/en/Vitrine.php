@@ -12,7 +12,7 @@ return [
 
     // Hero
     'hero_title'     => 'Find Your Dream Property',
-    'hero_subtitle'  => 'Apartments, villas, land and commercial premises — buy & rent across Morocco.',
+    'hero_subtitle'  => 'Apartments, villas, land and commercial premises — buy & rent across Tunisia.',
     'hero_search_placeholder' => 'City, district, reference…',
     'hero_btn_search'  => 'Search',
     'hero_btn_estimate'=> 'Estimate my property',
@@ -27,8 +27,8 @@ return [
     'search_type_bureau'     => 'Office',
     'search_transaction_buy' => 'Buy',
     'search_transaction_rent'=> 'Rent',
-    'search_min_price'       => 'Min price (MAD)',
-    'search_max_price'       => 'Max price (MAD)',
+    'search_min_price'       => 'Min price (TND)',
+    'search_max_price'       => 'Max price (TND)',
     'search_min_surface'     => 'Min surface (m²)',
 
     // Stats
@@ -46,7 +46,7 @@ return [
     // Property card
     'label_rooms'    => 'rms.',
     'label_surface'  => 'm²',
-    'label_price'    => 'MAD',
+    'label_price'    => 'TND',
     'label_ref'      => 'Ref.',
     'label_buy'      => 'For Sale',
     'label_rent'     => 'For Rent',
@@ -64,7 +64,7 @@ return [
     'why_3_title'  => 'Full Transparency',
     'why_3_text'   => 'No hidden fees, clear and honest communication at every stage.',
     'why_4_title'  => 'National Network',
-    'why_4_text'   => 'Present in all major Moroccan cities with a network of qualified agents.',
+    'why_4_text'   => 'Present in all major Tunisian cities with a network of qualified agents.',
 
     // Testimonials
     'testimonials_title' => 'What Our Clients Say',
@@ -126,11 +126,11 @@ return [
     'contact_phone_label' => 'Phone',
     'contact_email_label' => 'Email',
     'contact_hours'    => 'Opening hours',
-    'contact_hours_val'=> 'Mon – Fri: 9am – 6pm | Sat: 10am – 3pm',
+    'contact_hours_val'=> 'Mon – Fri: 9am – 6pm | Sat: 9am – 1pm',
 
     // About
     'about_title'         => 'About Rebencia',
-    'about_subtitle'      => 'Your trusted real estate partner in Morocco',
+    'about_subtitle'      => 'Your trusted real estate partner in Tunisia',
     'about_story_title'   => 'Our Story',
     'about_mission_title' => 'Our Mission',
     'about_values_title'  => 'Our Values',
@@ -138,7 +138,7 @@ return [
 
     // Blog
     'blog_title'        => 'Real Estate News & Advice',
-    'blog_subtitle'     => 'Stay informed about Moroccan real estate market trends',
+    'blog_subtitle'     => 'Stay informed about Tunisian real estate market trends',
     'blog_read_more'    => 'Read more',
     'blog_coming_soon'  => 'Articles coming soon — stay tuned!',
 
@@ -152,7 +152,7 @@ return [
     'estimate_success'   => 'Your valuation request has been received. An agent will contact you within 24 hours.',
 
     // Footer
-    'footer_about'     => 'Rebencia is a Moroccan real estate agency offering expertise, transparency and personalised support.',
+    'footer_about'     => 'Rebencia is a Tunisian real estate agency offering expertise, transparency and personalised support.',
     'footer_links'     => 'Quick links',
     'footer_contact'   => 'Contact',
     'footer_rights'    => '© {year} Rebencia. All rights reserved.',

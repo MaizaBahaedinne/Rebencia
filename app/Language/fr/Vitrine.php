@@ -12,7 +12,7 @@ return [
 
     // Hero
     'hero_title'     => 'Trouvez le bien immobilier de vos rêves',
-    'hero_subtitle'  => 'Appartements, villas, terrains et locaux commerciaux — achat & location partout au Maroc.',
+    'hero_subtitle'  => 'Appartements, villas, terrains et locaux commerciaux — achat & location partout en Tunisie.',
     'hero_search_placeholder' => 'Ville, quartier, référence…',
     'hero_btn_search'  => 'Rechercher',
     'hero_btn_estimate'=> 'Estimer mon bien',
@@ -27,8 +27,8 @@ return [
     'search_type_bureau'     => 'Bureau',
     'search_transaction_buy' => 'Achat',
     'search_transaction_rent'=> 'Location',
-    'search_min_price'       => 'Prix min (DH)',
-    'search_max_price'       => 'Prix max (DH)',
+    'search_min_price'       => 'Prix min (DT)',
+    'search_max_price'       => 'Prix max (DT)',
     'search_min_surface'     => 'Surface min (m²)',
 
     // Stats
@@ -46,7 +46,7 @@ return [
     // Property card
     'label_rooms'    => 'ch.',
     'label_surface'  => 'm²',
-    'label_price'    => 'DH',
+    'label_price'    => 'DT',
     'label_ref'      => 'Réf.',
     'label_buy'      => 'Vente',
     'label_rent'     => 'Location',
@@ -64,7 +64,7 @@ return [
     'why_3_title'  => 'Transparence totale',
     'why_3_text'   => 'Aucuns frais cachés, communication claire et honnête à chaque étape.',
     'why_4_title'  => 'Réseau national',
-    'why_4_text'   => 'Présents dans toutes les grandes villes du Maroc avec un réseau d\'agents qualifiés.',
+    'why_4_text'   => 'Présents dans toutes les grandes villes de Tunisie avec un réseau d\'agents qualifiés.',
 
     // Testimonials
     'testimonials_title' => 'Ce que disent nos clients',
@@ -126,11 +126,11 @@ return [
     'contact_phone_label' => 'Téléphone',
     'contact_email_label' => 'Email',
     'contact_hours'    => 'Horaires',
-    'contact_hours_val'=> 'Lun – Ven : 9h – 18h | Sam : 10h – 15h',
+    'contact_hours_val'=> 'Lun – Ven : 8h30 – 17h30 | Sam : 9h – 13h',
 
     // About
     'about_title'      => 'À Propos de Rebencia',
-    'about_subtitle'   => 'Votre partenaire immobilier de confiance au Maroc',
+    'about_subtitle'   => 'Votre partenaire immobilier de confiance en Tunisie',
     'about_story_title'=> 'Notre Histoire',
     'about_mission_title' => 'Notre Mission',
     'about_values_title'  => 'Nos Valeurs',
@@ -138,7 +138,7 @@ return [
 
     // Blog
     'blog_title'        => 'Actualités & Conseils Immobiliers',
-    'blog_subtitle'     => 'Restez informé des tendances du marché immobilier marocain',
+    'blog_subtitle'     => 'Restez informé des tendances du marché immobilier tunisien',
     'blog_read_more'    => 'Lire la suite',
     'blog_coming_soon'  => 'Articles bientôt disponibles — restez connecté !',
 
@@ -152,7 +152,7 @@ return [
     'estimate_success'   => 'Votre demande d\'estimation a bien été reçue. Un agent vous contactera sous 24h.',
 
     // Footer
-    'footer_about'     => 'Rebencia est une agence immobilière marocaine offrant expertise, transparence et accompagnement personnalisé.',
+    'footer_about'     => 'Rebencia est une agence immobilière tunisienne offrant expertise, transparence et accompagnement personnalisé.',
     'footer_links'     => 'Liens rapides',
     'footer_contact'   => 'Contact',
     'footer_rights'    => '© {year} Rebencia. Tous droits réservés.',

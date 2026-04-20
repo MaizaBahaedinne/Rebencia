@@ -83,13 +83,14 @@ class HomeController extends BaseController
         $lang = $this->setLang($lang);
 
         // Biens en vedette (6 max)
-        $featured = $this->propertyModel
-            ->where('is_published', 1)
-            ->where('featured', 1)
-            ->where('deleted_at IS NULL', null, false)
-            ->orderBy('published_at', 'DESC')
+        $featured = $this->db->table('properties p')
+            ->select('p.*, (SELECT path FROM property_images pi WHERE pi.property_id = p.id AND pi.is_primary = 1 LIMIT 1) AS main_image')
+            ->where('p.is_published', 1)
+            ->where('p.featured', 1)
+            ->where('p.deleted_at IS NULL', null, false)
+            ->orderBy('p.published_at', 'DESC')
             ->limit(6)
-            ->findAll();
+            ->get()->getResultArray();
 
         // Stats
         $stats = [
@@ -130,7 +131,7 @@ class HomeController extends BaseController
 
         $perPage = 12;
         $builder = $this->db->table('properties p')
-            ->select('p.*, (SELECT file_path FROM property_images pi WHERE pi.property_id = p.id AND pi.is_main = 1 LIMIT 1) AS main_image')
+            ->select('p.*, (SELECT path FROM property_images pi WHERE pi.property_id = p.id AND pi.is_primary = 1 LIMIT 1) AS main_image')
             ->where('p.is_published', 1)
             ->where('p.deleted_at IS NULL', null, false);
 
@@ -192,7 +193,7 @@ class HomeController extends BaseController
         // Images
         $images = $this->db->table('property_images')
             ->where('property_id', $id)
-            ->orderBy('is_main DESC, sort_order ASC')
+            ->orderBy('is_primary DESC, sort_order ASC')
             ->get()->getResultArray();
 
         // Agent
@@ -203,7 +204,7 @@ class HomeController extends BaseController
 
         // Biens similaires (même type/ville, max 3)
         $similar = $this->db->table('properties p')
-            ->select('p.*, (SELECT file_path FROM property_images pi WHERE pi.property_id = p.id AND pi.is_main = 1 LIMIT 1) AS main_image')
+            ->select('p.*, (SELECT path FROM property_images pi2 WHERE pi2.property_id = p.id AND pi2.is_primary = 1 LIMIT 1) AS main_image')
             ->where('p.id !=', $id)
             ->where('p.is_published', 1)
             ->where('p.deleted_at IS NULL', null, false)

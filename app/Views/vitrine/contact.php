@@ -56,7 +56,7 @@
                             <label class="form-label fw-semibold"><?= lang('Vitrine.contact_phone') ?></label>
                             <input type="tel" name="phone" class="form-control"
                                    value="<?= esc(old('phone')) ?>"
-                                   placeholder="+212 6 00 00 00 00">
+                                   placeholder="+216 2X XX XX XX">
                         </div>
                     </div>
                     <div class="mb-3">
@@ -90,7 +90,7 @@
                         <div class="rb-contact-icon"><i class="bi bi-geo-alt-fill"></i></div>
                         <div>
                             <strong><?= lang('Vitrine.contact_address') ?></strong>
-                            <p class="mb-0 text-muted">123 Boulevard Mohammed V<br>20000 Casablanca, Maroc</p>
+                            <p class="mb-0 text-muted">Av. Habib Bourguiba<br>1001 Tunis, Tunisie</p>
                         </div>
                     </div>
 
@@ -98,8 +98,8 @@
                         <div class="rb-contact-icon"><i class="bi bi-telephone-fill"></i></div>
                         <div>
                             <strong><?= lang('Vitrine.contact_phone_label') ?></strong>
-                            <p class="mb-0"><a href="tel:+212522000000" class="text-decoration-none">+212 5 22 00 00 00</a></p>
-                            <p class="mb-0"><a href="tel:+212600000000" class="text-decoration-none text-muted">+212 6 00 00 00 00</a></p>
+                            <p class="mb-0"><a href="tel:+21671000000" class="text-decoration-none">+216 71 00 00 00</a></p>
+                            <p class="mb-0"><a href="tel:+21620000000" class="text-decoration-none text-muted">+216 20 00 00 00</a></p>
                         </div>
                     </div>
 
@@ -120,7 +120,7 @@
                     </div>
 
                     <!-- WhatsApp rapide -->
-                    <a href="https://wa.me/212600000000?text=Bonjour+Rebencia%2C+je+voudrais+plus+d%27informations."
+                    <a href="https://wa.me/21620000000?text=Bonjour+Rebencia%2C+je+voudrais+plus+d%27informations."
                        target="_blank" class="btn btn-outline-success w-100 mt-2">
                         <i class="bi bi-whatsapp me-2"></i>Chat WhatsApp
                     </a>

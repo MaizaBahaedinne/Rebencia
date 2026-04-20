@@ -12,7 +12,7 @@ return [
 
     // Hero
     'hero_title'     => 'اعثر على عقار أحلامك',
-    'hero_subtitle'  => 'شقق، فيلات، أراضٍ ومحلات تجارية — بيع وإيجار في جميع أنحاء المغرب.',
+    'hero_subtitle'  => 'شقق، فيلات، أراضٍ ومحلات تجارية — بيع وإيجار في جميع أنحاء تونس.',
     'hero_search_placeholder' => 'مدينة، حي، مرجع…',
     'hero_btn_search'  => 'بحث',
     'hero_btn_estimate'=> 'تقييم عقاري',
@@ -27,8 +27,8 @@ return [
     'search_type_bureau'     => 'مكتب',
     'search_transaction_buy' => 'شراء',
     'search_transaction_rent'=> 'إيجار',
-    'search_min_price'       => 'الحد الأدنى للسعر (درهم)',
-    'search_max_price'       => 'الحد الأقصى للسعر (درهم)',
+    'search_min_price'       => 'الحد الأدنى للسعر (د.ت)',
+    'search_max_price'       => 'الحد الأقصى للسعر (د.ت)',
     'search_min_surface'     => 'المساحة الدنيا (م²)',
 
     // Stats
@@ -46,7 +46,7 @@ return [
     // Property card
     'label_rooms'    => 'غرف',
     'label_surface'  => 'م²',
-    'label_price'    => 'درهم',
+    'label_price'    => 'د.ت',
     'label_ref'      => 'مرجع.',
     'label_buy'      => 'للبيع',
     'label_rent'     => 'للإيجار',
@@ -64,7 +64,7 @@ return [
     'why_3_title'  => 'شفافية تامة',
     'why_3_text'   => 'لا رسوم مخفية، تواصل واضح وصادق في كل مرحلة.',
     'why_4_title'  => 'شبكة وطنية',
-    'why_4_text'   => 'حضور في كبرى المدن المغربية مع شبكة من الوكلاء المؤهلين.',
+    'why_4_text'   => 'حضور في كبرى المدن التونسية مع شبكة من الوكلاء المؤهلين.',
 
     // Testimonials
     'testimonials_title' => 'آراء عملائنا',
@@ -130,7 +130,7 @@ return [
 
     // About
     'about_title'         => 'من نحن',
-    'about_subtitle'      => 'شريكك العقاري الموثوق في المغرب',
+    'about_subtitle'         => 'شريكك العقاري الموثوق في تونس',
     'about_story_title'   => 'قصتنا',
     'about_mission_title' => 'مهمتنا',
     'about_values_title'  => 'قيمنا',
@@ -138,7 +138,7 @@ return [
 
     // Blog
     'blog_title'        => 'أخبار ونصائح عقارية',
-    'blog_subtitle'     => 'ابق على اطلاع بأحدث توجهات سوق العقارات المغربي',
+    'blog_subtitle'     => 'ابق على اطلاع بأحدث توجهات سوق العقارات التونسي',
     'blog_read_more'    => 'اقرأ المزيد',
     'blog_coming_soon'  => 'مقالات قادمة قريباً — ترقبونا!',
 
@@ -152,7 +152,7 @@ return [
     'estimate_success'   => 'تم استلام طلب التقييم. سيتواصل معك أحد وكلائنا خلال 24 ساعة.',
 
     // Footer
-    'footer_about'     => 'ريبنسيا وكالة عقارية مغربية تقدم خبرة وشفافية ومرافقة شخصية.',
+    'footer_about'     => 'ريبنسيا وكالة عقارية تونسية تقدم خبرة وشفافية ومرافقة شخصية.',
     'footer_links'     => 'روابط سريعة',
     'footer_contact'   => 'تواصل',
     'footer_rights'    => '© {year} ريبنسيا. جميع الحقوق محفوظة.',

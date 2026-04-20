@@ -107,7 +107,7 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Ville *</label>
                                 <input type="text" name="city" class="form-control" required
-                                       value="<?= esc(old('city')) ?>" placeholder="ex : Casablanca">
+                                       value="<?= esc(old('city')) ?>" placeholder="ex : Tunis">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Quartier / Zone</label>
@@ -135,7 +135,7 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold"><?= lang('Vitrine.contact_phone') ?> *</label>
                                 <input type="tel" name="phone" class="form-control" required
-                                       value="<?= esc(old('phone')) ?>" placeholder="+212 6 00 00 00 00">
+                                       value="<?= esc(old('phone')) ?>" placeholder="+216 2X XX XX XX">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold"><?= lang('Vitrine.contact_email') ?> *</label>

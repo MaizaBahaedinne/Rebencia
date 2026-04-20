@@ -23,8 +23,7 @@
                         <!-- Mot-clé -->
                         <div class="col-lg-4 col-md-6">
                             <input type="text" name="q" class="form-control rb-search-input"
-                                   placeholder="<?= lang('Vitrine.hero_search_placeholder') ?>"
-                                   value="<?= esc($this->request->getGet('q') ?? '') ?>">
+                                   placeholder="<?= lang('Vitrine.hero_search_placeholder') ?>">
                         </div>
                         <!-- Type -->
                         <div class="col-lg-2 col-md-6">

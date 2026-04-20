@@ -18,12 +18,12 @@
             <div class="col-md-2">
                 <select name="type" class="form-select form-select-sm">
                     <option value="">Tous types</option>
-                    <option value="apartment" <?= $filters['type'] === 'apartment' ? 'selected' : '' ?>>Appartement</option>
-                    <option value="house"      <?= $filters['type'] === 'house'     ? 'selected' : '' ?>>Maison</option>
-                    <option value="villa"      <?= $filters['type'] === 'villa'     ? 'selected' : '' ?>>Villa</option>
-                    <option value="commercial" <?= $filters['type'] === 'commercial'? 'selected' : '' ?>>Commercial</option>
-                    <option value="land"       <?= $filters['type'] === 'land'      ? 'selected' : '' ?>>Terrain</option>
-                    <option value="office"     <?= $filters['type'] === 'office'    ? 'selected' : '' ?>>Bureau</option>
+                    <?php foreach ($propertyTypes ?? [] as $pt): ?>
+                    <option value="<?= esc($pt['slug']) ?>"
+                        <?= ($filters['type'] ?? '') === $pt['slug'] ? 'selected' : '' ?>>
+                        <?= esc($pt['name']) ?>
+                    </option>
+                    <?php endforeach; ?>
                 </select>
             </div>
             <div class="col-md-2">
@@ -89,7 +89,8 @@
                     <?php foreach ($result['data'] as $p) :
                         $sMap = ['available'=>'success','reserved'=>'warning','sold'=>'danger','rented'=>'info','inactive'=>'secondary'];
                         $sLbl = ['available'=>'Disponible','reserved'=>'Réservé','sold'=>'Vendu','rented'=>'Loué','inactive'=>'Inactif'];
-                        $tLbl = ['apartment'=>'Appt.','house'=>'Maison','villa'=>'Villa','commercial'=>'Commercial','land'=>'Terrain','office'=>'Bureau'];
+                        $tLbl = [];
+                        foreach ($propertyTypes ?? [] as $_pt) { $tLbl[$_pt['slug']] = $_pt['name']; }
                     ?>
                     <tr>
                         <td>

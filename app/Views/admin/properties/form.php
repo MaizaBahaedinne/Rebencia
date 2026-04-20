@@ -49,8 +49,16 @@ $characteristics = $characteristics ?? [];
                         <div class="col-md-4">
                             <label class="form-label fw-semibold">Type de bien <span class="text-danger">*</span></label>
                             <select name="type" class="form-select" required>
-                                <?php foreach (['apartment'=>'Appartement','house'=>'Maison','villa'=>'Villa','commercial'=>'Commercial','land'=>'Terrain','office'=>'Bureau'] as $v => $l) : ?>
-                                <option value="<?= $v ?>" <?= old('type', $property['type'] ?? '') === $v ? 'selected' : '' ?>><?= $l ?></option>
+                                <option value="">-- Sélectionner --</option>
+                                <?php
+                                $propertyTypes = $propertyTypes ?? [];
+                                $currentType   = old('type', $property['type'] ?? '');
+                                foreach ($propertyTypes as $pt):
+                                ?>
+                                <option value="<?= esc($pt['slug']) ?>"
+                                    <?= $currentType === $pt['slug'] ? 'selected' : '' ?>>
+                                    <?= esc($pt['name']) ?>
+                                </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>

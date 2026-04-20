@@ -5,6 +5,7 @@ namespace App\Controllers\Admin;
 use App\Controllers\BaseController;
 use App\Models\PropertyModel;
 use App\Models\PropertyCharacteristicModel;
+use App\Models\PropertyTypeModel;
 use App\Models\UserModel;
 use App\Models\ZoneModel;
 
@@ -42,10 +43,11 @@ class PropertiesController extends BaseController
         $result = $this->model->getFiltered($filters);
 
         return $this->render('admin/properties/index', [
-            'page_title' => 'Biens Immobiliers',
-            'result'     => $result,
-            'filters'    => $filters,
-            'agents'     => (new UserModel())->getWithRole(['status' => 'active']),
+            'page_title'    => 'Biens Immobiliers',
+            'result'        => $result,
+            'filters'       => $filters,
+            'agents'        => (new UserModel())->getWithRole(['status' => 'active']),
+            'propertyTypes' => (new PropertyTypeModel())->getActive(),
         ]);
     }
 
@@ -54,7 +56,6 @@ class PropertiesController extends BaseController
     {
         $this->requirePermission('properties.create');
         $zoneModel = new ZoneModel();
-
         $charModel = new PropertyCharacteristicModel();
 
         return $this->render('admin/properties/form', [
@@ -63,6 +64,7 @@ class PropertiesController extends BaseController
             'agents'          => (new UserModel())->getWithRole(['status' => 'active']),
             'pays_list'       => $zoneModel->getByType('pays'),
             'characteristics' => $charModel->getActive(),
+            'propertyTypes'   => (new PropertyTypeModel())->getActive(),
         ]);
     }
 
@@ -155,6 +157,7 @@ class PropertiesController extends BaseController
             'pays_list'       => $zoneModel->getByType('pays'),
             'ville_preselect' => $villePreselect,
             'characteristics' => $charModel->getActive($property['type'] ?? null),
+            'propertyTypes'   => (new PropertyTypeModel())->getActive(),
         ]);
     }
 

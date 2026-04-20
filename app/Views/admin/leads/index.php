@@ -95,7 +95,7 @@
 <!-- Tableau -->
 <div class="card border-0 shadow-sm">
     <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-        <span><i class="bi bi-people me-2"></i>Leads <span class="badge bg-secondary"><?= $pager->getTotal() ?? count($leads) ?></span></span>
+        <span><i class="bi bi-people me-2"></i>Leads <span class="badge bg-secondary"><?= $total ?></span></span>
     </div>
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
@@ -139,17 +139,19 @@
                     </td>
                     <td><span class="badge bg-light text-dark border"><?= esc($lead['source'] ?? '—') ?></span></td>
                     <td>
-                        <?php if (!empty($lead['property_reference'])): ?>
+                        <?php if (!empty($lead['property_ref'])): ?>
                             <a href="<?= site_url('admin/properties/' . $lead['property_id']) ?>" class="text-decoration-none small">
-                                <?= esc($lead['property_reference']) ?>
+                                <?= esc($lead['property_ref']) ?>
                             </a>
+                        <?php elseif (!empty($lead['property_title'])): ?>
+                            <span class="small"><?= esc($lead['property_title']) ?></span>
                         <?php else: ?>
                             <span class="text-muted">—</span>
                         <?php endif; ?>
                     </td>
                     <td>
-                        <?php if (!empty($lead['agent_first_name'])): ?>
-                            <?= esc($lead['agent_first_name'] . ' ' . $lead['agent_last_name']) ?>
+                        <?php if (!empty($lead['agent_name'])): ?>
+                            <?= esc($lead['agent_name']) ?>
                         <?php else: ?>
                             <span class="text-muted">Non assigné</span>
                         <?php endif; ?>
@@ -180,9 +182,30 @@
         </table>
     </div>
 
-    <?php if (!empty($pager)): ?>
-    <div class="card-footer bg-transparent">
-        <?= $pager->links() ?>
+    <?php if ($pages > 1): ?>
+    <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+        <small class="text-muted">
+            Page <?= $page ?> / <?= $pages ?> &mdash; <?= $total ?> lead<?= $total > 1 ? 's' : '' ?>
+        </small>
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                <?php if ($page > 1): ?>
+                <li class="page-item">
+                    <a class="page-link" href="?<?= http_build_query(array_merge($filters, ['page' => $page - 1])) ?>">&laquo;</a>
+                </li>
+                <?php endif; ?>
+                <?php for ($p = max(1, $page - 2); $p <= min($pages, $page + 2); $p++): ?>
+                <li class="page-item <?= $p === $page ? 'active' : '' ?>">
+                    <a class="page-link" href="?<?= http_build_query(array_merge($filters, ['page' => $p])) ?>"><?= $p ?></a>
+                </li>
+                <?php endfor; ?>
+                <?php if ($page < $pages): ?>
+                <li class="page-item">
+                    <a class="page-link" href="?<?= http_build_query(array_merge($filters, ['page' => $page + 1])) ?>">&raquo;</a>
+                </li>
+                <?php endif; ?>
+            </ul>
+        </nav>
     </div>
     <?php endif; ?>
 </div>

@@ -41,7 +41,11 @@ class LeadsController extends BaseController
 
         return $this->render('admin/leads/index', [
             'page_title' => 'Leads / CRM',
-            'result'     => $result,
+            'leads'      => $result['data'],
+            'total'      => $result['total'],
+            'page'       => $result['page'],
+            'pages'      => $result['pages'],
+            'per_page'   => $result['per_page'],
             'filters'    => $filters,
             'agents'     => (new UserModel())->getWithRole(['status' => 'active']),
             'pipeline'   => $this->model->getPipeline(

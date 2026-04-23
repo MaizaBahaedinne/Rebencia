@@ -320,26 +320,131 @@ $waReminderLink = 'https://wa.me/' . $cleanPhone . '?text=' . $waMsgReminder;
 
 </div><!-- /row -->
 
+<!-- ── MODAL SIGNATURE (changement statut → effectuée) ────────────────── -->
+<div class="modal fade" id="signatureStatusModal" data-bs-backdrop="static" tabindex="-1"
+     aria-labelledby="signatureStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="signatureStatusModalLabel">
+                    <i class="bi bi-pen me-2 text-primary"></i>Signature du client
+                </h5>
+            </div>
+            <div class="modal-body text-center">
+                <p class="text-muted small mb-3">
+                    Faites signer le client sur l'écran tactile pour confirmer la visite effectuée.
+                </p>
+                <div class="border rounded bg-white" style="touch-action:none; cursor:crosshair;">
+                    <canvas id="sigStatusCanvas" style="width:100%; display:block; height:220px;"></canvas>
+                </div>
+                <div class="d-flex justify-content-between mt-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="sigStatusClearBtn">
+                        <i class="bi bi-eraser me-1"></i>Effacer
+                    </button>
+                    <span class="text-danger small align-self-center" id="sigStatusEmptyMsg" style="display:none;">
+                        Veuillez signer avant de valider.
+                    </span>
+                </div>
+            </div>
+            <div class="modal-footer flex-column gap-2">
+                <button type="button" class="btn btn-success w-100" id="sigStatusValidateBtn">
+                    <i class="bi bi-check2-circle me-1"></i>Valider la signature
+                </button>
+                <button type="button" class="btn btn-link text-muted small w-100" id="sigStatusSkipBtn">
+                    Marquer effectuée sans signature
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- signature_pad.js -->
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4/dist/signature_pad.umd.min.js"></script>
+
 <script>
 (function () {
     'use strict';
 
     const BASE_URL  = '<?= base_url('/') ?>';
     const CSRF_NAME = '<?= csrf_token() ?>';
-    const CSRF_HASH = '<?= csrf_hash() ?>';
+    let   csrfHash  = '<?= csrf_hash() ?>';
 
+    var signaturePad    = null;
+    var pendingVisitId  = null;
+    var pendingStatus   = null;
+
+    // ── Init canvas à la résolution DPR ──────────────────────────────
+    function initSignaturePad() {
+        var canvas = document.getElementById('sigStatusCanvas');
+        var ratio  = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width  = canvas.offsetWidth  * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext('2d').scale(ratio, ratio);
+        if (signaturePad) {
+            signaturePad.clear();
+        } else {
+            signaturePad = new SignaturePad(canvas, {
+                minWidth: 1,
+                maxWidth: 3,
+                penColor: '#000000',
+            });
+        }
+    }
+
+    document.getElementById('signatureStatusModal')
+        .addEventListener('shown.bs.modal', function () { initSignaturePad(); });
+
+    document.getElementById('sigStatusClearBtn').addEventListener('click', function () {
+        if (signaturePad) signaturePad.clear();
+        document.getElementById('sigStatusEmptyMsg').style.display = 'none';
+    });
+
+    document.getElementById('sigStatusValidateBtn').addEventListener('click', function () {
+        if (! signaturePad || signaturePad.isEmpty()) {
+            document.getElementById('sigStatusEmptyMsg').style.display = 'inline';
+            return;
+        }
+        document.getElementById('sigStatusEmptyMsg').style.display = 'none';
+        var sigData = signaturePad.toDataURL('image/png');
+        bootstrap.Modal.getInstance(document.getElementById('signatureStatusModal')).hide();
+        doUpdateStatus(pendingVisitId, pendingStatus, sigData);
+    });
+
+    document.getElementById('sigStatusSkipBtn').addEventListener('click', function () {
+        bootstrap.Modal.getInstance(document.getElementById('signatureStatusModal')).hide();
+        doUpdateStatus(pendingVisitId, pendingStatus, '');
+    });
+
+    // ── Point d'entrée appelé par les boutons de statut ──────────────
     window.updateStatus = function (visitId, newStatus) {
+        if (newStatus === 'effectuee') {
+            pendingVisitId = visitId;
+            pendingStatus  = newStatus;
+            new bootstrap.Modal(document.getElementById('signatureStatusModal')).show();
+            return;
+        }
+
         const label = document.querySelector('[onclick*="' + newStatus + '"]')?.textContent.trim() || newStatus;
         if (! confirm('Passer la visite au statut « ' + label + ' » ?')) return;
+        doUpdateStatus(visitId, newStatus, '');
+    };
 
-        const btn = document.querySelector('[onclick*="updateStatus(' + visitId + ', \'' + newStatus + '\')"]');
+    function doUpdateStatus(visitId, newStatus, sigData) {
+        var btn = document.querySelector(
+            '[onclick*="updateStatus(' + visitId + ', \'' + newStatus + '\')"]'
+        );
         if (btn) btn.disabled = true;
+
+        var body = CSRF_NAME + '=' + encodeURIComponent(csrfHash)
+                 + '&status=' + encodeURIComponent(newStatus);
+        if (sigData) {
+            body += '&client_signature=' + encodeURIComponent(sigData);
+        }
 
         fetch(BASE_URL + 'admin/visits/' + visitId + '/status', {
             method:  'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body:    CSRF_NAME + '=' + encodeURIComponent(CSRF_HASH)
-                   + '&status=' + encodeURIComponent(newStatus),
+            body:    body,
         })
         .then(function (r) { return r.json(); })
         .then(function (data) {
@@ -356,9 +461,8 @@ $waReminderLink = 'https://wa.me/' . $cleanPhone . '?text=' . $waMsgReminder;
             alert('Erreur réseau');
             if (btn) btn.disabled = false;
         });
-    };
+    }
 
 })();
 </script>
-
 

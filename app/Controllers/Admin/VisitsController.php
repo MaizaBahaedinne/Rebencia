@@ -277,7 +277,17 @@ class VisitsController extends BaseController
             return $this->json(['ok' => false, 'error' => 'Statut invalide'], 400);
         }
 
-        $this->model->update($id, ['status' => $newStatus]);
+        $updateData = ['status' => $newStatus];
+
+        if ($newStatus === 'effectuee') {
+            $sig = trim($this->request->getPost('client_signature') ?? '');
+            if ($sig !== '') {
+                $updateData['client_signature'] = $sig;
+                $updateData['signed_at']        = date('Y-m-d H:i:s');
+            }
+        }
+
+        $this->model->update($id, $updateData);
 
         // Intégration CRM : visite effectuée → client actif
         if ($newStatus === 'effectuee') {

@@ -529,6 +529,8 @@ $floorLabels = [
         attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
         maxZoom: 18,
     }).addTo(map);
+    // Forcer le recalcul de taille (tuiles grises sinon dans un layout Bootstrap)
+    setTimeout(function () { map.invalidateSize(); }, 200);
     var bounds = [];
     Promise.all(zoneNames.map(function (name) {
         return fetch(
@@ -551,6 +553,7 @@ $floorLabels = [
     })).then(function () {
         if (bounds.length > 0) {
             map.fitBounds(bounds, { padding: [40, 40], maxZoom: 10 });
+            map.invalidateSize();
         }
     });
 })();

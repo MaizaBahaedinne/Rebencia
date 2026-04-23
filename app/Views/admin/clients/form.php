@@ -301,7 +301,7 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
                     </p>
 
                     <!-- Carte Leaflet -->
-                    <div id="zoneMapWrapper" class="mt-3 <?= empty($selectedZones) ? 'd-none' : '' ?>">
+                    <div id="zoneMapWrapper" class="mt-3">
                         <div id="zoneMap" style="height:260px; border-radius:.5rem; border:1px solid #dee2e6;"></div>
                         <p class="text-muted small mt-1 mb-0">
                             <i class="bi bi-info-circle me-1"></i>
@@ -861,7 +861,7 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
     'use strict';
 
     // ── Initialisation carte Leaflet ─────────────────────────────────
-    let map         = null;
+    let map          = null;
     let markersGroup = null;
 
     function initMap() {
@@ -869,7 +869,7 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
         const el = document.getElementById('zoneMap');
         if (!el) return;
 
-        map = L.map('zoneMap', { zoomControl: true }).setView([33.8869, 9.5375], 6); // Tunisie
+        map = L.map('zoneMap', { zoomControl: true }).setView([33.8869, 9.5375], 6);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
@@ -880,28 +880,18 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
     }
 
     function refreshMap() {
-        const tags    = document.querySelectorAll('#selectedZonesTags .zone-tag');
-        const wrapper = document.getElementById('zoneMapWrapper');
+        if (!map) return;
+
+        const tags = document.querySelectorAll('#selectedZonesTags .zone-tag');
+        markersGroup.clearLayers();
+        map.invalidateSize();
 
         if (tags.length === 0) {
-            if (wrapper) wrapper.classList.add('d-none');
+            map.setView([33.8869, 9.5375], 6);
             return;
         }
 
-        if (wrapper) wrapper.classList.remove('d-none');
-        initMap();
-        if (!map) return;
-
-        // Forcer Leaflet à recalculer la taille (sinon tuiles grises)
-        setTimeout(function () { map.invalidateSize(); }, 50);
-
-        markersGroup.clearLayers();
-
-        const zoneIds = Array.from(tags).map(t => t.dataset.zoneId);
-        const url = '<?= base_url('admin/clients/zones-search') ?>?q=';
-
-        // Géocoder chaque zone par nom via Nominatim (open, no-key)
-        const names = Array.from(tags).map(t => {
+        const names = Array.from(tags).map(function (t) {
             const spans = t.querySelectorAll('span');
             return spans.length > 0 ? spans[0].textContent.trim() : '';
         }).filter(Boolean);
@@ -915,23 +905,22 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
                 '&format=json&limit=1',
                 { headers: { 'Accept-Language': 'fr' } }
             )
-            .then(r => r.json())
+            .then(function (r) { return r.json(); })
             .then(function (res) {
                 if (res && res[0]) {
                     const lat = parseFloat(res[0].lat);
                     const lng = parseFloat(res[0].lon);
                     bounds.push([lat, lng]);
-
-                    const marker = L.circleMarker([lat, lng], {
+                    L.circleMarker([lat, lng], {
                         radius: 10, color: '#0dcaf0', fillColor: '#0dcaf0', fillOpacity: 0.45, weight: 2,
-                    }).addTo(markersGroup);
-                    marker.bindTooltip(name, { permanent: false, direction: 'top' });
+                    }).addTo(markersGroup).bindTooltip(name, { permanent: true, direction: 'top' });
                 }
             })
             .catch(function () {});
         })).then(function () {
             if (bounds.length > 0) {
                 map.fitBounds(bounds, { padding: [30, 30], maxZoom: 10 });
+                map.invalidateSize();
             }
         });
     }
@@ -940,10 +929,21 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
     const observer = new MutationObserver(refreshMap);
     observer.observe(document.getElementById('selectedZonesTags'), { childList: true });
 
-    // Init si des zones pré-sélectionnées existent
-    if (document.querySelectorAll('#selectedZonesTags .zone-tag').length > 0) {
-        // Attendre que Leaflet JS soit prêt
-        window.addEventListener('load', refreshMap);
+    // Initialiser la carte dès que le DOM + Leaflet sont prêts
+    function onReady() {
+        initMap();
+        // Double invalidateSize pour garantir un rendu correct des tuiles
+        setTimeout(function () {
+            map.invalidateSize();
+            refreshMap();
+        }, 200);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', onReady);
+    } else {
+        // DOM déjà prêt (Leaflet JS chargé en bas de page)
+        setTimeout(onReady, 100);
     }
 
 })();

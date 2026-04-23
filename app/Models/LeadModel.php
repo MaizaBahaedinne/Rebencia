@@ -85,14 +85,14 @@ class LeadModel extends Model
             return null;
         }
 
-        $lead['notes'] = $this->db->table('lead_notes ln')
+        $lead['lead_notes'] = $this->db->table('lead_notes ln')
             ->select('ln.*, u.first_name AS author_first_name, u.last_name AS author_last_name')
             ->join('users u', 'u.id = ln.user_id', 'left')
             ->where('ln.lead_id', $id)
             ->orderBy('ln.created_at', 'DESC')
             ->get()->getResultArray();
 
-        $lead['history'] = $this->db->table('lead_status_history lsh')
+        $lead['status_history'] = $this->db->table('lead_status_history lsh')
             ->select('lsh.*, CONCAT(u.first_name, " ", u.last_name) AS changed_by')
             ->join('users u', 'u.id = lsh.user_id', 'left')
             ->where('lsh.lead_id', $id)

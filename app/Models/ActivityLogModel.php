@@ -40,6 +40,13 @@ class ActivityLogModel extends Model
         if (! empty($filters['date_to'])) {
             $builder->where('DATE(al.created_at) <=', $filters['date_to']);
         }
+        if (! empty($filters['search'])) {
+            $builder->groupStart()
+                ->like('al.action', $filters['search'])
+                ->orLike('al.description', $filters['search'])
+                ->orLike('al.module', $filters['search'])
+                ->groupEnd();
+        }
 
         $total  = $builder->countAllResults(false);
         $page   = max(1, (int) ($filters['page'] ?? 1));

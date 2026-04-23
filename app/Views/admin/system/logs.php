@@ -151,7 +151,7 @@
                 <tr>
                     <td class="text-muted"><?= date('d/m/Y H:i:s', strtotime($log['created_at'])) ?></td>
                     <?php if ($isActivity): ?>
-                    <td><?= esc(($log['user_first_name'] ?? '') . ' ' . ($log['user_last_name'] ?? '')) ?></td>
+                    <td><?= esc($log['user_name'] ?? '—') ?></td>
                     <td><code><?= esc($log['action']) ?></code></td>
                     <td><?= esc($log['module'] ?? '—') ?></td>
                     <td><?= esc($log['description'] ?? '—') ?></td>
@@ -183,9 +183,22 @@
         </table>
     </div>
 
-    <?php if (!empty($pager)): ?>
-    <div class="card-footer bg-transparent">
-        <?= $pager->links() ?>
+    <?php if (($totalPages ?? 1) > 1): ?>
+    <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+        <small class="text-muted">Total : <strong><?= number_format($total ?? 0) ?></strong> entrées</small>
+        <nav><ul class="pagination pagination-sm mb-0">
+            <?php if (($curPage ?? 1) > 1): ?>
+            <li class="page-item"><a class="page-link" href="?<?= http_build_query(array_merge($filters, ['page' => $curPage - 1])) ?>">‹</a></li>
+            <?php endif; ?>
+            <?php for ($p = max(1, ($curPage ?? 1) - 2); $p <= min($totalPages, ($curPage ?? 1) + 2); $p++): ?>
+            <li class="page-item <?= $p === ($curPage ?? 1) ? 'active' : '' ?>">
+                <a class="page-link" href="?<?= http_build_query(array_merge($filters, ['page' => $p])) ?>"><?= $p ?></a>
+            </li>
+            <?php endfor; ?>
+            <?php if (($curPage ?? 1) < ($totalPages ?? 1)): ?>
+            <li class="page-item"><a class="page-link" href="?<?= http_build_query(array_merge($filters, ['page' => $curPage + 1])) ?>">›</a></li>
+            <?php endif; ?>
+        </ul></nav>
     </div>
     <?php endif; ?>
 </div>

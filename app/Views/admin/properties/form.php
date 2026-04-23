@@ -51,13 +51,29 @@ $characteristics = $characteristics ?? [];
                             <select name="type" class="form-select" required>
                                 <option value="">-- Sélectionner --</option>
                                 <?php
-                                $propertyTypes = $propertyTypes ?? [];
-                                $currentType   = old('type', $property['type'] ?? '');
-                                foreach ($propertyTypes as $pt):
+                                // Les valeurs correspondent à l'ENUM de la table properties
+                                $typeOptions = [
+                                    'apartment'  => 'Appartement',
+                                    'house'      => 'Maison',
+                                    'villa'      => 'Villa',
+                                    'commercial' => 'Local commercial',
+                                    'land'       => 'Terrain',
+                                    'office'     => 'Bureau',
+                                ];
+                                // Surcharger les libellés depuis property_types si les slugs correspondent
+                                if (!empty($propertyTypes)) {
+                                    foreach ($propertyTypes as $pt) {
+                                        if (isset($typeOptions[$pt['slug']])) {
+                                            $typeOptions[$pt['slug']] = $pt['name'];
+                                        }
+                                    }
+                                }
+                                $currentType = old('type', $property['type'] ?? '');
+                                foreach ($typeOptions as $val => $lbl):
                                 ?>
-                                <option value="<?= esc($pt['slug']) ?>"
-                                    <?= $currentType === $pt['slug'] ? 'selected' : '' ?>>
-                                    <?= esc($pt['name']) ?>
+                                <option value="<?= $val ?>"
+                                    <?= $currentType === $val ? 'selected' : '' ?>>
+                                    <?= esc($lbl) ?>
                                 </option>
                                 <?php endforeach; ?>
                             </select>
@@ -714,6 +730,49 @@ $characteristics = $characteristics ?? [];
     if (LOC.zone) {
         const m = LOC.zone.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
         if (m) inpPostal.value = m[2];
+    }
+
+    // ── Pré-sélection cascade en mode édition ──────────────────────
+    if (LOC.villeId) {
+        // Récupère la hiérarchie de la ville pour pré-sélectionner Pays→Région→Ville
+        fetch(BASE_URL + LOC.villeId + '/ancestors', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(r => r.json())
+        .then(async ancestors => {
+            // ancestors = [{type:'pays', id:x, name:'Tunisie'}, {type:'region',...}, ...]
+            const pays    = ancestors.find(a => a.type === 'pays');
+            const region  = ancestors.find(a => a.type === 'region');
+
+            if (pays) {
+                selPays.value   = pays.id;
+                selPays.disabled = false;
+                const regions = await loadChildren(pays.id, selRegion, '— Région —');
+                if (region && regions.length) {
+                    selRegion.value   = region.id;
+                    selRegion.disabled = false;
+                    const villes = await loadChildren(region.id, selVille, '— Ville —');
+                    if (villes.length) {
+                        selVille.value   = LOC.villeId;
+                        selVille.disabled = false;
+                        inpCity.value = LOC.villeName || '';
+                        // Quartiers (optionnel)
+                        const quartiers = await loadChildren(LOC.villeId, selQuartier, '— Quartier —');
+                        if (LOC.zone && quartiers.length) {
+                            const q = quartiers.find(q => q.name === LOC.zone ||
+                                                          (LOC.zone + '').startsWith(q.name));
+                            if (q) {
+                                selQuartier.value   = q.id;
+                                selQuartier.disabled = false;
+                                inpZone.value   = q.name;
+                                inpPostal.value = q.code ?? '';
+                            }
+                        }
+                    }
+                }
+            }
+        })
+        .catch(() => {}); // Silencieux si l'endpoint n'existe pas encore
     }
 
     // ── Saisie manuelle coordonnées ─────────────────────────────────

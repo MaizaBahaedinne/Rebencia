@@ -14,9 +14,26 @@ use CodeIgniter\Router\RouteCollection;
 $routes->setAutoRoute(false);
 
 // --------------------------------------------------------
+// VITRINE PUBLIQUE (multilangue : fr / en / ar)
+// --------------------------------------------------------
+$routes->get('/', 'HomeController::redirectHome');
+
+foreach (['fr', 'en', 'ar'] as $_l) {
+    $routes->get($_l . '/',                    "HomeController::home/{$_l}");
+    $routes->get($_l . '/properties',          "HomeController::properties/{$_l}");
+    $routes->get($_l . '/properties/(:num)',   "HomeController::propertyDetail/{$_l}/$1");
+    $routes->get($_l . '/about',               "HomeController::about/{$_l}");
+    $routes->get($_l . '/blog',                "HomeController::blog/{$_l}");
+    $routes->get($_l . '/contact',             "HomeController::contact/{$_l}");
+    $routes->post($_l . '/contact',            "HomeController::contactSubmit/{$_l}");
+    $routes->get($_l . '/estimate',            "HomeController::estimate/{$_l}");
+    $routes->post($_l . '/estimate',           "HomeController::estimateSubmit/{$_l}");
+}
+unset($_l);
+
+// --------------------------------------------------------
 // AUTH (public)
 // --------------------------------------------------------
-$routes->get('/',      'Auth\LoginController::index');
 $routes->get('login',  'Auth\LoginController::index');
 $routes->post('login', 'Auth\LoginController::authenticate');
 $routes->get('logout', 'Auth\LoginController::logout');
@@ -140,6 +157,7 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
     $routes->get('zones/create/(:alpha)',        'Admin\ZonesController::create/$1');
     $routes->post('zones/store',                 'Admin\ZonesController::store');
     $routes->get('zones/(:num)/children',        'Admin\ZonesController::childrenJson/$1');
+    $routes->get('zones/(:num)/ancestors',       'Admin\ZonesController::ancestorsJson/$1');
     $routes->get('zones/search',                 'Admin\ZonesController::searchJson');
     $routes->get('zones/(:num)/edit',            'Admin\ZonesController::edit/$1');
     $routes->post('zones/(:num)/update',         'Admin\ZonesController::update/$1');

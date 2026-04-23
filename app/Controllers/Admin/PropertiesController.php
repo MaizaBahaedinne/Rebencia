@@ -15,10 +15,12 @@ use App\Models\ZoneModel;
 class PropertiesController extends BaseController
 {
     protected PropertyModel $model;
+    protected \CodeIgniter\Database\BaseConnection $db;
 
     public function __construct()
     {
         $this->model = new PropertyModel();
+        $this->db    = \Config\Database::connect();
     }
 
     /** Liste des biens. */
@@ -128,9 +130,20 @@ class PropertiesController extends BaseController
         $this->requirePermission('properties.view');
         $property = $this->findOrFail($id);
 
+        // Historique des modifications du bien
+        $history = $this->db->table('property_history ph')
+            ->select('ph.*, u.first_name AS user_first_name, u.last_name AS user_last_name')
+            ->join('users u', 'u.id = ph.user_id', 'left')
+            ->where('ph.property_id', $id)
+            ->orderBy('ph.created_at', 'DESC')
+            ->limit(20)
+            ->get()->getResultArray();
+
         return $this->render('admin/properties/show', [
             'page_title' => $property['reference'] . ' – ' . $property['title'],
             'property'   => $property,
+            'images'     => $property['images'] ?? [],
+            'history'    => $history,
         ]);
     }
 
@@ -168,17 +181,27 @@ class PropertiesController extends BaseController
         $property = $this->findOrFail($id);
 
         $post   = $this->request->getPost();
-        $fields = ['title','description','type','transaction_type','status','price',
-                   'surface','rooms','bedrooms','bathrooms','floor','total_floors',
-                   'address','city','zone','latitude','longitude','agent_id'];
+
+        // Champs texte/nullable : on accepte la chaîne vide (pour effacer une valeur optionnelle)
+        $nullableFields  = ['description','surface','rooms','bedrooms','bathrooms',
+                            'floor','total_floors','address','city','zone','latitude','longitude'];
+        // Champs obligatoires : on refuse la chaîne vide (on garde l'ancienne valeur)
+        $requiredFields  = ['title','type','transaction_type','status','price','agent_id'];
 
         $data = [];
-        foreach ($fields as $f) {
-            $data[$f] = $post[$f] ?? $property[$f];
+        foreach (array_merge($requiredFields, $nullableFields) as $f) {
+            $posted = $post[$f] ?? null;
+            if (in_array($f, $requiredFields, true) && ($posted === null || $posted === '')) {
+                $data[$f] = $property[$f];   // garde l'ancienne valeur si champ obligatoire vide
+            } else {
+                $data[$f] = $posted;          // null ou '' autorisés pour les champs optionnels
+            }
         }
         $data['parking']   = isset($post['parking']) ? 1 : 0;
         $data['furnished'] = isset($post['furnished']) ? 1 : 0;
-        $data['features']  = $this->buildFeaturesJson($post);
+        // Ne réinitialiser features que si des données feat[] sont effectivement envoyées
+        $newFeatures = $this->buildFeaturesJson($post);
+        $data['features'] = $newFeatures !== null ? $newFeatures : $property['features'];
 
         // Log changes
         foreach (['status', 'price', 'agent_id'] as $f) {

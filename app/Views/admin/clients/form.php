@@ -302,6 +302,8 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
 
                     <!-- Carte Leaflet -->
                     <div id="zoneMapWrapper" class="mt-3">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
                         <div id="zoneMap" style="height:260px; border-radius:.5rem; border:1px solid #dee2e6;"></div>
                         <p class="text-muted small mt-1 mb-0">
                             <i class="bi bi-info-circle me-1"></i>
@@ -850,9 +852,7 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
 })();
 </script>
 
-<!-- Leaflet CSS + JS (CDN) -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<!-- Leaflet JS (CDN) — CSS injecté avant #zoneMap -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLfI=" crossorigin=""></script>
 
@@ -929,21 +929,20 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
     const observer = new MutationObserver(refreshMap);
     observer.observe(document.getElementById('selectedZonesTags'), { childList: true });
 
-    // Initialiser la carte dès que le DOM + Leaflet sont prêts
+    // Initialiser la carte — Leaflet JS est synchrone (script blocking en bas de page)
+    // CSS est déjà appliqué (link placé avant #zoneMap dans le HTML)
     function onReady() {
         initMap();
-        // Double invalidateSize pour garantir un rendu correct des tuiles
         setTimeout(function () {
-            map.invalidateSize();
+            map.invalidateSize(true);
             refreshMap();
-        }, 200);
+        }, 300);
     }
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', onReady);
     } else {
-        // DOM déjà prêt (Leaflet JS chargé en bas de page)
-        setTimeout(onReady, 100);
+        setTimeout(onReady, 0);
     }
 
 })();

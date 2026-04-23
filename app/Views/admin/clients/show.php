@@ -270,6 +270,8 @@ $floorLabels = [
                     </span>
                     <?php endforeach; ?>
                 </div>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
                 <div id="zoneMap" style="height:280px; border-radius:.5rem; border:1px solid #dee2e6;"></div>
                 <p class="text-muted small mt-1 mb-0">
                     <i class="bi bi-info-circle me-1"></i>Visualisation via OpenStreetMap (Nominatim)
@@ -516,8 +518,6 @@ $floorLabels = [
 </div>
 
 <?php if (! empty($pivotZones)): ?>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLfI=" crossorigin=""></script>
 <script>
@@ -529,8 +529,7 @@ $floorLabels = [
         attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
         maxZoom: 18,
     }).addTo(map);
-    // Forcer le recalcul de taille (tuiles grises sinon dans un layout Bootstrap)
-    setTimeout(function () { map.invalidateSize(); }, 200);
+    setTimeout(function () { map.invalidateSize(true); }, 300);
     var bounds = [];
     Promise.all(zoneNames.map(function (name) {
         return fetch(

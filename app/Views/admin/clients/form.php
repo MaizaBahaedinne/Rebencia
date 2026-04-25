@@ -271,7 +271,7 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
             <!-- ── Section 6 : Zones recherchées ───────────────────── -->
             <div class="card shadow-sm">
                 <div class="card-header fw-semibold bg-white">
-                    <i class="bi bi-geo-alt-fill me-2 text-info"></i>Zones de recherche
+                    <i class="bi bi-geo-alt-fill me-2 text-info"></i>Quartiers géolocalisés
                 </div>
                 <div class="card-body">
                     <!-- Champ de recherche -->
@@ -305,10 +305,10 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
                     <!-- Carte Leaflet -->
                     <div id="zoneMapWrapper" class="mt-3">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-                        <div id="zoneMap" style="height:260px; border-radius:.5rem; border:1px solid #dee2e6;"></div>
+                        <div id="zoneMap" style="height:380px; border-radius:.5rem; border:1px solid #dee2e6;"></div>
                         <p class="text-muted small mt-1 mb-0">
-                            <i class="bi bi-info-circle me-1"></i>
-                            Visualisation approximative — centrage sur les zones sélectionnées.
+                            <i class="bi bi-geo-alt me-1 text-secondary"></i>Marqueurs gris = quartiers disponibles (cliquez pour sélectionner) &nbsp;·&nbsp;
+                            <i class="bi bi-geo-alt-fill me-1 text-info"></i>Marqueurs bleus = zones sélectionnées.
                         </p>
                     </div>
                 </div>
@@ -668,6 +668,7 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
     const selectedZoneIds = new Set(
         Array.from(zoneTags.querySelectorAll('.zone-tag')).map(t => String(t.dataset.zoneId))
     );
+    window.selectedZoneIds = selectedZoneIds; // partagé avec le bloc Leaflet
 
     function updateNoHint() {
         if (zoneTags.querySelectorAll('.zone-tag').length > 0) {
@@ -677,24 +678,21 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
         }
     }
 
-    function addZoneTag(zone) {
+    function addZoneTagDOMOnly(zone) {
         if (selectedZoneIds.has(String(zone.id))) return;
         selectedZoneIds.add(String(zone.id));
+
+        const lat    = (zone.lat != null ? zone.lat : null) ?? (zone.latitude  != null ? zone.latitude  : null);
+        const lng    = (zone.lng != null ? zone.lng : null) ?? (zone.longitude != null ? zone.longitude : null);
+        const tlbls  = {pays:'Pays', region:'Gouvernorat', ville:'Ville', quartier:'Quartier'};
+        const typLbl = zone.type_label || tlbls[zone.type] || '';
 
         const span = document.createElement('span');
         span.className = 'badge text-bg-info d-inline-flex align-items-center gap-1 zone-tag';
         span.dataset.zoneId = zone.id;
-        if (zone.latitude  != null) span.dataset.lat = zone.latitude;
-        if (zone.longitude != null) span.dataset.lng = zone.longitude;
-        span.innerHTML =
-            '<i class="bi bi-geo-alt"></i>' +
-            document.createTextNode(zone.name).textContent +
-            ' <small class="opacity-75">(' + zone.type_label + ')</small>' +
-            '<button type="button" class="btn-close btn-close-white btn-sm zone-remove" style="font-size:.6rem;" aria-label="Retirer"></button>' +
-            '<input type="hidden" name="search_zones[]" value="' + zone.id + '">';
+        if (lat != null) span.dataset.lat = lat;
+        if (lng != null) span.dataset.lng = lng;
 
-        // Réécrire proprement pour éviter XSS
-        span.innerHTML = '';
         const icon = document.createElement('i');
         icon.className = 'bi bi-geo-alt';
         span.appendChild(icon);
@@ -703,10 +701,12 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
         nameText.textContent = zone.name;
         span.appendChild(nameText);
 
-        const typeBadge = document.createElement('small');
-        typeBadge.className = 'opacity-75';
-        typeBadge.textContent = '(' + zone.type_label + ')';
-        span.appendChild(typeBadge);
+        if (typLbl) {
+            const typeBadge = document.createElement('small');
+            typeBadge.className = 'opacity-75';
+            typeBadge.textContent = '(' + typLbl + ')';
+            span.appendChild(typeBadge);
+        }
 
         const rmBtn = document.createElement('button');
         rmBtn.type = 'button';
@@ -725,12 +725,72 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
         updateNoHint();
     }
 
+    function addZoneTag(zone) {
+        if (selectedZoneIds.has(String(zone.id))) return;
+        const lat = (zone.lat != null ? zone.lat : null) ?? (zone.latitude  != null ? zone.latitude  : null);
+        const lng = (zone.lng != null ? zone.lng : null) ?? (zone.longitude != null ? zone.longitude : null);
+
+        // Si un marqueur gris existe sur la carte → passer en bleu
+        const geo = (typeof geoMarkers !== 'undefined') ? geoMarkers.get(String(zone.id)) : null;
+        if (geo) {
+            geo.marker.setStyle(STYLE_SELECTED);
+            geo.marker.bindTooltip(zone.name, { permanent: true, direction: 'top' });
+            geo.marker.off('click');
+            selMarkers.set(String(zone.id), geo.marker);
+            geoMarkers.delete(String(zone.id));
+        } else if (map && lat && lng) {
+            const m = L.circleMarker([lat, lng], STYLE_SELECTED)
+                .addTo(markersLayer)
+                .bindTooltip(zone.name, { permanent: true, direction: 'top' });
+            selMarkers.set(String(zone.id), m);
+        } else if (map) {
+            fetch('https://nominatim.openstreetmap.org/search?q=' +
+                encodeURIComponent(zone.name + ', Tunisie') + '&format=json&limit=1',
+                { headers: { 'Accept-Language': 'fr' } })
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+                if (res && res[0]) {
+                    const m = L.circleMarker(
+                        [parseFloat(res[0].lat), parseFloat(res[0].lon)], STYLE_SELECTED)
+                        .addTo(markersLayer)
+                        .bindTooltip(zone.name, { permanent: true, direction: 'top' });
+                    selMarkers.set(String(zone.id), m);
+                }
+            })
+            .catch(function () {});
+        }
+        addZoneTagDOMOnly(zone);
+    }
+
     // Suppression d'un badge
     zoneTags.addEventListener('click', function (e) {
         const rmBtn = e.target.closest('.zone-remove');
         if (!rmBtn) return;
         const tag = rmBtn.closest('.zone-tag');
-        selectedZoneIds.delete(String(tag.dataset.zoneId));
+        const id  = String(tag.dataset.zoneId);
+        const lat = parseFloat(tag.dataset.lat);
+        const lng = parseFloat(tag.dataset.lng);
+        const nameEl = tag.querySelector('span');
+        const name   = nameEl ? nameEl.textContent.trim() : '';
+
+        selectedZoneIds.delete(id);
+
+        // Gérer le marqueur carte
+        if (typeof selMarkers !== 'undefined' && selMarkers.has(id)) {
+            const m = selMarkers.get(id);
+            selMarkers.delete(id);
+            if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
+                m.setStyle(STYLE_AVAILABLE);
+                m.unbindTooltip();
+                m.bindTooltip(name, { direction: 'top' });
+                m.on('click', function () {
+                    addZoneTag({ id: id, name: name, lat: lat, lng: lng });
+                });
+                geoMarkers.set(id, { marker: m, zone: { id: id, name: name, lat: lat, lng: lng } });
+            } else {
+                if (typeof markersLayer !== 'undefined') markersLayer.removeLayer(m);
+            }
+        }
         tag.remove();
         updateNoHint();
     });
@@ -848,6 +908,8 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
     });
 
     // Pré-charger depuis la BDD en édition
+    window.addZoneTag = addZoneTag; // partagé avec le bloc Leaflet
+
     <?php if (! empty($client['zone_pays_id'])): ?>
     loadSelect(selRegion, '<?= base_url('admin/clients/regions/') ?>' + selPays.value, preRegion);
     <?php endif; ?>
@@ -859,99 +921,103 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-(function () {
-    'use strict';
+// ── Carte Quartiers géolocalisés ─────────────────────────────────────
 
-    // ── Initialisation carte Leaflet ─────────────────────────────────
+    const STYLE_AVAILABLE = { radius: 8,  color: '#6c757d', fillColor: '#adb5bd', fillOpacity: 0.4, weight: 1.5 };
+    const STYLE_SELECTED  = { radius: 11, color: '#0dcaf0', fillColor: '#0dcaf0', fillOpacity: 0.55, weight: 2.5 };
+
     let map          = null;
-    let markersGroup = null;
+    let markersLayer = null;
+    const geoMarkers = new Map(); // id → {marker, zone} — quartiers dispo (gris)
+    const selMarkers = new Map(); // id → marker — zones sélectionnées (bleu)
 
     function initMap() {
         if (map) return;
         const el = document.getElementById('zoneMap');
         if (!el) return;
-
         map = L.map('zoneMap', { zoomControl: true }).setView([33.8869, 9.5375], 6);
-
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
             maxZoom: 18,
         }).addTo(map);
-
-        markersGroup = L.layerGroup().addTo(map);
+        markersLayer = L.layerGroup().addTo(map);
     }
 
-    function refreshMap() {
-        if (!map) return;
+    // ── Chargement de tous les quartiers géolocalisés (DB) ───────────
+    function loadGeoZones() {
+        fetch('<?= base_url('admin/clients/zones-geolocalises') ?>')
+        .then(function (r) { return r.json(); })
+        .then(function (zones) {
+            zones.forEach(function (z) {
+                if (selectedZoneIds.has(String(z.id))) return;
+                const m = L.circleMarker([z.lat, z.lng], STYLE_AVAILABLE)
+                    .addTo(markersLayer)
+                    .bindTooltip(z.name, { direction: 'top' });
+                m.on('click', function () {
+                    addZoneTag(z);
+                });
+                geoMarkers.set(String(z.id), { marker: m, zone: z });
+            });
+        })
+        .catch(function () {});
+    }
 
+    // ── Marqueurs bleus pour les zones déjà sélectionnées (édition) ──
+    function placeExistingMarkers() {
         const tags = document.querySelectorAll('#selectedZonesTags .zone-tag');
-        markersGroup.clearLayers();
-        map.invalidateSize();
-
-        if (tags.length === 0) {
-            map.setView([33.8869, 9.5375], 6);
-            return;
-        }
-
-        const bounds = [];
-
-        function placeMarker(lat, lng, name) {
-            bounds.push([lat, lng]);
-            L.circleMarker([lat, lng], {
-                radius: 10, color: '#0dcaf0', fillColor: '#0dcaf0', fillOpacity: 0.45, weight: 2,
-            }).addTo(markersGroup).bindTooltip(name, { permanent: true, direction: 'top' });
-        }
+        const coords = [];
 
         const promises = Array.from(tags).map(function (t) {
+            const lat    = parseFloat(t.dataset.lat);
+            const lng    = parseFloat(t.dataset.lng);
+            const id     = String(t.dataset.zoneId);
             const nameEl = t.querySelector('span');
             const name   = nameEl ? nameEl.textContent.trim() : '';
-            if (!name) return Promise.resolve();
 
-            const dbLat = parseFloat(t.dataset.lat);
-            const dbLng = parseFloat(t.dataset.lng);
-
-            // Priorité : coordonnées enregistrées dans la base de données
-            if (dbLat && dbLng && !isNaN(dbLat) && !isNaN(dbLng)) {
-                placeMarker(dbLat, dbLng, name);
+            if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
+                const m = L.circleMarker([lat, lng], STYLE_SELECTED)
+                    .addTo(markersLayer)
+                    .bindTooltip(name, { permanent: true, direction: 'top' });
+                selMarkers.set(id, m);
+                coords.push([lat, lng]);
                 return Promise.resolve();
             }
-
-            // Fallback : géocodage Nominatim si pas de coordonnées en base
+            // Nominatim fallback
             return fetch(
                 'https://nominatim.openstreetmap.org/search?q=' +
-                encodeURIComponent(name + ', Tunisie') +
-                '&format=json&limit=1',
+                encodeURIComponent(name + ', Tunisie') + '&format=json&limit=1',
                 { headers: { 'Accept-Language': 'fr' } }
             )
             .then(function (r) { return r.json(); })
             .then(function (res) {
                 if (res && res[0]) {
-                    placeMarker(parseFloat(res[0].lat), parseFloat(res[0].lon), name);
+                    const rlat = parseFloat(res[0].lat);
+                    const rlng = parseFloat(res[0].lon);
+                    const m = L.circleMarker([rlat, rlng], STYLE_SELECTED)
+                        .addTo(markersLayer)
+                        .bindTooltip(name, { permanent: true, direction: 'top' });
+                    selMarkers.set(id, m);
+                    coords.push([rlat, rlng]);
                 }
             })
             .catch(function () {});
         });
 
         Promise.all(promises).then(function () {
-            if (bounds.length > 0) {
-                map.fitBounds(bounds, { padding: [30, 30], maxZoom: 10 });
-                map.invalidateSize();
+            if (coords.length > 0) {
+                map.fitBounds(coords, { padding: [40, 40], maxZoom: 10 });
             }
+            map.invalidateSize(true);
         });
     }
 
-    // Écouter les ajouts/suppressions de zones pour rafraîchir la carte
-    const observer = new MutationObserver(refreshMap);
-    observer.observe(document.getElementById('selectedZonesTags'), { childList: true });
-
-    // Initialiser la carte — Leaflet JS est synchrone (script blocking en bas de page)
-    // CSS est déjà appliqué (link placé avant #zoneMap dans le HTML)
     function onReady() {
         initMap();
         setTimeout(function () {
             map.invalidateSize(true);
-            refreshMap();
-        }, 300);
+            loadGeoZones();
+            placeExistingMarkers();
+        }, 250);
     }
 
     if (document.readyState === 'loading') {
@@ -959,6 +1025,4 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
     } else {
         setTimeout(onReady, 0);
     }
-
-})();
 </script>

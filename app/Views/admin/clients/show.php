@@ -258,7 +258,7 @@ $floorLabels = [
         ?>
         <div class="card shadow-sm">
             <div class="card-header fw-semibold bg-white">
-                <i class="bi bi-geo-alt-fill me-1 text-info"></i> Zones de recherche
+                <i class="bi bi-geo-alt-fill me-1 text-info"></i> Quartiers géolocalisés
             </div>
             <div class="card-body">
                 <div class="d-flex flex-wrap gap-2 mb-3">
@@ -271,9 +271,9 @@ $floorLabels = [
                     <?php endforeach; ?>
                 </div>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-                <div id="zoneMap" style="height:280px; border-radius:.5rem; border:1px solid #dee2e6;"></div>
+                <div id="zoneMap" style="height:320px; border-radius:.5rem; border:1px solid #dee2e6;"></div>
                 <p class="text-muted small mt-1 mb-0">
-                    <i class="bi bi-info-circle me-1"></i>Visualisation via OpenStreetMap (Nominatim)
+                    <i class="bi bi-geo-alt-fill me-1 text-info"></i>Zones de recherche géolocalisées du client
                 </p>
             </div>
         </div>

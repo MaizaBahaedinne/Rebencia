@@ -307,8 +307,8 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
                         <div id="zoneMap" style="height:380px; border-radius:.5rem; border:1px solid #dee2e6;"></div>
                         <p class="text-muted small mt-1 mb-0">
-                            <i class="bi bi-geo-alt me-1 text-secondary"></i>Marqueurs gris = quartiers disponibles (cliquez pour sélectionner) &nbsp;·&nbsp;
-                            <i class="bi bi-geo-alt-fill me-1 text-info"></i>Marqueurs bleus = zones sélectionnées.
+                            <i class="bi bi-map me-1 text-secondary"></i>Polygones gris = zones disponibles — cliquez pour sélectionner &nbsp;·&nbsp;
+                            <i class="bi bi-map-fill me-1 text-info"></i>Polygones bleus = zones sélectionnées.
                         </p>
                     </div>
                 </div>
@@ -727,37 +727,18 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
 
     function addZoneTag(zone) {
         if (selectedZoneIds.has(String(zone.id))) return;
-        const lat = (zone.lat != null ? zone.lat : null) ?? (zone.latitude  != null ? zone.latitude  : null);
-        const lng = (zone.lng != null ? zone.lng : null) ?? (zone.longitude != null ? zone.longitude : null);
 
-        // Si un marqueur gris existe sur la carte → passer en bleu
-        const geo = (typeof geoMarkers !== 'undefined') ? geoMarkers.get(String(zone.id)) : null;
-        if (geo) {
-            geo.marker.setStyle(STYLE_SELECTED);
-            geo.marker.bindTooltip(zone.name, { permanent: true, direction: 'top' });
-            geo.marker.off('click');
-            selMarkers.set(String(zone.id), geo.marker);
-            geoMarkers.delete(String(zone.id));
-        } else if (map && lat && lng) {
-            const m = L.circleMarker([lat, lng], STYLE_SELECTED)
-                .addTo(markersLayer)
-                .bindTooltip(zone.name, { permanent: true, direction: 'top' });
-            selMarkers.set(String(zone.id), m);
-        } else if (map) {
-            fetch('https://nominatim.openstreetmap.org/search?q=' +
-                encodeURIComponent(zone.name + ', Tunisie') + '&format=json&limit=1',
-                { headers: { 'Accept-Language': 'fr' } })
-            .then(function (r) { return r.json(); })
-            .then(function (res) {
-                if (res && res[0]) {
-                    const m = L.circleMarker(
-                        [parseFloat(res[0].lat), parseFloat(res[0].lon)], STYLE_SELECTED)
-                        .addTo(markersLayer)
-                        .bindTooltip(zone.name, { permanent: true, direction: 'top' });
-                    selMarkers.set(String(zone.id), m);
-                }
-            })
-            .catch(function () {});
+        // Polygone disponible (gris) → passer en bleu
+        const geoEntry = (typeof geoLayers !== 'undefined') ? geoLayers.get(String(zone.id)) : null;
+        if (geoEntry) {
+            geoEntry.layer.setStyle(STYLE_SELECTED);
+            geoEntry.layer.unbindTooltip();
+            geoEntry.layer.bindTooltip(zone.name, { sticky: true });
+            geoEntry.layer.off('click');
+            geoEntry.layer.off('mouseover');
+            geoEntry.layer.off('mouseout');
+            selLayers.set(String(zone.id), geoEntry);
+            geoLayers.delete(String(zone.id));
         }
         addZoneTagDOMOnly(zone);
     }
@@ -768,27 +749,25 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
         if (!rmBtn) return;
         const tag = rmBtn.closest('.zone-tag');
         const id  = String(tag.dataset.zoneId);
-        const lat = parseFloat(tag.dataset.lat);
-        const lng = parseFloat(tag.dataset.lng);
-        const nameEl = tag.querySelector('span');
-        const name   = nameEl ? nameEl.textContent.trim() : '';
 
         selectedZoneIds.delete(id);
 
-        // Gérer le marqueur carte
-        if (typeof selMarkers !== 'undefined' && selMarkers.has(id)) {
-            const m = selMarkers.get(id);
-            selMarkers.delete(id);
-            if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
-                m.setStyle(STYLE_AVAILABLE);
-                m.unbindTooltip();
-                m.bindTooltip(name, { direction: 'top' });
-                m.on('click', function () {
-                    addZoneTag({ id: id, name: name, lat: lat, lng: lng });
-                });
-                geoMarkers.set(id, { marker: m, zone: { id: id, name: name, lat: lat, lng: lng } });
-            } else {
-                if (typeof markersLayer !== 'undefined') markersLayer.removeLayer(m);
+        // Restaurer le polygone gris si disponible
+        if (typeof selLayers !== 'undefined' && selLayers.has(id)) {
+            const entry = selLayers.get(id);
+            selLayers.delete(id);
+            const zone = entry.zone;
+            if (zone && zone.geometry) {
+                entry.layer.setStyle(STYLE_AVAILABLE);
+                entry.layer.unbindTooltip();
+                const tip = zone.name + (zone.type_label ? ' (' + zone.type_label + ')' : '');
+                entry.layer.bindTooltip(tip, { sticky: true });
+                entry.layer.on('mouseover', function () { entry.layer.setStyle({ fillOpacity: 0.45, weight: 2 }); });
+                entry.layer.on('mouseout',  function () { entry.layer.setStyle(STYLE_AVAILABLE); });
+                entry.layer.on('click', function () { addZoneTag(zone); });
+                geoLayers.set(id, entry);
+            } else if (typeof markersLayer !== 'undefined' && markersLayer) {
+                markersLayer.removeLayer(entry.layer);
             }
         }
         tag.remove();
@@ -917,98 +896,102 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
 })();
 </script>
 
+<?php
+// Données de géométrie pour les zones déjà sélectionnées (mode édition)
+$_preGeoMap = [];
+foreach ($selectedZones as $_sz) {
+    if (! empty($_sz['geometry'])) {
+        $_preGeoMap[(int) $_sz['zone_id']] = $_sz['geometry'];
+    }
+}
+?>
+<script>window._preselectedGeo = <?= json_encode($_preGeoMap, JSON_UNESCAPED_UNICODE) ?>;</script>
+
 <!-- Leaflet JS (CDN) — CSS injecté avant #zoneMap -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-// ── Carte Quartiers géolocalisés ─────────────────────────────────────
+// ── Carte Quartiers géolocalisés (polygones GeoJSON) ─────────────────
 
-    const STYLE_AVAILABLE = { radius: 8,  color: '#6c757d', fillColor: '#adb5bd', fillOpacity: 0.4, weight: 1.5 };
-    const STYLE_SELECTED  = { radius: 11, color: '#0dcaf0', fillColor: '#0dcaf0', fillOpacity: 0.55, weight: 2.5 };
+    const STYLE_AVAILABLE = { color: '#6c757d', fillColor: '#adb5bd', fillOpacity: 0.25, weight: 1.5 };
+    const STYLE_SELECTED  = { color: '#0dcaf0', fillColor: '#0dcaf0', fillOpacity: 0.45, weight: 2.5 };
 
     let map          = null;
     let markersLayer = null;
-    const geoMarkers = new Map(); // id → {marker, zone} — quartiers dispo (gris)
-    const selMarkers = new Map(); // id → marker — zones sélectionnées (bleu)
+    const geoLayers  = new Map(); // id → { layer, zone } — disponibles (gris)
+    const selLayers  = new Map(); // id → { layer, zone } — sélectionnées (bleu)
+
+    function makeGeoLayer(geometry, style) {
+        try {
+            const gj = typeof geometry === 'string' ? JSON.parse(geometry) : geometry;
+            return L.geoJSON(gj, {
+                style: function () { return style; },
+                pointToLayer: function (feat, latlng) {
+                    return L.circleMarker(latlng, Object.assign({}, style, { radius: 8 }));
+                },
+            });
+        } catch (e) { return null; }
+    }
 
     function initMap() {
         if (map) return;
         const el = document.getElementById('zoneMap');
         if (!el) return;
-        map = L.map('zoneMap', { zoomControl: true }).setView([33.8869, 9.5375], 6);
+        map = L.map('zoneMap', { zoomControl: true }).setView([33.8869, 9.5375], 7);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
-            maxZoom: 18,
+            maxZoom: 19,
         }).addTo(map);
         markersLayer = L.layerGroup().addTo(map);
     }
 
-    // ── Chargement de tous les quartiers géolocalisés (DB) ───────────
+    // ── Chargement des zones avec géométrie depuis la DB ──────────────
     function loadGeoZones() {
         fetch('<?= base_url('admin/clients/zones-geolocalises') ?>')
         .then(function (r) { return r.json(); })
         .then(function (zones) {
             zones.forEach(function (z) {
+                if (!z.geometry) return;
                 if (selectedZoneIds.has(String(z.id))) return;
-                const m = L.circleMarker([z.lat, z.lng], STYLE_AVAILABLE)
-                    .addTo(markersLayer)
-                    .bindTooltip(z.name, { direction: 'top' });
-                m.on('click', function () {
-                    addZoneTag(z);
-                });
-                geoMarkers.set(String(z.id), { marker: m, zone: z });
+                const layer = makeGeoLayer(z.geometry, STYLE_AVAILABLE);
+                if (!layer) return;
+                const tip = z.name + (z.type_label ? ' (' + z.type_label + ')' : '');
+                layer.bindTooltip(tip, { sticky: true, direction: 'top' });
+                layer.on('mouseover', function () { layer.setStyle({ fillOpacity: 0.45, weight: 2 }); });
+                layer.on('mouseout',  function () { layer.setStyle(STYLE_AVAILABLE); });
+                layer.on('click', function () { addZoneTag(z); });
+                layer.addTo(markersLayer);
+                geoLayers.set(String(z.id), { layer: layer, zone: z });
             });
         })
         .catch(function () {});
     }
 
-    // ── Marqueurs bleus pour les zones déjà sélectionnées (édition) ──
+    // ── Polygones bleus pour les zones déjà sélectionnées (mode édition) ──
     function placeExistingMarkers() {
-        const tags = document.querySelectorAll('#selectedZonesTags .zone-tag');
-        const coords = [];
+        const preGeo = window._preselectedGeo || {};
+        const bounds = [];
 
-        const promises = Array.from(tags).map(function (t) {
-            const lat    = parseFloat(t.dataset.lat);
-            const lng    = parseFloat(t.dataset.lng);
-            const id     = String(t.dataset.zoneId);
-            const nameEl = t.querySelector('span');
+        Object.keys(preGeo).forEach(function (id) {
+            const geom = preGeo[id];
+            if (!geom) return;
+            const tagEl  = document.querySelector('[data-zone-id="' + id + '"]');
+            const nameEl = tagEl ? tagEl.querySelector('span') : null;
             const name   = nameEl ? nameEl.textContent.trim() : '';
-
-            if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
-                const m = L.circleMarker([lat, lng], STYLE_SELECTED)
-                    .addTo(markersLayer)
-                    .bindTooltip(name, { permanent: true, direction: 'top' });
-                selMarkers.set(id, m);
-                coords.push([lat, lng]);
-                return Promise.resolve();
-            }
-            // Nominatim fallback
-            return fetch(
-                'https://nominatim.openstreetmap.org/search?q=' +
-                encodeURIComponent(name + ', Tunisie') + '&format=json&limit=1',
-                { headers: { 'Accept-Language': 'fr' } }
-            )
-            .then(function (r) { return r.json(); })
-            .then(function (res) {
-                if (res && res[0]) {
-                    const rlat = parseFloat(res[0].lat);
-                    const rlng = parseFloat(res[0].lon);
-                    const m = L.circleMarker([rlat, rlng], STYLE_SELECTED)
-                        .addTo(markersLayer)
-                        .bindTooltip(name, { permanent: true, direction: 'top' });
-                    selMarkers.set(id, m);
-                    coords.push([rlat, rlng]);
-                }
-            })
-            .catch(function () {});
+            const layer  = makeGeoLayer(geom, STYLE_SELECTED);
+            if (!layer) return;
+            if (name) layer.bindTooltip(name, { sticky: true });
+            layer.addTo(markersLayer);
+            selLayers.set(String(id), { layer: layer, zone: { id: id, name: name, geometry: geom } });
+            try { const b = layer.getBounds(); if (b.isValid()) bounds.push(b); } catch (e) {}
         });
 
-        Promise.all(promises).then(function () {
-            if (coords.length > 0) {
-                map.fitBounds(coords, { padding: [40, 40], maxZoom: 10 });
-            }
-            map.invalidateSize(true);
-        });
+        if (bounds.length > 0) {
+            let combined = bounds[0];
+            for (let i = 1; i < bounds.length; i++) { combined = combined.extend(bounds[i]); }
+            map.fitBounds(combined, { padding: [40, 40], maxZoom: 12 });
+        }
+        map.invalidateSize(true);
     }
 
     function onReady() {

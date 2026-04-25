@@ -302,21 +302,19 @@ class ClientsController extends BaseController
     }
 
     // ----------------------------------------------------------------
-    // AJAX : tous les quartiers géolocalisés (lat/lng renseignés)
+    // AJAX : zones avec géométrie dessinée (GeoJSON)
     // ----------------------------------------------------------------
 
     public function zonesGeolocalises()
     {
         $db   = \Config\Database::connect();
         $rows = $db->table('zones')
-            ->select('id, name, type, latitude, longitude')
+            ->select('id, name, type, geometry')
             ->where('deleted_at', null)
             ->where('is_active', 1)
-            ->where('latitude IS NOT NULL')
-            ->where('longitude IS NOT NULL')
+            ->where('geometry IS NOT NULL')
             ->orderBy('type', 'ASC')
             ->orderBy('name', 'ASC')
-            ->limit(3000)
             ->get()->getResultArray();
 
         $typeLabels = [
@@ -332,8 +330,7 @@ class ClientsController extends BaseController
                 'name'       => $r['name'],
                 'type'       => $r['type'],
                 'type_label' => $typeLabels[$r['type']] ?? $r['type'],
-                'lat'        => (float) $r['latitude'],
-                'lng'        => (float) $r['longitude'],
+                'geometry'   => $r['geometry'], // GeoJSON string
             ];
         }, $rows));
     }

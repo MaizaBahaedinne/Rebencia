@@ -521,7 +521,13 @@ $floorLabels = [
 <script>
 (function () {
     'use strict';
-    var zoneNames = <?= json_encode(array_column($pivotZones, 'name')) ?>;
+    var zonesData = <?= json_encode(array_map(function($z) {
+        return [
+            'name' => $z['name'],
+            'lat'  => $z['latitude']  !== null ? (float) $z['latitude']  : null,
+            'lng'  => $z['longitude'] !== null ? (float) $z['longitude'] : null,
+        ];
+    }, $pivotZones)) ?>;
     var map = L.map('zoneMap').setView([33.8869, 9.5375], 6);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
@@ -529,21 +535,30 @@ $floorLabels = [
     }).addTo(map);
     setTimeout(function () { map.invalidateSize(true); }, 300);
     var bounds = [];
-    Promise.all(zoneNames.map(function (name) {
+
+    function placeMarker(lat, lng, name) {
+        bounds.push([lat, lng]);
+        L.circleMarker([lat, lng], {
+            radius: 11, color: '#0dcaf0', fillColor: '#0dcaf0', fillOpacity: 0.4, weight: 2,
+        }).addTo(map).bindTooltip(name, { permanent: true, direction: 'top', className: 'fw-semibold' });
+    }
+
+    Promise.all(zonesData.map(function (z) {
+        // Priorité : coordonnées en base de données
+        if (z.lat && z.lng) {
+            placeMarker(z.lat, z.lng, z.name);
+            return Promise.resolve();
+        }
+        // Fallback : géocodage Nominatim
         return fetch(
             'https://nominatim.openstreetmap.org/search?q=' +
-            encodeURIComponent(name + ', Tunisie') + '&format=json&limit=1',
+            encodeURIComponent(z.name + ', Tunisie') + '&format=json&limit=1',
             { headers: { 'Accept-Language': 'fr' } }
         )
         .then(function (r) { return r.json(); })
         .then(function (res) {
             if (res && res[0]) {
-                var lat = parseFloat(res[0].lat);
-                var lng = parseFloat(res[0].lon);
-                bounds.push([lat, lng]);
-                L.circleMarker([lat, lng], {
-                    radius: 11, color: '#0dcaf0', fillColor: '#0dcaf0', fillOpacity: 0.4, weight: 2,
-                }).addTo(map).bindTooltip(name, { permanent: true, direction: 'top', className: 'fw-semibold' });
+                placeMarker(parseFloat(res[0].lat), parseFloat(res[0].lon), z.name);
             }
         })
         .catch(function () {});

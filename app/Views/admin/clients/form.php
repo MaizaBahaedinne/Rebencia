@@ -287,9 +287,11 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
                     <div id="selectedZonesTags" class="d-flex flex-wrap gap-2">
                         <?php foreach ($selectedZones as $sz): ?>
                         <span class="badge text-bg-info d-inline-flex align-items-center gap-1 zone-tag"
-                              data-zone-id="<?= $sz['zone_id'] ?>">
+                              data-zone-id="<?= $sz['zone_id'] ?>"
+                              data-lat="<?= $sz['latitude']  ?? '' ?>"
+                              data-lng="<?= $sz['longitude'] ?? '' ?>">
                             <i class="bi bi-geo-alt"></i>
-                            <?= esc($sz['name']) ?>
+                            <span><?= esc($sz['name']) ?></span>
                             <button type="button" class="btn-close btn-close-white btn-sm zone-remove"
                                     style="font-size:.6rem;" aria-label="Retirer"></button>
                             <input type="hidden" name="search_zones[]" value="<?= $sz['zone_id'] ?>">
@@ -682,6 +684,8 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
         const span = document.createElement('span');
         span.className = 'badge text-bg-info d-inline-flex align-items-center gap-1 zone-tag';
         span.dataset.zoneId = zone.id;
+        if (zone.latitude  != null) span.dataset.lat = zone.latitude;
+        if (zone.longitude != null) span.dataset.lng = zone.longitude;
         span.innerHTML =
             '<i class="bi bi-geo-alt"></i>' +
             document.createTextNode(zone.name).textContent +
@@ -889,14 +893,30 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
             return;
         }
 
-        const names = Array.from(tags).map(function (t) {
-            const spans = t.querySelectorAll('span');
-            return spans.length > 0 ? spans[0].textContent.trim() : '';
-        }).filter(Boolean);
-
         const bounds = [];
 
-        Promise.all(names.map(function (name) {
+        function placeMarker(lat, lng, name) {
+            bounds.push([lat, lng]);
+            L.circleMarker([lat, lng], {
+                radius: 10, color: '#0dcaf0', fillColor: '#0dcaf0', fillOpacity: 0.45, weight: 2,
+            }).addTo(markersGroup).bindTooltip(name, { permanent: true, direction: 'top' });
+        }
+
+        const promises = Array.from(tags).map(function (t) {
+            const nameEl = t.querySelector('span');
+            const name   = nameEl ? nameEl.textContent.trim() : '';
+            if (!name) return Promise.resolve();
+
+            const dbLat = parseFloat(t.dataset.lat);
+            const dbLng = parseFloat(t.dataset.lng);
+
+            // Priorité : coordonnées enregistrées dans la base de données
+            if (dbLat && dbLng && !isNaN(dbLat) && !isNaN(dbLng)) {
+                placeMarker(dbLat, dbLng, name);
+                return Promise.resolve();
+            }
+
+            // Fallback : géocodage Nominatim si pas de coordonnées en base
             return fetch(
                 'https://nominatim.openstreetmap.org/search?q=' +
                 encodeURIComponent(name + ', Tunisie') +
@@ -906,16 +926,13 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
             .then(function (r) { return r.json(); })
             .then(function (res) {
                 if (res && res[0]) {
-                    const lat = parseFloat(res[0].lat);
-                    const lng = parseFloat(res[0].lon);
-                    bounds.push([lat, lng]);
-                    L.circleMarker([lat, lng], {
-                        radius: 10, color: '#0dcaf0', fillColor: '#0dcaf0', fillOpacity: 0.45, weight: 2,
-                    }).addTo(markersGroup).bindTooltip(name, { permanent: true, direction: 'top' });
+                    placeMarker(parseFloat(res[0].lat), parseFloat(res[0].lon), name);
                 }
             })
             .catch(function () {});
-        })).then(function () {
+        });
+
+        Promise.all(promises).then(function () {
             if (bounds.length > 0) {
                 map.fitBounds(bounds, { padding: [30, 30], maxZoom: 10 });
                 map.invalidateSize();

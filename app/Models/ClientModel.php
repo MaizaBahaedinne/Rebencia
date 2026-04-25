@@ -139,7 +139,7 @@ class ClientModel extends Model
             return [];
         }
         return $db->table('client_search_zones csz')
-            ->select('csz.zone_id, z.name, z.type')
+            ->select('csz.zone_id, z.name, z.type, z.latitude, z.longitude')
             ->join('zones z', 'z.id = csz.zone_id AND z.deleted_at IS NULL', 'left')
             ->where('csz.client_id', $clientId)
             ->get()->getResultArray();

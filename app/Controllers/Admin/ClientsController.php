@@ -270,7 +270,7 @@ class ClientsController extends BaseController
         if (strlen($q) >= 2) {
             $db      = \Config\Database::connect();
             $builder = $db->table('zones')
-                ->select('id, name, type')
+                ->select('id, name, type, latitude, longitude')
                 ->where('deleted_at', null)
                 ->like('name', $q)
                 ->limit(20);
@@ -292,6 +292,8 @@ class ClientsController extends BaseController
                     'name'       => $row['name'],
                     'type'       => $row['type'],
                     'type_label' => $typeLabels[$row['type']] ?? $row['type'],
+                    'latitude'   => $row['latitude']  !== null ? (float) $row['latitude']  : null,
+                    'longitude'  => $row['longitude'] !== null ? (float) $row['longitude'] : null,
                 ];
             }
         }

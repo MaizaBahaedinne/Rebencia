@@ -56,9 +56,9 @@ class SystemController extends BaseController
 
         // Listes distinctes pour les filtres
         $db = \Config\Database::connect();
-        $modules  = $db->table('activity_logs')->select('DISTINCT module')->where('module !=', '')->orderBy('module')->get()->getResultArray();
+        $modules  = $db->table('activity_logs')->distinct()->select('module')->where('module !=', '')->orderBy('module')->get()->getResultArray();
         $modules  = array_column($modules, 'module');
-        $channels = $db->table('system_logs')->select('DISTINCT channel')->where('channel !=', '')->orderBy('channel')->get()->getResultArray();
+        $channels = $db->table('system_logs')->distinct()->select('channel')->where('channel !=', '')->orderBy('channel')->get()->getResultArray();
         $channels = array_column($channels, 'channel');
 
         return $this->render('admin/system/logs', [

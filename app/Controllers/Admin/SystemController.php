@@ -37,29 +37,36 @@ class SystemController extends BaseController
             'tab'       => $activeTab,
         ];
 
-        $activityModel = new ActivityLogModel();
-        $systemModel   = new SystemLogModel();
-
+        $activityModel  = new ActivityLogModel();
         $activityResult = $activityModel->getFiltered($filters, $perPage);
-        $systemResult   = $systemModel->getFiltered($filters, $perPage);
 
-        // Sélectionner les données et le total selon l'onglet actif
+        // Onglet système → lecture des fichiers logs CI4
         if ($activeTab === 'system') {
-            $result = $systemResult;
+            $systemResult     = $this->parseCI4Logs($filters, $perPage);
+            $systemLevelStats = $this->parseCI4LevelStats();
         } else {
-            $result = $activityResult;
+            $systemResult     = ['data' => [], 'total' => $this->countCI4LogLines(), 'page' => 1, 'perPage' => $perPage];
+            $systemLevelStats = $this->parseCI4LevelStats();
         }
 
-        // Pagination manuelle simple
+        $result     = $activeTab === 'system' ? $systemResult : $activityResult;
         $totalPages = max(1, (int) ceil($result['total'] / $perPage));
         $curPage    = (int) $result['page'];
 
-        // Listes distinctes pour les filtres
-        $db = \Config\Database::connect();
-        $modules  = $db->table('activity_logs')->distinct()->select('module')->where('module !=', '')->orderBy('module')->get()->getResultArray();
-        $modules  = array_column($modules, 'module');
-        $channels = $db->table('system_logs')->distinct()->select('channel')->where('channel !=', '')->orderBy('channel')->get()->getResultArray();
-        $channels = array_column($channels, 'channel');
+        // Modules distincts pour filtre activité
+        $db      = \Config\Database::connect();
+        $modules = $db->table('activity_logs')->distinct()->select('module')
+                      ->where('module !=', '')->orderBy('module')->get()->getResultArray();
+        $modules = array_column($modules, 'module');
+
+        // Fichiers de log CI4 disponibles (dates) pour filtre système
+        $logFiles = [];
+        foreach (glob(WRITEPATH . 'logs/log-*.log') as $f) {
+            if (preg_match('/log-(\d{4}-\d{2}-\d{2})\.log$/', $f, $m)) {
+                $logFiles[] = $m[1];
+            }
+        }
+        rsort($logFiles);
 
         return $this->render('admin/system/logs', [
             'page_title'      => 'Logs système',
@@ -68,14 +75,125 @@ class SystemController extends BaseController
             'logs'            => $result['data'],
             'activityStats'   => ['total' => $activityResult['total']],
             'systemStats'     => ['total' => $systemResult['total']],
-            'systemLevelStats'=> $systemModel->getLevelStats(),
+            'systemLevelStats'=> $systemLevelStats,
             'users'           => (new UserModel())->getWithRole(),
             'modules'         => $modules,
-            'channels'        => $channels,
+            'channels'        => $logFiles,
             'curPage'         => $curPage,
             'totalPages'      => $totalPages,
             'total'           => $result['total'],
         ]);
+    }
+
+    /** Parse les fichiers logs CI4 depuis writable/logs/ */
+    private function parseCI4Logs(array $filters = [], int $perPage = 50): array
+    {
+        $levelMap = [
+            'emergency' => 'critical', 'alert'   => 'critical', 'critical' => 'critical',
+            'error'     => 'error',    'warning'  => 'warning',
+            'notice'    => 'info',     'info'     => 'info',     'debug'    => 'debug',
+        ];
+
+        $files = glob(WRITEPATH . 'logs/log-*.log');
+        if (empty($files)) {
+            return ['data' => [], 'total' => 0, 'page' => 1, 'perPage' => $perPage];
+        }
+        rsort($files); // plus récent en premier
+
+        $entries = [];
+
+        foreach ($files as $filePath) {
+            if (!preg_match('/log-(\d{4}-\d{2}-\d{2})\.log$/', $filePath, $m)) {
+                continue;
+            }
+            $fileDate = $m[1];
+
+            // Filtre par date du fichier
+            if (!empty($filters['date_from']) && $fileDate < $filters['date_from']) continue;
+            if (!empty($filters['date_to'])   && $fileDate > $filters['date_to'])   continue;
+            // Filtre par fichier (channel = date)
+            if (!empty($filters['channel']) && $fileDate !== $filters['channel']) continue;
+
+            $lines = @file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            if (! $lines) continue;
+
+            foreach (array_reverse($lines) as $line) {
+                if (! preg_match('/^(\w+) - (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) --> (.+)$/', $line, $p)) {
+                    continue;
+                }
+                $level   = $levelMap[strtolower($p[1])] ?? 'info';
+                $datetime = $p[2];
+                $message  = $p[3];
+
+                if (!empty($filters['level'])  && $level !== $filters['level'])            continue;
+                if (!empty($filters['search']) && stripos($message, $filters['search']) === false) continue;
+
+                $entries[] = [
+                    'level'      => $level,
+                    'channel'    => $fileDate,
+                    'message'    => $message,
+                    'created_at' => $datetime,
+                    'context'    => null,
+                ];
+            }
+        }
+
+        $total  = count($entries);
+        $page   = max(1, (int) ($filters['page'] ?? 1));
+        $offset = ($page - 1) * $perPage;
+
+        return [
+            'data'    => array_slice($entries, $offset, $perPage),
+            'total'   => $total,
+            'page'    => $page,
+            'perPage' => $perPage,
+        ];
+    }
+
+    /** Compte total de lignes dans les logs CI4 (pour le badge de l'onglet). */
+    private function countCI4LogLines(): int
+    {
+        $count = 0;
+        foreach (glob(WRITEPATH . 'logs/log-*.log') as $f) {
+            $lines = @file($f, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            if ($lines) {
+                foreach ($lines as $line) {
+                    if (preg_match('/^\w+ - \d{4}-\d{2}-\d{2}/', $line)) $count++;
+                }
+            }
+        }
+        return $count;
+    }
+
+    /** Stats par niveau sur les 24 dernières heures depuis les fichiers CI4. */
+    private function parseCI4LevelStats(): array
+    {
+        $levelMap = [
+            'emergency' => 'critical', 'alert'   => 'critical', 'critical' => 'critical',
+            'error'     => 'error',    'warning'  => 'warning',
+            'notice'    => 'info',     'info'     => 'info',     'debug'    => 'debug',
+        ];
+        $since  = date('Y-m-d H:i:s', strtotime('-24 hours'));
+        $today  = date('Y-m-d');
+        $yesterday = date('Y-m-d', strtotime('-1 day'));
+        $stats  = [];
+
+        foreach (glob(WRITEPATH . 'logs/log-*.log') as $f) {
+            if (!preg_match('/log-(\d{4}-\d{2}-\d{2})\.log$/', $f, $m)) continue;
+            if ($m[1] < $yesterday) continue; // skip old files
+
+            $lines = @file($f, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            if (! $lines) continue;
+
+            foreach ($lines as $line) {
+                if (!preg_match('/^(\w+) - (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) --> /', $line, $p)) continue;
+                if ($p[2] < $since) continue;
+                $lvl = $levelMap[strtolower($p[1])] ?? 'info';
+                $stats[$lvl] = ($stats[$lvl] ?? 0) + 1;
+            }
+        }
+
+        return $stats;
     }
 
     /** Export CSV des logs. */

@@ -97,7 +97,7 @@
             </div>
             <div class="col-sm-2">
                 <select name="channel" class="form-select form-select-sm">
-                    <option value="">Tous canaux</option>
+                    <option value="">Tous les fichiers</option>
                     <?php foreach ($channels ?? [] as $ch): ?>
                         <option value="<?= esc($ch) ?>" <?= ($filters['channel'] ?? '') === $ch ? 'selected' : '' ?>><?= esc($ch) ?></option>
                     <?php endforeach; ?>
@@ -133,9 +133,9 @@
                     <th>IP</th>
                     <?php else: ?>
                     <th style="width:90px">Niveau</th>
-                    <th>Canal</th>
+                    <th style="width:110px">Fichier</th>
                     <th>Message</th>
-                    <th>Contexte</th>
+                    <th style="width:40px">Ctx</th>
                     <?php endif; ?>
                 </tr>
             </thead>

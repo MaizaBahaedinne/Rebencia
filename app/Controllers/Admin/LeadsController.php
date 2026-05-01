@@ -113,12 +113,23 @@ class LeadsController extends BaseController
         $this->requirePermission('leads.view');
         $lead = $this->findOrFail($id);
 
+        $propertyModel = new PropertyModel();
+
+        $linkedProperty = null;
+        if (!empty($lead['property_id'])) {
+            $linkedProperty = $propertyModel->findWithImages((int) $lead['property_id']);
+        }
+
+        $similarProperties = $propertyModel->getSimilarProperties($lead);
+
         return $this->render('admin/leads/show', [
-            'page_title'    => $lead['first_name'] . ' ' . $lead['last_name'],
-            'lead'          => $lead,
-            'agents'        => (new UserModel())->getWithRole(['status' => 'active']),
-            'notes'         => $lead['lead_notes'],
-            'statusHistory' => $lead['status_history'],
+            'page_title'        => $lead['first_name'] . ' ' . $lead['last_name'],
+            'lead'              => $lead,
+            'agents'            => (new UserModel())->getWithRole(['status' => 'active']),
+            'notes'             => $lead['lead_notes'],
+            'statusHistory'     => $lead['status_history'],
+            'linkedProperty'    => $linkedProperty,
+            'similarProperties' => $similarProperties,
         ]);
     }
 

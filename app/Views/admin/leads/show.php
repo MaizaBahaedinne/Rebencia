@@ -137,6 +137,91 @@ $currentIdx  = array_search($currentStatus, $statusKeys);
             </div>
         </div>
 
+        <!-- Bien demandé -->
+        <?php if (!empty($linkedProperty)): ?>
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-transparent">
+                <strong><i class="bi bi-building-check me-2 text-primary"></i>Bien demandé par le client</strong>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 align-items-start">
+                    <?php
+                    $coverImg = null;
+                    foreach ($linkedProperty['images'] as $img) {
+                        if ($img['is_primary']) { $coverImg = $img['path']; break; }
+                    }
+                    if (!$coverImg && !empty($linkedProperty['images'])) {
+                        $coverImg = $linkedProperty['images'][0]['path'];
+                    }
+                    ?>
+                    <?php if ($coverImg): ?>
+                    <div class="col-md-4">
+                        <img src="<?= base_url(esc($coverImg)) ?>"
+                             class="img-fluid rounded" style="object-fit:cover;height:160px;width:100%;" alt="">
+                    </div>
+                    <?php endif; ?>
+                    <div class="col-md-<?= $coverImg ? '8' : '12' ?>">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <span class="badge bg-secondary me-1"><?= esc($linkedProperty['reference']) ?></span>
+                                <?php
+                                $sMap = ['available'=>['Disponible','success'],'sold'=>['Vendu','danger'],'reserved'=>['Réservé','warning'],'rented'=>['Loué','info']];
+                                [$sLabel,$sColor] = $sMap[$linkedProperty['status']] ?? [ucfirst($linkedProperty['status']),'secondary'];
+                                ?>
+                                <span class="badge bg-<?= $sColor ?>"><?= $sLabel ?></span>
+                            </div>
+                            <a href="<?= site_url('admin/properties/' . $linkedProperty['id']) ?>" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye me-1"></i>Voir la fiche
+                            </a>
+                        </div>
+                        <h6 class="mb-2"><?= esc($linkedProperty['title']) ?></h6>
+                        <p class="text-muted small mb-2">
+                            <i class="bi bi-geo-alt me-1"></i><?= esc($linkedProperty['city'] . (!empty($linkedProperty['zone']) ? ', ' . $linkedProperty['zone'] : '')) ?>
+                        </p>
+                        <div class="row g-2">
+                            <div class="col-6 col-md-4">
+                                <div class="border rounded p-2 text-center">
+                                    <div class="text-muted small">Prix</div>
+                                    <strong class="text-primary"><?= number_format((float)$linkedProperty['price'], 0, ',', ' ') ?> TND</strong>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-4">
+                                <div class="border rounded p-2 text-center">
+                                    <div class="text-muted small">Surface</div>
+                                    <strong><?= esc($linkedProperty['surface']) ?> m²</strong>
+                                </div>
+                            </div>
+                            <?php if (!empty($linkedProperty['rooms'])): ?>
+                            <div class="col-6 col-md-4">
+                                <div class="border rounded p-2 text-center">
+                                    <div class="text-muted small">Pièces</div>
+                                    <strong><?= esc($linkedProperty['rooms']) ?></strong>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                            <?php if (!empty($linkedProperty['bedrooms'])): ?>
+                            <div class="col-6 col-md-4">
+                                <div class="border rounded p-2 text-center">
+                                    <div class="text-muted small">Chambres</div>
+                                    <strong><?= esc($linkedProperty['bedrooms']) ?></strong>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                            <?php if (!empty($linkedProperty['bathrooms'])): ?>
+                            <div class="col-6 col-md-4">
+                                <div class="border rounded p-2 text-center">
+                                    <div class="text-muted small">SDB</div>
+                                    <strong><?= esc($linkedProperty['bathrooms']) ?></strong>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <!-- Notes existantes -->
         <div class="card border-0 shadow-sm mb-3">
             <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
@@ -217,4 +302,64 @@ $currentIdx  = array_search($currentStatus, $statusKeys);
         <?php endif; ?>
     </div>
 </div>
+
+<!-- Propositions similaires -->
+<?php if (!empty($similarProperties)): ?>
+<div class="card border-0 shadow-sm mt-4">
+    <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+        <strong><i class="bi bi-stars me-2 text-warning"></i>Propositions similaires à la demande</strong>
+        <span class="badge bg-secondary"><?= count($similarProperties) ?> bien<?= count($similarProperties) > 1 ? 's' : '' ?></span>
+    </div>
+    <div class="card-body">
+        <?php if (!empty($lead['property_type']) || !empty($lead['budget_max']) || !empty($lead['desired_location'])): ?>
+        <p class="text-muted small mb-3">
+            Biens disponibles correspondant à :
+            <?php if (!empty($lead['property_type'])): ?><span class="badge bg-light text-dark border me-1"><?= esc($lead['property_type']) ?></span><?php endif; ?>
+            <?php if (!empty($lead['transaction_type'])): ?><span class="badge bg-light text-dark border me-1"><?= esc($lead['transaction_type']) ?></span><?php endif; ?>
+            <?php if (!empty($lead['desired_location'])): ?><span class="badge bg-light text-dark border me-1"><i class="bi bi-geo-alt"></i> <?= esc($lead['desired_location']) ?></span><?php endif; ?>
+            <?php if (!empty($lead['budget_max'])): ?><span class="badge bg-light text-dark border me-1">≤ <?= number_format((float)$lead['budget_max'], 0, ',', ' ') ?> TND</span><?php endif; ?>
+        </p>
+        <?php endif; ?>
+        <div class="row g-3">
+            <?php foreach ($similarProperties as $prop): ?>
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border">
+                    <?php if (!empty($prop['primary_image'])): ?>
+                    <img src="<?= base_url(esc($prop['primary_image'])) ?>"
+                         class="card-img-top" style="object-fit:cover;height:170px;" alt="">
+                    <?php else: ?>
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height:170px;">
+                        <i class="bi bi-building text-secondary" style="font-size:3rem;"></i>
+                    </div>
+                    <?php endif; ?>
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <span class="badge bg-light text-dark border small"><?= esc($prop['type']) ?></span>
+                            <?php if ($prop['featured']): ?>
+                            <i class="bi bi-star-fill text-warning small" title="En vedette"></i>
+                            <?php endif; ?>
+                        </div>
+                        <h6 class="card-title small mb-1 fw-semibold"><?= esc($prop['title']) ?></h6>
+                        <p class="text-muted small mb-2">
+                            <i class="bi bi-geo-alt me-1"></i><?= esc($prop['city']) ?>
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong class="text-primary"><?= number_format((float)$prop['price'], 0, ',', ' ') ?> TND</strong>
+                            <?php if (!empty($prop['surface'])): ?>
+                            <small class="text-muted"><?= esc($prop['surface']) ?> m²</small>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent p-2">
+                        <a href="<?= site_url('admin/properties/' . $prop['id']) ?>" class="btn btn-sm btn-outline-primary w-100">
+                            <i class="bi bi-eye me-1"></i>Voir la fiche
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 

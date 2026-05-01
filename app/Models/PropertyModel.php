@@ -124,6 +124,48 @@ class PropertyModel extends Model
     }
 
     /**
+     * Retourne des biens similaires à un lead (pour propositions).
+     */
+    public function getSimilarProperties(array $lead, int $limit = 6): array
+    {
+        $builder = $this->db->table('properties p')
+            ->select('p.*,
+                      (SELECT path FROM property_images WHERE property_id = p.id AND is_primary = 1 LIMIT 1) AS primary_image')
+            ->where('p.deleted_at IS NULL')
+            ->where('p.status', 'available');
+
+        if (!empty($lead['transaction_type'])) {
+            $builder->where('p.transaction_type', $lead['transaction_type']);
+        }
+        if (!empty($lead['property_type'])) {
+            $builder->where('p.type', $lead['property_type']);
+        }
+        if (!empty($lead['budget_max'])) {
+            $builder->where('p.price <=', (float) $lead['budget_max'] * 1.1);
+        }
+        if (!empty($lead['budget_min'])) {
+            $builder->where('p.price >=', (float) $lead['budget_min'] * 0.9);
+        }
+        if (!empty($lead['desired_location'])) {
+            $builder->groupStart()
+                ->like('p.city', $lead['desired_location'])
+                ->orLike('p.zone', $lead['desired_location'])
+                ->orLike('p.address', $lead['desired_location'])
+                ->groupEnd();
+        }
+        if (!empty($lead['property_id'])) {
+            $builder->where('p.id !=', (int) $lead['property_id']);
+        }
+
+        return $builder
+            ->orderBy('p.featured', 'DESC')
+            ->orderBy('p.created_at', 'DESC')
+            ->limit($limit)
+            ->get()
+            ->getResultArray();
+    }
+
+    /**
      * Enregistre l'historique d'une modification.
      */
     public function logChange(int $propertyId, int $userId, string $field, $old, $new): void

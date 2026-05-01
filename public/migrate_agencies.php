@@ -13,29 +13,38 @@ if (($_GET['token'] ?? '') !== MIGRATION_TOKEN) {
 }
 
 // ── Charger la config CI4 ──────────────────────────────────────────────────
-define('FCPATH', __DIR__ . '/');
-$envFile = __DIR__ . '/.env';
+// Le .env est à la racine du projet (un niveau au-dessus de public/)
+$envFile = dirname(__DIR__) . '/.env';
 $dbHost = 'localhost'; $dbUser = 'root'; $dbPass = ''; $dbName = 'rebencia';
 
 if (file_exists($envFile)) {
     foreach (file($envFile) as $line) {
         $line = trim($line);
+        if ($line === '' || str_starts_with($line, '#')) continue;
         if (str_starts_with($line, 'database.default.hostname')) $dbHost = explode('=', $line, 2)[1] ?? $dbHost;
         if (str_starts_with($line, 'database.default.username')) $dbUser = explode('=', $line, 2)[1] ?? $dbUser;
         if (str_starts_with($line, 'database.default.password')) $dbPass = explode('=', $line, 2)[1] ?? $dbPass;
         if (str_starts_with($line, 'database.default.database'))  $dbName = explode('=', $line, 2)[1] ?? $dbName;
     }
+} else {
+    die('<h2>Erreur</h2><p>Fichier .env introuvable : ' . htmlspecialchars($envFile) . '</p>');
 }
 
 // Nettoyage des valeurs lues
-$dbHost = trim(str_replace(['"',"'"], '', $dbHost));
-$dbUser = trim(str_replace(['"',"'"], '', $dbUser));
-$dbPass = trim(str_replace(['"',"'"], '', $dbPass));
-$dbName = trim(str_replace(['"',"'"], '', $dbName));
+$dbHost = trim(str_replace(['"',"'", ' '], '', $dbHost));
+$dbUser = trim(str_replace(['"',"'", ' '], '', $dbUser));
+$dbPass = trim(str_replace(['"',"'"], '',   $dbPass));
+$dbName = trim(str_replace(['"',"'", ' '], '', $dbName));
 
-$pdo = new PDO("mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4", $dbUser, $dbPass, [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-]);
+try {
+    $pdo = new PDO("mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4", $dbUser, $dbPass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    ]);
+} catch (PDOException $e) {
+    die('<h2>Connexion DB échouée</h2><pre>'
+        . htmlspecialchars("host={$dbHost} user={$dbUser} db={$dbName}\n" . $e->getMessage())
+        . '</pre>');
+}
 
 $steps = [];
 

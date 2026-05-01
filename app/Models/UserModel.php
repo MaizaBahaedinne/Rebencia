@@ -135,9 +135,8 @@ class UserModel extends Model
         $this->db->table('user_roles')->where('user_id', $userId)->delete();
         foreach ($roleIds as $rid) {
             $this->db->table('user_roles')->insert([
-                'user_id'    => $userId,
-                'role_id'    => $rid,
-                'created_at' => date('Y-m-d H:i:s'),
+                'user_id' => $userId,
+                'role_id' => $rid,
             ]);
         }
 

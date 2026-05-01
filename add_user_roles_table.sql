@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS `user_roles` (
   `id`         INT UNSIGNED    NOT NULL AUTO_INCREMENT,
   `user_id`    INT UNSIGNED    NOT NULL,
   `role_id`    INT UNSIGNED    NOT NULL,
-  `created_at` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY  `uq_user_role` (`user_id`, `role_id`),
   CONSTRAINT `ur_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users`  (`id`) ON DELETE CASCADE,

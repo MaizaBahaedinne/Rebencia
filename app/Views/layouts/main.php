@@ -322,13 +322,13 @@
                     <?php if (in_array('roles.view', session()->get('permissions') ?? [])): ?>
                     <li>
                         <a class="dropdown-item py-2" href="<?= base_url('admin/roles') ?>">
-                            <i class="bi bi-shield-check me-2 text-muted"></i>Rôles
+                            <i class="bi bi-shield-check me-2 text-muted"></i>Mes rôles
                         </a>
                     </li>
                     <?php endif; ?>
                     <li>
                         <a class="dropdown-item py-2" href="<?= base_url('admin/agency') ?>">
-                            <i class="bi bi-building me-2 text-muted"></i>Agence
+                            <i class="bi bi-building me-2 text-muted"></i>Mon agence
                         </a>
                     </li>
 

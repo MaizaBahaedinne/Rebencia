@@ -109,6 +109,43 @@ class UserModel extends Model
     }
 
     /**
+     * Retourne tous les rôles assignés à un utilisateur (table user_roles).
+     */
+    public function getUserRoles(int $userId): array
+    {
+        return $this->db->table('user_roles ur')
+            ->select('ur.role_id, r.name, COALESCE(r.label, r.name) AS label, COALESCE(r.color, \'#6c757d\') AS color')
+            ->join('roles r', 'r.id = ur.role_id')
+            ->where('ur.user_id', $userId)
+            ->orderBy('r.name')
+            ->get()->getResultArray();
+    }
+
+    /**
+     * Synchronise la table user_roles pour un utilisateur.
+     * Met aussi à jour role_id (rôle principal = premier de la liste).
+     */
+    public function syncRoles(int $userId, array $roleIds): void
+    {
+        $roleIds = array_values(array_unique(array_filter(array_map('intval', $roleIds))));
+        if (empty($roleIds)) {
+            return;
+        }
+
+        $this->db->table('user_roles')->where('user_id', $userId)->delete();
+        foreach ($roleIds as $rid) {
+            $this->db->table('user_roles')->insert([
+                'user_id'    => $userId,
+                'role_id'    => $rid,
+                'created_at' => date('Y-m-d H:i:s'),
+            ]);
+        }
+
+        // Le premier rôle sélectionné devient le rôle principal
+        $this->db->table('users')->where('id', $userId)->update(['role_id' => $roleIds[0]]);
+    }
+
+    /**
      * Statistiques globales pour le dashboard.
      */
     public function getStats(): array

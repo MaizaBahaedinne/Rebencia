@@ -45,9 +45,10 @@ class UsersController extends BaseController
         $this->requirePermission('users.create');
 
         return $this->render('admin/users/form', [
-            'page_title' => 'Nouvel utilisateur',
-            'roles'      => $this->roleModel->where('is_active', 1)->findAll(),
-            'user'       => [],
+            'page_title'  => 'Nouvel utilisateur',
+            'roles'       => $this->roleModel->where('is_active', 1)->findAll(),
+            'user'        => [],
+            'userRoleIds' => [],
         ]);
     }
 
@@ -56,27 +57,49 @@ class UsersController extends BaseController
     {
         $this->requirePermission('users.create');
 
+        $roleIds = array_filter(array_map('intval', (array) $this->request->getPost('role_ids')));
+
         $rules = [
             'first_name' => 'required|min_length[2]|max_length[100]',
             'last_name'  => 'required|min_length[2]|max_length[100]',
             'email'      => 'required|valid_email|is_unique[users.email]',
             'password'   => 'required|min_length[8]|max_length[255]',
-            'role_id'    => 'required|is_natural_no_zero',
         ];
+
+        if (empty($roleIds)) {
+            return redirect()->back()->withInput()->with('error', 'Veuillez sélectionner au moins un rôle.');
+        }
 
         if (! $this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        $this->model->insert([
-            'role_id'       => $this->request->getPost('role_id'),
+        $data = [
+            'role_id'       => $roleIds[0],
             'first_name'    => $this->request->getPost('first_name'),
             'last_name'     => $this->request->getPost('last_name'),
             'email'         => $this->request->getPost('email'),
-            'phone'         => $this->request->getPost('phone'),
+            'phone'         => ($this->request->getPost('phone') ?? '') ?: null,
             'password_hash' => password_hash($this->request->getPost('password'), PASSWORD_BCRYPT, ['cost' => 12]),
-            'status'        => $this->request->getPost('status') ?? 'active',
-        ]);
+            'status'        => $this->request->getPost('status') ?: 'active',
+        ];
+
+        // Avatar upload
+        $avatar = $this->request->getFile('avatar');
+        if ($avatar && $avatar->isValid() && ! $avatar->hasMoved()) {
+            if (! in_array(strtolower($avatar->getClientExtension()), ['jpg','jpeg','png','gif','webp'], true)) {
+                return redirect()->back()->withInput()->with('error', 'Format avatar invalide (jpg, png, gif, webp).');
+            }
+            if ($avatar->getSize() > 2 * 1024 * 1024) {
+                return redirect()->back()->withInput()->with('error', 'Avatar trop volumineux (max 2 Mo).');
+            }
+            $newName = 'user_' . time() . '_' . random_int(1000, 9999) . '.' . $avatar->getClientExtension();
+            $avatar->move(ROOTPATH . 'public/uploads/avatars/', $newName);
+            $data['avatar'] = 'uploads/avatars/' . $newName;
+        }
+
+        $newId = $this->model->insert($data);
+        $this->model->syncRoles($newId ?: $this->model->getInsertID(), $roleIds);
 
         $this->log->activity('user.create', 'users', 'user', $this->model->getInsertID(), 'Création utilisateur');
 
@@ -110,10 +133,18 @@ class UsersController extends BaseController
             throw new \CodeIgniter\Exceptions\PageNotFoundException("Utilisateur #{$id} introuvable");
         }
 
+        $userRoles   = $this->model->getUserRoles($id);
+        $userRoleIds = array_column($userRoles, 'role_id');
+        // Fallback: si user_roles est vide (avant migration), utiliser role_id principal
+        if (empty($userRoleIds) && !empty($user['role_id'])) {
+            $userRoleIds = [(int) $user['role_id']];
+        }
+
         return $this->render('admin/users/form', [
-            'page_title' => 'Modifier – ' . $user['first_name'],
-            'user'       => $user,
-            'roles'      => $this->roleModel->where('is_active', 1)->findAll(),
+            'page_title'  => 'Modifier – ' . $user['first_name'],
+            'user'        => $user,
+            'roles'       => $this->roleModel->where('is_active', 1)->findAll(),
+            'userRoleIds' => $userRoleIds,
         ]);
     }
 
@@ -127,11 +158,16 @@ class UsersController extends BaseController
             return redirect()->to('/admin/users')->with('error', 'Utilisateur introuvable.');
         }
 
+        $roleIds = array_filter(array_map('intval', (array) $this->request->getPost('role_ids')));
+
+        if (empty($roleIds)) {
+            return redirect()->back()->withInput()->with('error', 'Veuillez sélectionner au moins un rôle.');
+        }
+
         $rules = [
             'first_name' => 'required|min_length[2]',
             'last_name'  => 'required|min_length[2]',
             'email'      => "required|valid_email|is_unique[users.email,id,{$id}]",
-            'role_id'    => 'required|is_natural_no_zero',
         ];
 
         if (! $this->validate($rules)) {
@@ -142,20 +178,49 @@ class UsersController extends BaseController
             'first_name' => $this->request->getPost('first_name'),
             'last_name'  => $this->request->getPost('last_name'),
             'email'      => $this->request->getPost('email'),
-            'phone'      => $this->request->getPost('phone'),
-            'role_id'    => $this->request->getPost('role_id'),
+            'phone'      => ($this->request->getPost('phone') ?? '') ?: null,
+            'role_id'    => $roleIds[0],
             'status'     => $this->request->getPost('status'),
         ];
 
+        // Nouveau mot de passe (optionnel)
         $newPassword = $this->request->getPost('password');
         if (! empty($newPassword)) {
             $data['password_hash'] = password_hash($newPassword, PASSWORD_BCRYPT, ['cost' => 12]);
         }
 
+        // Avatar upload
+        $avatar = $this->request->getFile('avatar');
+        if ($avatar && $avatar->isValid() && ! $avatar->hasMoved()) {
+            if (! in_array(strtolower($avatar->getClientExtension()), ['jpg','jpeg','png','gif','webp'], true)) {
+                return redirect()->back()->withInput()->with('error', 'Format avatar invalide (jpg, png, gif, webp).');
+            }
+            if ($avatar->getSize() > 2 * 1024 * 1024) {
+                return redirect()->back()->withInput()->with('error', 'Avatar trop volumineux (max 2 Mo).');
+            }
+            // Supprimer l'ancien avatar
+            if (! empty($user['avatar'])) {
+                @unlink(ROOTPATH . 'public/' . $user['avatar']);
+            }
+            $newName = 'user_' . $id . '_' . time() . '.' . $avatar->getClientExtension();
+            $avatar->move(ROOTPATH . 'public/uploads/avatars/', $newName);
+            $data['avatar'] = 'uploads/avatars/' . $newName;
+        }
+
+        // Supprimer l'avatar si demandé
+        if ($this->request->getPost('remove_avatar') === '1' && empty($data['avatar'])) {
+            if (! empty($user['avatar'])) {
+                @unlink(ROOTPATH . 'public/' . $user['avatar']);
+            }
+            $data['avatar'] = null;
+        }
+
         $this->model->update($id, $data);
+        $this->model->syncRoles($id, array_values($roleIds));
+
         $this->log->activity('user.update', 'users', 'user', $id, 'Modification utilisateur');
 
-        return redirect()->to('/admin/users')->with('success', 'Utilisateur mis à jour.');
+        return redirect()->to('/admin/users/' . $id . '/edit')->with('success', 'Utilisateur mis à jour.');
     }
 
     /** Active / suspend / met en attente. */

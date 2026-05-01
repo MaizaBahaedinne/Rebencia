@@ -280,12 +280,68 @@
             </div>
             <!-- ── Fin cloche ── -->
 
-            <span class="badge bg-light text-dark border" style="font-size:.75rem;">
-                <?= esc(session()->get('user_role_label')) ?>
-            </span>
-            <a href="<?= base_url('admin/profile') ?>" class="text-decoration-none text-dark" style="font-size:.875rem;">
-                <i class="bi bi-person-circle me-1"></i><?= esc(session()->get('user_name')) ?>
-            </a>
+            <!-- ── Menu utilisateur ── -->
+            <div class="dropdown">
+                <button class="btn btn-sm btn-light d-flex align-items-center gap-2 pe-2"
+                        id="userMenuBtn" data-bs-toggle="dropdown" aria-expanded="false"
+                        style="border-radius:2rem;">
+                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white"
+                         style="width:30px;height:30px;font-size:.8rem;flex-shrink:0;">
+                        <?= strtoupper(substr(session()->get('user_name') ?? 'U', 0, 1)) ?>
+                    </div>
+                    <div class="text-start d-none d-md-block" style="line-height:1.2;">
+                        <div style="font-size:.82rem;font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                            <?= esc(session()->get('user_name')) ?>
+                        </div>
+                        <div style="font-size:.7rem;color:#6c757d;">
+                            <?= esc(session()->get('user_role_label')) ?>
+                        </div>
+                    </div>
+                    <i class="bi bi-chevron-down text-muted" style="font-size:.65rem;"></i>
+                </button>
+
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-1"
+                    style="min-width:220px;border-radius:.75rem;" aria-labelledby="userMenuBtn">
+                    <!-- En-tête du menu -->
+                    <li class="px-3 py-2 border-bottom">
+                        <div class="fw-semibold" style="font-size:.875rem;"><?= esc(session()->get('user_name')) ?></div>
+                        <div class="text-muted" style="font-size:.75rem;"><?= esc(session()->get('user_email') ?? '') ?></div>
+                        <span class="badge bg-primary mt-1" style="font-size:.7rem;"><?= esc(session()->get('user_role_label')) ?></span>
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item py-2" href="<?= base_url('admin/profile') ?>">
+                            <i class="bi bi-person me-2 text-muted"></i>Profil
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item py-2" href="<?= base_url('admin/settings') ?>">
+                            <i class="bi bi-gear me-2 text-muted"></i>Paramètres
+                        </a>
+                    </li>
+                    <?php if (in_array('roles.view', session()->get('permissions') ?? [])): ?>
+                    <li>
+                        <a class="dropdown-item py-2" href="<?= base_url('admin/roles') ?>">
+                            <i class="bi bi-shield-check me-2 text-muted"></i>Rôles
+                        </a>
+                    </li>
+                    <?php endif; ?>
+                    <li>
+                        <a class="dropdown-item py-2" href="<?= base_url('admin/agency') ?>">
+                            <i class="bi bi-building me-2 text-muted"></i>Agence
+                        </a>
+                    </li>
+
+                    <li><hr class="dropdown-divider my-1"></li>
+
+                    <li>
+                        <a class="dropdown-item py-2 text-danger" href="<?= base_url('logout') ?>">
+                            <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <!-- ── Fin menu utilisateur ── -->
         </div>
     </div>
 

@@ -4,9 +4,11 @@
         <h2 class="mb-0">Leads / CRM</h2>
         <small class="text-muted">Gestion du pipeline commercial</small>
     </div>
+    <?php if (in_array('leads.create', session()->get('permissions') ?? [])) : ?>
     <a href="<?= site_url('admin/leads/create') ?>" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i> Nouveau lead
     </a>
+    <?php endif; ?>
 </div>
 
 <?php if (session()->has('success')): ?>
@@ -171,9 +173,11 @@
                         <a href="<?= site_url('admin/leads/' . $lead['id']) ?>" class="btn btn-sm btn-outline-info" title="Voir">
                             <i class="bi bi-eye"></i>
                         </a>
+                        <?php if (in_array('leads.edit', session()->get('permissions') ?? [])) : ?>
                         <a href="<?= site_url('admin/leads/' . $lead['id'] . '/edit') ?>" class="btn btn-sm btn-outline-warning ms-1" title="Modifier">
                             <i class="bi bi-pencil"></i>
                         </a>
+                        <?php endif; ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>

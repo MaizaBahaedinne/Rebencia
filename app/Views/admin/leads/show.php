@@ -20,9 +20,11 @@ $currentIdx  = array_search($currentStatus, $statusKeys);
         <small class="text-muted">Lead #<?= $lead['id'] ?> • Créé le <?= date('d/m/Y', strtotime($lead['created_at'])) ?></small>
     </div>
     <div class="d-flex gap-2">
+        <?php if (in_array('leads.edit', session()->get('permissions') ?? [])) : ?>
         <a href="<?= site_url('admin/leads/' . $lead['id'] . '/edit') ?>" class="btn btn-warning">
             <i class="bi bi-pencil me-1"></i> Modifier
         </a>
+        <?php endif; ?>
         <a href="<?= site_url('admin/leads') ?>" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left me-1"></i> Retour
         </a>

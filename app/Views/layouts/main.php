@@ -179,10 +179,16 @@
         </a>
         <?php endif; ?>
 
+        <?php
+        $_devPerms = session()->get('permissions') ?? [];
+        $_hasTasks = in_array('tasks.view', $_devPerms);
+        ?>
+        <?php if ($_hasTasks): ?>
         <div class="nav-section">Développement</div>
         <a href="<?= base_url('admin/tasks') ?>" class="nav-link <?= str_starts_with(uri_string(), 'admin/tasks') ? 'active' : '' ?>">
             <i class="bi bi-kanban"></i> Suivi des tâches
         </a>
+        <?php endif; ?>
         <a href="<?= base_url('admin/notifications') ?>" class="nav-link <?= str_starts_with(uri_string(), 'admin/notifications') ? 'active' : '' ?>"
            id="sb-notif-link" title="Notifications">
             <i class="bi bi-bell"></i> Notifications

@@ -446,6 +446,42 @@ $currentType = old('client_type', $client['client_type'] ?? 'acheteur');
                             <label class="form-check-label" for="hasElevator">Ascenseur requis</label>
                         </div>
                     </div>
+
+                    <!-- ── Nouveaux critères ── -->
+                    <div class="col-sm-6 col-lg-3">
+                        <label class="form-label">Salles de bain (min)</label>
+                        <input type="number" name="bathrooms_min" class="form-control" min="0" max="10"
+                               value="<?= esc(old('bathrooms_min', $client['bathrooms_min'] ?? '')) ?>">
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <label class="form-label">Places de parking (min)</label>
+                        <input type="number" name="parking_min" class="form-control" min="0" max="10"
+                               value="<?= esc(old('parking_min', $client['parking_min'] ?? '')) ?>">
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <label class="form-label">État du bien</label>
+                        <select name="construction_state" class="form-select">
+                            <option value="">— Indifférent —</option>
+                            <?php foreach ($constructionStateLabels as $csKey => $csMeta): ?>
+                            <option value="<?= $csKey ?>"
+                                <?= old('construction_state', $client['construction_state'] ?? '') === $csKey ? 'selected' : '' ?>>
+                                <?= $csMeta['label'] ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <label class="form-label">Meublement</label>
+                        <select name="furnished" class="form-select">
+                            <option value="">— Indifférent —</option>
+                            <?php foreach ($furnishedLabels as $fKey => $fMeta): ?>
+                            <option value="<?= $fKey ?>"
+                                <?= old('furnished', $client['furnished'] ?? '') === $fKey ? 'selected' : '' ?>>
+                                <?= $fMeta['label'] ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
                 </div>
             </div>
 

@@ -22,6 +22,7 @@ class ClientModel extends Model
         'surface_min', 'surface_max', 'rooms_min', 'bedrooms_min',
         'floor_preferred', 'has_elevator',
         'urgency', 'budget_flexibility',
+        'bathrooms_min', 'parking_min', 'construction_state', 'furnished',
         'status', 'assigned_to', 'source',
         'notes',
     ];
@@ -80,6 +81,21 @@ class ClientModel extends Model
         'nord_ouest'=> 'Nord-Ouest',
         'sud_est'   => 'Sud-Est',
         'sud_ouest' => 'Sud-Ouest',
+    ];
+
+    public const CONSTRUCTION_STATE_LABELS = [
+        'neuf'         => ['label' => 'Neuf',             'color' => 'success',   'icon' => 'bi-stars'],
+        'recent'       => ['label' => 'Récent (< 5 ans)', 'color' => 'info',      'icon' => 'bi-calendar-check'],
+        'ancien'       => ['label' => 'Ancien',           'color' => 'secondary', 'icon' => 'bi-building'],
+        'a_renover'    => ['label' => 'À rénover',        'color' => 'warning',   'icon' => 'bi-tools'],
+        'indifferent'  => ['label' => 'Indifférent',      'color' => 'light',     'icon' => 'bi-dash-circle'],
+    ];
+
+    public const FURNISHED_LABELS = [
+        'meuble'       => ['label' => 'Meublé',        'color' => 'primary',   'icon' => 'bi-lamp'],
+        'semi_meuble'  => ['label' => 'Semi-meublé',   'color' => 'info',      'icon' => 'bi-lamp-fill'],
+        'vide'         => ['label' => 'Vide',          'color' => 'secondary', 'icon' => 'bi-box'],
+        'indifferent'  => ['label' => 'Indifférent',   'color' => 'light',     'icon' => 'bi-dash-circle'],
     ];
 
     public const FEATURES_CATALOG = [

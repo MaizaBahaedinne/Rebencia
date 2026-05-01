@@ -102,11 +102,13 @@
                         <td class="text-muted small"><?= date('d/m/Y', strtotime($user['created_at'])) ?></td>
                         <td class="text-end">
                             <div class="btn-group btn-group-sm">
+                                <?php if (in_array('users.edit', session()->get('permissions') ?? [])) : ?>
                                 <a href="<?= base_url('admin/users/' . $user['id'] . '/edit') ?>"
                                    class="btn btn-outline-secondary" title="Modifier">
                                     <i class="bi bi-pencil"></i>
                                 </a>
-                                <?php if ($user['id'] !== session()->get('user_id')) : ?>
+                                <?php endif; ?>
+                                <?php if (in_array('users.delete', session()->get('permissions') ?? []) && $user['id'] !== session()->get('user_id')) : ?>
                                 <button class="btn btn-outline-danger" title="Supprimer"
                                         onclick="confirmDelete(<?= $user['id'] ?>, '<?= esc($user['first_name']) ?>')">
                                     <i class="bi bi-trash"></i>

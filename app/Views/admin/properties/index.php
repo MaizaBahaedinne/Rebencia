@@ -128,12 +128,16 @@
                         </td>
                         <td class="text-end">
                             <div class="btn-group btn-group-sm">
+                                <?php if (in_array('properties.edit', session()->get('permissions') ?? [])) : ?>
                                 <a href="<?= base_url('admin/properties/' . $p['id'] . '/edit') ?>"
                                    class="btn btn-outline-secondary" title="Modifier"><i class="bi bi-pencil"></i></a>
+                                <?php endif; ?>
+                                <?php if (in_array('properties.delete', session()->get('permissions') ?? [])) : ?>
                                 <button class="btn btn-outline-danger" title="Supprimer"
                                         onclick="confirmDelete(<?= $p['id'] ?>, '<?= esc($p['title']) ?>')">
                                     <i class="bi bi-trash"></i>
                                 </button>
+                                <?php endif; ?>
                             </div>
                         </td>
                     </tr>

@@ -7,7 +7,7 @@ $priorityIcons = array_column($priorities, 'icon', 0);
     <div>
         <h4 class="mb-0 fw-bold"><i class="bi bi-kanban text-primary me-2"></i>Suivi des tâches</h4>
         <p class="text-muted mb-0"><?= count($tasks) ?> tâche(s) trouvée(s)</p>
-    </div><?php if (!isset($migration_pending) && ($auth->hasPermission('tasks.create') || in_array(session()->get('user_role'), ['super_admin','admin','director']))) : ?>
+    </div><?php if (!isset($migration_pending) && $auth->hasPermission('tasks.create')) : ?>
     <a href="<?= base_url('admin/tasks/create') ?>" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i> Nouvelle tâche
     </a>

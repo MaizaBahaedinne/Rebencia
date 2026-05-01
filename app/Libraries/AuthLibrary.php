@@ -60,16 +60,18 @@ class AuthLibrary
         $permissions = $this->userModel->getPermissions($user['id']);
 
         session()->set([
-            'logged_in'       => true,
-            'user_id'         => $user['id'],
-            'user_name'       => $user['first_name'] . ' ' . $user['last_name'],
-            'user_email'      => $user['email'],
-            'user_role'       => $user['role_name'],
-            'user_role_label' => $user['role_label'],
-            'user_role_id'    => $user['role_id'],
-            'user_avatar'     => $user['avatar'],
-            'user_status'     => $user['status'],
-            'permissions'     => $permissions,
+            'logged_in'        => true,
+            'user_id'          => $user['id'],
+            'user_name'        => $user['first_name'] . ' ' . $user['last_name'],
+            'user_email'       => $user['email'],
+            'user_role'        => $user['role_name'],
+            'user_role_label'  => $user['role_label'],
+            'user_role_id'     => $user['role_id'],
+            'user_avatar'      => $user['avatar'],
+            'user_status'      => $user['status'],
+            'permissions'      => $permissions,
+            'agency_id'        => $user['agency_id'] ?? null,
+            'agency_name'      => $user['agency_name'] ?? null,
         ]);
     }
 

@@ -126,6 +126,25 @@
                 </div>
             </div>
 
+            <!-- Agence -->
+            <?php if (! empty($agencies ?? [])): ?>
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent fw-semibold"><i class="bi bi-buildings me-2 text-primary"></i>Agence de rattachement</div>
+                <div class="card-body">
+                    <select name="agency_id" class="form-select">
+                        <option value="">— Sans agence (admin global) —</option>
+                        <?php foreach ($agencies as $ag): ?>
+                        <option value="<?= $ag['id'] ?>"
+                            <?= (int) old('agency_id', $user['agency_id'] ?? 0) === (int) $ag['id'] ? 'selected' : '' ?>>
+                            <?= esc($ag['name']) ?><?= $ag['city'] ? ' (' . esc($ag['city']) . ')' : '' ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <div class="form-text">Les biens et la visibilité de cet utilisateur seront limités à cette agence.</div>
+                </div>
+            </div>
+            <?php endif; ?>
+
             <!-- Rôles -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-transparent d-flex justify-content-between align-items-center">

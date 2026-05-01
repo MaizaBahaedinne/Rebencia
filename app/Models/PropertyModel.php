@@ -13,7 +13,7 @@ class PropertyModel extends Model
     protected $deletedField   = 'deleted_at';
 
     protected $allowedFields = [
-        'reference', 'agent_id', 'title', 'description', 'type', 'transaction_type',
+        'reference', 'agent_id', 'agency_id', 'title', 'description', 'type', 'transaction_type',
         'status', 'price', 'surface', 'rooms', 'bedrooms', 'bathrooms',
         'floor', 'total_floors', 'parking', 'furnished',
         'address', 'city', 'zone', 'latitude', 'longitude', 'features',
@@ -41,6 +41,9 @@ class PropertyModel extends Model
         }
         if (! empty($filters['agent_id'])) {
             $builder->where('p.agent_id', $filters['agent_id']);
+        }
+        if (! empty($filters['agency_id'])) {
+            $builder->where('p.agency_id', $filters['agency_id']);
         }
         if (! empty($filters['city'])) {
             $builder->like('p.city', $filters['city']);

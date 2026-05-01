@@ -42,6 +42,12 @@ class PropertiesController extends BaseController
             $filters['agent_id'] = $this->auth->id();
         }
 
+        // Restriction agence : tout rôle non super_admin/admin voit uniquement les biens de son agence
+        $agencyId = (int) session()->get('agency_id');
+        if ($agencyId && ! $this->auth->hasPermission('agencies.create')) {
+            $filters['agency_id'] = $agencyId;
+        }
+
         $result = $this->model->getFiltered($filters);
 
         return $this->render('admin/properties/index', [
@@ -88,9 +94,15 @@ class PropertiesController extends BaseController
         }
 
         $post = $this->request->getPost();
+
+        // Résoudre l'agency_id à partir de l'agent sélectionné
+        $agentRow  = $this->db->table('users')->select('agency_id')->where('id', (int) $post['agent_id'])->get()->getRowArray();
+        $agencyId  = $agentRow['agency_id'] ?? null;
+
         $data = [
             'reference'        => $this->model->generateReference(),
             'agent_id'         => $post['agent_id'],
+            'agency_id'        => $agencyId,
             'title'            => $post['title'],
             'description'      => $post['description'] ?? '',
             'type'             => $post['type'],
@@ -210,10 +222,13 @@ class PropertiesController extends BaseController
             }
         }
 
-        $this->model->update($id, $data);
-        $this->handleImageUploads($id);
+        // Si l'agent change, mettre à jour l'agency_id
+        if (isset($data['agent_id']) && (string) $data['agent_id'] !== (string) $property['agent_id']) {
+            $agentRow = $this->db->table('users')->select('agency_id')->where('id', (int) $data['agent_id'])->get()->getRowArray();
+            $data['agency_id'] = $agentRow['agency_id'] ?? null;
+        }
 
-        $this->log->activity('property.update', 'properties', 'property', $id, 'Modification bien');
+        $this->model->update($id, $data);
 
         return redirect()->to('/admin/properties/' . $id)->with('success', 'Bien mis à jour.');
     }

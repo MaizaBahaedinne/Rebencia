@@ -168,6 +168,16 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
     $routes->post('zones/(:num)/delete',          'Admin\ZonesController::delete/$1');
     $routes->get('zones/(:num)',                  'Admin\ZonesController::show/$1');
 
+    // Agences
+    $routes->get('agencies',                        'Admin\AgenciesController::index');
+    $routes->get('agencies/create',                 'Admin\AgenciesController::create');
+    $routes->post('agencies/store',                 'Admin\AgenciesController::store');
+    $routes->get('agencies/(:num)',                 'Admin\AgenciesController::show/$1');
+    $routes->get('agencies/(:num)/edit',            'Admin\AgenciesController::edit/$1');
+    $routes->post('agencies/(:num)/update',         'Admin\AgenciesController::update/$1');
+    $routes->post('agencies/(:num)/toggle',         'Admin\AgenciesController::toggleStatus/$1');
+    $routes->post('agencies/(:num)/delete',         'Admin\AgenciesController::delete/$1');
+
     // Notifications in-app
     $routes->get('notifications',                   'Admin\NotificationController::index');
     $routes->get('notifications/seed-test',         'Admin\NotificationController::seedTest'); // DEV uniquement

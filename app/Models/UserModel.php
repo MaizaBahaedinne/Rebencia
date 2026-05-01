@@ -13,7 +13,7 @@ class UserModel extends Model
     protected $deletedField  = 'deleted_at';
 
     protected $allowedFields = [
-        'role_id', 'first_name', 'last_name', 'email', 'phone',
+        'role_id', 'agency_id', 'first_name', 'last_name', 'email', 'phone',
         'password_hash', 'avatar', 'status',
         'last_login_at', 'last_login_ip', 'remember_token',
     ];
@@ -37,8 +37,10 @@ class UserModel extends Model
     public function findByEmail(string $email): ?array
     {
         return $this->db->table('users u')
-            ->select('u.*, r.name AS role_name, COALESCE(r.label, r.name) AS role_label, COALESCE(r.color, \'#6c757d\') AS role_color')
+            ->select('u.*, r.name AS role_name, COALESCE(r.label, r.name) AS role_label, COALESCE(r.color, \'#6c757d\') AS role_color,
+                      a.name AS agency_name')
             ->join('roles r', 'r.id = u.role_id')
+            ->join('agencies a', 'a.id = u.agency_id', 'left')
             ->where('u.email', $email)
             ->where('u.deleted_at IS NULL')
             ->get()
@@ -52,9 +54,11 @@ class UserModel extends Model
     {
         $builder = $this->db->table('users u')
             ->select('u.id, u.first_name, u.last_name, u.email, u.phone,
-                      u.status, u.avatar, u.last_login_at, u.created_at,
-                      r.name AS role_name, COALESCE(r.label, r.name) AS role_label, COALESCE(r.color, \'#6c757d\') AS role_color')
+                      u.status, u.avatar, u.last_login_at, u.created_at, u.agency_id,
+                      r.name AS role_name, COALESCE(r.label, r.name) AS role_label, COALESCE(r.color, \'#6c757d\') AS role_color,
+                      a.name AS agency_name')
             ->join('roles r', 'r.id = u.role_id')
+            ->join('agencies a', 'a.id = u.agency_id', 'left')
             ->where('u.deleted_at IS NULL');
 
         if (! empty($filters['status'])) {
@@ -62,6 +66,9 @@ class UserModel extends Model
         }
         if (! empty($filters['role_id'])) {
             $builder->where('u.role_id', $filters['role_id']);
+        }
+        if (! empty($filters['agency_id'])) {
+            $builder->where('u.agency_id', $filters['agency_id']);
         }
         if (! empty($filters['search'])) {
             $builder->groupStart()

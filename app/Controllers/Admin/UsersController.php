@@ -31,6 +31,12 @@ class UsersController extends BaseController
             'search'  => $this->request->getGet('search'),
         ];
 
+        // Restriction agence : un non-admin ne voit que les membres de son agence
+        $agencyId = (int) session()->get('agency_id');
+        if ($agencyId && ! $this->auth->hasPermission('agencies.create')) {
+            $filters['agency_id'] = $agencyId;
+        }
+
         return $this->render('admin/users/index', [
             'page_title' => 'Gestion des utilisateurs',
             'users'      => $this->model->getWithRole($filters),
@@ -49,6 +55,7 @@ class UsersController extends BaseController
             'roles'       => $this->roleModel->where('is_active', 1)->findAll(),
             'user'        => [],
             'userRoleIds' => [],
+            'agencies'    => (new \App\Models\AgencyModel())->getActive(),
         ]);
     }
 
@@ -76,6 +83,7 @@ class UsersController extends BaseController
 
         $data = [
             'role_id'       => $roleIds[0],
+            'agency_id'     => $this->request->getPost('agency_id') ?: null,
             'first_name'    => $this->request->getPost('first_name'),
             'last_name'     => $this->request->getPost('last_name'),
             'email'         => $this->request->getPost('email'),
@@ -145,6 +153,7 @@ class UsersController extends BaseController
             'user'        => $user,
             'roles'       => $this->roleModel->where('is_active', 1)->findAll(),
             'userRoleIds' => $userRoleIds,
+            'agencies'    => (new \App\Models\AgencyModel())->getActive(),
         ]);
     }
 
@@ -180,6 +189,7 @@ class UsersController extends BaseController
             'email'      => $this->request->getPost('email'),
             'phone'      => ($this->request->getPost('phone') ?? '') ?: null,
             'role_id'    => $roleIds[0],
+            'agency_id'  => $this->request->getPost('agency_id') ?: null,
             'status'     => $this->request->getPost('status'),
         ];
 

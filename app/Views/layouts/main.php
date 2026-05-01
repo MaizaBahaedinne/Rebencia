@@ -166,11 +166,18 @@
         </a>
         <?php endif; ?>
 
-        <?php if (in_array('users.view', session()->get('permissions') ?? [])) : ?>
+        <?php if (in_array('users.view', session()->get('permissions') ?? []) || in_array('agencies.view', session()->get('permissions') ?? [])) : ?>
         <div class="nav-section">Équipe</div>
+        <?php if (in_array('agencies.view', session()->get('permissions') ?? [])) : ?>
+        <a href="<?= base_url('admin/agencies') ?>" class="nav-link <?= str_starts_with(uri_string(), 'admin/agencies') ? 'active' : '' ?>">
+            <i class="bi bi-buildings"></i> Agences
+        </a>
+        <?php endif; ?>
+        <?php if (in_array('users.view', session()->get('permissions') ?? [])) : ?>
         <a href="<?= base_url('admin/users') ?>" class="nav-link <?= str_starts_with(uri_string(), 'admin/users') ? 'active' : '' ?>">
             <i class="bi bi-people"></i> Utilisateurs
         </a>
+        <?php endif; ?>
         <?php endif; ?>
 
         <?php if (in_array('roles.view', session()->get('permissions') ?? [])) : ?>
@@ -219,7 +226,11 @@
             </div>
             <div style="flex:1;min-width:0;">
                 <div class="text-white text-truncate" style="font-size:.8rem;"><?= esc(session()->get('user_name')) ?></div>
-                <div class="text-white-50" style="font-size:.7rem;"><?= esc(session()->get('user_role_label')) ?></div>
+                <div class="text-white-50" style="font-size:.7rem;"><?= esc(session()->get('user_role_label')) ?>
+                    <?php if (session()->get('agency_name')): ?>
+                    · <span class="opacity-75"><?= esc(session()->get('agency_name')) ?></span>
+                    <?php endif; ?>
+                </div>
             </div>
             <a href="<?= base_url('logout') ?>" class="text-white-50" title="Déconnexion">
                 <i class="bi bi-box-arrow-right"></i>

@@ -1,5 +1,3 @@
-<?= $this->extend('layouts/main') ?>
-<?= $this->section('content') ?>
 
 <?php
 $perms    = session()->get('permissions') ?? [];
@@ -271,4 +269,4 @@ $statusColors = [
 
 </div><!-- /.tab-content -->
 
-<?= $this->endSection() ?>
+

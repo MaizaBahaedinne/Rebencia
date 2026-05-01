@@ -1,6 +1,3 @@
-<?= $this->extend('layouts/main') ?>
-<?= $this->section('content') ?>
-
 <?php $perms = session()->get('permissions') ?? []; ?>
 
 <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
@@ -143,4 +140,4 @@
 </div>
 <?php endif; ?>
 
-<?= $this->endSection() ?>
+

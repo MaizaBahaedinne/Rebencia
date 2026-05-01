@@ -1,5 +1,3 @@
-<?= $this->extend('layouts/main') ?>
-<?= $this->section('content') ?>
 
 <?php $isEdit = ! empty($agency['id']); ?>
 
@@ -145,4 +143,4 @@
     </div><!-- /.row -->
 </form>
 
-<?= $this->endSection() ?>
+

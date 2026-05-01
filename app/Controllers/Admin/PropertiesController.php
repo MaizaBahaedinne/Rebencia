@@ -95,9 +95,12 @@ class PropertiesController extends BaseController
 
         $post = $this->request->getPost();
 
-        // Résoudre l'agency_id à partir de l'agent sélectionné
-        $agentRow  = $this->db->table('users')->select('agency_id')->where('id', (int) $post['agent_id'])->get()->getRowArray();
-        $agencyId  = $agentRow['agency_id'] ?? null;
+        // Résoudre l'agency_id à partir de l'agent sélectionné (migration optionnelle)
+        $agencyId = null;
+        try {
+            $agentRow = $this->db->table('users')->select('agency_id')->where('id', (int) $post['agent_id'])->get()->getRowArray();
+            $agencyId = $agentRow['agency_id'] ?? null;
+        } catch (\Throwable $e) { /* colonne absente */ }
 
         $data = [
             'reference'        => $this->model->generateReference(),
@@ -222,10 +225,12 @@ class PropertiesController extends BaseController
             }
         }
 
-        // Si l'agent change, mettre à jour l'agency_id
+        // Si l'agent change, mettre à jour l'agency_id (migration optionnelle)
         if (isset($data['agent_id']) && (string) $data['agent_id'] !== (string) $property['agent_id']) {
-            $agentRow = $this->db->table('users')->select('agency_id')->where('id', (int) $data['agent_id'])->get()->getRowArray();
-            $data['agency_id'] = $agentRow['agency_id'] ?? null;
+            try {
+                $agentRow = $this->db->table('users')->select('agency_id')->where('id', (int) $data['agent_id'])->get()->getRowArray();
+                $data['agency_id'] = $agentRow['agency_id'] ?? null;
+            } catch (\Throwable $e) { /* colonne absente */ }
         }
 
         $this->model->update($id, $data);

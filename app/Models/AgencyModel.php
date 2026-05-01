@@ -54,10 +54,14 @@ class AgencyModel extends Model
      */
     public function getActive(): array
     {
-        return $this->where('is_active', 1)
-                    ->where('deleted_at IS NULL')
-                    ->orderBy('name', 'ASC')
-                    ->findAll();
+        try {
+            return $this->where('is_active', 1)
+                        ->where('deleted_at IS NULL')
+                        ->orderBy('name', 'ASC')
+                        ->findAll();
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 
     /**

@@ -50,12 +50,14 @@ class UsersController extends BaseController
     {
         $this->requirePermission('users.create');
 
+        try { $agencies = (new \App\Models\AgencyModel())->getActive(); } catch (\Throwable $e) { $agencies = []; }
+
         return $this->render('admin/users/form', [
             'page_title'  => 'Nouvel utilisateur',
             'roles'       => $this->roleModel->where('is_active', 1)->findAll(),
             'user'        => [],
             'userRoleIds' => [],
-            'agencies'    => (new \App\Models\AgencyModel())->getActive(),
+            'agencies'    => $agencies,
         ]);
     }
 
@@ -148,12 +150,14 @@ class UsersController extends BaseController
             $userRoleIds = [(int) $user['role_id']];
         }
 
+        try { $agencies = (new \App\Models\AgencyModel())->getActive(); } catch (\Throwable $e) { $agencies = []; }
+
         return $this->render('admin/users/form', [
             'page_title'  => 'Modifier – ' . $user['first_name'],
             'user'        => $user,
             'roles'       => $this->roleModel->where('is_active', 1)->findAll(),
             'userRoleIds' => $userRoleIds,
-            'agencies'    => (new \App\Models\AgencyModel())->getActive(),
+            'agencies'    => $agencies,
         ]);
     }
 

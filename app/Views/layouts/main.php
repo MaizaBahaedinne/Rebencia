@@ -285,10 +285,15 @@
                 <button class="btn btn-sm btn-light d-flex align-items-center gap-2 pe-2"
                         id="userMenuBtn" data-bs-toggle="dropdown" aria-expanded="false"
                         style="border-radius:2rem;">
+                    <?php if (!empty(session()->get('user_avatar'))): ?>
+                    <img src="<?= base_url(esc(session()->get('user_avatar'))) ?>"
+                         class="rounded-circle" style="width:30px;height:30px;object-fit:cover;flex-shrink:0;" alt="">
+                    <?php else: ?>
                     <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white"
                          style="width:30px;height:30px;font-size:.8rem;flex-shrink:0;">
                         <?= strtoupper(substr(session()->get('user_name') ?? 'U', 0, 1)) ?>
                     </div>
+                    <?php endif; ?>
                     <div class="text-start d-none d-md-block" style="line-height:1.2;">
                         <div style="font-size:.82rem;font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                             <?= esc(session()->get('user_name')) ?>
@@ -301,7 +306,7 @@
                 </button>
 
                 <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-1"
-                    style="min-width:220px;border-radius:.75rem;" aria-labelledby="userMenuBtn">
+                    style="min-width:240px;border-radius:.75rem;" aria-labelledby="userMenuBtn">
                     <!-- En-tête du menu -->
                     <li class="px-3 py-2 border-bottom">
                         <div class="fw-semibold" style="font-size:.875rem;"><?= esc(session()->get('user_name')) ?></div>
@@ -319,13 +324,49 @@
                             <i class="bi bi-gear me-2 text-muted"></i>Paramètres
                         </a>
                     </li>
-                    <?php if (in_array('roles.view', session()->get('permissions') ?? [])): ?>
-                    <li>
-                        <a class="dropdown-item py-2" href="<?= base_url('admin/roles') ?>">
-                            <i class="bi bi-shield-check me-2 text-muted"></i>Mes rôles
-                        </a>
+
+                    <!-- Switcher de rôles -->
+                    <?php
+                    $sessionUserId = session()->get('user_id');
+                    $sessionRoleId = (int) session()->get('user_role_id');
+                    $availableRoles = $sessionUserId ? (new \App\Models\UserModel())->getUserRoles((int)$sessionUserId) : [];
+                    ?>
+                    <?php if (count($availableRoles) > 0): ?>
+                    <li><hr class="dropdown-divider my-1"></li>
+                    <li class="px-3 pt-1 pb-0">
+                        <small class="text-muted text-uppercase fw-semibold" style="font-size:.65rem;letter-spacing:.06em;">
+                            <i class="bi bi-arrow-left-right me-1"></i>Mes rôles
+                        </small>
                     </li>
+                    <?php foreach ($availableRoles as $r):
+                        $isActive = ((int)$r['role_id'] === $sessionRoleId);
+                    ?>
+                    <li>
+                        <?php if ($isActive): ?>
+                        <span class="dropdown-item py-2 d-flex align-items-center justify-content-between active pe-none">
+                            <span>
+                                <span class="rounded-circle d-inline-block me-2"
+                                      style="width:8px;height:8px;background:<?= esc($r['color']) ?>;"></span>
+                                <?= esc($r['label']) ?>
+                            </span>
+                            <i class="bi bi-check2 fw-bold"></i>
+                        </span>
+                        <?php else: ?>
+                        <form method="post" action="<?= base_url('admin/role/switch') ?>" class="d-block">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="role_id" value="<?= (int)$r['role_id'] ?>">
+                            <input type="hidden" name="redirect" value="<?= esc(current_url()) ?>">
+                            <button type="submit" class="dropdown-item py-2 d-flex align-items-center">
+                                <span class="rounded-circle d-inline-block me-2"
+                                      style="width:8px;height:8px;background:<?= esc($r['color']) ?>;"></span>
+                                <?= esc($r['label']) ?>
+                            </button>
+                        </form>
+                        <?php endif; ?>
+                    </li>
+                    <?php endforeach; ?>
                     <?php endif; ?>
+
                     <li>
                         <a class="dropdown-item py-2" href="<?= base_url('admin/agency') ?>">
                             <i class="bi bi-building me-2 text-muted"></i>Mon agence

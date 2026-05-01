@@ -259,6 +259,47 @@ class UsersController extends BaseController
         return redirect()->to('/admin/users')->with('success', 'Utilisateur supprimé.');
     }
 
+    /** Changement de rôle actif (switch role). */
+    public function switchRole()
+    {
+        $roleId = (int) $this->request->getPost('role_id');
+        $userId = $this->auth->id();
+
+        // Vérifier que ce rôle est bien assigné à l'utilisateur
+        $assigned = array_column($this->model->getUserRoles($userId), 'role_id');
+        if (! in_array($roleId, array_map('intval', $assigned), true)) {
+            return redirect()->back()->with('error', 'Rôle non autorisé.');
+        }
+
+        $role = $this->roleModel->find($roleId);
+        if (! $role) {
+            return redirect()->back()->with('error', 'Rôle introuvable.');
+        }
+
+        // Mettre à jour le rôle principal en session
+        $newPermissions = \Config\Database::connect()->table('permissions p')
+            ->select('p.name')
+            ->join('role_permissions rp', 'rp.permission_id = p.id')
+            ->where('rp.role_id', $roleId)
+            ->get()->getResultArray();
+        $permNames = array_column($newPermissions, 'name');
+
+        session()->set([
+            'user_role'       => $role['name'],
+            'user_role_label' => $role['label'] ?? $role['name'],
+            'user_role_id'    => $roleId,
+            'permissions'     => $permNames,
+        ]);
+
+        // Mettre à jour role_id en BDD
+        $this->model->update($userId, ['role_id' => $roleId]);
+
+        $this->log->activity('user.switch_role', 'users', 'user', $userId, 'Changement de rôle → ' . ($role['label'] ?? $role['name']));
+
+        $redirectTo = $this->request->getPost('redirect') ?: '/admin/dashboard';
+        return redirect()->to($redirectTo)->with('success', 'Rôle actif : ' . esc($role['label'] ?? $role['name']));
+    }
+
     /** Profil de l'utilisateur connecté. */
     public function profile(): string
     {
@@ -273,7 +314,9 @@ class UsersController extends BaseController
     /** Mise à jour du profil. */
     public function updateProfile()
     {
-        $id    = $this->auth->id();
+        $id   = $this->auth->id();
+        $user = $this->model->find($id);
+
         $rules = [
             'first_name' => 'required|min_length[2]',
             'last_name'  => 'required|min_length[2]',
@@ -288,7 +331,7 @@ class UsersController extends BaseController
             'first_name' => $this->request->getPost('first_name'),
             'last_name'  => $this->request->getPost('last_name'),
             'email'      => $this->request->getPost('email'),
-            'phone'      => $this->request->getPost('phone'),
+            'phone'      => ($this->request->getPost('phone') ?? '') ?: null,
         ];
 
         $newPass = $this->request->getPost('password');
@@ -299,11 +342,36 @@ class UsersController extends BaseController
             $data['password_hash'] = password_hash($newPass, PASSWORD_BCRYPT, ['cost' => 12]);
         }
 
+        // Avatar upload
+        $avatar = $this->request->getFile('avatar');
+        if ($avatar && $avatar->isValid() && ! $avatar->hasMoved()) {
+            if (! in_array(strtolower($avatar->getClientExtension()), ['jpg','jpeg','png','gif','webp'], true)) {
+                return redirect()->back()->with('error', 'Format avatar invalide (jpg, png, gif, webp).');
+            }
+            if ($avatar->getSize() > 2 * 1024 * 1024) {
+                return redirect()->back()->with('error', 'Avatar trop volumineux (max 2 Mo).');
+            }
+            if (! empty($user['avatar'])) {
+                @unlink(ROOTPATH . 'public/' . $user['avatar']);
+            }
+            $newName = 'user_' . $id . '_' . time() . '.' . $avatar->getClientExtension();
+            $avatar->move(ROOTPATH . 'public/uploads/avatars/', $newName);
+            $data['avatar'] = 'uploads/avatars/' . $newName;
+        } elseif ($this->request->getPost('remove_avatar') === '1') {
+            if (! empty($user['avatar'])) {
+                @unlink(ROOTPATH . 'public/' . $user['avatar']);
+            }
+            $data['avatar'] = null;
+        }
+
         $this->model->update($id, $data);
 
         // Rafraîchir la session
         session()->set('user_name', $data['first_name'] . ' ' . $data['last_name']);
         session()->set('user_email', $data['email']);
+        if (isset($data['avatar'])) {
+            session()->set('user_avatar', $data['avatar']);
+        }
 
         return redirect()->to('/admin/profile')->with('success', 'Profil mis à jour.');
     }

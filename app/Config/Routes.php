@@ -51,6 +51,7 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
     $routes->get('profile',             'Admin\UsersController::profile');
     $routes->post('profile/update',     'Admin\UsersController::updateProfile');
     $routes->post('profile/password',   'Admin\UsersController::changePassword');
+    $routes->post('role/switch',        'Admin\UsersController::switchRole');
 
     // Gestion Utilisateurs
     $routes->get('users',                       'Admin\UsersController::index');

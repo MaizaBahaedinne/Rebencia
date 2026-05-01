@@ -60,19 +60,41 @@
                                    value="<?= esc(old('phone', $user['phone'] ?? '')) ?>">
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Avatar</label>
-                            <input type="file" name="avatar" class="form-control" accept="image/jpeg,image/png,image/webp">
-                            <div class="form-text">JPEG, PNG ou WebP — max 2 Mo</div>
+                            <label class="form-label">Photo de profil</label>
+                            <input type="file" name="avatar" id="profileAvatarInput" class="form-control"
+                                   accept="image/jpeg,image/png,image/gif,image/webp"
+                                   onchange="previewProfileAvatar(this)">
+                            <div class="form-text">JPEG, PNG, GIF, WebP — max 2 Mo</div>
                         </div>
+                        <?php if (!empty($user['avatar'])): ?>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="remove_avatar" value="1" id="removeProfileAvatar">
+                                <label class="form-check-label text-danger small" for="removeProfileAvatar">Supprimer la photo actuelle</label>
+                            </div>
+                        </div>
+                        <?php endif; ?>
                     </div>
                     <hr>
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-check-lg me-1"></i> Enregistrer les modifications
                     </button>
                 </form>
-            </div>
-        </div>
-    </div>
+
+<script>
+function previewProfileAvatar(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        const prev = document.getElementById('profileAvatarPreview');
+        const init = document.getElementById('profileAvatarInitials');
+        if (prev) { prev.src = e.target.result; prev.classList.remove('d-none'); }
+        if (init) init.classList.add('d-none');
+    };
+    reader.readAsDataURL(file);
+}
+</script>
 
     <!-- Avatar + Changer mot de passe -->
     <div class="col-lg-4">
@@ -80,13 +102,14 @@
         <div class="card border-0 shadow-sm mb-3 text-center">
             <div class="card-body p-4">
                 <?php if (!empty($user['avatar'])): ?>
-                    <img src="<?= site_url('uploads/avatars/' . $user['avatar']) ?>"
-                         class="rounded-circle mb-3" width="80" height="80" style="object-fit:cover">
+                    <img src="<?= base_url(esc($user['avatar'])) ?>"
+                         class="rounded-circle mb-3" width="80" height="80" style="object-fit:cover" id="profileAvatarPreview">
                 <?php else: ?>
                     <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
-                         style="width:80px;height:80px;font-size:2rem;">
+                         style="width:80px;height:80px;font-size:2rem;" id="profileAvatarInitials">
                         <?= strtoupper(mb_substr($user['first_name'], 0, 1)) ?>
                     </div>
+                    <img src="" class="rounded-circle mb-3 d-none" width="80" height="80" style="object-fit:cover" id="profileAvatarPreview">
                 <?php endif; ?>
                 <p class="mb-0 fw-semibold"><?= esc($user['first_name'] . ' ' . $user['last_name']) ?></p>
                 <small class="text-muted"><?= esc($user['role_name'] ?? '') ?></small>

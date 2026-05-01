@@ -59,6 +59,21 @@ class AuthLibrary
     {
         $permissions = $this->userModel->getPermissions($user['id']);
 
+        // Résoudre agency_id et agency_name uniquement si la migration a été appliquée
+        $agencyId   = null;
+        $agencyName = null;
+        try {
+            $db  = \Config\Database::connect();
+            $row = $db->query('SELECT agency_id FROM users WHERE id = ? LIMIT 1', [(int) $user['id']])->getRowArray();
+            if ($row && $row['agency_id']) {
+                $agencyId   = (int) $row['agency_id'];
+                $agRow      = $db->query('SELECT name FROM agencies WHERE id = ? LIMIT 1', [$agencyId])->getRowArray();
+                $agencyName = $agRow['name'] ?? null;
+            }
+        } catch (\Throwable $e) {
+            // Migration non encore appliquée — on ignore
+        }
+
         session()->set([
             'logged_in'        => true,
             'user_id'          => $user['id'],
@@ -70,8 +85,8 @@ class AuthLibrary
             'user_avatar'      => $user['avatar'],
             'user_status'      => $user['status'],
             'permissions'      => $permissions,
-            'agency_id'        => $user['agency_id'] ?? null,
-            'agency_name'      => $user['agency_name'] ?? null,
+            'agency_id'        => $agencyId,
+            'agency_name'      => $agencyName,
         ]);
     }
 

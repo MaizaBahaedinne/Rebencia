@@ -37,10 +37,8 @@ class UserModel extends Model
     public function findByEmail(string $email): ?array
     {
         return $this->db->table('users u')
-            ->select('u.*, r.name AS role_name, COALESCE(r.label, r.name) AS role_label, COALESCE(r.color, \'#6c757d\') AS role_color,
-                      a.name AS agency_name')
+            ->select('u.*, r.name AS role_name, COALESCE(r.label, r.name) AS role_label, COALESCE(r.color, \'#6c757d\') AS role_color')
             ->join('roles r', 'r.id = u.role_id')
-            ->join('agencies a', 'a.id = u.agency_id', 'left')
             ->where('u.email', $email)
             ->where('u.deleted_at IS NULL')
             ->get()
@@ -54,12 +52,18 @@ class UserModel extends Model
     {
         $builder = $this->db->table('users u')
             ->select('u.id, u.first_name, u.last_name, u.email, u.phone,
-                      u.status, u.avatar, u.last_login_at, u.created_at, u.agency_id,
-                      r.name AS role_name, COALESCE(r.label, r.name) AS role_label, COALESCE(r.color, \'#6c757d\') AS role_color,
-                      a.name AS agency_name')
+                      u.status, u.avatar, u.last_login_at, u.created_at,
+                      r.name AS role_name, COALESCE(r.label, r.name) AS role_label, COALESCE(r.color, \'#6c757d\') AS role_color')
             ->join('roles r', 'r.id = u.role_id')
-            ->join('agencies a', 'a.id = u.agency_id', 'left')
             ->where('u.deleted_at IS NULL');
+
+        // agency_id n'existe que si la migration add_agencies_module.sql a été appliquée
+        try {
+            $this->db->query('SELECT agency_id FROM users LIMIT 0');
+            $builder->select('u.agency_id');
+        } catch (\Throwable $e) {
+            // colonne absente – migration non appliquée, on ignore silencieusement
+        }
 
         if (! empty($filters['status'])) {
             $builder->where('u.status', $filters['status']);

@@ -61,7 +61,7 @@
         ════════════════════════════════ */
         #sidebar {
             width: var(--rb-sidebar-w);
-            min-height: 100vh;
+            height: 100vh;
             background: var(--rb-sidebar-bg);
             border-right: 1px solid var(--rb-border);
             position: fixed; top: 0; left: 0; z-index: 1040;
@@ -164,10 +164,8 @@
         #content {
             margin-left: var(--rb-sidebar-w);
             min-height: 100vh;
-            padding-bottom: 52px; /* hauteur du footer fixe */
+            padding-bottom: 52px;
             transition: margin var(--rb-transition);
-            display: flex; flex-direction: column;
-            align-items: stretch;
         }
 
         /* ════════════════════════════════
@@ -256,7 +254,7 @@
         /* ════════════════════════════════
            PAGE CONTENT
         ════════════════════════════════ */
-        .page-content { padding: 1.6rem; flex: 1; align-self: flex-start; width: 100%; }
+        .page-content { padding: 1.6rem; width: 100%; }
 
         /* ════════════════════════════════
            CARDS

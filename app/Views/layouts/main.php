@@ -20,18 +20,18 @@
     <style>
         :root {
             --rb-sidebar-w:   260px;
-            --rb-bg:          #0f1117;
-            --rb-sidebar-bg:  #13151c;
-            --rb-surface:     #1a1d27;
-            --rb-surface-2:   #21242f;
-            --rb-border:      rgba(255,255,255,.07);
+            --rb-bg:          #f0f2f8;
+            --rb-sidebar-bg:  #1e1b4b;
+            --rb-surface:     #ffffff;
+            --rb-surface-2:   #f5f6fb;
+            --rb-border:      #e5e7f0;
             --rb-primary:     #6c63ff;
             --rb-primary-rgb: 108,99,255;
             --rb-accent:      #f7c948;
-            --rb-green:       #22d3a5;
-            --rb-red:         #ff5c7c;
-            --rb-text:        #e2e4ef;
-            --rb-text-muted:  rgba(226,228,239,.45);
+            --rb-green:       #10b981;
+            --rb-red:         #ef4444;
+            --rb-text:        #1e1b4b;
+            --rb-text-muted:  #6b7280;
             --rb-radius:      .875rem;
             --rb-transition:  .22s cubic-bezier(.4,0,.2,1);
         }
@@ -52,9 +52,9 @@
            SCROLLBAR
         ════════════════════════════════ */
         ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(108,99,255,.35); border-radius: 99px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(108,99,255,.6); }
+        ::-webkit-scrollbar-track { background: #f0f2f8; }
+        ::-webkit-scrollbar-thumb { background: rgba(108,99,255,.3); border-radius: 99px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(108,99,255,.55); }
 
         /* ════════════════════════════════
            SIDEBAR
@@ -161,7 +161,7 @@
            TOPBAR
         ════════════════════════════════ */
         .topbar {
-            background: rgba(19,21,28,.85);
+            background: rgba(255,255,255,.9);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--rb-border);
@@ -222,7 +222,7 @@
             background: var(--rb-surface) !important;
             border: 1px solid var(--rb-border) !important;
             border-radius: var(--rb-radius) !important;
-            box-shadow: 0 20px 60px rgba(0,0,0,.5) !important;
+            box-shadow: 0 20px 60px rgba(108,99,255,.12), 0 4px 16px rgba(0,0,0,.08) !important;
             padding: .4rem !important;
         }
         .dropdown-item {
@@ -400,12 +400,12 @@
             border: 1px solid var(--rb-border) !important;
             font-size: .875rem;
         }
-        .alert-success { background: rgba(34,211,165,.1) !important; color: #6effd9 !important; border-color: rgba(34,211,165,.25) !important; }
-        .alert-danger  { background: rgba(255,92,124,.1)  !important; color: #ffb3c1 !important; border-color: rgba(255,92,124,.25) !important; }
-        .alert-warning { background: rgba(247,201,72,.1)  !important; color: #fde68a !important; border-color: rgba(247,201,72,.25)  !important; }
-        .alert-info    { background: rgba(56,189,248,.1)  !important; color: #bae6fd !important; border-color: rgba(56,189,248,.25)  !important; }
-        .btn-close { filter: invert(1) opacity(.5); }
-        .btn-close:hover { filter: invert(1) opacity(1); }
+        .alert-success { background: #ecfdf5 !important; color: #065f46 !important; border-color: #a7f3d0 !important; }
+        .alert-danger  { background: #fef2f2 !important; color: #991b1b !important; border-color: #fecaca !important; }
+        .alert-warning { background: #fffbeb !important; color: #92400e !important; border-color: #fde68a !important; }
+        .alert-info    { background: #eff6ff !important; color: #1e40af !important; border-color: #bfdbfe !important; }
+        .btn-close { filter: none; opacity: .5; }
+        .btn-close:hover { filter: none; opacity: 1; }
 
         /* ════════════════════════════════
            PAGINATION
@@ -443,7 +443,7 @@
             background: var(--rb-surface) !important;
             border: 1px solid var(--rb-border) !important;
         }
-        #rb-notif-menu .sticky-top { background: var(--rb-surface-2) !important; }
+        #rb-notif-menu .sticky-top { background: #f8f9fc !important; }
         .notif-item { transition: background var(--rb-transition); }
         .notif-item:hover { background: rgba(108,99,255,.08) !important; }
 
@@ -482,7 +482,7 @@
         .modal-content { background: var(--rb-surface) !important; border: 1px solid var(--rb-border) !important; color: var(--rb-text) !important; }
         .modal-header, .modal-footer { border-color: var(--rb-border) !important; }
         .tooltip-inner { background: var(--rb-surface-2); border: 1px solid var(--rb-border); }
-        code { background: rgba(108,99,255,.15); color: #c4b5fd; border-radius: .3rem; padding: .1em .35em; font-size: .85em; }
+        code { background: rgba(108,99,255,.08); color: #6c63ff; border-radius: .3rem; padding: .1em .35em; font-size: .85em; }
         pre  { background: var(--rb-surface-2) !important; border: 1px solid var(--rb-border); border-radius: .6rem; color: var(--rb-text); }
         .opacity-65 { opacity: .65; }
 

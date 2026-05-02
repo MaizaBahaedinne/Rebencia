@@ -775,7 +775,7 @@
                     <?php endif; ?>
 
                     <li>
-                        <a class="dropdown-item py-2" href="<?= base_url('admin/agency') ?>">
+                        <a class="dropdown-item py-2" href="<?= base_url('admin/agencies') ?>">
                             <i class="bi bi-building me-2 text-muted"></i>Mon agence
                         </a>
                     </li>

@@ -126,11 +126,22 @@
         }
         #sidebar .nav-link.active .bi { color: var(--rb-primary); }
 
-        /* Sidebar footer */
+        /* Sidebar scrollable nav */
+        #sidebar .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-bottom: .5rem;
+        }
+        #sidebar .sidebar-nav::-webkit-scrollbar { width: 3px; }
+        #sidebar .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 99px; }
+
+        /* Sidebar footer — fixé en bas */
         .sidebar-footer {
-            margin-top: auto;
+            flex-shrink: 0;
             padding: .9rem 1.1rem;
-            border-top: 1px solid var(--rb-border);
+            border-top: 1px solid rgba(255,255,255,.1);
+            background: var(--rb-sidebar-bg);
         }
         .sidebar-footer .sf-avatar {
             width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
@@ -153,8 +164,10 @@
         #content {
             margin-left: var(--rb-sidebar-w);
             min-height: 100vh;
+            padding-bottom: 52px; /* hauteur du footer fixe */
             transition: margin var(--rb-transition);
             display: flex; flex-direction: column;
+            align-items: stretch;
         }
 
         /* ════════════════════════════════
@@ -243,7 +256,7 @@
         /* ════════════════════════════════
            PAGE CONTENT
         ════════════════════════════════ */
-        .page-content { padding: 1.6rem; flex: 1; }
+        .page-content { padding: 1.6rem; flex: 1; align-self: flex-start; width: 100%; }
 
         /* ════════════════════════════════
            CARDS
@@ -487,6 +500,30 @@
         .opacity-65 { opacity: .65; }
 
         /* ════════════════════════════════
+           FOOTER FIXE
+        ════════════════════════════════ */
+        #app-footer {
+            position: fixed;
+            bottom: 0;
+            left: var(--rb-sidebar-w);
+            right: 0;
+            height: 44px;
+            background: rgba(255,255,255,.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid var(--rb-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            z-index: 800;
+            font-size: .75rem;
+            color: var(--rb-text-muted);
+        }
+        #app-footer a { color: var(--rb-primary); text-decoration: none; }
+        #app-footer a:hover { text-decoration: underline; }
+
+        /* ════════════════════════════════
            RESPONSIVE
         ════════════════════════════════ */
         @media (max-width: 991.98px) {
@@ -494,6 +531,7 @@
             #sidebar.show { transform: translateX(0); box-shadow: 8px 0 40px rgba(0,0,0,.6); }
             #content { margin-left: 0; }
             .page-content { padding: 1rem; }
+            #app-footer { left: 0; }
         }
     </style>
     <?= $extra_css ?? '' ?>
@@ -512,7 +550,7 @@
         </div>
     </div>
 
-    <div class="py-2 overflow-auto flex-grow-1">
+    <div class="sidebar-nav" id="sidebar-nav">
         <!-- Dashboard -->
         <a href="<?= base_url('admin/dashboard') ?>" class="nav-link <?= (uri_string() === 'admin/dashboard' || uri_string() === 'admin') ? 'active' : '' ?>">
             <i class="bi bi-speedometer2"></i> Tableau de bord
@@ -610,7 +648,7 @@
         </a>
         <?php endif; ?>
         <?php endif; ?>
-    </div>
+    </div><!-- /.sidebar-nav -->
 
     <!-- Sidebar footer : profil -->
     <div class="sidebar-footer">
@@ -824,6 +862,15 @@
         <?= $content ?? '' ?>
     </div>
 </div>
+
+<!-- Footer fixe -->
+<footer id="app-footer">
+    <span>© <?= date('Y') ?> <strong>Rebencia</strong> — Gestion Immobilière</span>
+    <span class="d-none d-md-inline">
+        <i class="bi bi-circle-fill me-1" style="font-size:.45rem;color:var(--rb-green);vertical-align:middle;"></i>
+        Système opérationnel
+    </span>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>

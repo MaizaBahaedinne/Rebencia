@@ -240,7 +240,6 @@ else                                       $budgetStr = '—';
         </div>
     </div>
 </div>
-</div>
 
 <!-- ═══ Main row ═══════════════════════════════════════════════════════════ -->
 <div style="display:grid;grid-template-columns:1fr 340px;gap:1.5rem;align-items:start;">

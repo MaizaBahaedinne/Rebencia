@@ -66,21 +66,33 @@
      ORGANIGRAMME
 ═══════════════════════════════════════════ -->
 <div class="card border-0 shadow-sm">
-    <div class="card-header bg-white d-flex align-items-center justify-content-between">
+    <div class="card-header bg-white d-flex align-items-center justify-content-between flex-wrap gap-2">
         <span class="fw-semibold">
             <i class="bi bi-diagram-3 me-2 text-primary"></i>Arbre hiérarchique
         </span>
-        <span class="text-muted small">
-            <i class="bi bi-arrows-move me-1"></i>Défilement horizontal disponible si nécessaire
-        </span>
+        <!-- Contrôles Zoom -->
+        <div class="d-flex align-items-center gap-1">
+            <button class="btn btn-sm btn-outline-secondary org-zoom-btn" onclick="orgZoom(-0.15)" title="Réduire">
+                <i class="bi bi-dash-lg"></i>
+            </button>
+            <span class="org-zoom-label" id="orgScaleLabel">100%</span>
+            <button class="btn btn-sm btn-outline-secondary org-zoom-btn" onclick="orgZoom(0.15)" title="Agrandir">
+                <i class="bi bi-plus-lg"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-primary ms-1" onclick="orgZoomReset()" title="Réinitialiser le zoom">
+                <i class="bi bi-fullscreen-exit"></i>
+            </button>
+        </div>
     </div>
     <div class="card-body p-0">
         <div class="org-wrap" id="orgWrap">
-            <!-- SVG pour les lignes de connexion -->
-            <svg id="orgSvg" class="org-svg"></svg>
+            <!-- Canvas scalable (SVG + nœuds) -->
+            <div id="orgCanvas">
+                <!-- SVG pour les lignes de connexion -->
+                <svg id="orgSvg"></svg>
 
-            <!-- Niveaux de l'arbre -->
-            <div class="org-levels" id="orgLevels">
+                <!-- Niveaux de l'arbre -->
+                <div class="org-levels" id="orgLevels">
                 <?php foreach ($levels as $depth => $levelNodes): ?>
                 <div class="org-level" id="level-<?= $depth ?>">
                     <?php foreach ($levelNodes as $m):
@@ -129,8 +141,9 @@
                     <?php endforeach; ?>
                 </div>
                 <?php endforeach; ?>
-            </div>
-        </div>
+                </div><!-- /org-levels -->
+            </div><!-- /orgCanvas -->
+        </div><!-- /org-wrap -->
     </div>
 </div>
 
@@ -192,10 +205,20 @@
     min-height: 240px;
 }
 
+/* Canvas scalable (contient SVG + nœuds) */
+#orgCanvas {
+    position: relative;
+    display: inline-block;
+    min-width: 100%;
+    transform-origin: top center;
+    transition: transform .22s ease;
+}
+
 /* SVG overlay */
-.org-svg {
+#orgSvg {
     position: absolute;
     top: 0; left: 0;
+    width: 100%; height: 100%;
     pointer-events: none;
     z-index: 0;
     overflow: visible;
@@ -219,6 +242,16 @@
     justify-content: center;
     flex-wrap: nowrap;
 }
+
+/* Zoom label & boutons */
+.org-zoom-label {
+    font-size: .8rem;
+    font-weight: 600;
+    color: #6b7280;
+    min-width: 40px;
+    text-align: center;
+}
+.org-zoom-btn { padding: .18rem .45rem; font-size: .8rem; }
 
 /* Nœud */
 .org-node {
@@ -294,20 +327,40 @@
 ═══════════════════════════════════════════ -->
 <script>
 const ORG_EDGES = <?= json_encode(array_values($edges)) ?>;
+let orgScale = 1;
 
+// ── Zoom ──────────────────────────────────────────
+function orgZoom(delta) {
+    orgScale = Math.max(0.25, Math.min(2.0, orgScale + delta));
+    document.getElementById('orgCanvas').style.transform = `scale(${orgScale})`;
+    document.getElementById('orgScaleLabel').textContent = Math.round(orgScale * 100) + '%';
+    // Ajuster la hauteur du conteneur pour éviter le chevauchement
+    const canvas = document.getElementById('orgCanvas');
+    document.getElementById('orgWrap').style.minHeight = (canvas.offsetHeight * orgScale + 80) + 'px';
+}
+
+function orgZoomReset() {
+    orgScale = 1;
+    document.getElementById('orgCanvas').style.transform = 'scale(1)';
+    document.getElementById('orgScaleLabel').textContent = '100%';
+    document.getElementById('orgWrap').style.minHeight = '';
+}
+
+// ── Dessin des lignes SVG ─────────────────────────
 function drawOrgChart() {
-    const wrap = document.getElementById('orgWrap');
-    const svg  = document.getElementById('orgSvg');
-    if (!wrap || !svg || ORG_EDGES.length === 0) return;
+    const canvas = document.getElementById('orgCanvas');
+    const svg    = document.getElementById('orgSvg');
+    if (!canvas || !svg || ORG_EDGES.length === 0) return;
 
-    // Redimensionner le SVG au contenu réel
-    svg.setAttribute('width',  wrap.scrollWidth  + 'px');
-    svg.setAttribute('height', wrap.scrollHeight + 'px');
+    // Taille SVG = taille réelle du canvas (non-scalée)
+    const W = canvas.offsetWidth;
+    const H = canvas.offsetHeight;
+    svg.setAttribute('width',  W);
+    svg.setAttribute('height', H);
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
     svg.innerHTML = '';
 
-    const wrapRect = wrap.getBoundingClientRect();
-
-    // Gradient definition
+    // Gradient
     const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
     const grad = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
     grad.setAttribute('id', 'orgLineGrad');
@@ -322,6 +375,8 @@ function drawOrgChart() {
     defs.appendChild(grad);
     svg.appendChild(defs);
 
+    const canvasRect = canvas.getBoundingClientRect();
+
     ORG_EDGES.forEach(([parentId, childId]) => {
         const pEl = document.querySelector(`[data-node-id="${parentId}"]`);
         const cEl = document.querySelector(`[data-node-id="${childId}"]`);
@@ -330,45 +385,41 @@ function drawOrgChart() {
         const pr = pEl.getBoundingClientRect();
         const cr = cEl.getBoundingClientRect();
 
-        // Positions relatives au conteneur (avec scroll compensé)
-        const x1 = pr.left + pr.width  / 2 - wrapRect.left + wrap.scrollLeft;
-        const y1 = pr.bottom              - wrapRect.top  + wrap.scrollTop;
-        const x2 = cr.left + cr.width  / 2 - wrapRect.left + wrap.scrollLeft;
-        const y2 = cr.top              - wrapRect.top  + wrap.scrollTop;
-
+        // Coordonnées dans l'espace SVG (non-scalé)
+        const x1 = (pr.left + pr.width  / 2 - canvasRect.left) / orgScale;
+        const y1 = (pr.bottom               - canvasRect.top)  / orgScale;
+        const x2 = (cr.left + cr.width  / 2 - canvasRect.left) / orgScale;
+        const y2 = (cr.top                  - canvasRect.top)  / orgScale;
         const midY = (y1 + y2) / 2;
 
-        // Courbe de Bézier cubique
+        // Bezier
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         path.setAttribute('d', `M ${x1} ${y1} C ${x1} ${midY} ${x2} ${midY} ${x2} ${y2}`);
         path.setAttribute('stroke', 'url(#orgLineGrad)');
-        path.setAttribute('stroke-width', '2');
+        path.setAttribute('stroke-width', '2.5');
         path.setAttribute('fill', 'none');
         path.setAttribute('stroke-linecap', 'round');
         svg.appendChild(path);
 
-        // Point d'arrivée (enfant)
+        // Dot enfant
         const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        dot.setAttribute('cx', x2);
-        dot.setAttribute('cy', y2);
-        dot.setAttribute('r', '3.5');
-        dot.setAttribute('fill', '#a78bfa');
+        dot.setAttribute('cx', x2); dot.setAttribute('cy', y2);
+        dot.setAttribute('r', '4'); dot.setAttribute('fill', '#a78bfa');
         svg.appendChild(dot);
 
-        // Point de départ (parent)
+        // Dot parent
         const dotP = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        dotP.setAttribute('cx', x1);
-        dotP.setAttribute('cy', y1);
-        dotP.setAttribute('r', '3');
-        dotP.setAttribute('fill', '#6c63ff');
+        dotP.setAttribute('cx', x1); dotP.setAttribute('cy', y1);
+        dotP.setAttribute('r', '3.5'); dotP.setAttribute('fill', '#6c63ff');
         svg.appendChild(dotP);
     });
 }
 
-// Redessiner au chargement, redimensionnement et scroll du conteneur
-window.addEventListener('load', drawOrgChart);
+// Double rAF pour garantir le layout complet avant de dessiner
+window.addEventListener('load', () => {
+    requestAnimationFrame(() => requestAnimationFrame(drawOrgChart));
+});
 window.addEventListener('resize', drawOrgChart);
-document.getElementById('orgWrap')?.addEventListener('scroll', drawOrgChart);
 
 // ── Modal définir manager ──────────────────────────
 function openManagerModal(userId, userName, currentMgrId) {

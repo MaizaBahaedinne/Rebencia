@@ -243,14 +243,14 @@ else                                       $budgetStr = '—';
 </div>
 
 <!-- ═══ Main row ═══════════════════════════════════════════════════════════ -->
-<div class="row g-4">
+<div style="display:grid;grid-template-columns:1fr 340px;gap:1.5rem;align-items:start;">
     <!-- Colonne gauche -->
-    <div class="col-lg-8">
+    <div>
 
         <!-- ── Contact + Projet (côte-à-côte) ── -->
-        <div class="row g-3 mb-3">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;" class="mb-3">
             <!-- Contact -->
-            <div class="col-md-6">
+            <div>
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-header d-flex align-items-center gap-2" style="background:linear-gradient(135deg,#ede9fe,#f5f3ff);border-bottom:1px solid #ddd6fe;">
                         <span style="width:32px;height:32px;border-radius:8px;background:#7c3aed;display:flex;align-items:center;justify-content:center;"><i class="bi bi-person-fill text-white" style="font-size:.85rem;"></i></span>
@@ -287,7 +287,7 @@ else                                       $budgetStr = '—';
             </div>
 
             <!-- Projet immobilier -->
-            <div class="col-md-6">
+            <div>
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-header d-flex align-items-center gap-2" style="background:linear-gradient(135deg,#dbeafe,#eff6ff);border-bottom:1px solid #bfdbfe;">
                         <span style="width:32px;height:32px;border-radius:8px;background:#2563eb;display:flex;align-items:center;justify-content:center;"><i class="bi bi-house-fill text-white" style="font-size:.85rem;"></i></span>
@@ -397,7 +397,7 @@ else                                       $budgetStr = '—';
     </div>
 
     <!-- ═══ Sidebar ═══════════════════════════════════════════════════════════ -->
-    <div class="col-lg-4">
+    <div>
         <!-- Agent assigné -->
         <div class="card border-0 shadow-sm mb-3">
             <div class="card-body p-3">

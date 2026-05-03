@@ -12,6 +12,18 @@ if (($_GET['token'] ?? '') !== MIGRATION_TOKEN) {
     die('<h2>403 Forbidden</h2><p>Accès refusé. Ajoutez <code>?token=reb2026agencies</code> à l\'URL.</p>');
 }
 
+// ── Action git pull ────────────────────────────────────────────────────────
+if (($_GET['action'] ?? '') === 'pull') {
+    header('Content-Type: text/plain; charset=utf-8');
+    $root = dirname(__DIR__);
+    chdir($root);
+    echo "=== Git Pull ===\n";
+    exec('git pull 2>&1', $out, $code);
+    echo implode("\n", $out) . "\n";
+    echo "\nExit code: $code\n";
+    exit;
+}
+
 // ── Charger la config CI4 ──────────────────────────────────────────────────
 // Le .env est à la racine du projet (un niveau au-dessus de public/)
 $envFile = dirname(__DIR__) . '/.env';

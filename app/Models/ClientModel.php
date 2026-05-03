@@ -242,15 +242,19 @@ class ClientModel extends Model
         }
     }
 
-    public function countByType(): array
+    public function countByType(?int $agencyId = null): array
     {
         $db = \Config\Database::connect();
-        $rows = $db->table('clients')
-            ->select('client_type, COUNT(*) AS total')
-            ->where('deleted_at', null)
-            ->groupBy('client_type')
-            ->get()
-            ->getResultArray();
+        $builder = $db->table('clients c')
+            ->select('c.client_type, COUNT(*) AS total')
+            ->where('c.deleted_at', null);
+
+        if ($agencyId) {
+            $builder->join('users u', 'u.id = c.assigned_to', 'left')
+                    ->where('u.agency_id', $agencyId);
+        }
+
+        $rows = $builder->groupBy('c.client_type')->get()->getResultArray();
 
         $counts = [];
         foreach ($rows as $r) {
@@ -282,6 +286,9 @@ class ClientModel extends Model
         }
         if (! empty($filters['assigned_to'])) {
             $builder->where('c.assigned_to', $filters['assigned_to']);
+        }
+        if (! empty($filters['agency_id'])) {
+            $builder->where('u.agency_id', (int) $filters['agency_id']);
         }
         if (! empty($filters['search'])) {
             $s = $filters['search'];

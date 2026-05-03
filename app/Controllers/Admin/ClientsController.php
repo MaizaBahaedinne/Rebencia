@@ -33,12 +33,18 @@ class ClientsController extends BaseController
             'page'        => $this->request->getGet('page') ?? 1,
         ];
 
+        // Restriction agence : rôles sans permission agencies.create ne voient que leur agence
+        $agencyId = (int) session()->get('agency_id');
+        if ($agencyId && ! $this->auth->hasPermission('agencies.create')) {
+            $filters['agency_id'] = $agencyId;
+        }
+
         return $this->render('admin/clients/index', [
             'page_title'  => 'Clients',
             'result'      => $this->model->getFiltered($filters),
             'filters'     => $filters,
             'agents'      => (new UserModel())->getWithRole(['status' => 'active']),
-            'typeCounts'  => $this->model->countByType(),
+            'typeCounts'  => $this->model->countByType($filters['agency_id'] ?? null),
             'typeLabels'  => ClientModel::TYPE_LABELS,
             'statusLabels'=> ClientModel::STATUS_LABELS,
         ]);

@@ -37,6 +37,12 @@ class LeadsController extends BaseController
             $filters['assigned_to'] = $this->auth->id();
         }
 
+        // Restriction agence : rôles sans permission agencies.create ne voient que leur agence
+        $agencyId = (int) session()->get('agency_id');
+        if ($agencyId && ! $this->auth->hasPermission('agencies.create')) {
+            $filters['agency_id'] = $agencyId;
+        }
+
         $result = $this->model->getFiltered($filters);
 
         return $this->render('admin/leads/index', [
@@ -49,7 +55,8 @@ class LeadsController extends BaseController
             'filters'    => $filters,
             'agents'     => (new UserModel())->getWithRole(['status' => 'active']),
             'pipeline'   => $this->model->getPipeline(
-                $this->auth->hasRole('collaborator') ? $this->auth->id() : null
+                $this->auth->hasRole('collaborator') ? $this->auth->id() : null,
+                $filters['agency_id'] ?? null
             ),
         ]);
     }

@@ -33,12 +33,18 @@ class VisitsController extends BaseController
             'page'      => $this->request->getGet('page') ?? 1,
         ];
 
+        // Restriction agence : rôles sans permission agencies.create ne voient que leur agence
+        $agencyId = (int) session()->get('agency_id');
+        if ($agencyId && ! $this->auth->hasPermission('agencies.create')) {
+            $filters['agency_id'] = $agencyId;
+        }
+
         return $this->render('admin/visits/index', [
             'page_title'   => 'Visites',
             'result'       => $this->model->getFiltered($filters),
             'filters'      => $filters,
             'agents'       => (new UserModel())->getWithRole(['status' => 'active']),
-            'statusCounts' => $this->model->countByStatus(),
+            'statusCounts' => $this->model->countByStatus($filters['agency_id'] ?? null),
             'statusLabels' => VisitModel::STATUS_LABELS,
         ]);
     }
@@ -64,11 +70,18 @@ class VisitsController extends BaseController
     {
         $this->requirePermission('visits.view');
 
-        $start   = substr($this->request->getGet('start') ?? date('Y-m-01'), 0, 10);
-        $end     = substr($this->request->getGet('end')   ?? date('Y-m-t'),  0, 10);
-        $agentId = (int) ($this->request->getGet('agent_id') ?? 0) ?: null;
+        $start    = substr($this->request->getGet('start') ?? date('Y-m-01'), 0, 10);
+        $end      = substr($this->request->getGet('end')   ?? date('Y-m-t'),  0, 10);
+        $agentId  = (int) ($this->request->getGet('agent_id') ?? 0) ?: null;
 
-        $rows   = $this->model->getForCalendar($start, $end, $agentId);
+        // Filtre agence pour le calendrier
+        $agencyId = null;
+        $sessAgencyId = (int) session()->get('agency_id');
+        if ($sessAgencyId && ! $this->auth->hasPermission('agencies.create')) {
+            $agencyId = $sessAgencyId;
+        }
+
+        $rows   = $this->model->getForCalendar($start, $end, $agentId, $agencyId);
         $events = [];
 
         foreach ($rows as $v) {

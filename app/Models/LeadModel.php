@@ -49,6 +49,9 @@ class LeadModel extends Model
         if (! empty($filters['priority'])) {
             $builder->where('l.priority', $filters['priority']);
         }
+        if (! empty($filters['agency_id'])) {
+            $builder->where('u.agency_id', (int) $filters['agency_id']);
+        }
         if (! empty($filters['search'])) {
             $builder->groupStart()
                 ->like('l.first_name', $filters['search'])
@@ -110,7 +113,7 @@ class LeadModel extends Model
     /**
      * Données pipeline pour le CRM (kanban).
      */
-    public function getPipeline(?int $agentId = null): array
+    public function getPipeline(?int $agentId = null, ?int $agencyId = null): array
     {
         $statuses = ['new', 'contacted', 'interested', 'visit_done', 'negotiating', 'won', 'lost'];
         $pipeline = [];
@@ -125,6 +128,10 @@ class LeadModel extends Model
 
             if ($agentId) {
                 $builder->where('l.assigned_to', $agentId);
+            }
+            if ($agencyId) {
+                $builder->join('users u', 'u.id = l.assigned_to', 'left')
+                         ->where('u.agency_id', $agencyId);
             }
 
             $pipeline[$status] = $builder->orderBy('l.priority DESC, l.created_at DESC')

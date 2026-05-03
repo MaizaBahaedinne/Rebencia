@@ -75,6 +75,9 @@ class VisitModel extends Model
         if (! empty($filters['agent_id'])) {
             $builder->where('v.agent_id', (int) $filters['agent_id']);
         }
+        if (! empty($filters['agency_id'])) {
+            $builder->where('u.agency_id', (int) $filters['agency_id']);
+        }
         if (! empty($filters['date_from'])) {
             $builder->where('v.visit_date >=', $filters['date_from']);
         }
@@ -162,13 +165,18 @@ class VisitModel extends Model
     /**
      * Comptage par statut (pour les cards du tableau de bord).
      */
-    public function countByStatus(): array
+    public function countByStatus(?int $agencyId = null): array
     {
-        $rows = $this->db->table('visits')
-            ->select('status, COUNT(*) AS cnt')
-            ->where('deleted_at IS NULL')
-            ->groupBy('status')
-            ->get()->getResultArray();
+        $builder = $this->db->table('visits v')
+            ->select('v.status, COUNT(*) AS cnt')
+            ->where('v.deleted_at IS NULL');
+
+        if ($agencyId) {
+            $builder->join('users u', 'u.id = v.agent_id', 'left')
+                    ->where('u.agency_id', $agencyId);
+        }
+
+        $rows = $builder->groupBy('v.status')->get()->getResultArray();
 
         $map = array_fill_keys(array_keys(self::STATUS_LABELS), 0);
         foreach ($rows as $r) {
@@ -182,7 +190,7 @@ class VisitModel extends Model
     /**
      * Retourne les visites pour FullCalendar (format JSON API).
      */
-    public function getForCalendar(string $start, string $end, ?int $agentId = null): array
+    public function getForCalendar(string $start, string $end, ?int $agentId = null, ?int $agencyId = null): array
     {
         $builder = $this->db->table('visits v')
             ->select('v.id, v.visit_date, v.visit_time, v.duration, v.status,
@@ -198,6 +206,9 @@ class VisitModel extends Model
 
         if ($agentId !== null) {
             $builder->where('v.agent_id', $agentId);
+        }
+        if ($agencyId !== null) {
+            $builder->where('u.agency_id', $agencyId);
         }
 
         return $builder

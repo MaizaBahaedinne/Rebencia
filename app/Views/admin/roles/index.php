@@ -57,16 +57,18 @@
                             style="font-size:.75rem;letter-spacing:.1em;">
                             <i class="bi bi-folder2 me-1"></i><?= esc($module) ?>
                         </td>
-                        <?php foreach ($roles as $role) : ?>
+                        <?php foreach ($roles as $role) :
+                            $isLocked = (int)($role['hierarchy_level'] ?? 5) === 1 || $role['name'] === 'pdg';
+                        ?>
                         <td class="text-center align-middle">
-                            <?php if ($role['name'] !== 'director') : ?>
+                            <?php if (!$isLocked) : ?>
                             <input type="checkbox"
                                    class="form-check-input select-all-module"
                                    data-role="<?= $role['id'] ?>"
                                    data-module="<?= esc($module) ?>"
                                    title="Tout sélectionner — <?= esc($role['label']) ?>">
                             <?php else : ?>
-                            <i class="bi bi-lock-fill text-danger" title="Toutes les permissions"></i>
+                            <i class="bi bi-lock-fill text-danger" title="Permissions non modifiables"></i>
                             <?php endif; ?>
                         </td>
                         <?php endforeach; ?>
@@ -79,6 +81,7 @@
                         </td>
                         <?php foreach ($roles as $role) :
                             $hasPermission = in_array($perm['id'], array_column($role['permissions'], 'id'));
+                            $isLocked = (int)($role['hierarchy_level'] ?? 5) === 1 || $role['name'] === 'pdg';
                         ?>
                         <td class="text-center align-middle">
                             <div class="form-check d-flex justify-content-center">
@@ -88,7 +91,7 @@
                                        data-perm="<?= $perm['id'] ?>"
                                        data-module="<?= esc($module) ?>"
                                        <?= $hasPermission ? 'checked' : '' ?>
-                                       <?= $role['name'] === 'director' ? 'disabled checked' : '' ?>
+                                       <?= $isLocked ? 'disabled' : '' ?>
                                        title="<?= esc($role['label']) ?> – <?= esc($perm['label']) ?>">
                             </div>
                         </td>
@@ -102,7 +105,7 @@
     </div>
     <div class="card-footer bg-light text-muted small">
         <i class="bi bi-info-circle me-1"></i>
-        Le rôle <strong>Directeur</strong> possède toujours toutes les permissions (non modifiable).
+        Les rôles <strong>Super Administrateur</strong> et <strong>PDG</strong> ont des permissions non modifiables.
         Les modifications sont enregistrées automatiquement.
     </div>
 </div>

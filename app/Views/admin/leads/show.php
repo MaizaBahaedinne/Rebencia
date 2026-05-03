@@ -1,15 +1,15 @@
 ﻿
 <?php
+// ── Définitions pipeline ────────────────────────────────────────────────────
 $pipelineSteps = [
-    'new'         => ['Nouveau',       'primary',   'bi-circle'],
-    'contacted'   => ['Contacté',      'info',      'bi-telephone-check'],
-    'interested'  => ['Intéressé',     'warning',   'bi-star'],
-    'visit_done'  => ['Visite faite',  'secondary', 'bi-house-check'],
-    'negotiating' => ['Négociation',   'dark',      'bi-chat-dots'],
-    'won'         => ['Conclu',        'success',   'bi-trophy'],
-    'lost'        => ['Perdu',         'danger',    'bi-x-circle'],
+    'new'         => ['Nouveau',       '#3b82f6', 'bi-circle-fill'],
+    'contacted'   => ['Contacté',      '#06b6d4', 'bi-telephone-check-fill'],
+    'interested'  => ['Intéressé',     '#f59e0b', 'bi-star-fill'],
+    'visit_done'  => ['Visite faite',  '#8b5cf6', 'bi-house-check-fill'],
+    'negotiating' => ['Négociation',   '#f97316', 'bi-chat-dots-fill'],
+    'won'         => ['Conclu',        '#10b981', 'bi-trophy-fill'],
+    'lost'        => ['Perdu',         '#ef4444', 'bi-x-circle-fill'],
 ];
-// Pipeline principal (sans 'lost' qui est un fallout)
 $mainPipeline  = array_filter($pipelineSteps, fn($k) => $k !== 'lost', ARRAY_FILTER_USE_KEY);
 $currentStatus = $lead['status'] ?? 'new';
 $statusKeys    = array_keys($pipelineSteps);
@@ -18,13 +18,24 @@ $currentIdx    = array_search($currentStatus, $statusKeys);
 $isTerminal    = in_array($currentStatus, ['won', 'lost'], true);
 $canEdit       = in_array('leads.edit', session()->get('permissions') ?? []);
 
-// Mapping bouton → déclencheur (modal ou POST direct)
+// ── Dates de passage par statut (depuis l'historique) ──────────────────────
+$stepDates = [];
+// La date "new" = date de création du lead
+$stepDates['new'] = date('d/m/Y', strtotime($lead['created_at']));
+foreach ($statusHistory ?? [] as $h) {
+    $key = $h['new_status'] ?? '';
+    if ($key && ! isset($stepDates[$key])) {
+        $stepDates[$key] = date('d/m/Y', strtotime($h['created_at']));
+    }
+}
+
+// ── Mapping bouton → modal ou POST direct ──────────────────────────────────
 $stepActions = [
-    'contacted'   => ['modal',  '#modalContacte',  'btn-info text-white'],
-    'interested'  => ['modal',  '#modalInteresse', 'btn-warning text-dark'],
-    'visit_done'  => ['direct', '',                'btn-secondary text-white'],
-    'negotiating' => ['direct', '',                'btn-dark text-white'],
-    'won'         => ['modal',  '#modalConclu',    'btn-success text-white'],
+    'contacted'   => ['modal',  '#modalContacte',  '#06b6d4'],
+    'interested'  => ['modal',  '#modalInteresse', '#f59e0b'],
+    'visit_done'  => ['direct', '',                '#8b5cf6'],
+    'negotiating' => ['direct', '',                '#f97316'],
+    'won'         => ['modal',  '#modalConclu',    '#10b981'],
 ];
 ?>
 
@@ -60,74 +71,131 @@ $stepActions = [
 <?php endif; ?>
 <?php endforeach; ?>
 
-<!-- ═══ Pipeline visuel ═══════════════════════════════════════════ -->
+<!-- ═══ Pipeline stepper ══════════════════════════════════════════════════════ -->
 <div class="card border-0 shadow-sm mb-4">
-    <div class="card-body py-3 px-4">
-        <div class="d-flex align-items-center overflow-auto gap-0">
-            <?php foreach ($mainPipeline as $key => [$label, $color, $icon]):
-                $idx      = array_search($key, $statusKeys);
-                $mainIdx  = array_search($key, $mainKeys);
-                $curMainIdx = array_search($currentStatus, $mainKeys);
-                if ($key === $currentStatus)           $state = 'active';
-                elseif ($currentStatus === 'lost')     $state = 'pending';  // fallout status
-                elseif ($idx < $currentIdx)            $state = 'done';
-                else                                   $state = 'pending';
-            ?>
-            <div class="d-flex align-items-center">
-                <?php if ($mainIdx > 0): ?>
-                <div class="pipeline-connector" style="width:24px;height:2px;background:<?= $state === 'done' || $state === 'active' ? '#0d6efd' : '#dee2e6' ?>"></div>
-                <?php endif; ?>
+    <div class="card-body px-4 py-4">
 
-                <?php if ($state === 'active'): ?>
-                    <!-- Étape actuelle : badge coloré -->
-                    <span class="badge bg-<?= $color ?> d-flex align-items-center gap-1 py-2 px-3 fs-6">
-                        <i class="bi <?= $icon ?>"></i><?= $label ?>
-                    </span>
+        <!-- Ligne de progression en haut -->
+        <?php
+        // Calcule le % de progression pour la barre sous-jacente
+        $totalSteps = count($mainKeys);
+        $doneSteps  = 0;
+        foreach ($mainKeys as $k) {
+            $kidx = array_search($k, $statusKeys);
+            if ($currentStatus !== 'lost' && $kidx <= $currentIdx) $doneSteps++;
+        }
+        $progressPct = $totalSteps > 1 ? round(($doneSteps - 1) / ($totalSteps - 1) * 100) : 0;
+        if ($currentStatus === 'lost') $progressPct = 0;
+        ?>
 
-                <?php elseif ($state === 'done'): ?>
-                    <!-- Étape passée : check vert -->
-                    <span class="badge bg-success bg-opacity-15 text-success border border-success d-flex align-items-center gap-1 py-2 px-3">
-                        <i class="bi bi-check-lg"></i><?= $label ?>
-                    </span>
+        <div class="position-relative" style="padding-bottom:0">
+            <!-- Barre de fond grise -->
+            <div class="position-absolute" style="top:20px;left:calc(50px / 2);right:calc(50px / 2);height:4px;background:#e5e7eb;z-index:0;border-radius:4px;"></div>
+            <!-- Barre colorée remplie -->
+            <div class="position-absolute" style="top:20px;left:calc(50px / 2);width:<?= $progressPct ?>%;height:4px;background:linear-gradient(90deg,#3b82f6,#10b981);z-index:1;border-radius:4px;transition:width .4s;"></div>
 
-                <?php elseif ($state === 'pending' && $canEdit && ! $isTerminal): ?>
-                    <!-- Prochaine étape : bouton d'action -->
-                    <?php [$actionType, $modalTarget, $btnClass] = $stepActions[$key] ?? ['direct', '', 'btn-outline-secondary']; ?>
-                    <?php if ($actionType === 'modal'): ?>
-                        <button type="button"
-                                class="btn btn-sm <?= $btnClass ?> d-flex align-items-center gap-1"
-                                data-bs-toggle="modal" data-bs-target="<?= $modalTarget ?>">
-                            <i class="bi <?= $icon ?>"></i><?= $label ?>
+            <!-- Étapes -->
+            <div class="d-flex justify-content-between position-relative" style="z-index:2">
+                <?php foreach ($mainPipeline as $key => [$label, $hexColor, $icon]):
+                    $kidx = array_search($key, $statusKeys);
+                    if ($key === $currentStatus)                                $state = 'active';
+                    elseif ($currentStatus !== 'lost' && $kidx < $currentIdx)  $state = 'done';
+                    else                                                         $state = 'pending';
+
+                    [$actionType, $modalTarget, $actionColor] = $stepActions[$key] ?? ['none', '', $hexColor];
+                    $date = $stepDates[$key] ?? null;
+                ?>
+                <div class="d-flex flex-column align-items-center" style="width:50px;flex-shrink:0">
+
+                    <?php if ($state === 'done'): ?>
+                        <!-- Passé : cercle vert avec check -->
+                        <div style="width:40px;height:40px;border-radius:50%;background:#10b981;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #d1fae5;">
+                            <i class="bi bi-check-lg text-white" style="font-size:1.1rem;"></i>
+                        </div>
+
+                    <?php elseif ($state === 'active'): ?>
+                        <!-- Actuel : cercle coloré + anneau -->
+                        <div style="width:40px;height:40px;border-radius:50%;background:<?= $hexColor ?>;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 4px <?= $hexColor ?>33;">
+                            <i class="bi <?= $icon ?> text-white" style="font-size:1rem;"></i>
+                        </div>
+
+                    <?php elseif ($state === 'pending' && $canEdit && ! $isTerminal && $actionType !== 'none'): ?>
+                        <!-- Suivant : bouton cliquable -->
+                        <?php if ($actionType === 'modal'): ?>
+                        <button type="button" data-bs-toggle="modal" data-bs-target="<?= $modalTarget ?>"
+                            title="Passer à : <?= $label ?>"
+                            style="width:40px;height:40px;border-radius:50%;border:2.5px dashed <?= $hexColor ?>;background:white;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .18s;"
+                            onmouseover="this.style.background='<?= $hexColor ?>22'"
+                            onmouseout="this.style.background='white'">
+                            <i class="bi <?= $icon ?>" style="color:<?= $hexColor ?>;font-size:1rem;"></i>
                         </button>
-                    <?php else: ?>
-                        <form method="post" action="<?= site_url('admin/leads/' . $lead['id'] . '/status') ?>" class="d-inline">
+                        <?php else: ?>
+                        <form method="post" action="<?= site_url('admin/leads/' . $lead['id'] . '/status') ?>" class="d-inline m-0 p-0">
                             <?= csrf_field() ?>
                             <input type="hidden" name="status" value="<?= $key ?>">
-                            <button type="submit" class="btn btn-sm <?= $btnClass ?> d-flex align-items-center gap-1">
-                                <i class="bi <?= $icon ?>"></i><?= $label ?>
+                            <button type="submit" title="Passer à : <?= $label ?>"
+                                style="width:40px;height:40px;border-radius:50%;border:2.5px dashed <?= $hexColor ?>;background:white;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .18s;"
+                                onmouseover="this.style.background='<?= $hexColor ?>22'"
+                                onmouseout="this.style.background='white'">
+                                <i class="bi <?= $icon ?>" style="color:<?= $hexColor ?>;font-size:1rem;"></i>
                             </button>
                         </form>
+                        <?php endif; ?>
+
+                    <?php else: ?>
+                        <!-- Futur : cercle gris -->
+                        <div style="width:40px;height:40px;border-radius:50%;border:2px solid #d1d5db;background:#f9fafb;display:flex;align-items:center;justify-content:center;">
+                            <i class="bi <?= $icon ?>" style="color:#9ca3af;font-size:1rem;"></i>
+                        </div>
                     <?php endif; ?>
 
-                <?php else: ?>
-                    <!-- Étape future désactivée -->
-                    <span class="badge bg-light text-muted border d-flex align-items-center gap-1 py-2 px-3">
-                        <i class="bi <?= $icon ?>"></i><?= $label ?>
+                    <!-- Label -->
+                    <span class="mt-2 text-center lh-1" style="font-size:.68rem;font-weight:<?= $state === 'active' ? '700' : '500' ?>;color:<?= $state === 'active' ? $hexColor : ($state === 'done' ? '#10b981' : '#9ca3af') ?>;white-space:nowrap;">
+                        <?= $label ?>
                     </span>
+
+                    <!-- Date de passage -->
+                    <?php if ($date): ?>
+                    <span class="text-center mt-1" style="font-size:.62rem;color:#6b7280;white-space:nowrap;"><?= $date ?></span>
+                    <?php else: ?>
+                    <span style="font-size:.62rem;color:transparent;user-select:none;">–</span>
+                    <?php endif; ?>
+                </div>
+                <?php endforeach; ?>
+
+                <?php if ($currentStatus === 'lost'): ?>
+                <!-- Perdu : icône rouge à droite -->
+                <div class="d-flex flex-column align-items-center" style="width:50px;flex-shrink:0">
+                    <div style="width:40px;height:40px;border-radius:50%;background:#ef4444;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 4px #fee2e2;">
+                        <i class="bi bi-x-lg text-white" style="font-size:1.1rem;"></i>
+                    </div>
+                    <span class="mt-2 text-center lh-1" style="font-size:.68rem;font-weight:700;color:#ef4444;white-space:nowrap;">Perdu</span>
+                    <?php if (isset($stepDates['lost'])): ?>
+                    <span class="text-center mt-1" style="font-size:.62rem;color:#6b7280;"><?= $stepDates['lost'] ?></span>
+                    <?php endif; ?>
+                </div>
                 <?php endif; ?>
             </div>
-            <?php endforeach; ?>
+        </div>
 
-            <?php if ($currentStatus === 'lost'): ?>
-            <div class="d-flex align-items-center ms-3">
-                <div class="pipeline-connector" style="width:24px;height:2px;background:#dc3545"></div>
-                <span class="badge bg-danger d-flex align-items-center gap-1 py-2 px-3 fs-6">
-                    <i class="bi bi-x-circle"></i>Perdu
-                </span>
-            </div>
+        <!-- Légende statut actuel -->
+        <div class="mt-4 pt-2 border-top d-flex align-items-center gap-3 flex-wrap">
+            <?php
+            [$curLabel, $curHex, $curIcon] = $pipelineSteps[$currentStatus];
+            ?>
+            <span style="font-size:.8rem;color:#6b7280;">Statut actuel :</span>
+            <span class="d-flex align-items-center gap-1 fw-semibold" style="color:<?= $curHex ?>;font-size:.9rem;">
+                <i class="bi <?= $curIcon ?>"></i><?= $curHex === '#f59e0b' ? '<span style="color:#92400e">' . $curLabel . '</span>' : $curLabel ?>
+            </span>
+            <?php if (! $isTerminal && $canEdit): ?>
+            <span class="text-muted" style="font-size:.78rem;">
+                <i class="bi bi-arrow-right-circle me-1"></i>
+                Cliquez sur le prochain cercle pointillé pour avancer
+            </span>
             <?php endif; ?>
         </div>
     </div>
+</div>
 </div>
 
 <div class="row g-4">
@@ -330,9 +398,10 @@ $stepActions = [
                 <div class="mb-3">
                     <label class="text-muted small">Statut actuel</label>
                     <div>
-                        <span class="badge bg-<?= $pipelineSteps[$currentStatus][1] ?> fs-6">
-                            <i class="bi <?= $pipelineSteps[$currentStatus][2] ?> me-1"></i>
-                            <?= $pipelineSteps[$currentStatus][0] ?>
+                        <?php [$sLabel, $sHex, $sIcon] = $pipelineSteps[$currentStatus]; ?>
+                        <span class="d-inline-flex align-items-center gap-1 rounded-pill px-3 py-1 fw-semibold"
+                              style="background:<?= $sHex ?>22;color:<?= $sHex ?>;border:1.5px solid <?= $sHex ?>55;font-size:.9rem;">
+                            <i class="bi <?= $sIcon ?>"></i><?= $sLabel ?>
                         </span>
                     </div>
                 </div>
@@ -354,9 +423,14 @@ $stepActions = [
             <ul class="list-group list-group-flush">
                 <?php foreach ($statusHistory as $h): ?>
                 <li class="list-group-item py-2">
-                    <div class="d-flex justify-content-between">
-                        <span class="badge bg-<?= $pipelineSteps[$h['new_status']][1] ?? 'secondary' ?>">
-                            <?= $pipelineSteps[$h['new_status']][0] ?? esc($h['new_status']) ?>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <?php
+                            $hStatus = $h['new_status'] ?? '';
+                            [$hLabel, $hHex, $hIcon] = $pipelineSteps[$hStatus] ?? [$hStatus, '#6b7280', 'bi-circle'];
+                        ?>
+                        <span class="d-inline-flex align-items-center gap-1 rounded-pill px-2 py-1 small fw-semibold"
+                              style="background:<?= $hHex ?>1a;color:<?= $hHex ?>;border:1px solid <?= $hHex ?>44;">
+                            <i class="bi <?= $hIcon ?>"></i><?= $hLabel ?>
                         </span>
                         <small class="text-muted"><?= date('d/m H:i', strtotime($h['created_at'])) ?></small>
                     </div>

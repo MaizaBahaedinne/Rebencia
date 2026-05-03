@@ -202,6 +202,171 @@ class TeamsController extends BaseController
     }
 
     // --------------------------------------------------------
+    // Organigramme de l'équipe
+    // --------------------------------------------------------
+    public function orgchart(int $id): string
+    {
+        $this->requirePermission('users.view');
+        $this->checkTeamAccess($id);
+
+        $team = $this->agencyModel->findDetail($id);
+        if (! $team) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException('Équipe introuvable.');
+        }
+
+        $db = \Config\Database::connect();
+
+        // Détecte si la colonne manager_id existe
+        $managerColExists = false;
+        try {
+            $db->query('SELECT manager_id FROM users LIMIT 0');
+            $managerColExists = true;
+        } catch (\Throwable $e) {
+            // Migration pas encore appliquée
+        }
+
+        $managerSelect = $managerColExists ? 'u.manager_id,' : 'NULL AS manager_id,';
+
+        $members = $db->table('users u')
+            ->select("u.id, u.first_name, u.last_name, u.email, u.avatar, u.status, u.agency_id,
+                      {$managerSelect}
+                      COALESCE(r.label, r.name) AS role_label,
+                      COALESCE(r.color, '#6c757d') AS role_color,
+                      r.name AS role_name,
+                      r.hierarchy_level")
+            ->join('roles r', 'r.id = u.role_id')
+            ->where('u.agency_id', $id)
+            ->where('u.deleted_at IS NULL')
+            ->orderBy('r.hierarchy_level', 'ASC')
+            ->orderBy('u.first_name', 'ASC')
+            ->get()->getResultArray();
+
+        // Construction de l'arbre
+        $byId        = array_column($members, null, 'id');
+        $childrenMap = [];
+        $roots       = [];
+        $edges       = [];
+
+        foreach ($members as $m) {
+            $mid = (int) ($m['manager_id'] ?? 0);
+            if ($mid && isset($byId[$mid]) && (int) ($byId[$mid]['agency_id'] ?? 0) === $id) {
+                $childrenMap[$mid][] = $m;
+                $edges[]             = [$mid, (int) $m['id']];
+            } else {
+                $roots[] = $m;
+            }
+        }
+
+        // BFS pour assigner les niveaux (avec détection de cycles)
+        $levels  = [];
+        $visited = [];
+        $queue   = array_map(fn ($r) => ['node' => $r, 'depth' => 0], $roots);
+
+        while (! empty($queue)) {
+            ['node' => $node, 'depth' => $depth] = array_shift($queue);
+            if (in_array($node['id'], $visited)) {
+                continue;
+            }
+            $visited[]        = $node['id'];
+            $levels[$depth][] = $node;
+
+            foreach ($childrenMap[$node['id']] ?? [] as $child) {
+                if (! in_array($child['id'], $visited)) {
+                    $queue[] = ['node' => $child, 'depth' => $depth + 1];
+                }
+            }
+        }
+
+        // Membres non atteints (cycles orphelins) → ajoutés au niveau 0
+        foreach ($members as $m) {
+            if (! in_array($m['id'], $visited)) {
+                $levels[0][] = $m;
+            }
+        }
+
+        ksort($levels);
+
+        return $this->render('admin/teams/orgchart', [
+            'page_title'       => 'Organigramme — ' . $team['name'],
+            'team'             => $team,
+            'levels'           => $levels,
+            'edges'            => $edges,
+            'members'          => $members,
+            'canManage'        => $this->auth->hasPermission('users.edit'),
+            'managerColExists' => $managerColExists,
+            'hasRelations'     => ! empty($edges),
+        ]);
+    }
+
+    // --------------------------------------------------------
+    // Définir le manager d'un membre
+    // --------------------------------------------------------
+    public function setManager(int $teamId)
+    {
+        $this->requirePermission('users.edit');
+        $this->checkTeamAccess($teamId);
+
+        $userId    = (int) $this->request->getPost('user_id');
+        $managerId = (int) $this->request->getPost('manager_id'); // 0 = aucun manager
+
+        $user = $this->userModel->find($userId);
+        if (! $user || (int) ($user['agency_id'] ?? 0) !== $teamId) {
+            return redirect()->back()->with('error', 'Utilisateur non valide.');
+        }
+
+        if ($managerId > 0) {
+            $manager = $this->userModel->find($managerId);
+            if (! $manager || (int) ($manager['agency_id'] ?? 0) !== $teamId) {
+                return redirect()->back()->with('error', 'Manager non valide.');
+            }
+            if ($managerId === $userId) {
+                return redirect()->back()->with('error', 'Un utilisateur ne peut pas être son propre manager.');
+            }
+            if ($this->hasCircularRef($managerId, $userId, $teamId)) {
+                return redirect()->back()->with('error', 'Référence circulaire détectée : ce manager est déjà subordonné à cet utilisateur.');
+            }
+        }
+
+        \Config\Database::connect()
+            ->table('users')
+            ->where('id', $userId)
+            ->update(['manager_id' => $managerId > 0 ? $managerId : null]);
+
+        $this->log->activity('team.manager.set', 'teams', 'user', $userId,
+            "Manager défini : utilisateur #{$userId} → " . ($managerId > 0 ? "#{$managerId}" : 'aucun'));
+
+        return redirect()->to(base_url("admin/teams/{$teamId}/orgchart"))
+            ->with('success', 'Hiérarchie mise à jour.');
+    }
+
+    // --------------------------------------------------------
+    // Détection de référence circulaire
+    // --------------------------------------------------------
+    private function hasCircularRef(int $userId, int $targetId, int $teamId): bool
+    {
+        $db      = \Config\Database::connect();
+        $current = $userId;
+        $seen    = [];
+
+        while ($current) {
+            if (in_array($current, $seen)) {
+                break;
+            }
+            $seen[] = $current;
+            if ($current === $targetId) {
+                return true;
+            }
+            $row     = $db->query(
+                'SELECT manager_id FROM users WHERE id = ? AND agency_id = ? LIMIT 1',
+                [$current, $teamId]
+            )->getRowArray();
+            $current = $row ? (int) ($row['manager_id'] ?? 0) : 0;
+        }
+
+        return false;
+    }
+
+    // --------------------------------------------------------
     // Vérification d'accès à une équipe selon la hiérarchie
     // --------------------------------------------------------
     private function checkTeamAccess(int $agencyId): void

@@ -13,7 +13,7 @@ class UserModel extends Model
     protected $deletedField  = 'deleted_at';
 
     protected $allowedFields = [
-        'role_id', 'agency_id', 'first_name', 'last_name', 'email', 'phone',
+        'role_id', 'agency_id', 'manager_id', 'first_name', 'last_name', 'email', 'phone',
         'password_hash', 'avatar', 'status',
         'last_login_at', 'last_login_ip', 'remember_token',
     ];

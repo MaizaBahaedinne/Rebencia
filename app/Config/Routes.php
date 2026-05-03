@@ -171,6 +171,8 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
     // Équipes
     $routes->get('teams',                           'Admin\TeamsController::index');
     $routes->get('teams/(:num)',                    'Admin\TeamsController::show/$1');
+    $routes->get('teams/(:num)/orgchart',           'Admin\TeamsController::orgchart/$1');
+    $routes->post('teams/(:num)/set-manager',       'Admin\TeamsController::setManager/$1');
     $routes->post('teams/(:num)/add-member',        'Admin\TeamsController::addMember/$1');
     $routes->post('teams/(:num)/remove-member',     'Admin\TeamsController::removeMember/$1');
 

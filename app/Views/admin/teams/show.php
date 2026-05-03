@@ -68,6 +68,9 @@
                     <i class="bi bi-person-plus me-1"></i>Ajouter un membre
                 </button>
                 <?php endif; ?>
+                <a href="<?= base_url('admin/teams/' . $team['id'] . '/orgchart') ?>" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-diagram-3-fill me-1"></i>Organigramme
+                </a>
                 <?php if (in_array('agencies.view', $perms)): ?>
                 <a href="<?= base_url('admin/agencies/' . $team['id']) ?>" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-pencil me-1"></i>Modifier l'agence

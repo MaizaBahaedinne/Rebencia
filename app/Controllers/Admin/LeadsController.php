@@ -64,6 +64,7 @@ class LeadsController extends BaseController
             'lead'       => [],
             'agents'     => (new UserModel())->getWithRole(['status' => 'active']),
             'properties' => (new PropertyModel())->getFiltered(['status' => 'available'])['data'],
+            'zones'      => $this->getZonesList(),
         ]);
     }
 
@@ -83,23 +84,7 @@ class LeadsController extends BaseController
         }
 
         $post = $this->request->getPost();
-        $id   = $this->model->insert([
-            'first_name'       => $post['first_name'],
-            'last_name'        => $post['last_name'],
-            'email'            => ($post['email']            ?? '') ?: null,
-            'phone'            => $post['phone'],
-            'source'           => ($post['source']           ?? '') ?: 'website',
-            'status'           => 'new',
-            'assigned_to'      => ($post['assigned_to']      ?? '') ?: null,
-            'property_id'      => ($post['property_id']      ?? '') ?: null,
-            'budget_min'       => ($post['budget_min']       ?? '') ?: null,
-            'budget_max'       => ($post['budget_max']       ?? '') ?: null,
-            'property_type'    => ($post['property_type']    ?? '') ?: null,
-            'transaction_type' => ($post['transaction_type'] ?? '') ?: 'sale',
-            'priority'         => ($post['priority']         ?? '') ?: 'medium',
-            'notes'            => $post['notes'] ?? '',
-            'next_follow_up'   => ($post['next_follow_up']   ?? '') ?: null,
-        ]);
+        $id   = $this->model->insert($this->buildLeadData($post, true));
 
         $this->log->activity('lead.create', 'leads', 'lead', $this->model->getInsertID(), 'Création lead');
 
@@ -139,11 +124,16 @@ class LeadsController extends BaseController
         $this->requirePermission('leads.edit');
         $lead = $this->findOrFail($id);
 
+        // Décoder les JSON pour la vue
+        $lead['property_types_arr']  = json_decode($lead['property_types']   ?? '[]', true) ?: [];
+        $lead['desired_zone_ids_arr'] = json_decode($lead['desired_zone_ids'] ?? '[]', true) ?: [];
+
         return $this->render('admin/leads/form', [
             'page_title' => 'Modifier lead – ' . $lead['first_name'],
             'lead'       => $lead,
             'agents'     => (new UserModel())->getWithRole(['status' => 'active']),
             'properties' => (new PropertyModel())->getFiltered(['status' => 'available'])['data'],
+            'zones'      => $this->getZonesList(),
         ]);
     }
 
@@ -154,22 +144,7 @@ class LeadsController extends BaseController
         $this->findOrFail($id);
 
         $post = $this->request->getPost();
-        $this->model->update($id, [
-            'first_name'       => $post['first_name'],
-            'last_name'        => $post['last_name'],
-            'email'            => ($post['email']            ?? '') ?: null,
-            'phone'            => $post['phone'],
-            'source'           => ($post['source']           ?? '') ?: 'website',
-            'assigned_to'      => ($post['assigned_to']      ?? '') ?: null,
-            'property_id'      => ($post['property_id']      ?? '') ?: null,
-            'budget_min'       => ($post['budget_min']       ?? '') ?: null,
-            'budget_max'       => ($post['budget_max']       ?? '') ?: null,
-            'property_type'    => ($post['property_type']    ?? '') ?: null,
-            'transaction_type' => ($post['transaction_type'] ?? '') ?: 'sale',
-            'priority'         => ($post['priority']         ?? '') ?: 'medium',
-            'notes'            => $post['notes'] ?? '',
-            'next_follow_up'   => ($post['next_follow_up']   ?? '') ?: null,
-        ]);
+        $this->model->update($id, $this->buildLeadData($post, false));
 
         $this->log->activity('lead.update', 'leads', 'lead', $id, 'Modification lead');
 
@@ -239,5 +214,69 @@ class LeadsController extends BaseController
             throw new \CodeIgniter\Exceptions\PageNotFoundException("Lead #{$id} introuvable");
         }
         return $lead;
+    }
+
+    /**
+     * Construit le tableau de données lead depuis un POST.
+     * $isCreate = true ajoute les champs réservés à la création.
+     */
+    private function buildLeadData(array $post, bool $isCreate): array
+    {
+        $types = $post['property_types'] ?? [];
+        $zoneIds = $post['desired_zone_ids'] ?? [];
+
+        $data = [
+            'first_name'         => $post['first_name'],
+            'last_name'          => $post['last_name'],
+            'email'              => ($post['email']            ?? '') ?: null,
+            'phone'              => $post['phone'],
+            'source'             => ($post['source']           ?? '') ?: 'website',
+            'assigned_to'        => ($post['assigned_to']      ?? '') ?: null,
+            'property_id'        => ($post['property_id']      ?? '') ?: null,
+            'budget_min'         => ($post['budget_min']       ?? '') ?: null,
+            'budget_max'         => ($post['budget_max']       ?? '') ?: null,
+            'property_type'      => is_array($types) && count($types) ? $types[0] : (($post['property_type'] ?? '') ?: null),
+            'property_types'     => !empty($types) ? json_encode(array_values((array) $types)) : null,
+            'transaction_type'   => ($post['transaction_type'] ?? '') ?: 'sale',
+            'priority'           => ($post['priority']         ?? '') ?: 'medium',
+            'notes'              => $post['notes'] ?? '',
+            'next_follow_up'     => ($post['next_follow_up']   ?? '') ?: null,
+            'desired_surface'    => ($post['desired_surface']  ?? '') ?: null,
+            'desired_location'   => ($post['desired_location'] ?? '') ?: null,
+            'desired_zone_ids'   => !empty($zoneIds) ? json_encode(array_values(array_filter(array_map('intval', (array) $zoneIds)))) : null,
+            'surface_min'        => ($post['surface_min']      ?? '') ?: null,
+            'surface_max'        => ($post['surface_max']      ?? '') ?: null,
+            'rooms_min'          => ($post['rooms_min']        ?? '') ?: null,
+            'bedrooms_min'       => ($post['bedrooms_min']     ?? '') ?: null,
+            'bathrooms_min'      => ($post['bathrooms_min']    ?? '') ?: null,
+            'floor_min'          => isset($post['floor_min']) && $post['floor_min'] !== '' ? (int) $post['floor_min'] : null,
+            'floor_max'          => isset($post['floor_max']) && $post['floor_max'] !== '' ? (int) $post['floor_max'] : null,
+            'wants_parking'      => isset($post['wants_parking'])  ? 1 : 0,
+            'wants_elevator'     => isset($post['wants_elevator']) ? 1 : 0,
+            'wants_garden'       => isset($post['wants_garden'])   ? 1 : 0,
+            'wants_pool'         => isset($post['wants_pool'])     ? 1 : 0,
+            'wants_terrace'      => isset($post['wants_terrace'])  ? 1 : 0,
+            'construction_state' => ($post['construction_state']   ?? '') ?: 'any',
+            'furnished'          => ($post['furnished']            ?? '') ?: 'any',
+            'orientation'        => ($post['orientation']          ?? '') ?: null,
+            'target_date'        => ($post['target_date']          ?? '') ?: null,
+        ];
+
+        if ($isCreate) {
+            $data['status'] = 'new';
+        }
+
+        return $data;
+    }
+
+    /** Retourne la liste des zones (villes/quartiers) pour le sélecteur. */
+    private function getZonesList(): array
+    {
+        try {
+            $db = \Config\Database::connect();
+            return $db->query('SELECT id, name, parent_id FROM zones WHERE is_active = 1 ORDER BY parent_id ASC, name ASC')->getResultArray();
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 }

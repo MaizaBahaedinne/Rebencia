@@ -17,12 +17,7 @@ class LeadModel extends Model
         'email', 'phone', 'source', 'status',
         'budget_min', 'budget_max', 'notes',
         'property_type', 'transaction_type', 'priority', 'next_follow_up',
-        'desired_surface', 'desired_location', 'desired_zone_ids',
-        'surface_min', 'surface_max',
-        'rooms_min', 'bedrooms_min', 'bathrooms_min',
-        'floor_min', 'floor_max',
-        'wants_parking', 'wants_elevator', 'wants_garden', 'wants_pool', 'wants_terrace',
-        'construction_state', 'furnished', 'orientation', 'target_date',
+        'desired_surface', 'desired_location',
     ];
 
     // --------------------------------------------------------

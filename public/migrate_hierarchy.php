@@ -90,6 +90,12 @@ $steps = [
         UPDATE `roles` SET `hierarchy_level` = 5 WHERE `name` IN ('expert', 'collaborator')
     "],
 
+    ['SET hierarchy_level rôles super_admin alternatifs (ex: "Super Admin")', "
+        UPDATE `roles` SET `hierarchy_level` = 1
+        WHERE LOWER(`name`) LIKE '%super%admin%'
+           OR LOWER(`name`) LIKE '%super admin%'
+    "],
+
     ['INSERT rôle PDG', "
         INSERT IGNORE INTO `roles` (`name`, `label`, `description`, `color`, `is_active`, `hierarchy_level`, `created_at`, `updated_at`)
         VALUES ('pdg', 'PDG', 'Président Directeur Général — vision multi-agences', '#6f42c1', 1, 3, NOW(), NOW())

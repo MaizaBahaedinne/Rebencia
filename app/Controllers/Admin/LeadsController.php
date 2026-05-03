@@ -6,6 +6,8 @@ use App\Controllers\BaseController;
 use App\Models\LeadModel;
 use App\Models\UserModel;
 use App\Models\PropertyModel;
+use App\Models\VisitModel;
+use App\Libraries\NotificationService;
 
 /**
  * LeadsController – CRM Leads Rebencia.
@@ -96,10 +98,21 @@ class LeadsController extends BaseController
 
         $post = $this->request->getPost();
         $id   = $this->model->insert($this->buildLeadData($post, true));
+        $newId = $this->model->getInsertID();
 
-        $this->log->activity('lead.create', 'leads', 'lead', $this->model->getInsertID(), 'Création lead');
+        $this->log->activity('lead.create', 'leads', 'lead', $newId, 'Création lead');
 
-        return redirect()->to('/admin/leads/' . $this->model->getInsertID())
+        // Notifier l'agence responsable du bien lié
+        if (! empty($post['property_id'])) {
+            $this->notifyPropertyAgency(
+                (int) $post['property_id'],
+                ($post['first_name'] ?? '') . ' ' . ($post['last_name'] ?? ''),
+                $newId,
+                'Nouveau lead'
+            );
+        }
+
+        return redirect()->to('/admin/leads/' . $newId)
             ->with('success', 'Lead créé avec succès.');
     }
 
@@ -162,22 +175,102 @@ class LeadsController extends BaseController
         return redirect()->to('/admin/leads/' . $id)->with('success', 'Lead mis à jour.');
     }
 
-    /** Changement de statut (AJAX). */
+    /** Changement de statut avec logique métier par étape. */
     public function updateStatus(int $id)
     {
         $this->requirePermission('leads.edit');
 
-        $newStatus = $this->request->getPost('status');
-        $validStatuses = ['new', 'contacted', 'visit', 'negotiation', 'sold', 'lost'];
+        $newStatus     = $this->request->getPost('status');
+        $validStatuses = ['new', 'contacted', 'interested', 'visit_done', 'negotiating', 'won', 'lost'];
+        $lead          = $this->findOrFail($id);
 
         if (! in_array($newStatus, $validStatuses, true)) {
-            return $this->json(['error' => 'Statut invalide'], 422);
+            return redirect()->back()->with('error', 'Statut invalide.');
         }
 
-        $this->model->changeStatus($id, $newStatus, $this->auth->id(), $this->request->getPost('notes') ?? '');
-        $this->log->activity('lead.status', 'leads', 'lead', $id, "Statut → {$newStatus}");
+        switch ($newStatus) {
 
-        return $this->json(['success' => true, 'status' => $newStatus]);
+            // ── Contacté : note obligatoire + notif agence ───────────
+            case 'contacted':
+                $note = trim($this->request->getPost('contact_note') ?? '');
+                if (empty($note)) {
+                    return redirect()->back()->with('error', 'Une note est requise pour passer au statut « Contacté ».');
+                }
+                $this->model->changeStatus($id, 'contacted', $this->auth->id(), $note);
+                $this->model->addNote($id, $this->auth->id(), $note);
+                if (! empty($lead['property_id'])) {
+                    $this->notifyPropertyAgency(
+                        (int) $lead['property_id'],
+                        $lead['first_name'] . ' ' . $lead['last_name'],
+                        $id,
+                        'Lead contacté',
+                        $lead['property_title'] ?? null
+                    );
+                }
+                break;
+
+            // ── Intéressé : RDV de visite obligatoire ────────────────
+            case 'interested':
+                $visitDate = trim($this->request->getPost('visit_date') ?? '');
+                $visitTime = trim($this->request->getPost('visit_time') ?? '');
+                if (empty($visitDate)) {
+                    return redirect()->back()->with('error', 'Veuillez choisir une date pour le RDV de visite.');
+                }
+                $visitNotes = 'Depuis lead #' . $id . ' — ' . $lead['first_name'] . ' ' . $lead['last_name'];
+                $extra      = trim($this->request->getPost('visit_notes') ?? '');
+                if ($extra !== '') {
+                    $visitNotes .= ' — ' . $extra;
+                }
+                $visitModel = new VisitModel();
+                $visitModel->insert([
+                    'property_id' => $lead['property_id'] ?: null,
+                    'agent_id'    => $lead['assigned_to'] ?: null,
+                    'visit_date'  => $visitDate,
+                    'visit_time'  => $visitTime ?: null,
+                    'status'      => 'planifiee',
+                    'notes'       => $visitNotes,
+                    'created_by'  => $this->auth->id(),
+                ]);
+                $rdvNote = 'RDV de visite planifié le ' . date('d/m/Y', strtotime($visitDate))
+                         . ($visitTime ? ' à ' . $visitTime : '');
+                $this->model->changeStatus($id, 'interested', $this->auth->id(), $rdvNote);
+                $this->model->addNote($id, $this->auth->id(), $rdvNote);
+                break;
+
+            // ── Visite effectuée : auto-avance en Négociation ────────
+            case 'visit_done':
+                $this->model->changeStatus($id, 'visit_done',   $this->auth->id(), 'Visite effectuée');
+                $this->model->changeStatus($id, 'negotiating',  $this->auth->id(), 'Passage automatique en négociation après visite effectuée');
+                $this->log->activity('lead.status', 'leads', 'lead', $id, 'Visite effectuée → Négociation (auto)');
+                return redirect()->to('/admin/leads/' . $id)
+                    ->with('success', 'Visite effectuée — lead passé automatiquement en Négociation.');
+
+            // ── Conclu (won) ─────────────────────────────────────────
+            case 'won':
+                $this->model->changeStatus($id, 'won', $this->auth->id(), 'Lead conclu');
+                break;
+
+            // ── Perdu : raison obligatoire ───────────────────────────
+            case 'lost':
+                $reason = trim($this->request->getPost('lost_reason') ?? '');
+                $detail = trim($this->request->getPost('lost_detail') ?? '');
+                if (empty($reason)) {
+                    return redirect()->back()->with('error', 'Veuillez indiquer la raison de la perte.');
+                }
+                $noteText = 'Raison de la perte : ' . $reason;
+                if ($detail !== '') {
+                    $noteText .= ' — ' . $detail;
+                }
+                $this->model->changeStatus($id, 'lost', $this->auth->id(), $noteText);
+                $this->model->addNote($id, $this->auth->id(), $noteText);
+                break;
+
+            default:
+                $this->model->changeStatus($id, $newStatus, $this->auth->id());
+        }
+
+        $this->log->activity('lead.status', 'leads', 'lead', $id, "Statut → {$newStatus}");
+        return redirect()->to('/admin/leads/' . $id)->with('success', 'Statut mis à jour avec succès.');
     }
 
     /** Assignation à un agent (AJAX). */
@@ -192,19 +285,26 @@ class LeadsController extends BaseController
         return $this->json(['success' => true]);
     }
 
-    /** Ajout de note (AJAX). */
+    /** Ajout de note. */
     public function addNote(int $id)
     {
         $this->requirePermission('leads.edit');
 
-        $content = trim($this->request->getPost('content') ?? '');
+        // Accepte 'note' (form normal) ou 'content' (appel AJAX legacy)
+        $content = trim($this->request->getPost('note') ?? $this->request->getPost('content') ?? '');
         if (empty($content)) {
-            return $this->json(['error' => 'Note vide'], 422);
+            if ($this->request->isAJAX()) {
+                return $this->json(['error' => 'Note vide'], 422);
+            }
+            return redirect()->back()->with('error', 'La note ne peut pas être vide.');
         }
 
         $this->model->addNote($id, $this->auth->id(), $content);
 
-        return $this->json(['success' => true, 'author' => session()->get('user_name'), 'created_at' => date('Y-m-d H:i:s')]);
+        if ($this->request->isAJAX()) {
+            return $this->json(['success' => true, 'author' => session()->get('user_name'), 'created_at' => date('Y-m-d H:i:s')]);
+        }
+        return redirect()->to('/admin/leads/' . $id)->with('success', 'Note ajoutée.');
     }
 
     /** Suppression (soft). */
@@ -217,7 +317,55 @@ class LeadsController extends BaseController
         return redirect()->to('/admin/leads')->with('success', 'Lead supprimé.');
     }
 
-    // --------------------------------------------------------
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    /**
+     * Notifie tous les membres actifs de l'agence responsable d'un bien.
+     */
+    private function notifyPropertyAgency(
+        int    $propertyId,
+        string $leadName,
+        int    $leadId,
+        string $title   = 'Nouveau lead',
+        ?string $propTitle = null
+    ): void {
+        $db = \Config\Database::connect();
+
+        // Récupère l'agent du bien + son agence
+        $prop = $db->query(
+            'SELECT p.title, p.agent_id, u.agency_id
+             FROM properties p
+             LEFT JOIN users u ON u.id = p.agent_id
+             WHERE p.id = ? AND p.deleted_at IS NULL LIMIT 1',
+            [$propertyId]
+        )->getRowArray();
+
+        if (empty($prop['agency_id'])) {
+            return;
+        }
+
+        $users = $db->query(
+            'SELECT id FROM users WHERE agency_id = ? AND status = ? AND deleted_at IS NULL',
+            [$prop['agency_id'], 'active']
+        )->getResultArray();
+
+        if (empty($users)) {
+            return;
+        }
+
+        $userIds   = array_column($users, 'id');
+        $bienTitle = $propTitle ?? $prop['title'] ?? 'Bien #' . $propertyId;
+        $message   = "{$leadName} est intéressé(e) par « {$bienTitle} »";
+
+        (new NotificationService())->send(
+            $userIds,
+            $title,
+            $message,
+            'lead',
+            base_url("admin/leads/{$leadId}")
+        );
+    }
+
     private function findOrFail(int $id): array
     {
         $lead = $this->model->findWithDetails($id);

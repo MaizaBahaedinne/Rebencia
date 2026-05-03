@@ -599,6 +599,11 @@
 
         <?php if (in_array('users.view', session()->get('permissions') ?? []) || in_array('agencies.view', session()->get('permissions') ?? [])) : ?>
         <div class="nav-section">Équipe</div>
+        <?php if (in_array('users.view', session()->get('permissions') ?? [])) : ?>
+        <a href="<?= base_url('admin/teams') ?>" class="nav-link <?= str_starts_with(uri_string(), 'admin/teams') ? 'active' : '' ?>">
+            <i class="bi bi-diagram-3-fill"></i> Équipes
+        </a>
+        <?php endif; ?>
         <?php if (in_array('agencies.view', session()->get('permissions') ?? [])) : ?>
         <a href="<?= base_url('admin/agencies') ?>" class="nav-link <?= str_starts_with(uri_string(), 'admin/agencies') ? 'active' : '' ?>">
             <i class="bi bi-buildings"></i> Agences

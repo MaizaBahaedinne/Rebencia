@@ -168,6 +168,12 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
     $routes->post('zones/(:num)/delete',          'Admin\ZonesController::delete/$1');
     $routes->get('zones/(:num)',                  'Admin\ZonesController::show/$1');
 
+    // Équipes
+    $routes->get('teams',                           'Admin\TeamsController::index');
+    $routes->get('teams/(:num)',                    'Admin\TeamsController::show/$1');
+    $routes->post('teams/(:num)/add-member',        'Admin\TeamsController::addMember/$1');
+    $routes->post('teams/(:num)/remove-member',     'Admin\TeamsController::removeMember/$1');
+
     // Agences
     $routes->get('agencies',                        'Admin\AgenciesController::index');
     $routes->get('agencies/create',                 'Admin\AgenciesController::create');

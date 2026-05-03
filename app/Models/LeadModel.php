@@ -16,7 +16,7 @@ class LeadModel extends Model
         'assigned_to', 'property_id', 'first_name', 'last_name',
         'email', 'phone', 'source', 'status',
         'budget_min', 'budget_max', 'notes',
-        'property_type', 'property_types', 'transaction_type', 'priority', 'next_follow_up',
+        'property_type', 'transaction_type', 'priority', 'next_follow_up',
         'desired_surface', 'desired_location', 'desired_zone_ids',
         'surface_min', 'surface_max',
         'rooms_min', 'bedrooms_min', 'bathrooms_min',

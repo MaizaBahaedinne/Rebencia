@@ -1,4 +1,4 @@
-﻿
+
 <?php
 // ── Définitions pipeline ────────────────────────────────────────────────────
 $pipelineSteps = [
@@ -39,25 +39,69 @@ $stepActions = [
 ];
 ?>
 
-<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
-    <div>
-        <h2 class="mb-0"><?= esc($lead['first_name'] . ' ' . $lead['last_name']) ?></h2>
-        <small class="text-muted">Lead #<?= $lead['id'] ?> &bull; Créé le <?= date('d/m/Y', strtotime($lead['created_at'])) ?></small>
-    </div>
-    <div class="d-flex gap-2 flex-wrap">
-        <?php if ($canEdit && ! $isTerminal): ?>
-        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalPerdu">
-            <i class="bi bi-x-circle me-1"></i>Marquer comme perdu
-        </button>
-        <?php endif; ?>
-        <?php if ($canEdit): ?>
-        <a href="<?= site_url('admin/leads/' . $lead['id'] . '/edit') ?>" class="btn btn-warning btn-sm">
-            <i class="bi bi-pencil me-1"></i>Modifier
-        </a>
-        <?php endif; ?>
-        <a href="<?= site_url('admin/leads') ?>" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-arrow-left me-1"></i>Retour
-        </a>
+<?php
+// ── Helpers traduction ───────────────────────────────────────────────────────
+$txMap  = ['sale'=>'Vente','rent'=>'Location','sale_rent'=>'Vente & Location'];
+$priMap = ['low'=>['Faible','#6b7280'],'medium'=>['Normale','#f59e0b'],'high'=>['Haute','#ef4444']];
+$srcMap = ['website'=>'Site web','referral'=>'Recommandation','phone'=>'Téléphone','email'=>'Email','social'=>'Réseaux sociaux','agency'=>'Agence','other'=>'Autre'];
+[$priLabel, $priHex] = $priMap[$lead['priority'] ?? 'medium'];
+$initials = strtoupper(substr($lead['first_name'] ?? '?', 0, 1) . substr($lead['last_name'] ?? '?', 0, 1));
+$aColors  = ['#6c63ff','#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316'];
+$avatarBg = $aColors[abs(crc32($lead['first_name'] . $lead['last_name'])) % count($aColors)];
+$budgetMin = (float)($lead['budget_min'] ?? 0);
+$budgetMax = (float)($lead['budget_max'] ?? 0);
+if ($budgetMin > 0 && $budgetMax > 0)     $budgetStr = number_format($budgetMin,0,',',' ').' – '.number_format($budgetMax,0,',',' ').' TND';
+elseif ($budgetMax > 0)                    $budgetStr = '≤ '.number_format($budgetMax,0,',',' ').' TND';
+elseif ($budgetMin > 0)                    $budgetStr = '≥ '.number_format($budgetMin,0,',',' ').' TND';
+else                                       $budgetStr = '—';
+?>
+
+<!-- ═══ Hero Card ══════════════════════════════════════════════════════════ -->
+<div class="card border-0 shadow-sm mb-4 overflow-hidden">
+    <div style="background:linear-gradient(135deg,#1e1b4b 0%,#312e81 50%,#4f46e5 100%);padding:1.75rem 1.75rem 1.25rem;">
+        <div class="d-flex align-items-start gap-4 flex-wrap">
+            <!-- Avatar -->
+            <div style="width:72px;height:72px;border-radius:50%;background:<?= $avatarBg ?>;display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:700;color:white;flex-shrink:0;box-shadow:0 0 0 4px rgba(255,255,255,.2);">
+                <?= $initials ?>
+            </div>
+            <!-- Info principale -->
+            <div class="flex-grow-1">
+                <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                    <h3 class="mb-0 fw-bold text-white"><?= esc($lead['first_name'] . ' ' . $lead['last_name']) ?></h3>
+                    <span class="rounded-pill px-2 py-1 fw-semibold" style="background:<?= $priHex ?>33;border:1.5px solid <?= $priHex ?>88;color:white;font-size:.72rem;"><?= $priLabel ?></span>
+                </div>
+                <div class="d-flex align-items-center gap-3 flex-wrap" style="color:rgba(255,255,255,.7);font-size:.85rem;">
+                    <span><i class="bi bi-hash me-1"></i>Lead #<?= $lead['id'] ?></span>
+                    <span><i class="bi bi-calendar3 me-1"></i>Créé le <?= date('d/m/Y', strtotime($lead['created_at'])) ?></span>
+                    <?php if (!empty($lead['phone'])): ?><span><i class="bi bi-telephone me-1"></i><?= esc($lead['phone']) ?></span><?php endif; ?>
+                    <?php if (!empty($lead['email'])): ?><span><i class="bi bi-envelope me-1"></i><?= esc($lead['email']) ?></span><?php endif; ?>
+                </div>
+                <!-- KPIs -->
+                <div class="d-flex gap-2 mt-3 flex-wrap">
+                    <?php [$sLabel,$sHex,$sIcon] = $pipelineSteps[$currentStatus]; ?>
+                    <span class="d-inline-flex align-items-center gap-1 rounded-pill px-3 py-1 fw-semibold" style="background:<?= $sHex ?>;color:white;font-size:.8rem;"><i class="bi <?= $sIcon ?>"></i><?= $sLabel ?></span>
+                    <?php if (!empty($lead['transaction_type'])): ?>
+                    <span class="d-inline-flex align-items-center gap-1 rounded-pill px-3 py-1" style="background:rgba(255,255,255,.15);color:rgba(255,255,255,.9);font-size:.8rem;"><i class="bi bi-arrow-left-right me-1"></i><?= $txMap[$lead['transaction_type']] ?? esc($lead['transaction_type']) ?></span>
+                    <?php endif; ?>
+                    <?php if (!empty($lead['source'])): ?>
+                    <span class="d-inline-flex align-items-center gap-1 rounded-pill px-3 py-1" style="background:rgba(255,255,255,.15);color:rgba(255,255,255,.9);font-size:.8rem;"><i class="bi bi-funnel me-1"></i><?= $srcMap[$lead['source']] ?? esc($lead['source']) ?></span>
+                    <?php endif; ?>
+                    <?php if ($budgetStr !== '—'): ?>
+                    <span class="d-inline-flex align-items-center gap-1 rounded-pill px-3 py-1" style="background:rgba(255,255,255,.15);color:rgba(255,255,255,.9);font-size:.8rem;"><i class="bi bi-wallet2 me-1"></i><?= $budgetStr ?></span>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <!-- Actions -->
+            <div class="d-flex flex-column gap-2 align-items-end">
+                <?php if ($canEdit && ! $isTerminal): ?>
+                <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalPerdu"><i class="bi bi-x-circle me-1"></i>Perdu</button>
+                <?php endif; ?>
+                <?php if ($canEdit): ?>
+                <a href="<?= site_url('admin/leads/' . $lead['id'] . '/edit') ?>" class="btn btn-sm" style="background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3);"><i class="bi bi-pencil me-1"></i>Modifier</a>
+                <?php endif; ?>
+                <a href="<?= site_url('admin/leads') ?>" class="btn btn-sm" style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.2);"><i class="bi bi-arrow-left me-1"></i>Retour</a>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -198,158 +242,118 @@ $stepActions = [
 </div>
 </div>
 
+<!-- ═══ Main row ═══════════════════════════════════════════════════════════ -->
 <div class="row g-4">
     <!-- Colonne gauche -->
     <div class="col-lg-8">
-        <!-- Informations -->
-        <div class="card border-0 shadow-sm mb-3">
-            <div class="card-header bg-transparent"><strong><i class="bi bi-person me-2"></i>Contact</strong></div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-sm-6">
-                        <label class="text-muted small">Prénom</label>
-                        <p class="mb-0 fw-semibold"><?= esc($lead['first_name']) ?></p>
-                    </div>
-                    <div class="col-sm-6">
-                        <label class="text-muted small">Nom</label>
-                        <p class="mb-0 fw-semibold"><?= esc($lead['last_name']) ?></p>
-                    </div>
-                    <div class="col-sm-6">
-                        <label class="text-muted small">Email</label>
-                        <p class="mb-0"><?= esc($lead['email'] ?? '—') ?></p>
-                    </div>
-                    <div class="col-sm-6">
-                        <label class="text-muted small">Téléphone</label>
-                        <p class="mb-0"><?= esc($lead['phone'] ?? '—') ?></p>
-                    </div>
-                    <div class="col-sm-6">
-                        <label class="text-muted small">Source</label>
-                        <p class="mb-0"><span class="badge bg-light text-dark border"><?= esc($lead['source'] ?? '—') ?></span></p>
-                    </div>
-                    <div class="col-sm-6">
-                        <label class="text-muted small">Priorité</label>
-                        <p class="mb-0">
-                            <?php $pMap = ['low'=>['Faible','secondary'],'medium'=>['Normale','warning'],'high'=>['Haute','danger']]; ?>
-                            <span class="badge bg-<?= $pMap[$lead['priority'] ?? 'medium'][1] ?>"><?= $pMap[$lead['priority'] ?? 'medium'][0] ?></span>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Projet -->
-        <div class="card border-0 shadow-sm mb-3">
-            <div class="card-header bg-transparent"><strong><i class="bi bi-house me-2"></i>Projet immobilier</strong></div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <?php
-                    $details = [
-                        'Type transaction' => $lead['transaction_type'] ?? '—',
-                        'Type de bien'     => $lead['property_type']    ?? '—',
-                        'Budget min'       => !empty($lead['budget_min'])     ? number_format((float)$lead['budget_min'], 0, ',', ' ')    . ' TND' : '—',
-                        'Budget max'       => !empty($lead['budget_max'])     ? number_format((float)$lead['budget_max'], 0, ',', ' ')    . ' TND' : '—',
-                        'Surface souhait.' => !empty($lead['desired_surface']) ? $lead['desired_surface'] . ' m²' : '—',
-                        'Localisation'     => $lead['desired_location'] ?? '—',
-                    ];
-                    foreach ($details as $label => $value):
-                    ?>
-                    <div class="col-sm-6">
-                        <label class="text-muted small"><?= $label ?></label>
-                        <p class="mb-0 fw-semibold"><?= esc($value) ?></p>
+        <!-- ── Contact + Projet (côte-à-côte) ── -->
+        <div class="row g-3 mb-3">
+            <!-- Contact -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header d-flex align-items-center gap-2" style="background:linear-gradient(135deg,#ede9fe,#f5f3ff);border-bottom:1px solid #ddd6fe;">
+                        <span style="width:32px;height:32px;border-radius:8px;background:#7c3aed;display:flex;align-items:center;justify-content:center;"><i class="bi bi-person-fill text-white" style="font-size:.85rem;"></i></span>
+                        <strong style="color:#5b21b6;">Contact</strong>
                     </div>
-                    <?php endforeach; ?>
-                    <?php if (!empty($lead['property_id'])): ?>
-                    <div class="col-12">
-                        <label class="text-muted small">Propriété liée</label>
-                        <p class="mb-0">
-                            <a href="<?= site_url('admin/properties/' . $lead['property_id']) ?>">
-                                [<?= esc($lead['property_reference'] ?? '…') ?>] <?= esc($lead['property_title'] ?? '') ?>
-                            </a>
-                        </p>
-                    </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bien demandé -->
-        <?php if (!empty($linkedProperty)): ?>
-        <div class="card border-0 shadow-sm mb-3">
-            <div class="card-header bg-transparent">
-                <strong><i class="bi bi-building-check me-2 text-primary"></i>Bien demandé par le client</strong>
-            </div>
-            <div class="card-body">
-                <div class="row g-3 align-items-start">
-                    <?php
-                    $coverImg = null;
-                    foreach ($linkedProperty['images'] as $img) {
-                        if ($img['is_primary']) { $coverImg = $img['path']; break; }
-                    }
-                    if (!$coverImg && !empty($linkedProperty['images'])) {
-                        $coverImg = $linkedProperty['images'][0]['path'];
-                    }
-                    ?>
-                    <?php if ($coverImg): ?>
-                    <div class="col-md-4">
-                        <img src="<?= base_url(esc($coverImg)) ?>"
-                             class="img-fluid rounded" style="object-fit:cover;height:160px;width:100%;" alt="">
-                    </div>
-                    <?php endif; ?>
-                    <div class="col-md-<?= $coverImg ? '8' : '12' ?>">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <div>
-                                <span class="badge bg-secondary me-1"><?= esc($linkedProperty['reference']) ?></span>
-                                <?php
-                                $sMap = ['available'=>['Disponible','success'],'sold'=>['Vendu','danger'],'reserved'=>['Réservé','warning'],'rented'=>['Loué','info']];
-                                [$sLabel,$sColor] = $sMap[$linkedProperty['status']] ?? [ucfirst($linkedProperty['status']),'secondary'];
-                                ?>
-                                <span class="badge bg-<?= $sColor ?>"><?= $sLabel ?></span>
-                            </div>
-                            <a href="<?= site_url('admin/properties/' . $linkedProperty['id']) ?>" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-eye me-1"></i>Voir la fiche
-                            </a>
+                    <div class="card-body p-0">
+                        <?php
+                        $cRows = [
+                            ['bi-person',    'Prénom & Nom', esc($lead['first_name']).' '.esc($lead['last_name'])],
+                            ['bi-telephone', 'Téléphone',   !empty($lead['phone']) ? '<a href="tel:'.esc($lead['phone']).'" class="text-decoration-none fw-semibold">'.esc($lead['phone']).'</a>' : '<span class="text-muted">—</span>'],
+                            ['bi-envelope',  'Email',       !empty($lead['email']) ? '<a href="mailto:'.esc($lead['email']).'" class="text-decoration-none">'.esc($lead['email']).'</a>' : '<span class="text-muted">—</span>'],
+                            ['bi-funnel',    'Source',      $srcMap[$lead['source'] ?? ''] ?? esc($lead['source'] ?? '—')],
+                        ];
+                        ?>
+                        <?php foreach ($cRows as $i => [$ico,$lbl,$val]): ?>
+                        <div class="d-flex align-items-center px-3 py-2 <?= $i > 0 ? 'border-top' : '' ?>">
+                            <span style="width:30px;height:30px;border-radius:8px;background:#f3f0ff;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi <?= $ico ?>" style="color:#7c3aed;font-size:.8rem;"></i></span>
+                            <div class="ms-3"><div style="font-size:.7rem;color:#9ca3af;font-weight:500;"><?= $lbl ?></div><div style="font-size:.88rem;color:#1f2937;font-weight:600;"><?= $val ?></div></div>
                         </div>
-                        <h6 class="mb-2"><?= esc($linkedProperty['title']) ?></h6>
-                        <p class="text-muted small mb-2">
-                            <i class="bi bi-geo-alt me-1"></i><?= esc($linkedProperty['city'] . (!empty($linkedProperty['zone']) ? ', ' . $linkedProperty['zone'] : '')) ?>
-                        </p>
-                        <div class="row g-2">
-                            <div class="col-6 col-md-4">
-                                <div class="border rounded p-2 text-center">
-                                    <div class="text-muted small">Prix</div>
-                                    <strong class="text-primary"><?= number_format((float)$linkedProperty['price'], 0, ',', ' ') ?> TND</strong>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-4">
-                                <div class="border rounded p-2 text-center">
-                                    <div class="text-muted small">Surface</div>
-                                    <strong><?= esc($linkedProperty['surface']) ?> m²</strong>
-                                </div>
-                            </div>
-                            <?php if (!empty($linkedProperty['rooms'])): ?>
-                            <div class="col-6 col-md-4">
-                                <div class="border rounded p-2 text-center">
-                                    <div class="text-muted small">Pièces</div>
-                                    <strong><?= esc($linkedProperty['rooms']) ?></strong>
-                                </div>
-                            </div>
-                            <?php endif; ?>
-                            <?php if (!empty($linkedProperty['bedrooms'])): ?>
-                            <div class="col-6 col-md-4">
-                                <div class="border rounded p-2 text-center">
-                                    <div class="text-muted small">Chambres</div>
-                                    <strong><?= esc($linkedProperty['bedrooms']) ?></strong>
-                                </div>
-                            </div>
-                            <?php endif; ?>
-                            <?php if (!empty($linkedProperty['bathrooms'])): ?>
-                            <div class="col-6 col-md-4">
-                                <div class="border rounded p-2 text-center">
-                                    <div class="text-muted small">SDB</div>
-                                    <strong><?= esc($linkedProperty['bathrooms']) ?></strong>
-                                </div>
-                            </div>
-                            <?php endif; ?>
+                        <?php endforeach; ?>
+                        <div class="d-flex align-items-center px-3 py-2 border-top">
+                            <span style="width:30px;height:30px;border-radius:8px;background:#f3f0ff;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-lightning-fill" style="color:#7c3aed;font-size:.8rem;"></i></span>
+                            <div class="ms-3"><div style="font-size:.7rem;color:#9ca3af;font-weight:500;">Priorité</div>
+                            <span class="rounded-pill px-2 py-0" style="background:<?= $priHex ?>18;color:<?= $priHex ?>;border:1px solid <?= $priHex ?>55;font-size:.8rem;font-weight:600;"><?= $priLabel ?></span></div>
+                        </div>
+                        <?php if (!empty($lead['next_follow_up'])): ?>
+                        <div class="d-flex align-items-center px-3 py-2 border-top">
+                            <span style="width:30px;height:30px;border-radius:8px;background:#fef3c7;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-alarm-fill" style="color:#d97706;font-size:.8rem;"></i></span>
+                            <div class="ms-3"><div style="font-size:.7rem;color:#9ca3af;font-weight:500;">Prochain suivi</div><div style="font-size:.88rem;color:#d97706;font-weight:600;"><?= date('d/m/Y', strtotime($lead['next_follow_up'])) ?></div></div>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projet immobilier -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header d-flex align-items-center gap-2" style="background:linear-gradient(135deg,#dbeafe,#eff6ff);border-bottom:1px solid #bfdbfe;">
+                        <span style="width:32px;height:32px;border-radius:8px;background:#2563eb;display:flex;align-items:center;justify-content:center;"><i class="bi bi-house-fill text-white" style="font-size:.85rem;"></i></span>
+                        <strong style="color:#1d4ed8;">Projet immobilier</strong>
+                    </div>
+                    <div class="card-body p-0">
+                        <?php
+                        $pRows = [
+                            ['bi-arrow-left-right', 'Transaction', $txMap[$lead['transaction_type'] ?? ''] ?? ($lead['transaction_type'] ?? '—')],
+                            ['bi-building',         'Type de bien', !empty($lead['property_type']) ? esc($lead['property_type']) : '—'],
+                            ['bi-wallet2',          'Budget',       $budgetStr],
+                            ['bi-rulers',           'Surface',      !empty($lead['desired_surface']) ? $lead['desired_surface'].' m²' : '—'],
+                            ['bi-geo-alt',          'Localisation', !empty($lead['desired_location']) ? esc($lead['desired_location']) : '—'],
+                        ];
+                        ?>
+                        <?php foreach ($pRows as $i => [$ico,$lbl,$val]): ?>
+                        <div class="d-flex align-items-center px-3 py-2 <?= $i > 0 ? 'border-top' : '' ?>">
+                            <span style="width:30px;height:30px;border-radius:8px;background:#eff6ff;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi <?= $ico ?>" style="color:#2563eb;font-size:.8rem;"></i></span>
+                            <div class="ms-3"><div style="font-size:.7rem;color:#9ca3af;font-weight:500;"><?= $lbl ?></div><div style="font-size:.88rem;color:#1f2937;font-weight:600;"><?= $val ?></div></div>
+                        </div>
+                        <?php endforeach; ?>
+                        <?php if (!empty($lead['property_id'])): ?>
+                        <div class="d-flex align-items-center px-3 py-2 border-top">
+                            <span style="width:30px;height:30px;border-radius:8px;background:#eff6ff;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-link-45deg" style="color:#2563eb;font-size:.9rem;"></i></span>
+                            <div class="ms-3 overflow-hidden"><div style="font-size:.7rem;color:#9ca3af;font-weight:500;">Bien lié</div>
+                            <a href="<?= site_url('admin/properties/'.$lead['property_id']) ?>" class="text-decoration-none fw-semibold" style="font-size:.82rem;color:#2563eb;"><?= esc($lead['property_title'] ?? 'Voir le bien') ?></a></div>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Bien lié (fiche complète) ── -->
+        <?php if (!empty($linkedProperty)): ?>
+        <?php
+        $coverImg = null;
+        foreach ($linkedProperty['images'] as $img) { if ($img['is_primary']) { $coverImg = $img['path']; break; } }
+        if (!$coverImg && !empty($linkedProperty['images'])) { $coverImg = $linkedProperty['images'][0]['path']; }
+        $sMap2 = ['available'=>['Disponible','#10b981'],'sold'=>['Vendu','#ef4444'],'reserved'=>['Réservé','#f59e0b'],'rented'=>['Loué','#06b6d4']];
+        [$sLbl2,$sClr2] = $sMap2[$linkedProperty['status']] ?? [ucfirst($linkedProperty['status']),'#6b7280'];
+        ?>
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header d-flex align-items-center gap-2" style="background:linear-gradient(135deg,#ecfdf5,#f0fdf4);border-bottom:1px solid #bbf7d0;">
+                <span style="width:32px;height:32px;border-radius:8px;background:#059669;display:flex;align-items:center;justify-content:center;"><i class="bi bi-building-check text-white" style="font-size:.85rem;"></i></span>
+                <strong style="color:#065f46;">Bien demandé</strong>
+                <span class="ms-auto rounded-pill px-2 py-0" style="background:<?= $sClr2 ?>18;color:<?= $sClr2 ?>;border:1px solid <?= $sClr2 ?>44;font-size:.75rem;font-weight:600;"><?= $sLbl2 ?></span>
+            </div>
+            <div class="card-body p-3">
+                <div class="d-flex gap-3 flex-wrap">
+                    <?php if ($coverImg): ?>
+                    <img src="<?= base_url(esc($coverImg)) ?>" class="rounded-3" style="width:140px;height:100px;object-fit:cover;flex-shrink:0;" alt="">
+                    <?php else: ?>
+                    <div class="rounded-3 bg-light d-flex align-items-center justify-content-center flex-shrink-0" style="width:140px;height:100px;"><i class="bi bi-building" style="font-size:2rem;color:#9ca3af;"></i></div>
+                    <?php endif; ?>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <span class="badge" style="background:#6b728020;color:#374151;font-size:.72rem;"><?= esc($linkedProperty['reference']) ?></span>
+                            <a href="<?= site_url('admin/properties/'.$linkedProperty['id']) ?>" class="btn btn-sm btn-outline-primary" style="font-size:.75rem;padding:.2rem .6rem;"><i class="bi bi-eye me-1"></i>Voir</a>
+                        </div>
+                        <h6 class="mb-1 fw-semibold" style="font-size:.9rem;"><?= esc($linkedProperty['title']) ?></h6>
+                        <p class="text-muted mb-2" style="font-size:.8rem;"><i class="bi bi-geo-alt me-1"></i><?= esc($linkedProperty['city']) ?><?= !empty($linkedProperty['zone']) ? ', '.esc($linkedProperty['zone']) : '' ?></p>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <div class="rounded-2 text-center px-3 py-1" style="background:#eff6ff;"><div style="font-size:.65rem;color:#9ca3af;">Prix</div><strong style="font-size:.85rem;color:#2563eb;"><?= number_format((float)$linkedProperty['price'],0,',',' ') ?> TND</strong></div>
+                            <?php if (!empty($linkedProperty['surface'])): ?><div class="rounded-2 text-center px-3 py-1" style="background:#f9fafb;"><div style="font-size:.65rem;color:#9ca3af;">Surface</div><strong style="font-size:.85rem;"><?= esc($linkedProperty['surface']) ?> m²</strong></div><?php endif; ?>
+                            <?php if (!empty($linkedProperty['rooms'])): ?><div class="rounded-2 text-center px-3 py-1" style="background:#f9fafb;"><div style="font-size:.65rem;color:#9ca3af;">Pièces</div><strong style="font-size:.85rem;"><?= esc($linkedProperty['rooms']) ?></strong></div><?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -357,148 +361,128 @@ $stepActions = [
         </div>
         <?php endif; ?>
 
-        <!-- Notes existantes -->
+        <!-- ── Notes ── -->
         <div class="card border-0 shadow-sm mb-3">
-            <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-                <strong><i class="bi bi-chat-text me-2"></i>Notes</strong>
-                <span class="badge bg-secondary"><?= count($notes ?? []) ?></span>
+            <div class="card-header d-flex align-items-center gap-2" style="background:linear-gradient(135deg,#fefce8,#fefce8);border-bottom:1px solid #fde68a;">
+                <span style="width:32px;height:32px;border-radius:8px;background:#d97706;display:flex;align-items:center;justify-content:center;"><i class="bi bi-chat-text-fill text-white" style="font-size:.85rem;"></i></span>
+                <strong style="color:#92400e;">Notes</strong>
+                <span class="ms-auto rounded-pill px-2" style="background:#d97706;color:white;font-size:.72rem;font-weight:700;"><?= count($notes ?? []) ?></span>
             </div>
-            <div class="card-body" style="max-height:300px;overflow-y:auto">
+            <div class="card-body p-0" style="max-height:320px;overflow-y:auto;">
                 <?php if (empty($notes)): ?>
-                    <p class="text-muted text-center mb-0">Aucune note</p>
+                <div class="text-center py-4 text-muted"><i class="bi bi-chat-square-dots" style="font-size:2rem;opacity:.3;"></i><p class="mt-2 mb-0 small">Aucune note pour le moment</p></div>
                 <?php else: ?>
                 <?php foreach (array_reverse($notes) as $note): ?>
-                <div class="border-start border-3 border-primary ps-3 mb-3">
-                    <div class="d-flex justify-content-between">
-                        <strong class="small"><?= esc(($note['author_first_name'] ?? '') . ' ' . ($note['author_last_name'] ?? '')) ?></strong>
-                        <small class="text-muted"><?= date('d/m/Y H:i', strtotime($note['created_at'])) ?></small>
+                <div class="px-3 py-3 border-bottom">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <span style="width:26px;height:26px;border-radius:50%;background:#6c63ff;display:flex;align-items:center;justify-content:center;color:white;font-size:.65rem;font-weight:700;flex-shrink:0;"><?= strtoupper(substr($note['author_first_name'] ?? '?',0,1).substr($note['author_last_name'] ?? '',0,1)) ?></span>
+                        <strong style="font-size:.82rem;color:#374151;"><?= esc(($note['author_first_name'] ?? '').' '.($note['author_last_name'] ?? '')) ?></strong>
+                        <small class="ms-auto text-muted"><?= date('d/m/Y H:i', strtotime($note['created_at'])) ?></small>
                     </div>
-                    <p class="mb-0"><?= nl2br(esc($note['note'])) ?></p>
+                    <p class="mb-0 ps-4" style="font-size:.87rem;color:#4b5563;"><?= nl2br(esc($note['note'])) ?></p>
                 </div>
                 <?php endforeach; ?>
                 <?php endif; ?>
             </div>
-            <div class="card-footer bg-transparent">
-                <form method="post" action="<?= site_url('admin/leads/' . $lead['id'] . '/note') ?>">
+            <div class="card-footer p-3" style="background:#fefce8;">
+                <form method="post" action="<?= site_url('admin/leads/'.$lead['id'].'/note') ?>">
                     <?= csrf_field() ?>
                     <div class="input-group">
-                        <textarea name="note" class="form-control" rows="2" placeholder="Ajouter une note…" required></textarea>
-                        <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i></button>
+                        <textarea name="note" class="form-control" rows="2" placeholder="Ajouter une note…" required style="font-size:.87rem;resize:none;"></textarea>
+                        <button type="submit" class="btn" style="background:#d97706;color:white;border:none;"><i class="bi bi-send-fill"></i></button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Sidebar -->
+    <!-- ═══ Sidebar ═══════════════════════════════════════════════════════════ -->
     <div class="col-lg-4">
-        <!-- Statut + agent -->
+        <!-- Agent assigné -->
         <div class="card border-0 shadow-sm mb-3">
-            <div class="card-body">
-                <div class="mb-3">
-                    <label class="text-muted small">Statut actuel</label>
+            <div class="card-body p-3">
+                <p class="text-muted small mb-2 fw-semibold" style="text-transform:uppercase;letter-spacing:.05em;font-size:.7rem;">Agent responsable</p>
+                <?php if (!empty($lead['agent_first_name'])): ?>
+                <div class="d-flex align-items-center gap-3">
+                    <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#6c63ff,#a78bfa);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:1rem;flex-shrink:0;"><?= strtoupper(substr($lead['agent_first_name'],0,1).substr($lead['agent_last_name'] ?? '',0,1)) ?></div>
                     <div>
-                        <?php [$sLabel, $sHex, $sIcon] = $pipelineSteps[$currentStatus]; ?>
-                        <span class="d-inline-flex align-items-center gap-1 rounded-pill px-3 py-1 fw-semibold"
-                              style="background:<?= $sHex ?>22;color:<?= $sHex ?>;border:1.5px solid <?= $sHex ?>55;font-size:.9rem;">
-                            <i class="bi <?= $sIcon ?>"></i><?= $sLabel ?>
-                        </span>
+                        <div class="fw-semibold" style="font-size:.92rem;"><?= esc($lead['agent_first_name'].' '.$lead['agent_last_name']) ?></div>
+                        <?php if (!empty($lead['agent_name'])): ?><div class="text-muted small"><?= esc($lead['agent_name']) ?></div><?php endif; ?>
                     </div>
                 </div>
-                <div>
-                    <label class="text-muted small">Assigné à</label>
-                    <p class="mb-0 fw-semibold">
-                        <?= !empty($lead['agent_first_name'])
-                            ? esc($lead['agent_first_name'] . ' ' . $lead['agent_last_name'])
-                            : '<span class="text-muted">Non assigné</span>' ?>
-                    </p>
+                <?php else: ?>
+                <div class="d-flex align-items-center gap-3">
+                    <div style="width:44px;height:44px;border-radius:50%;background:#f3f4f6;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="bi bi-person-dash" style="color:#9ca3af;font-size:1.2rem;"></i></div>
+                    <span class="text-muted small">Non assigné</span>
                 </div>
+                <?php endif; ?>
             </div>
         </div>
 
-        <!-- Historique statuts -->
+        <!-- Historique pipeline — timeline -->
         <?php if (!empty($statusHistory)): ?>
         <div class="card border-0 shadow-sm">
-            <div class="card-header bg-transparent"><strong>Historique du pipeline</strong></div>
-            <ul class="list-group list-group-flush">
-                <?php foreach ($statusHistory as $h): ?>
-                <li class="list-group-item py-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <?php
-                            $hStatus = $h['new_status'] ?? '';
-                            [$hLabel, $hHex, $hIcon] = $pipelineSteps[$hStatus] ?? [$hStatus, '#6b7280', 'bi-circle'];
-                        ?>
-                        <span class="d-inline-flex align-items-center gap-1 rounded-pill px-2 py-1 small fw-semibold"
-                              style="background:<?= $hHex ?>1a;color:<?= $hHex ?>;border:1px solid <?= $hHex ?>44;">
-                            <i class="bi <?= $hIcon ?>"></i><?= $hLabel ?>
-                        </span>
-                        <small class="text-muted"><?= date('d/m H:i', strtotime($h['created_at'])) ?></small>
+            <div class="card-header d-flex align-items-center gap-2" style="background:white;border-bottom:1px solid #f3f4f6;">
+                <i class="bi bi-clock-history text-primary"></i>
+                <strong style="font-size:.88rem;">Historique du pipeline</strong>
+            </div>
+            <div class="card-body p-3" style="max-height:400px;overflow-y:auto;">
+                <div class="position-relative" style="padding-left:20px;">
+                    <div style="position:absolute;left:6px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,#e0e7ff,#f3f4f6);"></div>
+                    <?php foreach ($statusHistory as $h): ?>
+                    <?php
+                    $hStatus = $h['new_status'] ?? '';
+                    [$hLabel, $hHex, $hIcon] = $pipelineSteps[$hStatus] ?? [$hStatus, '#6b7280', 'bi-circle'];
+                    ?>
+                    <div class="position-relative mb-3">
+                        <div style="position:absolute;left:-18px;top:2px;width:14px;height:14px;border-radius:50%;background:<?= $hHex ?>;box-shadow:0 0 0 3px <?= $hHex ?>22;"></div>
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <span class="d-inline-flex align-items-center gap-1 rounded-pill px-2 py-0" style="background:<?= $hHex ?>15;color:<?= $hHex ?>;border:1px solid <?= $hHex ?>44;font-size:.75rem;font-weight:600;"><i class="bi <?= $hIcon ?>" style="font-size:.65rem;"></i><?= $hLabel ?></span>
+                            <small class="text-muted" style="font-size:.7rem;"><?= date('d/m H:i', strtotime($h['created_at'])) ?></small>
+                        </div>
+                        <?php if (!empty($h['user_first_name'])): ?><div style="font-size:.72rem;color:#9ca3af;">Par <?= esc($h['user_first_name'].' '.$h['user_last_name']) ?></div><?php endif; ?>
+                        <?php if (!empty($h['notes'])): ?><div class="mt-1 p-2 rounded-2 fst-italic" style="background:#f9fafb;font-size:.75rem;color:#6b7280;border-left:2px solid <?= $hHex ?>;"><?= esc($h['notes']) ?></div><?php endif; ?>
                     </div>
-                    <?php if (!empty($h['user_first_name'])): ?>
-                    <small class="text-muted">Par <?= esc($h['user_first_name'] . ' ' . $h['user_last_name']) ?></small>
-                    <?php endif; ?>
-                    <?php if (!empty($h['notes'])): ?>
-                    <p class="text-muted small mb-0 mt-1 fst-italic"><?= esc($h['notes']) ?></p>
-                    <?php endif; ?>
-                </li>
-                <?php endforeach; ?>
-            </ul>
+                    <?php endforeach; ?>
+                </div>
+            </div>
         </div>
         <?php endif; ?>
     </div>
 </div>
 
-<!-- Propositions similaires -->
+<!-- ═══ Propositions similaires ═══════════════════════════════════════════ -->
 <?php if (!empty($similarProperties)): ?>
-<div class="card border-0 shadow-sm mt-4">
-    <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-        <strong><i class="bi bi-stars me-2 text-warning"></i>Propositions similaires à la demande</strong>
-        <span class="badge bg-secondary"><?= count($similarProperties) ?> bien<?= count($similarProperties) > 1 ? 's' : '' ?></span>
+<div class="card border-0 shadow-sm mt-2">
+    <div class="card-header d-flex align-items-center gap-2" style="background:linear-gradient(135deg,#fffbeb,#fefce8);border-bottom:1px solid #fde68a;">
+        <span style="width:32px;height:32px;border-radius:8px;background:#f59e0b;display:flex;align-items:center;justify-content:center;"><i class="bi bi-stars text-white" style="font-size:.85rem;"></i></span>
+        <strong style="color:#92400e;">Biens similaires à la demande</strong>
+        <span class="ms-auto rounded-pill px-2" style="background:#f59e0b;color:white;font-size:.72rem;font-weight:700;"><?= count($similarProperties) ?></span>
     </div>
     <div class="card-body">
-        <?php if (!empty($lead['property_type']) || !empty($lead['budget_max']) || !empty($lead['desired_location'])): ?>
-        <p class="text-muted small mb-3">
-            Biens disponibles correspondant à :
-            <?php if (!empty($lead['property_type'])): ?><span class="badge bg-light text-dark border me-1"><?= esc($lead['property_type']) ?></span><?php endif; ?>
-            <?php if (!empty($lead['transaction_type'])): ?><span class="badge bg-light text-dark border me-1"><?= esc($lead['transaction_type']) ?></span><?php endif; ?>
-            <?php if (!empty($lead['desired_location'])): ?><span class="badge bg-light text-dark border me-1"><i class="bi bi-geo-alt"></i> <?= esc($lead['desired_location']) ?></span><?php endif; ?>
-            <?php if (!empty($lead['budget_max'])): ?><span class="badge bg-light text-dark border me-1">≤ <?= number_format((float)$lead['budget_max'], 0, ',', ' ') ?> TND</span><?php endif; ?>
-        </p>
-        <?php endif; ?>
         <div class="row g-3">
             <?php foreach ($similarProperties as $prop): ?>
             <div class="col-md-6 col-lg-4">
-                <div class="card h-100 border">
+                <div class="card h-100 border-0 shadow-sm overflow-hidden">
                     <?php if (!empty($prop['primary_image'])): ?>
-                    <img src="<?= base_url(esc($prop['primary_image'])) ?>"
-                         class="card-img-top" style="object-fit:cover;height:170px;" alt="">
+                    <img src="<?= base_url(esc($prop['primary_image'])) ?>" class="card-img-top" style="height:160px;object-fit:cover;" alt="">
                     <?php else: ?>
-                    <div class="bg-light d-flex align-items-center justify-content-center" style="height:170px;">
-                        <i class="bi bi-building text-secondary" style="font-size:3rem;"></i>
-                    </div>
+                    <div style="height:160px;background:linear-gradient(135deg,#f3f4f6,#e5e7eb);display:flex;align-items:center;justify-content:center;"><i class="bi bi-building" style="font-size:2.5rem;color:#9ca3af;"></i></div>
                     <?php endif; ?>
                     <div class="card-body p-3">
                         <div class="d-flex justify-content-between align-items-start mb-1">
-                            <span class="badge bg-light text-dark border small"><?= esc($prop['type']) ?></span>
-                            <?php if ($prop['featured']): ?>
-                            <i class="bi bi-star-fill text-warning small" title="En vedette"></i>
-                            <?php endif; ?>
+                            <span style="font-size:.72rem;background:#f3f4f6;color:#374151;border-radius:4px;padding:1px 6px;"><?= esc($prop['type']) ?></span>
+                            <?php if ($prop['featured']): ?><i class="bi bi-star-fill text-warning" style="font-size:.8rem;"></i><?php endif; ?>
                         </div>
-                        <h6 class="card-title small mb-1 fw-semibold"><?= esc($prop['title']) ?></h6>
-                        <p class="text-muted small mb-2">
-                            <i class="bi bi-geo-alt me-1"></i><?= esc($prop['city']) ?>
-                        </p>
+                        <h6 class="fw-semibold mb-1" style="font-size:.85rem;line-height:1.3;"><?= esc($prop['title']) ?></h6>
+                        <p class="text-muted mb-2" style="font-size:.78rem;"><i class="bi bi-geo-alt me-1"></i><?= esc($prop['city']) ?></p>
                         <div class="d-flex justify-content-between align-items-center">
-                            <strong class="text-primary"><?= number_format((float)$prop['price'], 0, ',', ' ') ?> TND</strong>
-                            <?php if (!empty($prop['surface'])): ?>
-                            <small class="text-muted"><?= esc($prop['surface']) ?> m²</small>
-                            <?php endif; ?>
+                            <strong style="color:#2563eb;font-size:.9rem;"><?= number_format((float)$prop['price'],0,',',' ') ?> TND</strong>
+                            <?php if (!empty($prop['surface'])): ?><small class="text-muted"><?= esc($prop['surface']) ?> m²</small><?php endif; ?>
                         </div>
                     </div>
-                    <div class="card-footer bg-transparent p-2">
-                        <a href="<?= site_url('admin/properties/' . $prop['id']) ?>" class="btn btn-sm btn-outline-primary w-100">
-                            <i class="bi bi-eye me-1"></i>Voir la fiche
-                        </a>
+                    <div class="card-footer p-2" style="background:#f9fafb;border-top:1px solid #f3f4f6;">
+                        <a href="<?= site_url('admin/properties/'.$prop['id']) ?>" class="btn btn-sm btn-outline-primary w-100" style="font-size:.78rem;"><i class="bi bi-eye me-1"></i>Voir la fiche</a>
                     </div>
                 </div>
             </div>

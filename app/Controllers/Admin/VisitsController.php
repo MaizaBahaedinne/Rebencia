@@ -390,11 +390,18 @@ class VisitsController extends BaseController
 
     private function getPropertiesList(): array
     {
-        $db = \Config\Database::connect();
-        return $db->table('properties')
+        $db       = \Config\Database::connect();
+        $user     = $this->auth->user();
+        $agencyId = !empty($user['agency_id']) ? (int) $user['agency_id'] : null;
+
+        $builder = $db->table('properties')
             ->select('id, title, reference, city')
-            ->where('deleted_at IS NULL')
-            ->orderBy('title', 'ASC')
-            ->get()->getResultArray();
+            ->where('deleted_at IS NULL');
+
+        if ($agencyId) {
+            $builder->where('agency_id', $agencyId);
+        }
+
+        return $builder->orderBy('title', 'ASC')->get()->getResultArray();
     }
 }

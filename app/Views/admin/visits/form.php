@@ -3,6 +3,35 @@ $isEdit  = ! empty($visit['id']);
 $perms   = session()->get('permissions') ?? [];
 $errors  = session()->getFlashdata('errors') ?? [];
 ?>
+<style>
+/* ── Searchable Select ─────────────────────────────────── */
+.ss-wrap { position: relative; }
+.ss-list {
+    position: absolute; top: 100%; left: 0; right: 0;
+    z-index: 1055; display: none;
+    background: #fff; border: 1px solid #dee2e6;
+    border-radius: .375rem; box-shadow: 0 .25rem .75rem rgba(0,0,0,.12);
+    max-height: 230px; overflow-y: auto;
+}
+.ss-list.open { display: block; }
+.ss-item {
+    padding: .45rem .85rem; cursor: pointer; font-size: .875rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+.ss-item:last-child { border-bottom: none; }
+.ss-item:hover, .ss-item.active { background: #f0f2f8; }
+.ss-item.selected { font-weight: 600; color: #6c63ff; }
+.ss-empty { padding: .5rem .85rem; color: #6c757d; font-size: .8rem; }
+/* ── Agent Schedule ────────────────────────────────────── */
+#agentSchedule .sch-slot {
+    display: flex; align-items: center; gap: .5rem;
+    padding: .3rem .5rem; border-radius: .4rem;
+    font-size: .82rem;
+}
+#agentSchedule .sch-slot.busy   { background: #fff3cd; border-left: 3px solid #ffc107; }
+#agentSchedule .sch-slot.free   { color: #6c757d; }
+#agentSchedule .day-label { font-weight: 600; font-size: .8rem; color: #6c757d; text-transform: uppercase; letter-spacing: .04em; }
+</style>
 
 <!-- ── EN-TÊTE ───────────────────────────────────────────────────────────── -->
 <div class="d-flex align-items-center gap-3 mb-4">
@@ -48,40 +77,43 @@ $errors  = session()->getFlashdata('errors') ?? [];
 
                 <!-- Client -->
                 <div class="mb-3">
-                    <label class="form-label fw-semibold" for="client_id">
-                        Client <span class="text-danger">*</span>
-                    </label>
-                    <input type="text" id="searchClient" class="form-control form-control-sm mb-1"
-                           placeholder="Filtrer par nom ou téléphone…"
-                           oninput="filterSelect(this, 'client_id')">
-                    <select name="client_id" id="client_id" class="form-select" required>
-                        <option value="">— Sélectionner un client —</option>
-                        <?php foreach ($clients as $c): ?>
-                        <option value="<?= $c['id'] ?>"
-                            <?= (string) old('client_id', $visit['client_id'] ?? '') === (string) $c['id'] ? 'selected' : '' ?>>
-                            <?= esc($c['last_name'] . ' ' . $c['first_name']) ?> — <?= esc($c['phone']) ?>
-                        </option>
-                        <?php endforeach; ?>
-                    </select>
+                    <label class="form-label fw-semibold">Client <span class="text-danger">*</span></label>
+                    <div class="ss-wrap" id="ss-client">
+                        <input type="text" class="form-control ss-input" id="ss-input-client"
+                               autocomplete="off" placeholder="Rechercher par nom ou téléphone…">
+                        <div class="ss-list" id="ss-list-client"></div>
+                        <select name="client_id" id="client_id" class="d-none">
+                            <option value="">—</option>
+                            <?php foreach ($clients as $c): ?>
+                            <option value="<?= $c['id'] ?>"
+                                data-text="<?= esc($c['last_name'] . ' ' . $c['first_name'] . ' — ' . $c['phone']) ?>"
+                                <?= (string) old('client_id', $visit['client_id'] ?? '') === (string) $c['id'] ? 'selected' : '' ?>>
+                                <?= esc($c['last_name'] . ' ' . $c['first_name']) ?> — <?= esc($c['phone']) ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Bien -->
                 <div class="mb-3">
-                    <label class="form-label fw-semibold" for="property_id">
-                        Bien immobilier <span class="text-danger">*</span>
-                    </label>
-                    <input type="text" id="searchProperty" class="form-control form-control-sm mb-1"
-                           placeholder="Filtrer par titre, référence ou ville…"
-                           oninput="filterSelect(this, 'property_id')">
-                    <select name="property_id" id="property_id" class="form-select" required>
-                        <option value="">— Sélectionner un bien —</option>
-                        <?php foreach ($properties as $pr): ?>
-                        <option value="<?= $pr['id'] ?>"
-                            <?= (string) old('property_id', $visit['property_id'] ?? '') === (string) $pr['id'] ? 'selected' : '' ?>>
-                            <?= esc($pr['reference'] ? '[' . $pr['reference'] . '] ' : '') ?><?= esc($pr['title']) ?><?= $pr['city'] ? ' — ' . esc($pr['city']) : '' ?>
-                        </option>
-                        <?php endforeach; ?>
-                    </select>
+                    <label class="form-label fw-semibold">Bien immobilier <span class="text-danger">*</span></label>
+                    <div class="ss-wrap" id="ss-property">
+                        <input type="text" class="form-control ss-input" id="ss-input-property"
+                               autocomplete="off" placeholder="Rechercher par titre, référence ou ville…">
+                        <div class="ss-list" id="ss-list-property"></div>
+                        <select name="property_id" id="property_id" class="d-none">
+                            <option value="">—</option>
+                            <?php foreach ($properties as $pr): ?>
+                            <?php $prText = ($pr['reference'] ? '[' . $pr['reference'] . '] ' : '') . $pr['title'] . ($pr['city'] ? ' — ' . $pr['city'] : ''); ?>
+                            <option value="<?= $pr['id'] ?>"
+                                data-text="<?= esc($prText) ?>"
+                                <?= (string) old('property_id', $visit['property_id'] ?? '') === (string) $pr['id'] ? 'selected' : '' ?>>
+                                <?= esc($prText) ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Agent -->
@@ -149,6 +181,19 @@ $errors  = session()->getFlashdata('errors') ?? [];
                 <!-- Résultat de la vérification de disponibilité -->
                 <div id="availabilityStatus" class="mt-2 small"></div>
 
+            </div>
+        </div>
+
+        <!-- Section 3b : Planning de l'agent -->
+        <div class="card shadow-sm mb-4" id="agentScheduleCard" style="display:none">
+            <div class="card-header bg-white fw-semibold d-flex align-items-center justify-content-between">
+                <span><i class="bi bi-calendar2-week me-1 text-primary"></i> Planning de l'agent</span>
+                <small id="agentScheduleLabel" class="text-muted"></small>
+            </div>
+            <div class="card-body" id="agentSchedule">
+                <div class="text-center text-muted py-2 small">
+                    <i class="bi bi-hourglass-split me-1"></i>Chargement…
+                </div>
             </div>
         </div>
 
@@ -261,23 +306,195 @@ $errors  = session()->getFlashdata('errors') ?? [];
     const BASE_URL  = '<?= base_url('/') ?>';
     const VISIT_ID  = '<?= $isEdit ? (int) $visit['id'] : '' ?>';
 
-    // ── Filtre select ────────────────────────────────────────────────
-    window.filterSelect = function (input, selectId) {
-        const filter = input.value.toLowerCase();
-        const select = document.getElementById(selectId);
-        Array.from(select.options).forEach(function (opt) {
-            if (opt.value === '') return;
-            opt.hidden = ! opt.text.toLowerCase().includes(filter);
+    // ── Searchable Select ────────────────────────────────────────────
+    function initSearchableSelect(wrapId, selectId, inputId, listId) {
+        var wrap  = document.getElementById(wrapId);
+        var sel   = document.getElementById(selectId);
+        var inp   = document.getElementById(inputId);
+        var list  = document.getElementById(listId);
+        if (!wrap || !sel || !inp || !list) return;
+
+        // Build options array from hidden select
+        function getOpts() {
+            return Array.from(sel.options).filter(function (o) { return o.value !== ''; });
+        }
+
+        // Render dropdown
+        function render(query) {
+            var q = (query || '').toLowerCase();
+            var opts = getOpts().filter(function (o) {
+                return o.text.toLowerCase().includes(q);
+            });
+            if (opts.length === 0) {
+                list.innerHTML = '<div class="ss-empty">Aucun résultat</div>';
+            } else {
+                list.innerHTML = opts.map(function (o) {
+                    var isSel = o.selected;
+                    return '<div class="ss-item' + (isSel ? ' selected' : '') + '" data-val="' + o.value + '">' + o.text + '</div>';
+                }).join('');
+            }
+        }
+
+        // Open / close
+        function open() {
+            render(inp.value);
+            list.classList.add('open');
+        }
+        function close() {
+            list.classList.remove('open');
+        }
+
+        // Restore initial value
+        var preSelected = Array.from(sel.options).find(function (o) { return o.selected && o.value !== ''; });
+        if (preSelected) {
+            inp.value = preSelected.getAttribute('data-text') || preSelected.text;
+        }
+
+        // Events
+        inp.addEventListener('focus', function () { open(); });
+        inp.addEventListener('input', function () {
+            sel.value = '';
+            render(inp.value);
+            list.classList.add('open');
         });
-    };
+        inp.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') close();
+        });
+
+        list.addEventListener('mousedown', function (e) {
+            var item = e.target.closest('.ss-item');
+            if (!item) return;
+            e.preventDefault();
+            sel.value = item.dataset.val;
+            inp.value = item.textContent;
+            close();
+            // trigger change for availability check
+            sel.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!wrap.contains(e.target)) close();
+        });
+    }
+
+    // Init searchable selects
+    initSearchableSelect('ss-client',   'client_id',   'ss-input-client',   'ss-list-client');
+    initSearchableSelect('ss-property', 'property_id', 'ss-input-property', 'ss-list-property');
+
+    // Make ss-inputs visually required (HTML required won't work on hidden selects)
+    document.querySelector('form').addEventListener('submit', function (e) {
+        var ok = true;
+        ['client_id', 'property_id', 'agent_id'].forEach(function (fid) {
+            var sel = document.getElementById(fid);
+            if (sel && !sel.value) {
+                var inp = document.getElementById('ss-input-' + fid.replace('_id', ''));
+                if (inp) { inp.classList.add('is-invalid'); inp.focus(); }
+                ok = false;
+            }
+        });
+        if (!ok) e.preventDefault();
+    });
 
     // ── Vérification disponibilité ───────────────────────────────────
     let availTimer = null;
+    let schedTimer = null;
 
     window.triggerAvailabilityCheck = function () {
         clearTimeout(availTimer);
+        clearTimeout(schedTimer);
         availTimer = setTimeout(checkAvailability, 600);
+        schedTimer = setTimeout(loadAgentSchedule, 800);
     };
+
+    // ── Planning agent ────────────────────────────────────────────────
+    function loadAgentSchedule() {
+        var agentId = document.getElementById('agent_id').value;
+        var date    = document.getElementById('visit_date').value;
+        var card    = document.getElementById('agentScheduleCard');
+        var body    = document.getElementById('agentSchedule');
+        var label   = document.getElementById('agentScheduleLabel');
+
+        if (!agentId || !date) {
+            card.style.display = 'none';
+            return;
+        }
+
+        // Compute week range (Mon→Sun)
+        var d   = new Date(date);
+        var dow = d.getDay(); // 0=Sun
+        var mon = new Date(d); mon.setDate(d.getDate() - ((dow + 6) % 7));
+        var sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+        function fmt(dt) {
+            return dt.getFullYear() + '-' +
+                   String(dt.getMonth()+1).padStart(2,'0') + '-' +
+                   String(dt.getDate()).padStart(2,'0');
+        }
+        var start = fmt(mon);
+        var end   = fmt(sun);
+
+        // Get agent name
+        var agentSel  = document.getElementById('agent_id');
+        var agentName = agentSel.options[agentSel.selectedIndex]?.text ?? '';
+        label.textContent = agentName + ' · semaine du ' + mon.toLocaleDateString('fr-FR', {day:'numeric',month:'short'});
+
+        card.style.display = 'block';
+        body.innerHTML = '<div class="text-center text-muted py-2 small"><i class="bi bi-hourglass-split me-1"></i>Chargement…</div>';
+
+        var url = BASE_URL + 'admin/visits/calendar-events'
+                + '?agent_id=' + encodeURIComponent(agentId)
+                + '&start='   + encodeURIComponent(start)
+                + '&end='     + encodeURIComponent(end);
+
+        fetch(url)
+            .then(function (r) { return r.json(); })
+            .then(function (events) {
+                if (!events.length) {
+                    body.innerHTML = '<p class="text-muted small mb-0 py-1"><i class="bi bi-check-circle me-1 text-success"></i>Aucune visite planifiée cette semaine.</p>';
+                    return;
+                }
+
+                // Group by day
+                var days = {};
+                events.forEach(function (ev) {
+                    var day = ev.start.substring(0, 10);
+                    if (!days[day]) days[day] = [];
+                    days[day].push(ev);
+                });
+
+                var html = '';
+                Object.keys(days).sort().forEach(function (day) {
+                    var dt  = new Date(day + 'T00:00:00');
+                    var lbl = dt.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'short'});
+                    // highlight selected day
+                    var isSelected = day === date;
+                    html += '<div class="mb-2">';
+                    html += '<div class="day-label' + (isSelected ? ' text-primary' : '') + '">' + lbl + (isSelected ? ' ← jour sélectionné' : '') + '</div>';
+                    days[day].forEach(function (ev) {
+                        var time  = ev.start.substring(11, 16);
+                        var title = ev.title;
+                        var durationMs  = new Date(ev.end) - new Date(ev.start);
+                        var durationMin = Math.round(durationMs / 60000);
+                        html += '<div class="sch-slot busy">';
+                        html += '<i class="bi bi-clock-fill text-warning"></i>';
+                        html += '<strong>' + time + '</strong>';
+                        html += '<span class="text-truncate flex-fill" style="max-width:280px">' + title + '</span>';
+                        html += '<small class="text-muted ms-auto">' + durationMin + ' min</small>';
+                        html += '</div>';
+                    });
+                    html += '</div>';
+                });
+
+                body.innerHTML = html;
+            })
+            .catch(function () {
+                body.innerHTML = '<p class="text-muted small">Impossible de charger le planning.</p>';
+            });
+    }
+
+    // Load schedule on agent change
+    document.getElementById('agent_id').addEventListener('change', function () {
+        triggerAvailabilityCheck();
+    });
 
     function checkAvailability() {
         const agentId  = document.getElementById('agent_id').value;

@@ -74,6 +74,9 @@ class UserModel extends Model
         if (! empty($filters['agency_id'])) {
             $builder->where('u.agency_id', $filters['agency_id']);
         }
+        if (! empty($filters['organization_id'])) {
+            $builder->where('u.organization_id', $filters['organization_id']);
+        }
         if (! empty($filters['search'])) {
             $builder->groupStart()
                 ->like('u.first_name', $filters['search'])

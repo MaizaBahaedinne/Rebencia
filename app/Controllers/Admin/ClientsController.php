@@ -33,10 +33,18 @@ class ClientsController extends BaseController
             'page'        => $this->request->getGet('page') ?? 1,
         ];
 
-        // Restriction agence : rôles sans permission agencies.create ne voient que leur agence
-        $agencyId = (int) session()->get('agency_id');
-        if ($agencyId && ! $this->auth->hasPermission('agencies.create')) {
-            $filters['agency_id'] = $agencyId;
+        // Scope hiérarchique
+        $scope = $this->getDataScope();
+        switch ($scope['type']) {
+            case 'organization':
+                $filters['organization_id'] = $scope['value'];
+                break;
+            case 'agency':
+                $filters['agency_id'] = $scope['value'];
+                break;
+            case 'own':
+                $filters['assigned_to'] = $scope['value'];
+                break;
         }
 
         return $this->render('admin/clients/index', [
@@ -44,7 +52,10 @@ class ClientsController extends BaseController
             'result'      => $this->model->getFiltered($filters),
             'filters'     => $filters,
             'agents'      => (new UserModel())->getWithRole(['status' => 'active']),
-            'typeCounts'  => $this->model->countByType($filters['agency_id'] ?? null),
+            'typeCounts'  => $this->model->countByType(
+                $filters['agency_id']      ?? null,
+                $filters['organization_id'] ?? null
+            ),
             'typeLabels'  => ClientModel::TYPE_LABELS,
             'statusLabels'=> ClientModel::STATUS_LABELS,
         ]);

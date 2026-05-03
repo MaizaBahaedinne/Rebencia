@@ -59,19 +59,43 @@ class AuthLibrary
     {
         $permissions = $this->userModel->getPermissions($user['id']);
 
-        // Résoudre agency_id et agency_name uniquement si la migration a été appliquée
-        $agencyId   = null;
-        $agencyName = null;
+        // Résoudre agency_id, organization_id et hierarchy_level (migrations optionnelles)
+        $agencyId       = null;
+        $agencyName     = null;
+        $organizationId = null;
+        $hierarchyLevel = 5; // Valeur par défaut la plus restrictive
+
         try {
             $db  = \Config\Database::connect();
-            $row = $db->query('SELECT agency_id FROM users WHERE id = ? LIMIT 1', [(int) $user['id']])->getRowArray();
-            if ($row && $row['agency_id']) {
-                $agencyId   = (int) $row['agency_id'];
-                $agRow      = $db->query('SELECT name FROM agencies WHERE id = ? LIMIT 1', [$agencyId])->getRowArray();
-                $agencyName = $agRow['name'] ?? null;
+
+            // Récupérer agency_id et organization_id de l'utilisateur
+            $row = $db->query(
+                'SELECT agency_id, organization_id FROM users WHERE id = ? LIMIT 1',
+                [(int) $user['id']]
+            )->getRowArray();
+
+            if ($row) {
+                if (! empty($row['agency_id'])) {
+                    $agencyId = (int) $row['agency_id'];
+                    $agRow    = $db->query('SELECT name FROM agencies WHERE id = ? LIMIT 1', [$agencyId])->getRowArray();
+                    $agencyName = $agRow['name'] ?? null;
+                }
+                if (! empty($row['organization_id'])) {
+                    $organizationId = (int) $row['organization_id'];
+                }
+            }
+
+            // Récupérer le hierarchy_level du rôle
+            $roleRow = $db->query(
+                'SELECT hierarchy_level FROM roles WHERE id = ? LIMIT 1',
+                [(int) $user['role_id']]
+            )->getRowArray();
+
+            if ($roleRow && isset($roleRow['hierarchy_level'])) {
+                $hierarchyLevel = (int) $roleRow['hierarchy_level'];
             }
         } catch (\Throwable $e) {
-            // Migration non encore appliquée — on ignore
+            // Migration non encore appliquée — on ignore, valeurs par défaut utilisées
         }
 
         session()->set([
@@ -87,6 +111,8 @@ class AuthLibrary
             'permissions'      => $permissions,
             'agency_id'        => $agencyId,
             'agency_name'      => $agencyName,
+            'organization_id'  => $organizationId,
+            'hierarchy_level'  => $hierarchyLevel,
         ]);
     }
 
@@ -120,6 +146,23 @@ class AuthLibrary
     public function hasRole(string $role): bool
     {
         return session()->get('user_role') === $role;
+    }
+
+    /**
+     * Retourne le niveau hiérarchique de l'utilisateur connecté.
+     * 1=SuperAdmin  2=Admin  3=PDG/DG  4=Dir.Agence/Coord  5=Expert/Collab
+     */
+    public function getHierarchyLevel(): int
+    {
+        return (int) (session()->get('hierarchy_level') ?? 5);
+    }
+
+    /**
+     * Retourne true si l'utilisateur est au niveau 1 ou 2 (vision globale).
+     */
+    public function isGlobalAdmin(): bool
+    {
+        return $this->getHierarchyLevel() <= 2;
     }
 
     /**

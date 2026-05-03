@@ -31,10 +31,18 @@ class UsersController extends BaseController
             'search'  => $this->request->getGet('search'),
         ];
 
-        // Restriction agence : un non-admin ne voit que les membres de son agence
-        $agencyId = (int) session()->get('agency_id');
-        if ($agencyId && ! $this->auth->hasPermission('agencies.create')) {
-            $filters['agency_id'] = $agencyId;
+        // Scope hiérarchique
+        $scope = $this->getDataScope();
+        switch ($scope['type']) {
+            case 'organization':
+                $filters['organization_id'] = $scope['value'];
+                break;
+            case 'agency':
+                $filters['agency_id'] = $scope['value'];
+                break;
+            case 'own':
+                $filters['agency_id'] = (int) session()->get('agency_id') ?: null;
+                break;
         }
 
         return $this->render('admin/users/index', [

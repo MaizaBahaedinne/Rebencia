@@ -37,15 +37,18 @@ class PropertiesController extends BaseController
             'page'     => $this->request->getGet('page') ?? 1,
         ];
 
-        // Expert : ne voit que ses biens
-        if ($this->auth->hasRole('expert')) {
-            $filters['agent_id'] = $this->auth->id();
-        }
-
-        // Restriction agence : tout rôle non super_admin/admin voit uniquement les biens de son agence
-        $agencyId = (int) session()->get('agency_id');
-        if ($agencyId && ! $this->auth->hasPermission('agencies.create')) {
-            $filters['agency_id'] = $agencyId;
+        // Scope hiérarchique
+        $scope = $this->getDataScope();
+        switch ($scope['type']) {
+            case 'organization':
+                $filters['organization_id'] = $scope['value'];
+                break;
+            case 'agency':
+                $filters['agency_id'] = $scope['value'];
+                break;
+            case 'own':
+                $filters['agent_id'] = $scope['value'];
+                break;
         }
 
         $result = $this->model->getFiltered($filters);

@@ -33,10 +33,18 @@ class VisitsController extends BaseController
             'page'      => $this->request->getGet('page') ?? 1,
         ];
 
-        // Restriction agence : rôles sans permission agencies.create ne voient que leur agence
-        $agencyId = (int) session()->get('agency_id');
-        if ($agencyId && ! $this->auth->hasPermission('agencies.create')) {
-            $filters['agency_id'] = $agencyId;
+        // Scope hiérarchique
+        $scope = $this->getDataScope();
+        switch ($scope['type']) {
+            case 'organization':
+                $filters['organization_id'] = $scope['value'];
+                break;
+            case 'agency':
+                $filters['agency_id'] = $scope['value'];
+                break;
+            case 'own':
+                $filters['agent_id'] = $scope['value'];
+                break;
         }
 
         return $this->render('admin/visits/index', [
@@ -44,7 +52,10 @@ class VisitsController extends BaseController
             'result'       => $this->model->getFiltered($filters),
             'filters'      => $filters,
             'agents'       => (new UserModel())->getWithRole(['status' => 'active']),
-            'statusCounts' => $this->model->countByStatus($filters['agency_id'] ?? null),
+            'statusCounts' => $this->model->countByStatus(
+                $filters['agency_id']      ?? null,
+                $filters['organization_id'] ?? null
+            ),
             'statusLabels' => VisitModel::STATUS_LABELS,
         ]);
     }
@@ -74,14 +85,16 @@ class VisitsController extends BaseController
         $end      = substr($this->request->getGet('end')   ?? date('Y-m-t'),  0, 10);
         $agentId  = (int) ($this->request->getGet('agent_id') ?? 0) ?: null;
 
-        // Filtre agence pour le calendrier
-        $agencyId = null;
-        $sessAgencyId = (int) session()->get('agency_id');
-        if ($sessAgencyId && ! $this->auth->hasPermission('agencies.create')) {
-            $agencyId = $sessAgencyId;
+        // Filtre hiérarchique pour le calendrier
+        $scope      = $this->getDataScope();
+        $agencyId   = $scope['type'] === 'agency'       ? $scope['value'] : null;
+        $orgId      = $scope['type'] === 'organization' ? $scope['value'] : null;
+        // scope 'own' sur le calendrier = forcer l'agent_id
+        if ($scope['type'] === 'own' && $agentId === null) {
+            $agentId = $scope['value'];
         }
 
-        $rows   = $this->model->getForCalendar($start, $end, $agentId, $agencyId);
+        $rows   = $this->model->getForCalendar($start, $end, $agentId, $agencyId, $orgId);
         $events = [];
 
         foreach ($rows as $v) {

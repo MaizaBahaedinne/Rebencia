@@ -78,6 +78,9 @@ class VisitModel extends Model
         if (! empty($filters['agency_id'])) {
             $builder->where('u.agency_id', (int) $filters['agency_id']);
         }
+        if (! empty($filters['organization_id'])) {
+            $builder->where('u.organization_id', (int) $filters['organization_id']);
+        }
         if (! empty($filters['date_from'])) {
             $builder->where('v.visit_date >=', $filters['date_from']);
         }
@@ -165,15 +168,20 @@ class VisitModel extends Model
     /**
      * Comptage par statut (pour les cards du tableau de bord).
      */
-    public function countByStatus(?int $agencyId = null): array
+    public function countByStatus(?int $agencyId = null, ?int $organizationId = null): array
     {
         $builder = $this->db->table('visits v')
             ->select('v.status, COUNT(*) AS cnt')
             ->where('v.deleted_at IS NULL');
 
-        if ($agencyId) {
-            $builder->join('users u', 'u.id = v.agent_id', 'left')
-                    ->where('u.agency_id', $agencyId);
+        if ($agencyId || $organizationId) {
+            $builder->join('users u', 'u.id = v.agent_id', 'left');
+            if ($agencyId) {
+                $builder->where('u.agency_id', $agencyId);
+            }
+            if ($organizationId) {
+                $builder->where('u.organization_id', $organizationId);
+            }
         }
 
         $rows = $builder->groupBy('v.status')->get()->getResultArray();
@@ -190,7 +198,7 @@ class VisitModel extends Model
     /**
      * Retourne les visites pour FullCalendar (format JSON API).
      */
-    public function getForCalendar(string $start, string $end, ?int $agentId = null, ?int $agencyId = null): array
+    public function getForCalendar(string $start, string $end, ?int $agentId = null, ?int $agencyId = null, ?int $organizationId = null): array
     {
         $builder = $this->db->table('visits v')
             ->select('v.id, v.visit_date, v.visit_time, v.duration, v.status,
@@ -209,6 +217,9 @@ class VisitModel extends Model
         }
         if ($agencyId !== null) {
             $builder->where('u.agency_id', $agencyId);
+        }
+        if ($organizationId !== null) {
+            $builder->where('u.organization_id', $organizationId);
         }
 
         return $builder

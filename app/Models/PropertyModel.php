@@ -45,6 +45,9 @@ class PropertyModel extends Model
         if (! empty($filters['agency_id'])) {
             $builder->where('p.agency_id', $filters['agency_id']);
         }
+        if (! empty($filters['organization_id'])) {
+            $builder->where("p.agency_id IN (SELECT id FROM agencies WHERE organization_id = " . (int) $filters['organization_id'] . ")");
+        }
         if (! empty($filters['city'])) {
             $builder->like('p.city', $filters['city']);
         }

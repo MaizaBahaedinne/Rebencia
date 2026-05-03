@@ -32,15 +32,18 @@ class LeadsController extends BaseController
             'page'        => $this->request->getGet('page') ?? 1,
         ];
 
-        // Collaborateur : seulement ses leads
-        if ($this->auth->hasRole('collaborator')) {
-            $filters['assigned_to'] = $this->auth->id();
-        }
-
-        // Restriction agence : rôles sans permission agencies.create ne voient que leur agence
-        $agencyId = (int) session()->get('agency_id');
-        if ($agencyId && ! $this->auth->hasPermission('agencies.create')) {
-            $filters['agency_id'] = $agencyId;
+        // Scope hiérarchique
+        $scope = $this->getDataScope();
+        switch ($scope['type']) {
+            case 'organization':
+                $filters['organization_id'] = $scope['value'];
+                break;
+            case 'agency':
+                $filters['agency_id'] = $scope['value'];
+                break;
+            case 'own':
+                $filters['assigned_to'] = $scope['value'];
+                break;
         }
 
         $result = $this->model->getFiltered($filters);
@@ -55,8 +58,9 @@ class LeadsController extends BaseController
             'filters'    => $filters,
             'agents'     => (new UserModel())->getWithRole(['status' => 'active']),
             'pipeline'   => $this->model->getPipeline(
-                $this->auth->hasRole('collaborator') ? $this->auth->id() : null,
-                $filters['agency_id'] ?? null
+                $filters['assigned_to'] ?? null,
+                $filters['agency_id']      ?? null,
+                $filters['organization_id'] ?? null
             ),
         ]);
     }

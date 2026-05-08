@@ -35,18 +35,17 @@ try {
 
 echo "<pre>\n=== Backfill agency_id in properties ===\n\n";
 
-// Count properties without agency
-$stmt = $pdo->query("SELECT COUNT(*) AS cnt FROM properties WHERE agency_id IS NULL AND deleted_at IS NULL");
-$row = $stmt->fetch(PDO::FETCH_ASSOC);
-echo "Properties without agency: " . $row['cnt'] . "\n\n";
+// Step 1: assign all agents without agency to Agence Principale Tunis (id=1)
+$step1 = $pdo->exec("UPDATE users SET agency_id = 1 WHERE agency_id IS NULL AND deleted_at IS NULL AND role_id IS NOT NULL");
+echo "Step 1 — Agents without agency assigned to Agence Principale Tunis: $step1 users\n";
 
-// Backfill from agent's agency
+// Step 2: backfill ALL properties (including those already set, to stay in sync with agent)
 $sql = "UPDATE properties p
         JOIN users u ON u.id = p.agent_id
         SET p.agency_id = u.agency_id
-        WHERE p.agency_id IS NULL AND u.agency_id IS NOT NULL";
+        WHERE u.agency_id IS NOT NULL";
 $affected = $pdo->exec($sql);
-echo "Updated: $affected properties now have an agency.\n";
+echo "Step 2 — Properties updated with their agent's agency: $affected\n\n";
 
 // Show results
 $stmt = $pdo->query("

@@ -696,6 +696,19 @@
 
         <div class="d-flex align-items-center gap-2">
 
+            <!-- ── Bouton Deploy rapide (admins avec system.deploy) ── -->
+            <?php if (in_array('system.deploy', session()->get('permissions') ?? [])): ?>
+            <form method="post" action="<?= base_url('admin/system/deploy/pull') ?>" id="topbar-deploy-form">
+                <?= csrf_field() ?>
+                <button type="submit" class="btn-icon" title="Git Pull – Déployer la dernière version"
+                        style="border:none;cursor:pointer;color:var(--rb-text-muted);"
+                        onclick="this.innerHTML='<i class=\'bi bi-arrow-repeat spin\' style=\'animation:spin .8s linear infinite\'></i>';this.disabled=true;this.closest('form').submit();">
+                    <i class="bi bi-cloud-arrow-down"></i>
+                </button>
+            </form>
+            <style>#topbar-deploy-form .spin{display:inline-block;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}</style>
+            <?php endif; ?>
+
             <!-- ── Cloche de notifications ── -->
             <div class="dropdown" id="rb-notif-wrap">
                 <button class="btn-icon position-relative" id="rb-notif-btn"

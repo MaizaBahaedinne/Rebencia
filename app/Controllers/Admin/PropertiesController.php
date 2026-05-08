@@ -168,6 +168,7 @@ class PropertiesController extends BaseController
             'property'   => $property,
             'images'     => $property['images'] ?? [],
             'history'    => $history,
+            'canEdit'    => $this->canEditProperty($property),
         ]);
     }
 
@@ -176,6 +177,11 @@ class PropertiesController extends BaseController
     {
         $this->requirePermission('properties.edit');
         $property  = $this->findOrFail($id);
+
+        if (! $this->canEditProperty($property)) {
+            return redirect()->to('/admin/properties/' . $id)
+                ->with('error', 'Vous n\'êtes pas autorisé à modifier ce bien.');
+        }
         $zoneModel = new ZoneModel();
 
         // Tenter de retrouver la ville par son nom pour pré-sélectionner la cascade
@@ -203,6 +209,11 @@ class PropertiesController extends BaseController
     {
         $this->requirePermission('properties.edit');
         $property = $this->findOrFail($id);
+
+        if (! $this->canEditProperty($property)) {
+            return redirect()->to('/admin/properties/' . $id)
+                ->with('error', 'Vous n\'êtes pas autorisé à modifier ce bien.');
+        }
 
         $post   = $this->request->getPost();
 
@@ -257,6 +268,10 @@ class PropertiesController extends BaseController
             return $this->json(['error' => 'Introuvable'], 404);
         }
 
+        if (! $this->canEditProperty($property)) {
+            return $this->json(['error' => 'Non autorisé'], 403);
+        }
+
         $newState = $property['is_published'] ? 0 : 1;
         $this->model->update($id, [
             'is_published' => $newState,
@@ -274,6 +289,12 @@ class PropertiesController extends BaseController
     public function delete(int $id)
     {
         $this->requirePermission('properties.delete');
+        $property = $this->model->find($id);
+
+        if ($property && ! $this->canEditProperty($property)) {
+            return redirect()->to('/admin/properties/' . $id)
+                ->with('error', 'Vous n\'êtes pas autorisé à supprimer ce bien.');
+        }
 
         $this->model->delete($id);
         $this->log->activity('property.delete', 'properties', 'property', $id, 'Suppression bien');
@@ -285,6 +306,11 @@ class PropertiesController extends BaseController
     public function uploadImage(int $id)
     {
         $this->requirePermission('properties.edit');
+        $property = $this->model->find($id);
+
+        if ($property && ! $this->canEditProperty($property)) {
+            return $this->json(['error' => 'Non autorisé'], 403);
+        }
 
         $file = $this->request->getFile('image');
         if (! $file || ! $file->isValid()) {
@@ -324,6 +350,26 @@ class PropertiesController extends BaseController
             throw new \CodeIgniter\Exceptions\PageNotFoundException("Bien #{$id} introuvable");
         }
         return $p;
+    }
+
+    /**
+     * Un Collaborateur (niveau ≥ 5) ne peut modifier que ses propres biens (agent_id = lui).
+     * Les niveaux 1-4 (Admin, Directeur) peuvent tout modifier.
+     */
+    private function canEditProperty(array $property): bool
+    {
+        if (! $this->auth->hasPermission('properties.edit')) {
+            return false;
+        }
+
+        $level = $this->auth->getHierarchyLevel();
+
+        if ($level >= 1 && $level <= 4) {
+            return true;
+        }
+
+        // Niveau 5+ : uniquement si c'est son bien
+        return (int) ($property['agent_id'] ?? 0) === (int) $this->auth->id();
     }
 
     /**

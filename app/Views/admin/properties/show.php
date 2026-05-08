@@ -46,8 +46,9 @@ $hasCoords = !empty($property['latitude']) && !empty($property['longitude']);
             <?php endif; ?>
         </div>
     </div>
+<?php $canEdit = $canEdit ?? $auth->hasPermission('properties.edit'); ?>
     <div class="d-flex gap-2 flex-wrap">
-        <?php if ($auth->hasPermission('properties.edit')): ?>
+        <?php if ($canEdit): ?>
         <a href="<?= site_url('admin/properties/' . $property['id'] . '/edit') ?>" class="btn btn-warning">
             <i class="bi bi-pencil me-1"></i> Modifier
         </a>
@@ -116,7 +117,7 @@ $hasCoords = !empty($property['latitude']) && !empty($property['longitude']);
                     <i class="bi bi-images text-warning me-2"></i>Photos
                     <span class="badge bg-secondary ms-1"><?= count($images) ?></span>
                 </span>
-                <?php if ($auth->hasPermission('properties.edit')): ?>
+                <?php if ($canEdit): ?>
                 <label class="btn btn-sm btn-outline-primary mb-0" style="cursor:pointer">
                     <i class="bi bi-plus-lg me-1"></i>Ajouter
                     <input type="file" id="inp-add-photo" accept="image/jpeg,image/png,image/webp" multiple style="display:none">
@@ -161,7 +162,7 @@ $hasCoords = !empty($property['latitude']) && !empty($property['longitude']);
                         <?php if ($img['is_primary']): ?>
                         <span class="position-absolute top-0 start-0 badge bg-primary" style="font-size:.5rem">★</span>
                         <?php endif; ?>
-                        <?php if ($auth->hasPermission('properties.edit')): ?>
+                        <?php if ($canEdit): ?>
                         <button class="btn-delete-img position-absolute top-0 end-0 d-none
                                        bg-danger text-white border-0 rounded-circle d-flex align-items-center justify-content-center"
                                 data-img-id="<?= $img['id'] ?>"

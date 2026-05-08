@@ -44,7 +44,13 @@ class LeadsController extends BaseController
                 $filters['agency_id'] = $scope['value'];
                 break;
             case 'own':
-                $filters['assigned_to'] = $scope['value'];
+                // Collaborateur : voit tous les leads de son agence
+                $agencyId = (int) session()->get('agency_id');
+                if ($agencyId) {
+                    $filters['agency_id'] = $agencyId;
+                } else {
+                    $filters['assigned_to'] = $scope['value'];
+                }
                 break;
         }
 

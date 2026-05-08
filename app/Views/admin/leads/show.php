@@ -16,7 +16,7 @@ $statusKeys    = array_keys($pipelineSteps);
 $mainKeys      = array_keys($mainPipeline);
 $currentIdx    = array_search($currentStatus, $statusKeys);
 $isTerminal    = in_array($currentStatus, ['won', 'lost'], true);
-$canEdit       = in_array('leads.edit', session()->get('permissions') ?? []);
+$canEdit       = $canEdit ?? in_array('leads.edit', session()->get('permissions') ?? []);
 
 // ── Dates de passage par statut (depuis l'historique) ──────────────────────
 $stepDates = [];

@@ -139,6 +139,7 @@ class LeadsController extends BaseController
             'statusHistory'     => $lead['status_history'],
             'linkedProperty'    => $linkedProperty,
             'similarProperties' => $similarProperties,
+            'canEdit'           => $this->canEditLead($lead),
         ]);
     }
 
@@ -147,6 +148,11 @@ class LeadsController extends BaseController
     {
         $this->requirePermission('leads.edit');
         $lead = $this->findOrFail($id);
+
+        if (! $this->canEditLead($lead)) {
+            return redirect()->to('/admin/leads/' . $id)
+                ->with('error', 'Vous n\'êtes pas autorisé à modifier ce lead.');
+        }
 
         // Décoder les JSON pour la vue
         $lead['property_types_arr']  = json_decode($lead['property_types']   ?? '[]', true) ?: [];
@@ -165,7 +171,12 @@ class LeadsController extends BaseController
     public function update(int $id)
     {
         $this->requirePermission('leads.edit');
-        $this->findOrFail($id);
+        $lead = $this->findOrFail($id);
+
+        if (! $this->canEditLead($lead)) {
+            return redirect()->to('/admin/leads/' . $id)
+                ->with('error', 'Vous n\'êtes pas autorisé à modifier ce lead.');
+        }
 
         $post = $this->request->getPost();
         $this->model->update($id, $this->buildLeadData($post, false));
@@ -373,6 +384,28 @@ class LeadsController extends BaseController
             throw new \CodeIgniter\Exceptions\PageNotFoundException("Lead #{$id} introuvable");
         }
         return $lead;
+    }
+
+    /**
+     * Un utilisateur peut modifier un lead si :
+     *  - Il est admin/superadmin (niveau ≤ 2)
+     *  - Il a un scope 'organization' ou 'agency' (directeur)
+     *  - Il est lui-même l'agent assigné au lead (scope 'own')
+     */
+    private function canEditLead(array $lead): bool
+    {
+        if (! $this->auth->hasPermission('leads.edit')) {
+            return false;
+        }
+
+        $scope = $this->getDataScope();
+
+        if (in_array($scope['type'], ['all', 'organization', 'agency'], true)) {
+            return true;
+        }
+
+        // scope 'own' : uniquement si le lead lui est assigné
+        return (int) ($lead['assigned_to'] ?? 0) === (int) $scope['value'];
     }
 
     /**

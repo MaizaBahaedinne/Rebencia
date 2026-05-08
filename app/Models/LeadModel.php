@@ -80,6 +80,7 @@ class LeadModel extends Model
     {
         $lead = $this->db->table('leads l')
             ->select('l.*, CONCAT(u.first_name, " ", u.last_name) AS agent_name,
+                      u.first_name AS agent_first_name, u.last_name AS agent_last_name,
                       p.title AS property_title, p.reference AS property_ref')
             ->join('users u', 'u.id = l.assigned_to', 'left')
             ->join('properties p', 'p.id = l.property_id', 'left')

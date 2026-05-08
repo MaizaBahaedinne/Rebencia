@@ -47,7 +47,13 @@ class PropertiesController extends BaseController
                 $filters['agency_id'] = $scope['value'];
                 break;
             case 'own':
-                $filters['agent_id'] = $scope['value'];
+                // Un agent voit tous les biens de son agence (pas seulement les siens)
+                $agencyId = (int) session()->get('agency_id');
+                if ($agencyId) {
+                    $filters['agency_id'] = $agencyId;
+                } else {
+                    $filters['agent_id'] = $scope['value'];
+                }
                 break;
         }
 

@@ -195,6 +195,11 @@ class LeadsController extends BaseController
         $validStatuses = ['new', 'contacted', 'interested', 'visit_done', 'negotiating', 'won', 'lost'];
         $lead          = $this->findOrFail($id);
 
+        if (! $this->canEditLead($lead)) {
+            return redirect()->to('/admin/leads/' . $id)
+                ->with('error', 'Vous n\'êtes pas autorisé à modifier ce lead.');
+        }
+
         if (! in_array($newStatus, $validStatuses, true)) {
             return redirect()->back()->with('error', 'Statut invalide.');
         }
@@ -389,8 +394,9 @@ class LeadsController extends BaseController
     /**
      * Un utilisateur peut modifier un lead si :
      *  - Il est admin/superadmin (niveau ≤ 2)
-     *  - Il a un scope 'organization' ou 'agency' (directeur)
-     *  - Il est lui-même l'agent assigné au lead (scope 'own')
+     *  - Il est PDG/DG (niveau 3) — organisation complète
+     *  - Il est Directeur Agence (niveau 4) — son agence
+     *  - Il est lui-même l'agent assigné au lead (niveau ≥ 5)
      */
     private function canEditLead(array $lead): bool
     {
@@ -398,14 +404,15 @@ class LeadsController extends BaseController
             return false;
         }
 
-        $scope = $this->getDataScope();
+        $level = $this->auth->getHierarchyLevel();
 
-        if (in_array($scope['type'], ['all', 'organization', 'agency'], true)) {
+        // Niveaux 0-4 (admin, directeurs) → accès complet
+        if ($level <= 4) {
             return true;
         }
 
-        // scope 'own' : uniquement si le lead lui est assigné
-        return (int) ($lead['assigned_to'] ?? 0) === (int) $scope['value'];
+        // Niveau 5+ (collaborateur/expert) → uniquement ses propres leads
+        return (int) ($lead['assigned_to'] ?? 0) === (int) $this->auth->id();
     }
 
     /**

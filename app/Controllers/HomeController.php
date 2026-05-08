@@ -287,11 +287,27 @@ class HomeController extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        $name    = $this->request->getPost('name');
-        $email   = $this->request->getPost('email');
-        $phone   = $this->request->getPost('phone');
-        $message = $this->request->getPost('message');
-        $subject = $this->request->getPost('subject') ?? 'Demande de contact';
+        $name       = $this->request->getPost('name');
+        $email      = $this->request->getPost('email');
+        $phone      = $this->request->getPost('phone');
+        $message    = $this->request->getPost('message');
+        $subject    = $this->request->getPost('subject') ?? 'Demande de contact';
+        $propertyId = (int)($this->request->getPost('property_id') ?? 0) ?: null;
+
+        // Récupérer le bien et l'agent associé si property_id fourni
+        $assignedTo    = null;
+        $propertyTitle = null;
+        if ($propertyId) {
+            $prop = $this->db->table('properties')
+                ->select('id, title, agent_id')
+                ->where('id', $propertyId)
+                ->where('deleted_at IS NULL', null, false)
+                ->get()->getRowArray();
+            if ($prop) {
+                $assignedTo    = $prop['agent_id'] ?: null;
+                $propertyTitle = $prop['title'];
+            }
+        }
 
         // Enregistrer comme Lead
         $nameParts  = explode(' ', trim($name), 2);
@@ -307,6 +323,8 @@ class HomeController extends BaseController
             'notes'       => "[{$subject}]\n{$message}",
             'budget_min'  => 0,
             'budget_max'  => 0,
+            'property_id' => $propertyId,
+            'assigned_to' => $assignedTo,
         ]);
 
         return redirect()->to(base_url("{$lang}/contact"))

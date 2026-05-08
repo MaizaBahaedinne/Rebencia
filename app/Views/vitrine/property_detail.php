@@ -175,6 +175,7 @@
                     <h6 class="mb-3"><i class="bi bi-chat-dots me-1"></i><?= lang('Vitrine.detail_contact_form') ?></h6>
                     <form action="<?= base_url($currentLang . '/contact') ?>" method="post">
                         <?= csrf_field() ?>
+                        <input type="hidden" name="property_id" value="<?= (int)$property['id'] ?>">
                         <input type="hidden" name="subject"
                                value="Demande sur : <?= esc($property['title']) ?> (Réf. <?= esc($property['reference'] ?? $property['id']) ?>)">
                         <div class="mb-2">

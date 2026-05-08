@@ -406,8 +406,9 @@ class LeadsController extends BaseController
 
         $level = $this->auth->getHierarchyLevel();
 
-        // Niveaux 0-4 (admin, directeurs) → accès complet
-        if ($level <= 4) {
+        // Niveaux 1-4 (Admin, PDG, Directeur Agence) → accès complet
+        // Niveau 0 (session legacy) et 5+ (Collaborateur) → uniquement ses propres leads
+        if ($level >= 1 && $level <= 4) {
             return true;
         }
 

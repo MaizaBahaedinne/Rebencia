@@ -77,6 +77,7 @@
                         <th>Ville</th>
                         <th>Prix</th>
                         <th>Agent</th>
+                        <th>Agence</th>
                         <th>Statut</th>
                         <th>Publié</th>
                         <th class="text-end">Actions</th>
@@ -84,7 +85,7 @@
                 </thead>
                 <tbody>
                     <?php if (empty($result['data'])) : ?>
-                    <tr><td colspan="10" class="text-center text-muted py-4">Aucun bien trouvé.</td></tr>
+                    <tr><td colspan="11" class="text-center text-muted py-4">Aucun bien trouvé.</td></tr>
                     <?php else : ?>
                     <?php foreach ($result['data'] as $p) :
                         $sMap = ['available'=>'success','reserved'=>'warning','sold'=>'danger','rented'=>'info','inactive'=>'secondary'];
@@ -114,6 +115,7 @@
                         <td class="text-muted small"><?= esc($p['city']) ?></td>
                         <td class="fw-semibold small"><?= number_format($p['price'], 0, ',', ' ') ?> TND</td>
                         <td class="text-muted small"><?= esc($p['first_name'] . ' ' . $p['last_name']) ?></td>
+                        <td class="text-muted small"><?= esc($p['agency_name'] ?? '—') ?></td>
                         <td><span class="badge bg-<?= $sMap[$p['status']] ?? 'secondary' ?>"><?= $sLbl[$p['status']] ?? $p['status'] ?></span></td>
                         <td>
                             <?php if (in_array('properties.publish', session()->get('permissions') ?? [])) : ?>

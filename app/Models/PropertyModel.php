@@ -29,8 +29,10 @@ class PropertyModel extends Model
     {
         $builder = $this->db->table('properties p')
             ->select('p.*, u.first_name, u.last_name,
+                      a.name AS agency_name,
                       (SELECT path FROM property_images WHERE property_id = p.id AND is_primary = 1 LIMIT 1) AS primary_image')
             ->join('users u', 'u.id = p.agent_id')
+            ->join('agencies a', 'a.id = p.agency_id', 'left')
             ->where('p.deleted_at IS NULL');
 
         if (! empty($filters['status'])) {

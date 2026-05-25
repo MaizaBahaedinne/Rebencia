@@ -65,6 +65,8 @@ class PropertiesController extends BaseController
             'filters'       => $filters,
             'agents'        => (new UserModel())->getWithRole(['status' => 'active']),
             'propertyTypes' => (new PropertyTypeModel())->getActive(),
+            'extra_css'     => '<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">',
+            'extra_js'      => '<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>',
         ]);
     }
 

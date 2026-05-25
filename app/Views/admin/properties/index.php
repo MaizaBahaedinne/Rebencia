@@ -224,11 +224,7 @@ foreach ($result['data'] as $p) {
 }
 ?>
 
-<!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WPvE=" crossorigin=""></script>
-
+<!-- Leaflet CSS/JS chargés statiquement via extra_css/extra_js -->
 <script>
 // Données biens
 const propertiesData = <?= json_encode($mapData) ?>;
@@ -250,14 +246,34 @@ let map = null;
 let markers = [];
 let currentView = localStorage.getItem('propView') || 'list';
 
+function loadLeaflet(callback) {
+    if (typeof L !== 'undefined') {
+        callback();
+        return;
+    }
+    // Fallback si le script statique n'a pas pu charger (CDN lent/bloqué)
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+    script.onload = callback;
+    if (!document.querySelector('link[href*="leaflet"]')) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+        document.head.appendChild(link);
+    }
+    document.head.appendChild(script);
+}
+
 function initMap() {
     if (map) return;
-    map = L.map('properties-map').setView([36.8, 10.18], 7);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap',
-        maxZoom: 18
-    }).addTo(map);
-    loadMarkers();
+    loadLeaflet(() => {
+        map = L.map('properties-map').setView([36.8, 10.18], 7);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap',
+            maxZoom: 18
+        }).addTo(map);
+        loadMarkers();
+    });
 }
 
 function makeIcon(status) {
@@ -370,15 +386,21 @@ function setView(mode) {
         panelList.style.width   = '';
         container.style.flexWrap = 'nowrap';
         btnSplit.classList.add('active');
-        initMap();
-        setTimeout(() => map && map.invalidateSize(), 300);
+        loadLeaflet(() => {
+            initMap();
+            setTimeout(() => map && map.invalidateSize(), 300);
+            setTimeout(() => map && map.invalidateSize(), 800);
+        });
     } else if (mode === 'map') {
         panelList.style.display = 'none';
         panelMap.style.display  = '';
         panelMap.style.width    = '100%';
         btnMap.classList.add('active');
-        initMap();
-        setTimeout(() => map && map.invalidateSize(), 300);
+        loadLeaflet(() => {
+            initMap();
+            setTimeout(() => map && map.invalidateSize(), 300);
+            setTimeout(() => map && map.invalidateSize(), 800);
+        });
     }
 }
 
